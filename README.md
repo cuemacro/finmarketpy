@@ -50,7 +50,7 @@ mathematics, physics and computer science, not necessarily in that order. We run
 Budapest, Prague and Frankfurt (join our Meetup.com group at http://events.thalesians.com). We also publish research
 on systematic trading and also consult in the area. One of our clients is RavenPack, a major news analytics vendor.
 
-# Supporting PyThalesians
+# Supporting PyThalesians project
 
 If you find PyThalesians useful (and in particular if you are commercial company) please consider supporting the project
 through sponsorship or by using our consultancy/research services in systematic trading.

@@ -5,7 +5,7 @@ the project will remain proprietary (such as our proprietary trading algorithms)
 more generic elements to the community, many of whom have encouraged me to publish my code.
 
 At present the open source version (0.1a) of PyThalesians offers:
-* Seamless historic data from Bloomberg (requires licence), Yahoo, Quandl and other market data sources
+* Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl and other market data sources
 * Produces beautiful line plots with PyThalesians wrapper (via Matplotlib) and a simple wrapper for Bokeh
 * Helper functions built on top of Pandas
 * Automatic tweeting of charts

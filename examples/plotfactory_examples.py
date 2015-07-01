@@ -122,5 +122,5 @@ if True:
         gp.scale_factor = 2
         gp.html_file_output = 'demo_bokeh.htm'
         pf.plot_line_graph(daily_vals, adapter = 'bokeh', gp = gp)
-
+        pass
 

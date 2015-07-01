@@ -33,8 +33,9 @@ Bloomberg Server API (but I have not explicitly tested this).
 Major requirements
 * Python 3.4+
 * pandas, matplotlib etc.
-* Recommended: Bloomberg Python Open API (use Python 3 version from https://github.com/filmackay/blpapi-py/) 
-* Alternatively to access Bloomberg, the software also supports the old COM API
+* Recommended: Bloomberg Python Open API (use Python 3 version from https://github.com/filmackay/blpapi-py/) or 
+alternatively to access Bloomberg, the software also supports the old COM API
+* To use Bloomberg you will need to have a installed licence
 
 # Installation
 
@@ -77,5 +78,5 @@ More generally, we want to:
 # Release Notes
 
 * 0.1a (highly experimental alpha version)
-** Basic implementation for plotting
+** Basic implementation of plotting for line charts
 ** Basic downloading of market data like Bloomberg/Yahoo etc. via generic wrapper

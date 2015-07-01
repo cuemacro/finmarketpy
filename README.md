@@ -80,3 +80,5 @@ More generally, we want to:
 * 0.1a (highly experimental alpha version)
 ** Basic implementation of plotting for line charts
 ** Basic downloading of market data like Bloomberg/Yahoo etc. via generic wrapper
+
+End of note

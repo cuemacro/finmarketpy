@@ -25,6 +25,18 @@ The proprietary version of PyThalesians also has:
 * Elegant caching framework for historical market data
 * Proprietary trading algorithms used in my own personal trading
 
+# Gallery
+
+Below we give some examples of analysis which we've done using the full code of PyThalesians.
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/examples/usdjpy-nfp-delta.png" width="543"/>
+
+*Using PyThalesians to plot & calculate USD/JPY intraday moves around non-farm payrolls over past 10 years*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/examples/fx-intraday-vol.png" width="543"/>
+
+*Using PyThalesians to calculate intraday vol in major FX crosses by time of day*
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 running Bloomberg terminal software. Potentially, it could also work on the 

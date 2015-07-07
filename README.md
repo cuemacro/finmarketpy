@@ -55,11 +55,11 @@ alternatively to access Bloomberg, the software also supports the old COM API
 
 # Installation
 
-After installing manually, please make sure you edit pythalesians.util.constants for the following variables:
+At present you need to install manually by unzipping (at present setup.py is incomplete). Once unzipped, please make sure you edit pythalesians.util.constants for the following variables:
 * Change the root path variable - this will ensure that the logging (and a number of other features works correctly). 
 Failure to do so will result in the project not starting
-* Change the default Bloomberg settings (Which API to use? What address to use?
-* Planning to have installation via pip
+* Change the default Bloomberg settings (Which API to use? What server address to use?)
+* Planning to have installation via pip and fix setup.py
 
 # About the Thalesians
 

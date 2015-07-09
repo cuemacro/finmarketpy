@@ -27,7 +27,7 @@ The proprietary version of PyThalesians also has:
 
 # Gallery
 
-Below we give some examples of analysis which we've done using the full code of PyThalesians.
+Below we give some examples of analysis which we've done using the full code of PyThalesians (which currently includes more features than the open source version).
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/examples/usdjpy-nfp-delta.png" width="543"/>
 
@@ -36,6 +36,10 @@ Below we give some examples of analysis which we've done using the full code of 
 <img src="https://raw.github.com/thalesians/pythalesians/master/examples/fx-intraday-vol.png" width="543"/>
 
 *Using PyThalesians to calculate intraday vol in major FX crosses by time of day*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/examples/replicating-cta.png" width="543"/>
+
+*Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark*
 
 # Requirements
 
@@ -51,10 +55,11 @@ alternatively to access Bloomberg, the software also supports the old COM API
 
 # Installation
 
-After installing, please make sure you edit pythalesians.util.constants for the following variables:
+At present you need to install manually by unzipping (at present setup.py is incomplete). Once unzipped, please make sure you edit pythalesians.util.constants for the following variables:
 * Change the root path variable - this will ensure that the logging (and a number of other features works correctly). 
 Failure to do so will result in the project not starting
-* Change the default Bloomberg settings (Which API to use? What address to use?
+* Change the default Bloomberg settings (Which API to use? What server address to use?)
+* Planning to have installation via pip and fix setup.py
 
 # About the Thalesians
 
@@ -72,15 +77,17 @@ For the UK election Plot.ly code - please visit https://github.com/plotly/IPytho
 
 Saeed Amen (managing director & co-founder of the Thalesians)
 
-# Future Plans
+# Future Plans for PyThalesians
 
 We plan to add the following features:
-* Add Plotly wrapper for plotting
+* Have a proper setup mechanism (eg. via pip), at present needs manual deployment
+* Add Plotly & Seaborn wrappers for plotting
+* Improve support for Bokeh plotting
+* Add more plots from Matlibplot
 * Add Reuters as a historic data source
 * Add ability to stream data from Bloomberg and Reuters
 * Use event driven code to generate trading signals (to be used live and historically)
 * Integrate support for zipline as an alternative trading system
-* Improve installation
 * Support Python 2.7+
 
 More generally, we want to:

@@ -100,4 +100,8 @@ More generally, we want to:
 * Basic implementation of plotting for line charts
 * Basic downloading of market data like Bloomberg/Yahoo etc. via generic wrapper
 
+# Coding log
+
+* 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use - check Dukascopy terms & conditions). Note that past month of data is generally not made available by Dukascopy
+
 End of note

@@ -103,7 +103,7 @@ More generally, we want to:
 
 # Release Notes
 
-* 0.1a (highly experimental alpha version)
+* 0.1a (highly experimental alpha version) - 01 Jul 2015
 * Basic implementation of plotting for line charts
 * Basic downloading of market data like Bloomberg/Yahoo etc. via generic wrapper
 

@@ -61,6 +61,13 @@ Failure to do so will result in the project not starting
 * Change the default Bloomberg settings (Which API to use? What server address to use?)
 * Planning to have installation via pip and fix setup.py
 
+# Examples for PyThalesians
+
+After installation, the easiest way to get started is by looking at the example scripts. I am hoping to add some Jupyter notebooks, illustrating how to use the library too. The example scripts show how to:
+
+* Download market data from many different sources, Bloomberg, Yahoo, Quandl, Dukascopy etc
+* Plot line charts, with different styles
+
 # About the Thalesians
 
 The Thalesians are a think tank of dedicated professionals with an interest in quantitative finance, economics, 

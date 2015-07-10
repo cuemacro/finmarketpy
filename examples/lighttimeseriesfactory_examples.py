@@ -40,7 +40,7 @@ if True:
     import datetime
 
     ###### download daily data from Bloomberg for EUR/USD and GBP/USD spot and then plot
-    if True:
+    if False:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2014",                     # start date
@@ -64,7 +64,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     ###### download event dates for non farm payrolls and then print
-    if True:
+    if False:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2014",                     # start date
@@ -86,7 +86,7 @@ if True:
         print(df)
 
     ###### download daily data from Bloomberg for 30Y DE bonds and then plot
-    if True:
+    if False:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1990",                     # start date
@@ -108,7 +108,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     # download intraday data from Bloomberg for EUR/USD and GBP/USD spot and then plot
-    if True:
+    if False:
         from datetime import timedelta
         start_date = datetime.datetime.utcnow() - timedelta(days=1)
 
@@ -144,7 +144,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians', gp = gp)
 
     ###### download daily data from Quandl (via FRED) for EUR/USD and GBP/USD spot and then plot
-    if True:
+    if False:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1970",                     # start date
@@ -166,7 +166,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     ###### download daily data from Yahoo for Apple and Citigroup stock and then plot
-    if True:
+    if False:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1970",                     # start date
@@ -178,6 +178,27 @@ if True:
                 vendor_tickers = ['aapl', 'c'],                     # ticker (Yahoo)
                 vendor_fields = ['Close'],                          # which Bloomberg fields to download
                 cache_algo = 'internet_load_return')                # how to return data
+
+        ltsf = LightTimeSeriesFactory()
+
+        df = ltsf.harvest_time_series(time_series_request)
+
+        pf = PlotFactory()
+        pf.plot_line_graph(df, adapter = 'pythalesians')
+
+    # downloading historical tick data from Dukascopy broker for EUR/USD
+    # (past month of data cannot be downloaded, hence cannot be used for live trading)
+    if True:
+        time_series_request = TimeSeriesRequest(
+                start_date = "01 Jun 2015",                     # start date
+                finish_date = "02 Jun 2015",                    # finish date
+                freq = 'tick',                                  # tick data
+                data_source = 'dukascopy',                      # use dukascopy as data source
+                tickers = ['EURUSD', 'GBPUSD'],                 # ticker (Thalesians)
+                fields = ['bid', 'ask'],                        # which fields to download
+                vendor_tickers = ['EURUSD', 'GBPUSD'],          # ticker (Dukascopy)
+                vendor_fields = ['bid', 'ask'],                 # which Dukascopy fields to download
+                cache_algo = 'internet_load_return')            # how to return data
 
         ltsf = LightTimeSeriesFactory()
 

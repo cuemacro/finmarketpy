@@ -27,21 +27,22 @@ class Constants:
 
         ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER
         self.root_pythalesians_folder = "D:/Remote/pythalesians/"
+        self.temp_pythalesians_folder = self.root_pythalesians_folder + "temp"
 
         ###### FOR FUTURE VERSIONS (which include caching)
         # folders for holding market data
-        self.folder_historic_CSV = "D:/tickdata/historicCSV"
-        self.folder_time_series_data = self.root_pythalesians_folder + "timeseriesdata"
-
-        # config file for time series categories
-        self.time_series_categories_fields = \
-            self.root_pythalesians_folder + "conf/time_series_categories_fields.csv"
-
-        # we can have multiple tickers files (separated by ";")
-        self.time_series_tickers_list = self.root_pythalesians_folder + "conf/time_series_tickers_list.csv;" + \
-                                        self.root_pythalesians_folder + "conf/g10_vol_tickers.csv"
-
-        self.time_series_fields_list = self.root_pythalesians_folder + "conf/time_series_fields_list.csv"
+        # self.folder_historic_CSV = "D:/tickdata/historicCSV"
+        # self.folder_time_series_data = self.root_pythalesians_folder + "timeseriesdata"
+        #
+        # # config file for time series categories
+        # self.time_series_categories_fields = \
+        #     self.root_pythalesians_folder + "conf/time_series_categories_fields.csv"
+        #
+        # # we can have multiple tickers files (separated by ";")
+        # self.time_series_tickers_list = self.root_pythalesians_folder + "conf/time_series_tickers_list.csv;" + \
+        #                                 self.root_pythalesians_folder + "conf/g10_vol_tickers.csv"
+        #
+        # self.time_series_fields_list = self.root_pythalesians_folder + "conf/time_series_fields_list.csv"
 
         # for events filtering
         self.events_category = 'events'
@@ -61,6 +62,10 @@ class Constants:
         self.bbg_default_api = 'open-api'   # allowed values 'open-api' (newer & recommended) and 'com-api' (older style API)
         self.bbg_server = "localhost"       # needs changing if you use Bloomberg Server API
         self.bbg_server_port = 8194
+
+        # Dukascopy settings
+        self.dukascopy_base_url = "http://www.dukascopy.com/datafeed/"
+        self.dukascopy_write_temp_tick_disk = False
 
         # for plots
         self.plotfactory_default_adapter = "pythalesians"

@@ -4,8 +4,8 @@ PyThalesians is a Python financial library developed by the Thalesians (http://w
 the project will remain proprietary (such as our proprietary trading algorithms), we are keen to publish many of the 
 more generic elements to the community, many of whom have encouraged me to publish my code.
 
-At present the open source version (0.1a) of PyThalesians offers:
-* Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl and other market data sources
+At present the latest open source version of PyThalesians offers:
+* Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
 * Produces beautiful line plots with PyThalesians wrapper (via Matplotlib) and a simple wrapper for Bokeh
 * Helper functions built on top of Pandas
 * Automatic tweeting of charts

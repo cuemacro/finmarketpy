@@ -55,11 +55,11 @@ alternatively to access Bloomberg, the software also supports the old COM API
 
 # Installation
 
-At present you need to install manually by unzipping (at present setup.py is incomplete). Once unzipped, please make sure you edit pythalesians.util.constants for the following variables:
+Once installed please make sure you edit pythalesians.util.constants file for the following variables:
 * Change the root path variable - this will ensure that the logging (and a number of other features works correctly). 
 Failure to do so will result in the project not starting
 * Change the default Bloomberg settings (Which API to use? What server address to use?)
-* Planning to have installation via pip and fix setup.py
+* Latest version can be installed using setup.py
 
 # Examples for PyThalesians
 
@@ -101,6 +101,11 @@ More generally, we want to:
 * Make existing code more robust
 * Increase documentation and examples
 
+# Coding log
+
+* 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use 
+- check Dukascopy terms & conditions)
+
 # Release Notes
 
 * 0.1a (highly experimental alpha version) - 01 Jul 2015
@@ -109,6 +114,7 @@ More generally, we want to:
 
 # Coding log
 
+* 13 Jul 2015 - Changed location of conf, renamed examples folder to pythalesians-examples. Can now be installed using setup.py.
 * 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use - check Dukascopy terms & conditions). Note that past month of data is generally not made available by Dukascopy
 
 End of note

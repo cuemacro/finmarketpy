@@ -26,7 +26,7 @@ class Constants:
     def __init__(self):
 
         ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER
-        self.root_pythalesians_folder = "D:/Remote/pythalesians/"
+        self.root_pythalesians_folder = "D:/Remote/pythalesians/pythalesians/"
         self.temp_pythalesians_folder = self.root_pythalesians_folder + "temp"
 
         ###### FOR FUTURE VERSIONS (which include caching)

@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='pythalesians',
       version='0.1a',
@@ -8,6 +8,7 @@ setup(name='pythalesians',
       license='Apache 2.0',
       keywords = ['pandas', 'bloomberg', 'plot'],
       url = 'https://github.com/thalesians/pythalesians',
-      packages=['pythalesians'],
-      install_requires = ['pandas'],
+      packages = find_packages(),
+      include_package_data = True,
+      install_requires = ['pandas', 'matplotlib', 'twython'],
 	  zip_safe=False)

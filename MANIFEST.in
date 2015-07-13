@@ -1,0 +1,2 @@
+recursive-include pythalesians-examples *.*
+recursive-include pythalesians/conf/ *.*

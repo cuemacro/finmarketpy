@@ -101,11 +101,6 @@ More generally, we want to:
 * Make existing code more robust
 * Increase documentation and examples
 
-# Coding log
-
-* 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use 
-- check Dukascopy terms & conditions)
-
 # Release Notes
 
 * 0.1a (highly experimental alpha version) - 01 Jul 2015

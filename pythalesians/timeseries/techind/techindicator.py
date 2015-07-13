@@ -168,17 +168,29 @@ class TechIndicator:
 
 if __name__ == '__main__':
 
-    ###### Plot EUR/USD 20D SMA
+    ###### Plot EUR/USD and GBP/USD 20D SMA
 
     if True:
-        from pythalesians.market.loaders.assets.fxcrossfactory import FXCrossFactory
+        from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
+        from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 
-        fxcf = FXCrossFactory()
+        import datetime
 
-        start = '01 Jan 2007'
-        end = '20 Mar 2015'
-        cross = 'EURUSD'
-        daily_vals = fxcf.get_fx_cross(start, end, cross, cut = "BGN", source = "bloomberg", freq = "daily", cache_algo='cache_algo_return')
+        time_series_request = TimeSeriesRequest(
+                start_date = "01 Jan 1970",                     # start date
+                finish_date = datetime.date.today(),            # finish date
+                freq = 'daily',                                 # daily data
+                data_source = 'quandl',                         # use Quandl as data source
+                tickers = ['EURUSD',                            # ticker (Thalesians)
+                           'GBPUSD'],
+                fields = ['close'],                                 # which fields to download
+                vendor_tickers = ['FRED/DEXUSEU', 'FRED/DEXUSUK'],  # ticker (Quandl)
+                vendor_fields = ['close'],                          # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+        ltsf = LightTimeSeriesFactory()
+
+        daily_vals = ltsf.harvest_time_series(time_series_request)
 
         techind = TechIndicator()
 

@@ -109,6 +109,7 @@ More generally, we want to:
 
 # Coding log
 
+* 17 Jul 2015 - Created example to show how to use technical indicators.
 * 13 Jul 2015 - Changed location of conf, renamed examples folder to pythalesians-examples. Can now be installed using setup.py.
 * 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use - check Dukascopy terms & conditions). Note that past month of data is generally not made available by Dukascopy
 

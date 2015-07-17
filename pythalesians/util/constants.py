@@ -29,10 +29,11 @@ class Constants:
         self.root_pythalesians_folder = "D:/Remote/pythalesians/pythalesians/"
         self.temp_pythalesians_folder = self.root_pythalesians_folder + "temp"
 
+        self.folder_time_series_data = self.root_pythalesians_folder + "timeseriesdata"
+
         ###### FOR FUTURE VERSIONS (which include caching)
         # folders for holding market data
         # self.folder_historic_CSV = "D:/tickdata/historicCSV"
-        # self.folder_time_series_data = self.root_pythalesians_folder + "timeseriesdata"
         #
         # # config file for time series categories
         # self.time_series_categories_fields = \

@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator, HourLocator, MinuteLocator
 from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import Formatter
 
 # output matplotlib charts externally to D3 based libraries
 import mpld3
@@ -44,6 +45,7 @@ from pythalesians.util.constants import Constants
 class AdapterPyThalesians(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, type):
+
         matplotlib.rcdefaults()
 
         # set the matplotlib style sheet
@@ -76,13 +78,13 @@ class AdapterPyThalesians(AdapterTemplate):
         y_formatter = matplotlib.ticker.ScalarFormatter(useOffset = False)
         ax.yaxis.set_major_formatter(y_formatter)
 
-        # format X axis
-        self.format_x_axis(ax, data_frame, gp)
-
         y_axis_2_series = []
         ax2 = []
         color_2_series = []
         linewidth_2_series = []
+
+        if hasattr(gp, 'resample'):
+            data_frame = data_frame.asfreq(gp.resample)
 
         # create a second y axis if necessary
         if hasattr(gp, 'y_axis_2_series'):
@@ -176,8 +178,9 @@ class AdapterPyThalesians(AdapterTemplate):
 
                 if (type == 'line'):
                     linewidth = self.get_linewidth(label, linewidth_2, linewidth_2_series)
+
                     ax_temp.plot(xd, yd, label = label, color = color_spec,
-                                 linewidth = linewidth)
+                                     linewidth = linewidth)
                 elif(type == 'bar'):
                     ax_temp.bar(xd, yd, label = label, color = color_spec, bottom = yoff)
                     yoff = yoff + yd
@@ -190,6 +193,9 @@ class AdapterPyThalesians(AdapterTemplate):
                             self.trendline(ax_temp, xd.values, yd.values, order=1, color= color_spec, alpha=1,
                                            scale_factor = scale_factor)
         except: pass
+
+        # format X axis
+        self.format_x_axis(ax, data_frame, gp)
 
         try:
              fig.suptitle(gp.title, fontsize = 14 * scale_factor)
@@ -307,8 +313,25 @@ class AdapterPyThalesians(AdapterTemplate):
 
                 if hasattr(gp, 'date_formatter'):
                     ax.xaxis.set_major_formatter(md.DateFormatter(gp.date_formatter))
-                elif diff < timedelta(days = 2):
-                    xfmt = md.DateFormatter('%H:%M')
+                elif diff < timedelta(days = 4):
+
+                    # class MyFormatter(Formatter):
+                    #     def __init__(self, dates, fmt='%H:%M'):
+                    #         self.dates = dates
+                    #         self.fmt = fmt
+                    #
+                    #     def __call__(self, x, pos=0):
+                    #         'Return the label for time x at position pos'
+                    #         ind = int(round(x))
+                    #         if ind >= len(self.dates) or ind < 0: return ''
+                    #
+                    #         return self.dates[ind].strftime(self.fmt)
+                    #
+                    # formatter = MyFormatter(dates)
+                    # ax.xaxis.set_major_formatter(formatter)
+
+                    date_formatter = '%H:%M'
+                    xfmt = md.DateFormatter(date_formatter)
                     ax.xaxis.set_major_formatter(xfmt)
 
                     if diff < timedelta(minutes=20):
@@ -321,7 +344,7 @@ class AdapterPyThalesians(AdapterTemplate):
                         locator = HourLocator(interval=1)
                         ax.xaxis.set_major_locator(locator)
                         ax.xaxis.set_minor_locator(MinuteLocator(interval=30))
-                    elif diff < timedelta(days=2):
+                    elif diff < timedelta(days=4):
                         ax.xaxis.set_major_locator(HourLocator(interval=6))
                         ax.xaxis.set_minor_locator(HourLocator(interval=1))
 
@@ -353,6 +376,7 @@ class AdapterPyThalesians(AdapterTemplate):
                     locator = YearLocator()
                     ax.xaxis.set_major_locator(locator)
                     ax.xaxis.set_major_formatter(md.DateFormatter('%Y'))
+
             except:
                 try:
                     # otherwise we have integers, rather than dates

@@ -75,14 +75,16 @@ mathematics, physics and computer science, not necessarily in that order. We run
 Budapest, Prague and Frankfurt (join our Meetup.com group at http://events.thalesians.com). We also publish research
 on systematic trading and also consult in the area. One of our clients is RavenPack, a major news analytics vendor.
 
+# Major contributors to PyThalesians
+
+* Saeed Amen - Saeed is managing director and co-founder of the Thalesians. He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. He is also a co-founder of Argonautae.
+
 # Supporting PyThalesians project
 
 If you find PyThalesians useful (and in particular if you are commercial company) please consider supporting the project
 through sponsorship or by using our consultancy/research services in systematic trading.
 
 For the UK election Plot.ly code - please visit https://github.com/plotly/IPython-plotly/tree/master/notebooks/ukelectionbbg
-
-Saeed Amen (managing director & co-founder of the Thalesians)
 
 # Future Plans for PyThalesians
 

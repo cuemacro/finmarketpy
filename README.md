@@ -7,10 +7,12 @@ more generic elements to the community, many of whom have encouraged me to publi
 At present the latest open source version of PyThalesians offers:
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
 * Produces beautiful line plots with PyThalesians wrapper (via Matplotlib) and a simple wrapper for Bokeh
+* Basic seasonality analysis of markets
+* Calculates some technical indicators and gives trading signals based on these
 * Helper functions built on top of Pandas
 * Automatic tweeting of charts
 * And much more!
-* Please bear in mind at present PyThalesians currently a highly experimental alpha project and isn't yet fully 
+* Please bear in mind at present PyThalesians is currently a highly experimental alpha project and isn't yet fully 
 documented
 * Uses Apache 2.0 licence
 
@@ -19,11 +21,9 @@ The proprietary version of PyThalesians also has:
 * Backtesting systematic trading strategies for cash markets
 * Analysis of intraday price action around data events
 * Comprehensive number crunching of FX volatility market around data events
-* Seasonality analysis of markets
 * Backtesting systematic trading strategies in FX vanilla options
-* Implemented a trading signals based on a number of technical indicators
 * Elegant caching framework for historical market data
-* Proprietary trading algorithms used in my own personal trading
+* Proprietary trading algorithms used in my own personal trading - which will not be open sourced :-)
 
 # Gallery
 

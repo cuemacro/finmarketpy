@@ -98,6 +98,10 @@ class LightTimeSeriesFactory:
             from pythalesians.market.loaders.lowlevel.quandl.loaderquandl import LoaderQuandl
             loader = LoaderQuandl()
 
+        elif source == 'dukascopy':
+            from pythalesians.market.loaders.lowlevel.brokers.loaderdukascopy import LoaderDukasCopy
+            loader = LoaderDukasCopy()
+
         elif source in ['yahoo', 'google', 'fred']:
             from pythalesians.market.loaders.lowlevel.pandasweb.loaderpandasweb import LoaderPandasWeb
             loader = LoaderPandasWeb()
@@ -241,7 +245,7 @@ class LightTimeSeriesFactory:
             time_series_request_single.tickers = ticker
 
             if hasattr(time_series_request, 'vendor_tickers'):
-                time_series_request_single.vendor_tickers = time_series_request.vendor_tickers[ticker_cycle]
+                time_series_request_single.vendor_tickers = [time_series_request.vendor_tickers[ticker_cycle]]
                 ticker_cycle = ticker_cycle + 1
 
             # we downscale into float32, to avoid memory problems in Python (32 bit)

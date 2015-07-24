@@ -71,7 +71,10 @@ class TimeSeriesCalcs:
         first_ord_indices = list()
 
         for i in first_date_indices:
-            ind = df.index.searchsorted(i)
+            try:
+                ind = df.index.searchsorted(i)
+            except:
+                ind = 0
 
             if ind > 0: ind = ind - 1
 
@@ -324,8 +327,21 @@ class TimeSeriesCalcs:
     def remove_NaN_rows(self, data_frame):
         return data_frame.dropna()
 
+    def convert_month_day_to_date_time(self, df, year = 1970):
+        new_index = []
+
+        # TODO use map?
+        for i in range(0, len(df.index)):
+            x = df.index[i]
+            new_index.append(datetime.date(year, x[0], int(x[1])))
+
+        df.index = pandas.DatetimeIndex(new_index)
+
+        return df
+
 if __name__ == '__main__':
 
+    #
     tsc = TimeSeriesCalcs()
     tsf = TimeSeriesFilter()
 

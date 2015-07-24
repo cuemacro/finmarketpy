@@ -27,7 +27,7 @@ from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 
-# for plotting
+# for plotting graphs
 from pythalesians.graphics.graphs.plotfactory import PlotFactory
 from pythalesians.graphics.graphs.graphproperties import GraphProperties
 

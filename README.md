@@ -82,20 +82,21 @@ on systematic trading and also consult in the area. One of our clients is RavenP
 # Supporting PyThalesians project
 
 If you find PyThalesians useful (and in particular if you are commercial company) please consider supporting the project
-through sponsorship or by using our consultancy/research services in systematic trading.
+through sponsorship or by using our consultancy/research services in systematic trading. If you would like to contribute to the project, also let me know.
 
 For the UK election Plot.ly code - please visit https://github.com/plotly/IPython-plotly/tree/master/notebooks/ukelectionbbg
 
 # Future Plans for PyThalesians
 
 We plan to add the following features:
-* Have a proper setup mechanism (eg. via pip), at present needs manual deployment
+* Have a proper setup mechanism (eg. via pip), at present needs (partial) manual deployment
 * Add Plotly & Seaborn wrappers for plotting
 * Improve support for Bokeh plotting
 * Add more plots from Matlibplot
 * Add Reuters as a historic data source
 * Add ability to stream data from Bloomberg and Reuters
 * Use event driven code to generate trading signals (to be used live and historically)
+* Add support for live trading via Interactive Brokers
 * Integrate support for zipline as an alternative trading system
 * Support Python 2.7+
 

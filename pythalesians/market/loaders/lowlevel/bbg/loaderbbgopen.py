@@ -15,7 +15,7 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 """
 LoaderBBGOpen
 
-Calls the Bloomberg Open API to download market data: daily, intraday and reference data.
+Calls the Bloomberg Open API to download market data: daily, intraday and reference data (needs blpapi).
 
 """
 

@@ -5,6 +5,7 @@ the project will remain proprietary (such as our proprietary trading algorithms)
 more generic elements to the community, many of whom have encouraged me to publish my code.
 
 At present the latest open source version of PyThalesians offers:
+* Backtesting of systematic trading strategies for cash markets
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
 * Produces beautiful line plots with PyThalesians wrapper (via Matplotlib) and a simple wrapper for Bokeh
 * Basic seasonality analysis of markets
@@ -18,7 +19,7 @@ documented
 
 The proprietary version of PyThalesians also has:
 
-* Backtesting systematic trading strategies for cash markets
+* Comprehensive backtesting systematic trading strategies for cash markets
 * Analysis of intraday price action around data events
 * Comprehensive number crunching of FX volatility market around data events
 * Backtesting systematic trading strategies in FX vanilla options

@@ -33,7 +33,7 @@ class TimeSeriesFilter:
     _time_series_cache = {} # shared across all instances of object!
 
     def __init__(self):
-        self.config = ConfigManager()
+        # self.config = ConfigManager()
         self.logger = LoggerManager().getLogger(__name__)
         return
 

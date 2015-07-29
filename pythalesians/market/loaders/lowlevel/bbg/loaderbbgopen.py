@@ -110,15 +110,28 @@ class BBGLowLevelTemplate:
 
         try:
             # if can't open the session, kill existing one
-            # then try reopen
-            if not session.openService("//blp/refdata"):
-                self.logger.info("Try reopening Bloomberg session...")
-                self.kill_session() # need to forcibly kill_session since can't always reopen
-                session = self.start_bloomberg_session()
+            # then try reopen (up to 5 times...)
+            i = 0
 
-            # at second attempt give up!
+            while i < 5:
+                if session is not None:
+                    if not session.openService("//blp/refdata"):
+                        self.logger.info("Try reopening Bloomberg session... try " + str(i))
+                        self.kill_session() # need to forcibly kill_session since can't always reopen
+                        session = self.start_bloomberg_session()
+
+                        if session is not None:
+                            if session.openService("//blp/refdata"): i = 6
+                else:
+                    self.logger.info("Try opening Bloomberg session... try " + str(i))
+                    session = self.start_bloomberg_session()
+
+                i = i + 1
+
+            # give error if still doesn't work after several tries..
             if not session.openService("//blp/refdata"):
                 self.logger.error("Failed to open //blp/refdata")
+
                 return
 
             self.logger.info("Creating request...")
@@ -466,6 +479,7 @@ class BBGLowLevelIntraday(BBGLowLevelTemplate):
     # populate options for Bloomberg request for asset intraday request
     def fill_options(self, time_series_request):
         self._options = OptionsBBG()
+
         self._options.security = time_series_request.tickers[0]    # get 1st ticker only!
         self._options.event = "TRADE"
         self._options.barInterval = time_series_request.freq_mult

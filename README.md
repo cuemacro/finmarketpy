@@ -29,7 +29,7 @@ The proprietary version of PyThalesians also has:
 
 Below we give some examples of analysis which we've done using the full code of PyThalesians (which currently includes more features than the open source version).
 
-*Using PyThalesians to create a simple FX trend following strategy (included in open source version - you can run this 
+*Using PyThalesians to create a simple FX trend following strategy (in open source version - you can run this 
 backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/fx-trend-example.png" width="543"/>
@@ -42,7 +42,8 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/fx-intraday-vol.png" width="543"/>
 
-*Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark*
+*Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark 
+(in closed source version)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/replicating-cta.png" width="543"/>
 

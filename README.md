@@ -41,6 +41,10 @@ Below we give some examples of analysis which we've done using the full code of 
 
 *Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark*
 
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/fx-trend-example.png" width="543"/>
+
+*Using PyThalesians to create a simple FX trend following strategy (included in open source version)*
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 running Bloomberg terminal software. Potentially, it could also work on the 
@@ -59,7 +63,12 @@ Once installed please make sure you edit pythalesians.util.constants file for th
 * Change the root path variable - this will ensure that the logging (and a number of other features works correctly). 
 Failure to do so will result in the project not starting
 * Change the default Bloomberg settings (Which API to use? What server address to use?)
-* Latest version can be installed using setup.py
+* Write in API keys for Quandl, Twitter etc.
+* Latest version can be installed using setup.py or pip (see below)
+
+```
+pip install git+https://github.com/thalesians/pythalesians.git
+```
 
 # Examples for PyThalesians
 
@@ -112,6 +121,7 @@ More generally, we want to:
 
 # Coding log
 
+* 29 Jul 2015 - Added backtesting functions (including simple FX trend following strategy) and various bug fixes/comments.
 * 24 Jul 2015 - Added functions for doing simple seasonality studies and added examples.
 * 17 Jul 2015 - Created example to show how to use technical indicators.
 * 13 Jul 2015 - Changed location of conf, renamed examples folder to pythalesians-examples. Can now be installed using setup.py.

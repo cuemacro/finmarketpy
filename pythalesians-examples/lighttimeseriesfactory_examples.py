@@ -107,7 +107,7 @@ if True:
         pf = PlotFactory()
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
-    # download intraday data from Bloomberg for EUR/USD and GBP/USD spot and then plot
+    ###### download intraday data from Bloomberg for EUR/USD and GBP/USD spot and then plot
     if False:
         from datetime import timedelta
         start_date = datetime.datetime.utcnow() - timedelta(days=1)

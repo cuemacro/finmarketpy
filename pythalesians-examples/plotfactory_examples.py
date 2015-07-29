@@ -55,8 +55,8 @@ if True:
         gp = GraphProperties()
 
         gp.title = 'Spot values'
-        gp.file_output = 'demo.png'
-        gp.html_file_output = 'demo.htm'
+        gp.file_output = 'output_data/demo.png'
+        gp.html_file_output = 'output_data/demo.htm'
         gp.source = 'Thalesians/BBG'
 
         # plot using PyThalesians
@@ -93,7 +93,7 @@ if True:
         pf = PlotFactory()
 
         gp.title = 'Spot values'
-        gp.file_output = 'demo.png'
+        gp.file_output = 'output_data/demo.png'
         gp.scale_factor = 2
         gp.style_sheet = 'pythalesians'
 
@@ -115,12 +115,12 @@ if True:
         gp.display_source = False
         gp.style_sheet = 'ggplot-pythalesians'
         gp.display_mpld3 = True
-        gp.html_file_output = 'demo.htm'
+        gp.html_file_output = 'output_data/demo.htm'
         pf.plot_line_graph(daily_vals, adapter = 'pythalesians', gp = gp)
 
         # now use PyThalesians bokeh wrapper (still needs a lot of work!)
         gp.scale_factor = 2
-        gp.html_file_output = 'demo_bokeh.htm'
+        gp.html_file_output = 'output_data/demo_bokeh.htm'
         pf.plot_line_graph(daily_vals, adapter = 'bokeh', gp = gp)
 
 

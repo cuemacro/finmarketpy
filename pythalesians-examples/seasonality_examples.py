@@ -42,7 +42,7 @@ logger = LoggerManager().getLogger(__name__)
 
 pf = PlotFactory()
 
-###### calculate seasonal moves in EUR/USD and GBP/USD
+###### calculate seasonal moves in EUR/USD and GBP/USD (using Quandl data)
 if True:
     time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1970",                     # start date
@@ -68,5 +68,7 @@ if True:
     gp = GraphProperties()
     gp.date_formatter = '%b'
     gp.title = 'FX spot moves by time of year'
+    gp.scale_factor = 3
+    gp.file_output = "output_data/20150724 FX spot seas.png"
 
     pf.plot_line_graph(day_of_month_seasonality, adapter='pythalesians', gp = gp)

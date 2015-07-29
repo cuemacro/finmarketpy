@@ -27,12 +27,40 @@ import pandas
 
 class TimeSeriesDesc:
 
-    def calculate_ret_stats_from_prices(self, returns_df, ann_factor):
+    def calculate_ret_stats_from_prices(self, prices_df, ann_factor):
+        """
+        calculate_ret_stats_from_prices - Calculates return statistics for an asset's price
+
+        Parameters
+        ----------
+        prices_df : DataFrame
+            asset prices
+        ann_factor : int
+            annualisation factor to use on return statistics
+
+        Returns
+        -------
+        DataFrame
+        """
         tsc = TimeSeriesCalcs()
 
-        self.calculate_ret_stats(tsc.calculate_returns(returns_df), ann_factor)
+        self.calculate_ret_stats(tsc.calculate_returns(prices_df), ann_factor)
 
     def calculate_ret_stats(self, returns_df, ann_factor):
+        """
+        calculate_ret_stats - Calculates return statistics for an asset's returns including IR, vol, ret and drawdowns
+
+        Parameters
+        ----------
+        returns_df : DataFrame
+            asset returns
+        ann_factor : int
+            annualisation factor to use on return statistics
+
+        Returns
+        -------
+        DataFrame
+        """
         tsc = TimeSeriesCalcs()
 
         self._rets = returns_df.mean(axis=0) * ann_factor
@@ -46,18 +74,53 @@ class TimeSeriesDesc:
         self._dd = dd2here.min()
 
     def ann_returns(self):
+        """
+        ann_returns - Gets annualised returns
+
+        Returns
+        -------
+        float
+        """
         return self._rets
 
     def ann_vol(self):
+        """
+        ann_vol - Gets annualised volatility
+
+        Returns
+        -------
+        float
+        """
         return self._vol
 
     def inforatio(self):
+        """
+        inforatio - Gets information ratio
+
+        Returns
+        -------
+        float
+        """
         return self._inforatio
 
     def drawdowns(self):
+        """
+        drawdowns - Gets drawdowns for an asset or strategy
+
+        Returns
+        -------
+        float
+        """
         return self._dd
 
     def summary(self):
+        """
+        summary - Gets summary string contains various return statistics
+
+        Returns
+        -------
+        str
+        """
         stat_list = []
 
         for i in range(0, len(self._rets.index)):

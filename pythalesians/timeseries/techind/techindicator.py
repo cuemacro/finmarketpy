@@ -114,7 +114,7 @@ class TechIndicator:
             sells = (signal.shift(-1) < tech_params.rsi_lower) & (signal > tech_params.rsi_lower)
             buys = (signal.shift(-1) > tech_params.rsi_upper) & (signal < tech_params.rsi_upper)
 
-            print (buys[buys == True])
+            # print (buys[buys == True])
 
             # buys
             signal[buys] =  1
@@ -154,9 +154,24 @@ class TechIndicator:
             lower.columns = [x + " BB Lower" for x in data_frame.columns.values]
             upper.columns = [x + " BB Mid" for x in data_frame.columns.values]
             upper.columns = [x + " BB Lower" for x in data_frame.columns.values]
+
             self._techind = pandas.concat([lower, mid, upper], axis = 1)
+        elif name == "long-only":
+            ## have +1 signals only
+            self._techind = data_frame  # the technical indicator is just "prices"
+
+            narray = numpy.ones((len(data_frame.index), len(data_frame.columns)))
+
+            self._signal = pandas.DataFrame(index = data_frame.index, data = narray)
+            self._signal.columns = [x + " Long Only Signal" for x in data_frame.columns.values]
+
+            self._techind.columns = [x + " Long Only" for x in data_frame.columns.values]
 
         # TODO create other indicators
+
+        # apply signal multiplier (typically to flip signals)
+        if hasattr(tech_params, 'signal_mult'):
+            self._signal = self._signal * tech_params.signal_mult
 
         return self._techind
 

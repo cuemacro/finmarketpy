@@ -33,36 +33,193 @@ from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 class TimeSeriesCalcs:
 
     def calculate_signal_tc(self, signal_data_frame, tc, period_shift = 1):
+        """
+        calculate_signal_tc - Calculates the transaction costs for a particular signal
+
+        Parameters
+        ----------
+        signal_data_frame : DataFrame
+            contains trading signals
+        tc : float
+            transaction costs
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return (signal_data_frame.shift(period_shift) - signal_data_frame).abs().multiply(tc)
 
     def calculate_entry_tc(self, entry_data_frame, tc, period_shift = 1):
+        """
+        calculate_entry_tc - Calculates the transaction costs for defined trading points
+
+        Parameters
+        ----------
+        entry_data_frame : DataFrame
+            contains points where we enter/exit trades
+        tc : float
+            transaction costs
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return entry_data_frame.abs().multiply(tc)
 
     def calculate_signal_returns(self, signal_data_frame, returns_data_frame, period_shift = 1):
+        """
+        calculate_signal_returns - Calculates the trading startegy returns for given signal and asset
+
+        Parameters
+        ----------
+        signal_data_frame : DataFrame
+            trading signals
+        returns_data_frame: DataFrame
+            returns of asset to be traded
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return signal_data_frame.shift(period_shift) * returns_data_frame
 
     def calculate_signal_returns_matrix(self, signal_data_frame, returns_data_frame, period_shift = 1):
+        """
+        calculate_signal_returns_matrix - Calculates the trading strategy returns for given signal and asset
+        as a matrix multiplication
+
+        Parameters
+        ----------
+        signal_data_frame : DataFrame
+            trading signals
+        returns_data_frame: DataFrame
+            returns of asset to be traded
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return pandas.DataFrame(
             signal_data_frame.shift(period_shift).values * returns_data_frame.values, index = returns_data_frame.index)
 
     def calculate_signal_returns_with_tc(self, signal_data_frame, returns_data_frame, tc, period_shift = 1):
+        """
+        calculate_singal_returns_with_tc - Calculates the trading startegy returns for given signal and asset including
+        transaction costs
+
+        Parameters
+        ----------
+        signal_data_frame : DataFrame
+            trading signals
+        returns_data_frame: DataFrame
+            returns of asset to be traded
+        tc : float
+            transaction costs
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return signal_data_frame.shift(period_shift) * returns_data_frame - self.calculate_signal_tc(signal_data_frame, tc, period_shift)
 
     def calculate_signal_returns_with_tc_matrix(self, signal_data_frame, returns_data_frame, tc, period_shift = 1):
+        """
+        calculate_singal_returns_with_tc_matrix - Calculates the trading startegy returns for given signal and asset
+        with transaction costs with matrix multiplication
+
+        Parameters
+        ----------
+        signal_data_frame : DataFrame
+            trading signals
+        returns_data_frame: DataFrame
+            returns of asset to be traded
+        tc : float
+            transaction costs
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return pandas.DataFrame(
             signal_data_frame.shift(period_shift).values * returns_data_frame.values -
                 (numpy.abs(signal_data_frame.shift(period_shift).values - signal_data_frame.values) * tc), index = returns_data_frame.index)
 
     def calculate_returns(self, data_frame, period_shift = 1):
+        """
+        calculate_returns - Calculates the simple returns for an asset
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            asset price
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return data_frame / data_frame.shift(period_shift) - 1
 
     def calculate_diff_returns(self, data_frame, period_shift = 1):
+        """
+        calculate_diff_returns - Calculates the differences for an asset
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            asset price
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return data_frame - data_frame.shift(period_shift)
 
     def calculate_log_returns(self, data_frame, period_shift = 1):
+        """
+        calculate_log_returns - Calculates the log returns for an asset
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            asset price
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
         return math.log(data_frame / data_frame.shift(period_shift))
 
     def create_mult_index(self, df_rets):
+        """
+        calculate_mult_index - Calculates a multiplicative index for a time series of returns
+
+        Parameters
+        ----------
+        df_rets : DataFrame
+            asset price returns
+
+        Returns
+        -------
+        DataFrame
+        """
         df = 100.0 * (1.0 + df_rets).cumprod()
 
         # get the first non-nan values for rets and then start index
@@ -86,9 +243,35 @@ class TimeSeriesCalcs:
         return df
 
     def create_mult_index_from_prices(self, data_frame):
+        """
+        calculate_mult_index_from_prices - Calculates a multiplicative index for a time series of prices
+
+        Parameters
+        ----------
+        df_rets : DataFrame
+            asset price
+
+        Returns
+        -------
+        DataFrame
+        """
         return self.create_mult_index(self.calculate_returns(data_frame))
 
     def rolling_z_score(self, data_frame, periods):
+        """
+        rolling_z_score - Calculates the rolling z score for a time series
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            asset prices
+        periods : int
+            rolling window for z score computation
+
+        Returns
+        -------
+        DataFrame
+        """
         return (data_frame - pandas.rolling_mean(data_frame, periods)) / pandas.rolling_std(data_frame, periods)
 
     def rolling_volatility(self, data_frame, periods, obs_in_year = 252):
@@ -341,7 +524,7 @@ class TimeSeriesCalcs:
 
 if __name__ == '__main__':
 
-    #
+    # test functions
     tsc = TimeSeriesCalcs()
     tsf = TimeSeriesFilter()
 

@@ -19,6 +19,7 @@ Functions for filtering time series by dates and columns.
 
 """
 
+from pythalesians.util.configmanager import ConfigManager
 from pythalesians.util.loggermanager import LoggerManager
 
 from pandas.tseries.offsets import CustomBusinessDay
@@ -32,10 +33,25 @@ class TimeSeriesFilter:
     _time_series_cache = {} # shared across all instances of object!
 
     def __init__(self):
+        self.config = ConfigManager()
         self.logger = LoggerManager().getLogger(__name__)
         return
 
     def filter_time_series(self, time_series_request, data_frame):
+        """
+        filter_time_series - Filters a time series given a set of criteria (like start/finish date and tickers)
+
+        Parameters
+        ----------
+        time_series_request : TimeSeriesRequest
+            defining time series filtering
+        data_frame : DataFrame
+            time series to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
         start_date = time_series_request.start_date
         finish_date = time_series_request.finish_date
 
@@ -47,13 +63,45 @@ class TimeSeriesFilter:
 
         return data_frame
 
-    def create_calendar_bus_days(self, start, end, cal = 'FX'):
-        hols = self.get_holidays(start, end, cal)
-        index = pandas.bdate_range(start=start, end=end, freq='D')
+    def create_calendar_bus_days(self, start_date, end_date, cal = 'FX'):
+        """
+        create_calendar_bus_days - Creates a calendar of business days)
+
+        Parameters
+        ----------
+        start_date : DateTime
+            start date of calendar
+        end_date : DataFrame
+            finish date of calendar
+        cal : str
+            business calendar to use
+
+        Returns
+        -------
+        list
+        """
+        hols = self.get_holidays(start_date, end_date, cal)
+        index = pandas.bdate_range(start=start_date, end=end_date, freq='D')
 
         return [x for x in index if x not in hols]
 
-    def get_holidays(self, start, end, cal = 'FX'):
+    def get_holidays(self, start_date, end_date, cal = 'FX'):
+        """
+        get_holidays - Gets the holidays for a given calendar
+
+        Parameters
+        ----------
+        start_date : DateTime
+            start date of calendar
+        end_date : DataFrame
+            finish date of calendar
+        cal : str
+            business calendar to use
+
+        Returns
+        -------
+        list
+        """
         # TODO use Pandas CustomBusinessDays to get more calendars
         holidays_list = []
 
@@ -66,21 +114,35 @@ class TimeSeriesFilter:
         if cal == 'WEEKDAY':
             bday = CustomBusinessDay(weekmask='Sat Sun')
 
-            holidays_list = pandas.date_range(start, end, freq=bday)
+            holidays_list = pandas.date_range(start_date, end_date, freq=bday)
 
         holidays_list = pandas.to_datetime(holidays_list).order()
 
         # floor start date
-        start = np.datetime64(start) - np.timedelta64(1, 'D')
+        start = np.datetime64(start_date) - np.timedelta64(1, 'D')
 
         # ceiling end date
-        end = np.datetime64(end) + np.timedelta64(1, 'D')
+        end = np.datetime64(end_date) + np.timedelta64(1, 'D')
 
         holidays_list = [x for x in holidays_list if x >= start and x <= end]
 
         return pandas.to_datetime(holidays_list)
 
     def filter_time_series_by_holidays(self, data_frame, cal = 'FX'):
+        """
+        filter_time_series_by_holidays - Removes holidays from a given time series
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            data frame to be filtered
+        cal : str
+            business calendar to use
+
+        Returns
+        -------
+        DataFrame
+        """
 
         # optimal case for weekdays: remove Saturday and Sunday
         if (cal == 'WEEKDAY'):
@@ -133,11 +195,43 @@ class TimeSeriesFilter:
         return pandas.concat(data_frame_filtered)
 
     def filter_time_series_by_date(self, start_date, finish_date, data_frame):
+        """
+        filter_time_series_by_date - Filter time series by start/finish dates
+
+        Parameters
+        ----------
+        start_date : DateTime
+            start date of calendar
+        finish_date : DataTime
+            finish date of calendar
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
         offset = 0 # inclusive
 
         return self.filter_time_series_by_date_offset(start_date, finish_date, data_frame, offset)
 
     def filter_time_series_by_date_exc(self, start_date, finish_date, data_frame):
+        """
+        filter_time_series_by_date_exc - Filter time series by start/finish dates (exclude start & finish dates)
+
+        Parameters
+        ----------
+        start_date : DateTime
+            start date of calendar
+        finish_date : DataTime
+            finish date of calendar
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
         offset = 1 # exclusive of start finish date
 
         return self.filter_time_series_by_date_offset(start_date, finish_date, data_frame, offset)
@@ -162,6 +256,24 @@ class TimeSeriesFilter:
         # return data_frame
 
     def filter_time_series_by_date_offset(self, start_date, finish_date, data_frame, offset):
+        """
+        filter_time_series_by_date_offset - Filter time series by start/finish dates (and an offset)
+
+        Parameters
+        ----------
+        start_date : DateTime
+            start date of calendar
+        finish_date : DataTime
+            finish date of calendar
+        data_frame : DataFrame
+            data frame to be filtered
+        offset : int
+            offset to be applied
+
+        Returns
+        -------
+        DataFrame
+        """
         try:
             data_frame = self.filter_time_series_aux(start_date, finish_date, data_frame, offset)
         except:
@@ -193,6 +305,24 @@ class TimeSeriesFilter:
         return data_frame
 
     def filter_time_series_aux(self, start_date, finish_date, data_frame, offset):
+        """
+        filter_time_series_aux - Filter time series by start/finish dates (and an offset)
+
+        Parameters
+        ----------
+        start_date : DateTime
+            start date of calendar
+        finish_date : DataTime
+            finish date of calendar
+        data_frame : DataFrame
+            data frame to be filtered
+        offset : int
+            offset to be applied
+
+        Returns
+        -------
+        DataFrame
+        """
         start_index = 0
         finish_index = len(data_frame.index) - offset
 
@@ -216,6 +346,26 @@ class TimeSeriesFilter:
         return data_frame.ix[start_index:finish_index]
 
     def filter_time_series_by_time_of_day(self, hour, minute, data_frame, in_tz = None, out_tz = None):
+        """
+        filter_time_series_by_time_of_day - Filter time series by time of day
+
+        Parameters
+        ----------
+        hour : int
+            hour of day
+        minute : int
+            minute of day
+        data_frame : DataFrame
+            data frame to be filtered
+        in_tz : str (optional)
+            time zone of input data frame
+        out_tz : str (optional)
+            time zone of output data frame
+
+        Returns
+        -------
+        DataFrame
+        """
         if out_tz is not None:
             if in_tz is not None:
                 data_frame = data_frame.tz_localize(pytz.timezone(in_tz))
@@ -231,28 +381,113 @@ class TimeSeriesFilter:
         return data_frame
 
     def filter_time_series_between_hours(self, start_hour, finish_hour, data_frame):
+        """
+        filter_time_series_between_hours - Filter time series between hours of the day
+
+        Parameters
+        ----------
+        start_hour : int
+            start of hour filter
+        finish_hour : int
+            finish of hour filter
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
+
         data_frame = data_frame[data_frame.index.hour <= finish_hour]
         data_frame = data_frame[data_frame.index.hour >= start_hour]
 
         return data_frame
 
     def filter_time_series_by_columns(self, columns, data_frame):
+        """
+        filter_time_series_by_columns - Filter time series by certain columns
+
+        Parameters
+        ----------
+        columns : list(str)
+            start of hour filter
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
         return data_frame[columns]
 
     def filter_time_series_by_excluded_keyword(self, keyword, data_frame):
+        """
+        filter_time_series_by_excluded_keyword - Filter time series to exclude columns which contain keyword
+
+        Parameters
+        ----------
+        keyword : str
+            columns to be excluded with this keyword
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
         columns = [elem for elem in data_frame.columns if keyword not in elem]
 
         return self.filter_time_series_by_columns(columns, data_frame)
 
     def filter_time_series_by_included_keyword(self, keyword, data_frame):
+        """
+        filter_time_series_by_included_keyword - Filter time series to include columns which contain keyword
+
+        Parameters
+        ----------
+        keyword : str
+            columns to be included with this keyword
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
         columns = [elem for elem in data_frame.columns if keyword in elem]
 
         return self.filter_time_series_by_columns(columns, data_frame)
 
     def filter_time_series_by_minute_freq(self, freq, data_frame):
-         return data_frame.loc[data_frame.index.minute % freq == 0]
+        """
+        filter_time_series_by_minute_freq - Filter time series where minutes correspond to certain minute filter
+
+        Parameters
+        ----------
+        freq : int
+            minute frequency to be filtered
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
+        return data_frame.loc[data_frame.index.minute % freq == 0]
 
     def create_tickers_fields_list(self, time_series_request):
+        """
+        create_ticker_field_list - Creates a list of tickers concatenated with fields from a TimeSeriesRequest
+
+        Parameters
+        ----------
+        time_series_request : TimeSeriesRequest
+            request to be expanded
+
+        Returns
+        -------
+        list(str)
+        """
         tickers = time_series_request.tickers
         fields = time_series_request.fields
 
@@ -272,15 +507,27 @@ class TimeSeriesFilter:
         return data_frame.asfreq(freq, method = 'pad')
 
     def remove_out_FX_out_of_hours(self, data_frame):
+        """
+        remove_out_FX_out_of_hours - Filtered a time series for FX hours (ie. excludes 22h GMT Fri - 19h GMT Sun)
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            data frame with FX prices
+
+        Returns
+        -------
+        list(str)
+        """
         # assume data_frame is in GMT time
         # remove Fri after 22:00 GMT
         # remove Sat
-        # remove Sun before 22:00 GMT
+        # remove Sun before 19:00 GMT
 
         # Monday = 0, ..., Sunday = 6
         data_frame = data_frame.ix[~((data_frame.index.dayofweek == 4) & (data_frame.index.hour > 22))]
         data_frame = data_frame.ix[~((data_frame.index.dayofweek == 5))]
-        data_frame = data_frame.ix[~((data_frame.index.dayofweek == 6)& (data_frame.index.hour < 22))]
+        data_frame = data_frame.ix[~((data_frame.index.dayofweek == 6)& (data_frame.index.hour < 19))]
 
         return data_frame
 

@@ -89,7 +89,8 @@ class TimeSeriesTimezone:
         return data_frame
 
     def tz_UTC_to_naive(self, data_frame):
-        """ Converts a tz-aware DatetimeIndex into a tz-naive DatetimeIndex,
+        """
+        tz_UTC_to_naive - Converts a tz-aware DatetimeIndex into a tz-naive DatetimeIndex,
         effectively baking the timezone into the internal representation.
 
         Parameters
@@ -119,7 +120,8 @@ class TimeSeriesTimezone:
         return -1 #data_frame #(doesn't work)
 
     def tz_strip(self, data_frame):
-        """ Converts a tz-aware DatetimeIndex into a tz-naive DatetimeIndex,
+        """
+        tz_strip - Converts a tz-aware DatetimeIndex into a tz-naive DatetimeIndex,
         effectively baking the timezone into the internal representation.
 
         Parameters
@@ -138,6 +140,6 @@ class TimeSeriesTimezone:
         # Now convert to naive DatetimeIndex
         data_frame.index = pandas.DatetimeIndex(datetime_index.values)
 
-        return data_frame #(doesn't work)
+        return None #(TODO fix as doesn't work)
 
 

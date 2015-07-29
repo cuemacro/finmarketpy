@@ -15,8 +15,8 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 """
 LightTimeSeriesFactory
 
-Returns market data time series by directly calling data sources like Bloomberg, Yahoo and Quandl. Provides a common
-wrapper for all these data sources.
+Returns market data time series by directly calling data sources like Bloomberg, Yahoo and Quandl (planning to add more).
+Provides a common wrapper for all these data sources.
 
 """
 

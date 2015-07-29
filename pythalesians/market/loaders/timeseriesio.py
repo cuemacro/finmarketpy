@@ -15,7 +15,7 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 """
 TimeSeriesIO
 
-Write and reads time series data to disk in various formats, CSV and HDF5 format.
+Write and reads time series data to disk in various formats, CSV and HDF5 format. (planning to add other interfaces too).
 
 """
 

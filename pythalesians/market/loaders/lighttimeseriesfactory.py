@@ -45,7 +45,6 @@ class LightTimeSeriesFactory:
     def set_bloomberg_com_api(self):
         """
         set_bloomberg_com_api - Sets Bloomberg API to COM library
-
         """
 
         self._bbg_default_api = 'com-api'
@@ -53,7 +52,6 @@ class LightTimeSeriesFactory:
     def set_bloomberg_open_api(self):
         """
         set_bloomberg_open_api - Sets Bloomberg API to OpenAPI (recommended)
-
         """
 
         self._bbg_default_api = 'open-api'
@@ -61,8 +59,8 @@ class LightTimeSeriesFactory:
     def flush_cache(self):
         """
         flush_cache - Flushs internal cache of time series
-
         """
+
         self._time_series_cache = {}
 
     def set_intraday_code(self, code):
@@ -121,7 +119,7 @@ class LightTimeSeriesFactory:
 
         Returns
         -------
-        DataFrame
+        pandas.DataFrame
         """
 
         tickers = time_series_request.tickers
@@ -182,7 +180,7 @@ class LightTimeSeriesFactory:
 
         Returns
         -------
-        DataFrame
+        pandas.DataFrame
         """
 
         if (time_series_request.freq == "intraday"):
@@ -232,7 +230,7 @@ class LightTimeSeriesFactory:
 
         Returns
         -------
-        DataFrame
+        pandas.DataFrame
         """
 
         data_frame_agg = None
@@ -281,7 +279,7 @@ class LightTimeSeriesFactory:
 
         Returns
         -------
-        DataFrame
+        pandas.DataFrame
         """
 
         # daily data does not include ticker in the key, as multiple tickers in the same file
@@ -305,8 +303,8 @@ class LightTimeSeriesFactory:
         Returns
         -------
         str
-
         """
+
         category = 'default-cat'
         cut = 'default-cut'
 

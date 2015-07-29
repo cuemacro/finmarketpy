@@ -70,10 +70,44 @@ class TimeSeriesIO:
         writer.close()
 
     def write_time_series_to_excel_writer(self, writer, sheet, data_frame):
+        """
+        write_time_series_to_excel_writer - writes Pandas data frame to disk in Excel format for a writer
+
+        Parameters
+        ----------
+        writer : ExcelWriter
+            File handle to use for writing Excel file to disk
+        sheet : str
+            sheet in excel
+        data_frame : DataFrame
+            data frame to be written
+        """
         data_frame.to_excel(writer, sheet, engine='xlsxwriter')
 
     def read_excel_data_frame(self, f_name, excel_sheet, freq, cutoff = None, dateparse = None,
                             postfix = '.close', intraday_tz = 'UTC'):
+        """
+        read_excel_data_frame - Reads Excel from disk into DataFrame
+
+        Parameters
+        ----------
+        f_name : str
+            Excel file path to read
+        freq : str
+            Frequency of data to read (intraday/daily etc)
+        cutoff : DateTime (optional)
+            end date to read up to
+        dateparse : str (optional)
+            date parser to use
+        postfix : str (optional)
+            postfix to add to each columns
+        intraday_tz : str
+            timezone of file if uses intraday data
+
+        Returns
+        -------
+        DataFrame
+        """
 
         return self.read_csv_data_frame(f_name, freq, cutoff = cutoff, dateparse = dateparse,
                             postfix = postfix, intraday_tz = intraday_tz, excel_sheet = excel_sheet)
@@ -100,12 +134,36 @@ class TimeSeriesIO:
         store.close()
 
     def get_h5_filename(self, fname):
+        """
+        get_h5_filename - Strips h5 off filename returning first portion of filename
+
+        Parameters
+        ----------
+        fname : str
+            h5 filename to strip
+
+        Returns
+        -------
+        str
+        """
         if fname[-3:] == '.h5':
             return fname
 
         return fname + ".h5"
 
     def write_r_compatible_hdf_dataframe(self, data_frame, fname, fields = None):
+        """
+        write_r_compatible_hdf_dataframe - Write a DataFrame to disk in as an R compatible HDF5 file
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            data frame to be written
+        fname : str
+            file path to be written
+        fields : list(str)
+            columns to be written
+        """
         fname_r = self.get_h5_filename(fname)
 
         self.logger.info("About to dump R binary HDF5 - " + fname_r)
@@ -139,7 +197,7 @@ class TimeSeriesIO:
         Parameters
         ----------
         fname : str
-            file to be written too
+            file to be read from
 
         Returns
         -------
@@ -165,6 +223,31 @@ class TimeSeriesIO:
 
     def read_csv_data_frame(self, f_name, freq, cutoff = None, dateparse = None,
                             postfix = '.close', intraday_tz = 'UTC', excel_sheet = None):
+        """
+        read_csv_data_frame - Reads CSV/Excel from disk into DataFrame
+
+        Parameters
+        ----------
+        f_name : str
+            CSV/Excel file path to read
+        freq : str
+            Frequency of data to read (intraday/daily etc)
+        cutoff : DateTime (optional)
+            end date to read up to
+        dateparse : str (optional)
+            date parser to use
+        postfix : str (optional)
+            postfix to add to each columns
+        intraday_tz : str (optional)
+            timezone of file if uses intraday data
+        excel_sheet : str (optional)
+            Excel sheet to be read
+
+        Returns
+        -------
+        DataFrame
+        """
+
         if(freq == 'intraday'):
 
             if dateparse is None:
@@ -236,9 +319,26 @@ class TimeSeriesIO:
         return data_frame
 
     def convert_csv_data_frame(self, f_name, category, freq, cutoff=None, dateparse=None):
+        """
+        convert_csv_data_frame - Converts CSV file to HDF5 file
+
+        Parameters
+        ----------
+        f_name : str
+            File name to be read
+        category : str
+            data category of file (used in HDF5 filename)
+        freq : str
+            intraday/daily frequency (used in HDF5 filename)
+        cutoff : DateTime (optional)
+            filter dates up to here
+        dateparse : str
+            date parser to use
+        """
+
         self.logger.info("About to read... " + f_name)
 
-        data_frame = self.read_csv_data_frame(f_name, freq, cutoff=None, dateparse=None)
+        data_frame = self.read_csv_data_frame(f_name, freq, cutoff=cutoff, dateparse=dateparse)
 
         category_f_name = self.create_cache_file_name(category)
 
@@ -246,6 +346,15 @@ class TimeSeriesIO:
             category_f_name, data_frame)
 
     def clean_csv_file(self, f_name):
+        """
+        clean_csv_file - Cleans up CSV file (removing empty characters) before writing back to disk
+
+        Parameters
+        ----------
+        f_name : str
+            CSV file to be cleaned
+        """
+
         with codecs.open (f_name, 'rb', 'utf-8') as myfile:
             data = myfile.read()
 

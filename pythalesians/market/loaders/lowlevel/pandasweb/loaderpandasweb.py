@@ -45,16 +45,21 @@ class LoaderPandasWeb(LoaderTemplate):
         self.logger.info("Request Pandas Web data")
 
         data_frame = self.download_daily(time_series_request_vendor)
-        data_frame = data_frame.to_frame().unstack()
-        
-        print(data_frame.tail())
 
-        if data_frame.index is []: return None
+        if time_series_request_vendor.data_source == 'fred':
+            returned_fields = ['close' for x in data_frame.columns.values]
+            returned_tickers = data_frame.columns.values
+        else:
+            data_frame = data_frame.to_frame().unstack()
 
-        # convert from vendor to Thalesians tickers/fields
-        if data_frame is not None:
-            returned_fields = data_frame.columns.get_level_values(0)
-            returned_tickers = data_frame.columns.get_level_values(1)
+            print(data_frame.tail())
+
+            if data_frame.index is []: return None
+
+            # convert from vendor to Thalesians tickers/fields
+            if data_frame is not None:
+                returned_fields = data_frame.columns.get_level_values(0)
+                returned_tickers = data_frame.columns.get_level_values(1)
 
         if data_frame is not None:
             fields = self.translate_from_vendor_field(returned_fields, time_series_request)

@@ -39,6 +39,8 @@ if True:
 
     import datetime
 
+    ###### change the various labels to True to run
+
     ###### download daily data from Bloomberg for EUR/USD and GBP/USD spot and then plot
     if False:
 
@@ -165,6 +167,30 @@ if True:
         pf = PlotFactory()
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
+    ###### download CPI data from FRED
+    if False:
+
+        time_series_request = TimeSeriesRequest(
+                start_date = "01 Jan 1970",                     # start date
+                finish_date = datetime.date.today(),            # finish date
+                freq = 'daily',                                 # daily data
+                data_source = 'fred',                           # use FRED as data source
+                tickers = ['US CPI YoY', 'EZ CPI YoY'],         # ticker (Thalesians)
+                fields = ['close'],                                 # which fields to download
+                vendor_tickers = ['CPIAUCSL', 'CP0000EZ17M086NEST'],                     # ticker (Yahoo)
+                vendor_fields = ['Close'],                          # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+        ltsf = LightTimeSeriesFactory()
+
+        df = ltsf.harvest_time_series(time_series_request)
+
+        # calculate YoY data
+        df = df / df.shift(12) - 1
+
+        pf = PlotFactory()
+        pf.plot_line_graph(df, adapter = 'pythalesians')
+
     ###### download daily data from Yahoo for Apple and Citigroup stock and then plot
     if False:
 
@@ -188,7 +214,7 @@ if True:
 
     # downloading historical tick data from Dukascopy broker for EUR/USD
     # (past month of data cannot be downloaded, hence cannot be used for live trading)
-    if True:
+    if False:
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jun 2015",                     # start date
                 finish_date = "02 Jun 2015",                    # finish date

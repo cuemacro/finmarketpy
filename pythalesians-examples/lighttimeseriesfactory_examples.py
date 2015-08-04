@@ -43,6 +43,7 @@ if True:
 
     ###### download daily data from Bloomberg for EUR/USD and GBP/USD spot and then plot
     if False:
+
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2014",                     # start date
                 finish_date = datetime.date.today(),            # finish date

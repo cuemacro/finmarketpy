@@ -124,6 +124,7 @@ More generally, we want to:
 
 # Coding log
 
+* 04 Aug 2015 - Added ability to download from FRED and example for downloading from FRED.
 * 29 Jul 2015 - Added backtesting functions (including simple FX trend following strategy) and various bug fixes/comments.
 * 24 Jul 2015 - Added functions for doing simple seasonality studies and added examples.
 * 17 Jul 2015 - Created example to show how to use technical indicators.

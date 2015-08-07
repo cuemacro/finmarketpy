@@ -55,7 +55,7 @@ height="480"
 frameborder="0"
 seamless="seamless"
 scrolling="no"
-src="https://plot.ly/~thalesians/867/.embed?width=543&height=381"
+src="https://plot.ly/~thalesians/867/sp500-vs-apple/.embed?width=543&height=381"
 </iframe>
 
 # Requirements

@@ -167,6 +167,10 @@ class LightTimeSeriesFactory:
             try:
                 return tsf.filter_time_series(time_series_request, data_frame_agg)
             except:
+                import traceback
+
+                self.logger.error(traceback.format_exc())
+
                 return None
 
     def get_time_series_cached(self, time_series_request):

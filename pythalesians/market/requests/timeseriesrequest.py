@@ -52,7 +52,7 @@ class TimeSeriesRequest:
 
     @data_source.setter
     def data_source(self, data_source):
-        valid_data_source = ['ats', 'bloomberg', 'dukascopy', 'fred', 'gain', 'quandl', 'yahoo']
+        valid_data_source = ['ats', 'bloomberg', 'dukascopy', 'fred', 'gain', 'google', 'quandl', 'yahoo']
 
         if not data_source in valid_data_source:
             self.logger.warning(data_source & " is not a defined data source.")

@@ -52,7 +52,7 @@ class LoaderPandasWeb(LoaderTemplate):
         else:
             data_frame = data_frame.to_frame().unstack()
 
-            print(data_frame.tail())
+            # print(data_frame.tail())
 
             if data_frame.index is []: return None
 

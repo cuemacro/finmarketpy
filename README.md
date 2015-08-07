@@ -48,6 +48,13 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/replicating-cta.png" width="543"/>
 
+*Using PyThalesians via Cufflinks (Plotly wrapper) to plot interactive Plotly chart (using plotly_examples.py)*
+<div>
+    <a href="https://plot.ly/~thalesians/867/" target="_blank" title="S&amp;P500 vs Apple" style="display: block; text-align: center;"><img src="https://plot.ly/~thalesians/867.png" alt="S&amp;P500 vs Apple" style="max-width: 100%;"  onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="thalesians:867"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 running Bloomberg terminal software. Potentially, it could also work on the 
@@ -56,9 +63,12 @@ Bloomberg Server API (but I have not explicitly tested this).
 Major requirements
 * Python 3.4+
 * pandas, matplotlib etc.
-* Recommended: Bloomberg Python Open API (use Python 3 version from https://github.com/filmackay/blpapi-py/) or 
+* Recommended: Bloomberg Python Open API (use Python 3 version from https://github.com/filmackay/blpapi-py) or 
 alternatively to access Bloomberg, the software also supports the old COM API
 * To use Bloomberg you will need to have a installed licence
+* Recommended: Plotly for funky interactive plots (https://github.com/plotly/python-api) and Cufflinks a nice Plotly
+wrapper when using Pandas dataframes(my fork of Jorge Santos project has been modified slightly for Python 3 
+https://github.com/thalesians/cufflinks)
 
 # Installation
 
@@ -66,7 +76,7 @@ Once installed please make sure you edit pythalesians.util.constants file for th
 * Change the root path variable - this will ensure that the logging (and a number of other features works correctly). 
 Failure to do so will result in the project not starting
 * Change the default Bloomberg settings (Which API to use? What server address to use?)
-* Write in API keys for Quandl, Twitter etc.
+* Write in API keys for Quandl, Twitter, Plotly etc.
 * Latest version can be installed using setup.py or pip (see below)
 
 ```
@@ -124,6 +134,7 @@ More generally, we want to:
 
 # Coding log
 
+* 07 Aug 2015 - Added Plotly support (via Jorge Santos Cufflinks wrapper)
 * 04 Aug 2015 - Added ability to download from FRED and example for downloading from FRED.
 * 29 Jul 2015 - Added backtesting functions (including simple FX trend following strategy) and various bug fixes/comments.
 * 24 Jul 2015 - Added functions for doing simple seasonality studies and added examples.

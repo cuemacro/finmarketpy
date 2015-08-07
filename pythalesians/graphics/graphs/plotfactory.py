@@ -23,6 +23,12 @@ Plotly, Cufflinks (Plotly wrapper), Seaborne (Matplotlib wrapper)
 """
 
 from pythalesians.graphics.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
+
+try:
+    from pythalesians.graphics.graphs.lowleveladapters.adapterplotly import AdapterPlotly
+except: pass
+
+from pythalesians.graphics.graphs.lowleveladapters.adaptercufflinks import AdapterCufflinks
 from pythalesians.graphics.graphs.lowleveladapters.adapterbokeh import AdapterBokeh
 
 from pythalesians.util.twitterpythalesians import TwitterPyThalesians
@@ -72,7 +78,7 @@ class PlotFactory:
 
             data_frame = tio.read_excel_data_frame(excel_file, excel_sheet, freq)
 
-        if type in ['line', 'bar', 'scatter']: return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, type)
+        if type in ['line', 'bar', 'scatter', 'choropleth']: return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, type)
 
     def get_adapter(self, adapter):
 
@@ -84,7 +90,10 @@ class PlotFactory:
             return AdapterBokeh()
 
         elif adapter == 'plotly':
-            return self.logg
+            return AdapterPlotly()
+
+        elif adapter == 'cufflinks':
+            return AdapterCufflinks()
 
         return None
 

@@ -28,34 +28,31 @@ from pythalesians.util.constants import Constants
 class AdapterBokeh(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, type):
-        if hasattr(gp, 'html_file_output'):
+        try:
             output_file(gp.html_file_output)
-
-        scale_factor = Constants().plotfactory_scale_factor
-
-        if hasattr(gp, 'scale_factor'): scale_factor = gp.scale_factor
+        except: pass
 
         p1 = figure(
             x_axis_type = "datetime",
-            plot_width = Constants().plotfactory_width * scale_factor,
-            plot_height = Constants().plotfactory_height * scale_factor,
+            plot_width = gp.width * gp.scale_factor,
+            plot_height = gp.height * gp.scale_factor,
             )
 
-        p1.axis.major_label_text_font_size = str(10 * scale_factor) + "pt"
+        p1.axis.major_label_text_font_size = str(10 * gp.scale_factor) + "pt"
         p1.axis.major_label_text_font = Constants().plotfactory_bokeh_font
-        p1.xaxis.axis_label_text_font_size = str(10 * scale_factor) + "pt"
+        p1.xaxis.axis_label_text_font_size = str(10 * gp.scale_factor) + "pt"
         p1.xaxis.axis_label_text_font = Constants().plotfactory_bokeh_font
-        p1.yaxis.axis_label_text_font_size = str(10 * scale_factor) + "pt"
+        p1.yaxis.axis_label_text_font_size = str(10 * gp.scale_factor) + "pt"
         p1.yaxis.axis_label_text_font = Constants().plotfactory_bokeh_font
-        p1.legend.label_text_font_size = str(10 * scale_factor) + "pt"
+        p1.legend.label_text_font_size = str(10 * gp.scale_factor) + "pt"
         p1.legend.label_text_font = Constants().plotfactory_bokeh_font
 
-        p1.title_text_font_size = str(14 * scale_factor) + "pt"
+        p1.title_text_font_size = str(14 * gp.scale_factor) + "pt"
         p1.title_text_font = Constants().plotfactory_bokeh_font
 
-        if Constants().plotfactory_display_source:
-            p1.text([30, 30], [0, 0], text = [Constants().plotfactory_brand_label],
-                text_font_size = str(10 * scale_factor) + "pt", text_align = "left",
+        if gp.display_source_label:
+            p1.text([30, 30], [0, 0], text = [gp.brand_label],
+                text_font_size = str(10 * gp.scale_factor) + "pt", text_align = "left",
                 text_font = Constants().plotfactory_bokeh_font)
 
         dates = data_frame.index

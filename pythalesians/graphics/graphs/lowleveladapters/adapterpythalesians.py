@@ -35,7 +35,6 @@ import plotly.tools as tls
 
 # for manipulating dates and maths
 from datetime import timedelta
-from math import log10, floor
 import numpy as np
 
 from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
@@ -45,119 +44,42 @@ from pythalesians.util.constants import Constants
 class AdapterPyThalesians(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, type):
+        if gp.resample is not None: data_frame = data_frame.asfreq(gp.resample)
 
+        # set the matplotlib style sheet & defaults
         matplotlib.rcdefaults()
 
-        # set the matplotlib style sheet
-        plt.style.use(Constants().plotfactory_pythalesians_style_sheet[Constants().plotfactory_default_stylesheet])
-
-        if hasattr(gp, 'style_sheet'):
+        # first search PyThalesians styles, then try matplotlib
+        try:
             plt.style.use(Constants().plotfactory_pythalesians_style_sheet[gp.style_sheet])
+        except:
+            plt.style.use(gp.style_sheet)
 
-        scale_factor = Constants().plotfactory_scale_factor
+        matplotlib.rcParams.update({'font.size': matplotlib.rcParams['font.size'] * gp.scale_factor})
 
-        if hasattr(gp, 'scale_factor'): scale_factor = gp.scale_factor
-
-        dpi = Constants().plotfactory_dpi
-
-        if hasattr(gp, 'dpi'): dpi = gp.dpi
-
-        width = Constants().plotfactory_width; height = Constants().plotfactory_height
-
-        if hasattr(gp, 'width'): width = gp.width
-        if hasattr(gp, 'height'): width = gp.height
-
-        fig = plt.figure(figsize = ((width * scale_factor)/dpi, (height * scale_factor)/dpi), dpi = dpi)
-
-        # add a subplot
+        # create figure & add a subplot
+        fig = plt.figure(figsize = ((gp.width * gp.scale_factor)/gp.dpi,
+                                    (gp.height * gp.scale_factor)/gp.dpi), dpi = gp.dpi)
         ax = fig.add_subplot(111)
-
-        matplotlib.rcParams.update({'font.size': matplotlib.rcParams['font.size'] * scale_factor})
 
         # format Y axis
         y_formatter = matplotlib.ticker.ScalarFormatter(useOffset = False)
         ax.yaxis.set_major_formatter(y_formatter)
 
-        y_axis_2_series = []
-        ax2 = []
-        color_2_series = []
-        linewidth_2_series = []
-
-        if hasattr(gp, 'resample'):
-            data_frame = data_frame.asfreq(gp.resample)
-
         # create a second y axis if necessary
-        if hasattr(gp, 'y_axis_2_series'):
-            if gp.y_axis_2_series == []:
-                pass
-            else:
-                y_axis_2_series = gp.y_axis_2_series
-                ax2 = ax.twinx()
+        ax2 = []
 
-                # matplotlib.rcParams.update({'figure.subplot.right': matplotlib.rcParams['figure.subplot.right'] - 0.05})
+        if gp.y_axis_2_series != []:
+            ax2 = ax.twinx()
 
-                # do not use a grid with multiple y axes
-                ax.yaxis.grid(False)
-                ax2.yaxis.grid(False)
-
-        # is there a second palette?
-        if hasattr(gp, 'color_2_series'):
-            if hasattr(gp.color_2_series, 'values'):
-                color_2_series = [str(x) for x in gp.color_2_series.values]
-            else:
-                color_2_series = [str(x) for x in gp.color_2_series]
-
-        # is there a second linewidth series
-        if hasattr(gp, 'linewidth_2_series'):
-            if hasattr(gp.linewidth_2_series, 'values'):
-                linewidth_2_series = [str(x) for x in gp.linewidth_2_series.values]
-            else:
-                linewidth_2_series = [str(x) for x in gp.linewidth_2_series]
+            # do not use a grid with multiple y axes
+            ax.yaxis.grid(False)
+            ax2.yaxis.grid(False)
 
         # plot the lines (using custom palettes as appropriate)
         try:
-            color = []; color_2 = []
-            linewidth_2 = matplotlib.rcParams['axes.linewidth']
-
-            exclude_from_color = []
-
-            if hasattr(gp, 'color'):
-                if isinstance(gp.color, list):
-                    color = gp.color
-                else:
-                    try:
-                        color = self.create_colormap(
-                            len(data_frame.columns.values) - len(color_2_series), gp.color)
-                    except: pass
-
-            if hasattr(gp, 'width'):
-                if isinstance(gp.width, list):
-                    color = gp.color
-                else:
-                    try:
-                        color = self.create_colormap(
-                            len(data_frame.columns.values) - len(color_2_series), gp.color)
-                    except: pass
-
-            if hasattr(gp, 'color_2'):
-                if isinstance(gp.color_2, list):
-                    color_2 = gp.color_2
-                else:
-                    try:
-                        color_2 = self.create_colormap(len(color_2_series), gp.color_2)
-                    except: pass
-
-            if hasattr(gp, 'exclude_from_color'):
-                if not(isinstance(gp.exclude_from_color, list)):
-                    gp.exclude_from_color = [gp.exclude_from_color]
-
-                exclude_from_color = [str(x) for x in gp.exclude_from_color]
-
-            if hasattr(gp, 'linewidth_2'):
-                linewidth_2 = gp.linewidth_2
-
-            axis_1_color_index = 0
-            axis_2_color_index = 0
+            # get all the correct colors (and construct gradients if necessary eg. from 'blues')
+            color_spec = self.create_color_list(gp, data_frame)
 
             if type == 'bar':
                 # bottom = np.cumsum(np.vstack((np.zeros(data_frame.values.shape[1]), data_frame.values)), axis=0)[:-1]
@@ -168,65 +90,43 @@ class AdapterPyThalesians(AdapterTemplate):
             # some lines we should exclude from the color and use the default palette
             for i in range(0, len(data_frame.columns.values)):
                 label = str(data_frame.columns[i])
-                ax_temp = self.get_axis(ax, ax2, label, y_axis_2_series)
 
-                color_spec, axis_1_color_index, axis_2_color_index = \
-                    self.get_color(label, axis_1_color_index, axis_2_color_index, color, color_2,
-                                        exclude_from_color, color_2_series)
+                ax_temp = self.get_axis(ax, ax2, label, gp.y_axis_2_series)
 
                 xd = data_frame.index; yd = data_frame.ix[:,i]
 
                 if (type == 'line'):
-                    linewidth = self.get_linewidth(label, linewidth_2, linewidth_2_series)
+                    linewidth_t = self.get_linewidth(label,
+                                                     gp.linewidth, gp.linewidth_2, gp.linewidth_2_series)
 
-                    ax_temp.plot(xd, yd, label = label, color = color_spec,
-                                     linewidth = linewidth)
+                    if linewidth_t is None: linewidth_t = matplotlib.rcParams['axes.linewidth']
+
+                    ax_temp.plot(xd, yd, label = label, color = color_spec[i],
+                                     linewidth = linewidth_t)
                 elif(type == 'bar'):
-                    ax_temp.bar(xd, yd, label = label, color = color_spec, bottom = yoff)
+                    ax_temp.bar(xd, yd, label = label, color = color_spec[i], bottom = yoff)
                     yoff = yoff + yd
 
                 elif(type == 'scatter'):
-                    ax_temp.scatter(xd, yd, label = label, color = color_spec)
+                    ax_temp.scatter(xd, yd, label = label, color = color_spec[i])
 
-                    if hasattr(gp, 'line_of_best_fit'):
-                        if gp.line_of_best_fit == True:
-                            self.trendline(ax_temp, xd.values, yd.values, order=1, color= color_spec, alpha=1,
-                                           scale_factor = scale_factor)
+                    if gp.line_of_best_fit is True:
+                        self.trendline(ax_temp, xd.values, yd.values, order=1, color= color_spec[i], alpha=1,
+                                           scale_factor = gp.scale_factor)
         except: pass
 
         # format X axis
         self.format_x_axis(ax, data_frame, gp)
 
-        try:
-             fig.suptitle(gp.title, fontsize = 14 * scale_factor)
-        except: pass
+        fig.suptitle(gp.title, fontsize = 14 * gp.scale_factor)
 
-        try:
-            source = Constants().plotfactory_source
+        if gp.display_source_label == True:
+            ax.annotate('Source: ' + gp.source, xy = (1, 0), xycoords='axes fraction', fontsize=7 * gp.scale_factor,
+                        xytext=(-5 * gp.scale_factor, 10 * gp.scale_factor), textcoords='offset points',
+                        ha='right', va='top', color = gp.source_color)
 
-            source_color = 'black'
-            display_brand_label = False
-
-            if hasattr(gp, 'source'):
-                source = gp.source
-                display_brand_label = True
-
-            if hasattr(gp, 'source_color'):
-                source_color = self.get_color_code(gp.source_color)
-
-            if display_brand_label or Constants().plotfactory_display_brand_label:
-                ax.annotate('Source: ' + source, xy = (1, 0), xycoords='axes fraction', fontsize=7 * scale_factor,
-                        xytext=(-5 * scale_factor, 10 * scale_factor), textcoords='offset points',
-                        ha='right', va='top', color = source_color)
-
-        except: pass
-
-        if hasattr(gp, 'display_brand_label'):
-            if gp.display_brand_label is True:
-                self.create_brand_label(ax, anno = Constants().plotfactory_brand_label, scale_factor = scale_factor)
-        else:
-            if Constants().plotfactory_display_brand_label is True:
-                self.create_brand_label(ax, anno = Constants().plotfactory_brand_label, scale_factor = scale_factor)
+        if gp.display_brand_label == True:
+            self.create_brand_label(ax, anno = gp.brand_label, scale_factor = gp.scale_factor)
 
         leg = []
         leg2 = []
@@ -237,22 +137,20 @@ class AdapterPyThalesians(AdapterTemplate):
         if ax2 != []: loc = 2
 
         try:
-            leg = ax.legend(loc = loc, prop={'size':10 * scale_factor})
+            leg = ax.legend(loc = loc, prop={'size':10 * gp.scale_factor})
             leg.get_frame().set_linewidth(0.0)
             leg.get_frame().set_alpha(0)
 
-            if ax2 is not []:
-                leg2 = ax2.legend(loc = 1, prop={'size':10 * scale_factor})
+            if ax2 != []:
+                leg2 = ax2.legend(loc = 1, prop={'size':10 * gp.scale_factor})
                 leg2.get_frame().set_linewidth(0.0)
                 leg2.get_frame().set_alpha(0)
-
         except: pass
 
         try:
-            if gp.display_legend == False:
-                if leg is not[]: leg.remove()
-                if leg2 is not[]: leg.remove()
-
+            if gp.display_legend is False:
+                if leg != []: leg.remove()
+                if leg2 != []: leg.remove()
         except: pass
 
         try:
@@ -260,30 +158,23 @@ class AdapterPyThalesians(AdapterTemplate):
         except: pass
 
         try:
-            if hasattr(gp, 'silent_display'):
-                if gp.silent_display is False:
-                    plt.show()
-            else:
-                plt.show()
+            if gp.silent_display == False: plt.show()
         except:
             pass
 
         # convert to D3 format with mpld3
         try:
-            if hasattr(gp, 'html_file_output'):
-                mpld3.save_d3_html(fig, gp.html_file_output)
+            mpld3.save_d3_html(fig, gp.html_file_output)
 
-            if hasattr(gp, 'display_mpld3'):
-                if gp.display_mpld3 == True: mpld3.show(fig)
+            if gp.display_mpld3 == True: mpld3.show(fig)
         except: pass
 
-        # convert to Plotly format (fragile!)
-        # TODO better to create Plotly graphs from scratch rather than convert from matplotlib
-        # TODO also dependent on matplotlib version for support
+        # FRAGILE! convert matplotlib chart to Plotly format
+        # recommend using AdapterCufflinks instead to directly plot to Plotly
         try:
-            if hasattr(gp, 'plotly_url'):
-                plotly.tools.set_credentials_file(username = Constants().plotly_username,
-                                                  api_key = Constants().plotly_api_key)
+            if gp.convert_matplotlib_to_plotly:
+                plotly.tools.set_credentials_file(username = gp.plotly_username,
+                                                  api_key = gp.plotly_api_key)
 
                 py_fig = tls.mpl_to_plotly(fig, strip_style = True)
                 plot_url = py.plot_mpl(py_fig, filename = gp.plotly_url)
@@ -311,7 +202,7 @@ class AdapterPyThalesians(AdapterTemplate):
 
                 import matplotlib.dates as md
 
-                if hasattr(gp, 'date_formatter'):
+                if gp.date_formatter is not None:
                     ax.xaxis.set_major_formatter(md.DateFormatter(gp.date_formatter))
                 elif diff < timedelta(days = 4):
 
@@ -393,35 +284,12 @@ class AdapterPyThalesians(AdapterTemplate):
                     plt.xlim(min, max)
                 except: pass
 
-    def round_to_1(self, x):
-        return round(x, -int(floor(log10(x))))
-
     def get_axis(self, ax, ax2, label, y_axis_2_series):
 
-        if label in y_axis_2_series:
-            return ax2
+        if label in y_axis_2_series: return ax2
 
         return ax
 
-    def get_linewidth(self, label, linewidth_2, linewidth_2_series):
-        if label in linewidth_2_series:
-            return linewidth_2
-
-        return matplotlib.rcParams['axes.linewidth']
-
-    def get_color(self, label, axis_1_color_index, axis_2_color_index, color, color_2, exclude_from_color,
-                  color_2_series):
-        if label in exclude_from_color:
-            return None, axis_1_color_index, axis_2_color_index
-
-        if label in color_2_series:
-            if color_2 != []:
-                return self.get_color_code(color_2[axis_2_color_index]), axis_1_color_index, axis_2_color_index + 1
-        else:
-            if color != []:
-                return self.get_color_code(color[axis_1_color_index]), axis_1_color_index + 1, axis_2_color_index
-
-        return None, axis_1_color_index, axis_2_color_index
 
     def trendline(self, ax, xd, yd, order=1, color='red', alpha=1, Rval=False, scale_factor = 1):
         """Make a line of best fit"""
@@ -470,22 +338,12 @@ class AdapterPyThalesians(AdapterTemplate):
             # return the R^2 value:
             return Rsqr
 
-    def get_color_code(self, code):
-        # redefine color names
-        dict = Constants().plotfactory_color_overwrites
-
-        if code in dict: return dict[code]
-
-        return code
-
-    def create_brand_label(self, ax, anno = Constants().plotfactory_brand_label, scale_factor = 1):
+    def create_brand_label(self, ax, anno, scale_factor):
         ax.annotate(anno, xy = (0, 1), xycoords = 'axes fraction',
                     fontsize = 10 * scale_factor, color = 'white',
                     xytext = (0 * scale_factor, 15 * scale_factor), textcoords = 'offset points',
                     va = "center", ha = "center",
                     bbox = dict(boxstyle = "round,pad=0.4", facecolor = Constants().plotfactory_brand_colour))
 
-    def create_colormap(self, num_colors, map_name):
-        ## matplotlib ref for colors: http://matplotlib.org/examples/color/colormaps_reference.html
-        cm = matplotlib.cm.get_cmap(name = map_name)
-        return [cm(1.*i/num_colors) for i in range(num_colors)]
+
+

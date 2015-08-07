@@ -89,6 +89,7 @@ class Constants:
         self.plotfactory_height = 381
 
         self.plotfactory_bokeh_font = 'calibri'
+        self.plotly_world_readable = True
 
         ########## API KEYS
 

@@ -48,15 +48,8 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/replicating-cta.png" width="543"/>
 
-*Using PyThalesians via Cufflinks (Plotly wrapper) to plot interactive Plotly chart (using plotly_examples.py)*
-<iframe>
-width="640"
-height="480"
-frameborder="0"
-seamless="seamless"
-scrolling="no"
-src="https://plot.ly/~thalesians/867/sp500-vs-apple/.embed?width=543&height=381"
-</iframe>
+*Using PyThalesians with Cufflinks (Plotly wrapper) to plot interactive Plotly chart (using plotly_examples.py)*
+<iframe width="640" height="480" allowfullscreen="allowfullscreen" src="https://plot.ly/~thalesians/867/.embed?width=640&height=480">&nbsp;</</iframe>
 
 # Requirements
 

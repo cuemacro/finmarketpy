@@ -76,7 +76,7 @@ class GraphProperties:
         plotly_as_image = False,
         plotly_username = Constants().plotly_default_username,
         plotly_api_key = None,
-        plotly_world_readable = False,
+        plotly_world_readable = Constants().plotly_world_readable,
         plotly_theme = None,
 
         # matplotlib only
@@ -323,7 +323,11 @@ class GraphProperties:
     @property
     def plotly_username(self): return self.__plotly_username
     @plotly_username.setter
-    def plotly_username(self, plotly_username): self.__plotly_username = plotly_username 
+    def plotly_username(self, plotly_username):
+        self.__plotly_username = plotly_username
+        try:
+            self.plotly_api_key = Constants().plotly_creds[plotly_username]
+        except: pass
     
     @property
     def plotly_api_key(self): return self.__plotly_api_key

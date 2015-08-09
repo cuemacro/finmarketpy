@@ -18,3 +18,6 @@ AdapterPlotly
 Wrapper for Plotly to plot graph, with an easier to use common interface. Has not been implemented!
 
 """
+
+class AdapterPlotly:
+    pass

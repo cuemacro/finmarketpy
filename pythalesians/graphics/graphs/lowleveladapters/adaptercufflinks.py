@@ -41,7 +41,7 @@ class AdapterCufflinks(AdapterTemplate):
         mode = 'line'
 
         marker_size = 1
-        scale_factor = 1 # gp.scale_factor
+        scale_factor = gp.scale_factor
 
         x = ''; y = ''; z = ''
 

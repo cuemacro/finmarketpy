@@ -43,7 +43,7 @@ from pythalesians.util.constants import Constants
 
 class AdapterPyThalesians(AdapterTemplate):
 
-    def plot_2d_graph(self, data_frame, gp, type):
+    def plot_2d_graph(self, data_frame, gp, chart_type):
         if gp.resample is not None: data_frame = data_frame.asfreq(gp.resample)
 
         # set the matplotlib style sheet & defaults
@@ -89,13 +89,21 @@ class AdapterPyThalesians(AdapterTemplate):
 
             # some lines we should exclude from the color and use the default palette
             for i in range(0, len(data_frame.columns.values)):
+
+                if chart_type is not None:
+                    if gp.chart_type is not None:
+                        if isinstance(gp.type, list):
+                            chart_type = gp.chart_type[i]
+                        else:
+                            chart_type = gp.chart_type
+
                 label = str(data_frame.columns[i])
 
                 ax_temp = self.get_axis(ax, ax2, label, gp.y_axis_2_series)
 
                 xd = data_frame.index; yd = data_frame.ix[:,i]
 
-                if (type == 'line'):
+                if (chart_type == 'line'):
                     linewidth_t = self.get_linewidth(label,
                                                      gp.linewidth, gp.linewidth_2, gp.linewidth_2_series)
 
@@ -103,11 +111,11 @@ class AdapterPyThalesians(AdapterTemplate):
 
                     ax_temp.plot(xd, yd, label = label, color = color_spec[i],
                                      linewidth = linewidth_t)
-                elif(type == 'bar'):
+                elif(chart_type == 'bar'):
                     ax_temp.bar(xd, yd, label = label, color = color_spec[i], bottom = yoff)
                     yoff = yoff + yd
 
-                elif(type == 'scatter'):
+                elif(chart_type == 'scatter'):
                     ax_temp.scatter(xd, yd, label = label, color = color_spec[i])
 
                     if gp.line_of_best_fit is True:
@@ -157,27 +165,41 @@ class AdapterPyThalesians(AdapterTemplate):
             plt.savefig(gp.file_output, transparent=False)
         except: pass
 
-        try:
-            if gp.silent_display == False: plt.show()
-        except:
-            pass
 
+        ####### various matplotlib converters are unstable
         # convert to D3 format with mpld3
         try:
-            mpld3.save_d3_html(fig, gp.html_file_output)
+            if gp.display_mpld3 == True:
+                mpld3.save_d3_html(fig, gp.html_file_output)
+                mpld3.show(fig)
+        except: pass
 
-            if gp.display_mpld3 == True: mpld3.show(fig)
+        # FRAGILE! convert to Bokeh format
+        # better to use direct Bokeh renderer
+        try:
+            if (gp.convert_matplotlib_to_bokeh == True):
+                from bokeh.plotting import output_file, show
+                from bokeh import mpl
+
+                output_file(gp.html_file_output)
+                show(mpl.to_bokeh())
         except: pass
 
         # FRAGILE! convert matplotlib chart to Plotly format
         # recommend using AdapterCufflinks instead to directly plot to Plotly
         try:
-            if gp.convert_matplotlib_to_plotly:
+            if gp.convert_matplotlib_to_plotly == True:
                 plotly.tools.set_credentials_file(username = gp.plotly_username,
                                                   api_key = gp.plotly_api_key)
 
                 py_fig = tls.mpl_to_plotly(fig, strip_style = True)
                 plot_url = py.plot_mpl(py_fig, filename = gp.plotly_url)
+        except:
+            pass
+
+        # display in Matplotlib
+        try:
+            if gp.silent_display == False: plt.show()
         except:
             pass
 

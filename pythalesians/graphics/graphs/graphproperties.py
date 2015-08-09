@@ -32,6 +32,10 @@ class GraphProperties:
         title = '',
 	    x_title = '',
 	    y_title = '',
+        units = '',
+
+        # type of plot (can be defined as list)
+        chart_type = None,
 
         # colors
         color = [],
@@ -60,7 +64,7 @@ class GraphProperties:
         source = Constants().plotfactory_source,
         source_color = 'black',
         display_source_label =  Constants().plotfactory_display_source_label,
-        display_legend = False,
+        display_legend = True,
 
         # display output
         silent_display = False,
@@ -79,6 +83,9 @@ class GraphProperties:
         plotly_world_readable = Constants().plotly_world_readable,
         plotly_theme = None,
 
+        # plotly choropleth fields
+
+
         # matplotlib only
         style_sheet = Constants().plotfactory_default_stylesheet,
         convert_matplotlib_to_plotly = False
@@ -90,6 +97,10 @@ class GraphProperties:
         self.title = title
         self.x_title = x_title
         self.y_title = y_title
+        self.units = units
+        
+        # chart type
+        self.chart_type = chart_type
 
         # colors
         self.color = color
@@ -171,7 +182,18 @@ class GraphProperties:
     def y_title(self): return self.__y_title
     @y_title.setter
     def y_title(self, y_title): self.__y_title = y_title 
-
+    
+    @property
+    def units(self): return self.__units
+    @units.setter
+    def units(self, units): self.__units = units 
+    
+    ###### chart type
+    @property
+    def chart_type(self): return self.__chart_type
+    @chart_type.setter
+    def chart_type(self, chart_type): self.__chart_type = chart_type 
+    
     ###### colors
     @property
     def color(self): return self.__color

@@ -31,7 +31,7 @@ class Constants:
 
         ###### FOR FUTURE VERSIONS (which include caching)
         # folders for holding market data
-        # self.folder_time_series_data = "D:/timeseriesdata"
+        self.folder_time_series_data = "D:/timeseriesdata"
         # self.folder_historic_CSV = "D:/tickdata/historicCSV"
         #
         # # config file for time series categories
@@ -88,20 +88,31 @@ class Constants:
         self.plotfactory_width = 543
         self.plotfactory_height = 381
 
-        self.plotfactory_bokeh_font = 'calibri'
-        self.plotly_world_readable = True
+        ########## BOKEH SETTINGS
+        self.bokeh_font       = 'calibri'
+        self.bokeh_font_style = "normal"
+        self.bokeh_palette = [  '#E24A33',
+                                '#348ABD',
+                                '#988ED5',
+                                '#777777',
+                                '#FBC15E',
+                                '#8EBA42',
+                                '#FFB5B8']
+
+        ########## PLOTLY SETTINGS
+        self.plotly_world_readable = False
 
         ########## API KEYS
 
         # Plotly default username
-        self.plotly_default_username = 'x'
+        self.plotly_default_username = 'argonautae'
 
         # Plotly settings (username : api_key)
         self.plotly_creds = {"x" : "x",
-                             "x1" : "x"
+                             "x1" : "x1"
                              }
 
-        self.plotly_streaming_key = "x"
+        self.plotly_streaming_key = "x2"
 
         # Quandl settings
         self.quandl_api_key = "x"

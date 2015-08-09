@@ -53,7 +53,6 @@ backtest using cashbacktest_examples.py)*
     <a href="https://plot.ly/~thalesians/867/" target="_blank" title="S&amp;P500 vs Apple" style="display: block; text-align: center;"><img src="https://plot.ly/~thalesians/867.png" alt="S&amp;P500 vs Apple" style="max-width: 100%;width: 580px;"  width="580" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
     <script data-plotly="thalesians:867"  src="https://plot.ly/embed.js" async></script>
 </div>
->
 
 *Using PyThalesians to plot via Bokeh EUR/USD over NFP payrolls
 (plotting in open source version, calculations in closed source version)*

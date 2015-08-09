@@ -55,6 +55,11 @@ backtest using cashbacktest_examples.py)*
 </div>
 >
 
+*Using PyThalesians to plot via Bokeh EUR/USD over NFP payrolls
+(plotting in open source version, calculations in closed source version)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-complex-example.png" width="543"/>
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 running Bloomberg terminal software. Potentially, it could also work on the 
@@ -112,8 +117,8 @@ For the UK election Plot.ly code - please visit https://github.com/plotly/IPytho
 
 We plan to add the following features:
 * Have a proper setup mechanism (eg. via pip), at present needs (partial) manual deployment
-* Add Plotly & Seaborn wrappers for plotting
-* Improve support for Bokeh plotting
+* Add Plotly & Seaborn wrappers for plotting (partially there)
+* Improve support for Bokeh plotting (partially)
 * Add more plots from Matlibplot
 * Add Reuters as a historic data source
 * Add ability to stream data from Bloomberg and Reuters
@@ -134,6 +139,7 @@ More generally, we want to:
 
 # Coding log
 
+* 09 Aug 2015 - Improved Bokeh support
 * 07 Aug 2015 - Added Plotly support (via Jorge Santos Cufflinks wrapper)
 * 04 Aug 2015 - Added ability to download from FRED and example for downloading from FRED.
 * 29 Jul 2015 - Added backtesting functions (including simple FX trend following strategy) and various bug fixes/comments.

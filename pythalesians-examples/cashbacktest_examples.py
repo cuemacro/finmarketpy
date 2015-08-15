@@ -110,7 +110,7 @@ if True:
     gp = GraphProperties()
     gp.title = "Thalesians FX trend strategy"
     gp.source = 'Thalesians/BBG (calc with PyThalesians Python library)'
-    gp.scale_factor = 3
-    gp.file_output = 'output_data/FX-trend-example.png'
+    gp.scale_factor = 1
+    gp.file_output = 'output_data/fx-trend-example.png'
 
     pf.plot_line_graph(port, adapter = 'pythalesians', gp = gp)

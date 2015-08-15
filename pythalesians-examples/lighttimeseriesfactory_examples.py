@@ -39,10 +39,8 @@ if True:
 
     import datetime
 
-    ###### change the various labels to True to run
-
     ###### download daily data from Bloomberg for EUR/USD and GBP/USD spot and then plot
-    if False:
+    if True:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2014",                     # start date
@@ -66,7 +64,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     ###### download event dates for non farm payrolls and then print
-    if False:
+    if True:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2014",                     # start date
@@ -88,7 +86,7 @@ if True:
         print(df)
 
     ###### download daily data from Bloomberg for 30Y DE bonds and then plot
-    if False:
+    if True:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1990",                     # start date
@@ -110,7 +108,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     ###### download intraday data from Bloomberg for EUR/USD and GBP/USD spot and then plot
-    if False:
+    if True:
         from datetime import timedelta
         start_date = datetime.datetime.utcnow() - timedelta(days=1)
 
@@ -146,7 +144,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians', gp = gp)
 
     ###### download daily data from Quandl (via FRED) for EUR/USD and GBP/USD spot and then plot
-    if False:
+    if True:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1970",                     # start date
@@ -168,7 +166,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     ###### download CPI data from FRED
-    if False:
+    if True:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1970",                     # start date
@@ -192,7 +190,7 @@ if True:
         pf.plot_line_graph(df, adapter = 'pythalesians')
 
     ###### download daily data from Yahoo for Apple and Citigroup stock and then plot
-    if False:
+    if True:
 
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 1970",                     # start date
@@ -214,7 +212,7 @@ if True:
 
     # downloading historical tick data from Dukascopy broker for EUR/USD
     # (past month of data cannot be downloaded, hence cannot be used for live trading)
-    if False:
+    if True:
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jun 2015",                     # start date
                 finish_date = "02 Jun 2015",                    # finish date
@@ -229,6 +227,28 @@ if True:
         ltsf = LightTimeSeriesFactory()
 
         df = ltsf.harvest_time_series(time_series_request)
+
+        pf = PlotFactory()
+        pf.plot_line_graph(df, adapter = 'pythalesians')
+
+    ###### download daily data from Google for Apple and S&P500 ETF (and then rebase, before plotting)
+    if True:
+
+        time_series_request = TimeSeriesRequest(
+                start_date = "01 Jan 1970",                     # start date
+                finish_date = datetime.date.today(),            # finish date
+                freq = 'daily',                                 # daily data
+                data_source = 'google',                          # use Bloomberg as data source
+                tickers = ['Apple', 'S&P500 ETF'],                  # ticker (Thalesians)
+                fields = ['close'],                                 # which fields to download
+                vendor_tickers = ['aapl', 'spy'],                   # ticker (Google)
+                vendor_fields = ['Close'],                          # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+        ltsf = LightTimeSeriesFactory()
+        tsc = TimeSeriesCalcs()
+
+        df = tsc.create_mult_index_from_prices(ltsf.harvest_time_series(time_series_request))
 
         pf = PlotFactory()
         pf.plot_line_graph(df, adapter = 'pythalesians')

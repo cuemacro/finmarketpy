@@ -29,7 +29,7 @@ if True:
     pf = PlotFactory()
 
     # test simple PyThalesians/Bokeh time series line charts
-    if True:
+    if False:
         ltsf = LightTimeSeriesFactory()
 
         start = '01 Jan 2000'
@@ -123,4 +123,44 @@ if True:
         gp.html_file_output = 'output_data/demo_bokeh.htm'
         pf.plot_line_graph(daily_vals, adapter = 'bokeh', gp = gp)
 
+    # test simple PyThalesians bar charts - calculate yearly returns for various assets
+    if True:
+        ltsf = LightTimeSeriesFactory()
+
+        start = '01 Jan 2000'
+        end = datetime.datetime.utcnow()
+        tickers = ['AUDJPY', 'USDJPY', 'EURUSD', 'S&P500']
+        vendor_tickers = ['AUDJPY BGN Curncy', 'USDJPY BGN Curncy', 'EURUSD BGN Curncy', 'SPX Index']
+
+        time_series_request = TimeSeriesRequest(
+                start_date = start,                             # start date
+                finish_date = datetime.date.today(),            # finish date
+                freq = 'daily',                                 # daily data
+                data_source = 'bloomberg',                      # use Bloomberg as data source
+                tickers = tickers,                              # ticker (Thalesians)
+                fields = ['close'],                             # which fields to download
+                vendor_tickers = vendor_tickers,                # ticker (Bloomberg)
+                vendor_fields = ['PX_LAST'],                    # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+        daily_vals = ltsf.harvest_time_series(time_series_request)
+
+        # resample for year end
+        daily_vals = daily_vals.resample('A')
+
+        daily_vals = daily_vals / daily_vals.shift(1) - 1
+        daily_vals.index = daily_vals.index.year
+        daily_vals = daily_vals.drop(daily_vals.head(1).index)
+
+        pf = PlotFactory()
+
+        gp = GraphProperties()
+
+        gp.file_output = 'output_data/yearly-changes-spot-1.png'
+        gp.source = 'Thalesians/BBG'
+        gp.title = 'Yearly changes in spot'
+        gp.scale_factor = 3
+
+        # plot using PyThalesians
+        pf.plot_bar_graph(daily_vals, adapter = 'pythalesians', gp = gp)
 

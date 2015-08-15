@@ -29,20 +29,20 @@ class Constants:
         self.root_pythalesians_folder = "D:/Remote/pythalesians/pythalesians/"
         self.temp_pythalesians_folder = self.root_pythalesians_folder + "temp"
 
-        ###### FOR FUTURE VERSIONS (which include caching)
+        ###### FOR FUTURE VERSIONS (which include caching) - DO NOT REMOVE!
         # folders for holding market data
         self.folder_time_series_data = "D:/timeseriesdata"
-        # self.folder_historic_CSV = "D:/tickdata/historicCSV"
-        #
-        # # config file for time series categories
-        # self.time_series_categories_fields = \
-        #     self.root_pythalesians_folder + "conf/time_series_categories_fields.csv"
-        #
-        # # we can have multiple tickers files (separated by ";")
-        # self.time_series_tickers_list = self.root_pythalesians_folder + "conf/time_series_tickers_list.csv;" + \
-        #                                 self.root_pythalesians_folder + "conf/g10_vol_tickers.csv"
-        #
-        # self.time_series_fields_list = self.root_pythalesians_folder + "conf/time_series_fields_list.csv"
+        self.folder_historic_CSV = "D:/tickdata/historicCSV"
+
+        # config file for time series categories
+        self.time_series_categories_fields = \
+             self.root_pythalesians_folder + "conf/time_series_categories_fields.csv"
+
+        # we can have multiple tickers files (separated by ";")
+        self.time_series_tickers_list = self.root_pythalesians_folder + "conf/time_series_tickers_list.csv;" + \
+                                         self.root_pythalesians_folder + "conf/g10_vol_tickers.csv"
+
+        self.time_series_fields_list = self.root_pythalesians_folder + "conf/time_series_fields_list.csv"
 
         # for events filtering
         self.events_category = 'events'
@@ -67,7 +67,7 @@ class Constants:
         self.dukascopy_base_url = "http://www.dukascopy.com/datafeed/"
         self.dukascopy_write_temp_tick_disk = False
 
-              # for plots
+        # for plots
         self.plotfactory_default_adapter = "pythalesians"
         self.plotfactory_source = "Thalesians/BBG (created with PyThalesians Python library)"
         self.plotfactory_brand_label = "@thalesians"

@@ -59,6 +59,11 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-complex-example.png" width="543"/>
 
+*Using PyThalesians to plot combination of bar/line/scatter for recent equity returns
+(in open source version - you can run this analysis using bokeh_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-bar-example.png" width="543"/>
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 running Bloomberg terminal software. Potentially, it could also work on the 
@@ -138,6 +143,7 @@ More generally, we want to:
 
 # Coding log
 
+* 15 Aug 2015 - Added bar charts (with matplotlib & bokeh) & added more time series filter functions
 * 09 Aug 2015 - Improved Bokeh support
 * 07 Aug 2015 - Added Plotly support (via Jorge Santos Cufflinks wrapper)
 * 04 Aug 2015 - Added ability to download from FRED and example for downloading from FRED.

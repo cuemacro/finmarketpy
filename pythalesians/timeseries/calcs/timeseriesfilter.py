@@ -33,7 +33,10 @@ class TimeSeriesFilter:
     _time_series_cache = {} # shared across all instances of object!
 
     def __init__(self):
-        # self.config = ConfigManager()
+        try:
+            self.config = ConfigManager()
+        except: pass
+
         self.logger = LoggerManager().getLogger(__name__)
         return
 
@@ -380,6 +383,38 @@ class TimeSeriesFilter:
 
         return data_frame
 
+    def filter_time_series_by_minute_of_hour(self, minute, data_frame, in_tz = None, out_tz = None):
+        """
+        filter_time_series_by_minute_of_hour - Filter time series by minute of hour
+
+        Parameters
+        ----------
+        minute : int
+            minute of hour
+        data_frame : DataFrame
+            data frame to be filtered
+        in_tz : str (optional)
+            time zone of input data frame
+        out_tz : str (optional)
+            time zone of output data frame
+
+        Returns
+        -------
+        DataFrame
+        """
+        if out_tz is not None:
+            if in_tz is not None:
+                data_frame = data_frame.tz_localize(pytz.timezone(in_tz))
+
+            data_frame = data_frame.tz_convert(pytz.timezone(out_tz))
+
+            # change internal representation of time
+            data_frame.index = pandas.DatetimeIndex(data_frame.index.values)
+
+        data_frame = data_frame[data_frame.index.minute == minute]
+
+        return data_frame
+
     def filter_time_series_between_hours(self, start_hour, finish_hour, data_frame):
         """
         filter_time_series_between_hours - Filter time series between hours of the day
@@ -505,6 +540,14 @@ class TimeSeriesFilter:
 
     def resample_time_series(self, data_frame, freq):
         return data_frame.asfreq(freq, method = 'pad')
+
+    def make_FX_1_min_working_days(self, data_frame):
+        data_frame = data_frame.resample('1min')
+        data_frame = self.filter_time_series_by_holidays(data_frame, 'FX')
+        data_frame = data_frame.fillna(method='ffill')
+        data_frame = self.remove_out_FX_out_of_hours(data_frame)
+
+        return data_frame
 
     def remove_out_FX_out_of_hours(self, data_frame):
         """

@@ -26,26 +26,46 @@ class TechIndicator:
         self._techind = None
         self._signal = None
 
-    def create_tech_ind(self, data_frame_non_nan, name, tech_params):
+    def create_tech_ind(self, data_frame_non_nan, name, tech_params, data_frame_non_nan_early = None):
         self._signal = None
 
         data_frame = data_frame_non_nan.fillna(method="ffill")
 
-        if name == "SMA":
-            self._techind = pandas.rolling_mean(data_frame, tech_params.sma_period)
+        if data_frame_non_nan_early is not None:
+            data_frame_early = data_frame_non_nan_early.fillna(method="ffill")
 
-            narray = numpy.where(data_frame > self._techind, 1, -1)
+        if name == "SMA":
+
+            if (data_frame_non_nan_early is not None):
+                # calculate the lagged sum of the n-1 point
+                rolling_sum = pandas.rolling_sum(data_frame.shift(1), tech_params.sma_period - 1)
+
+                # add non-nan one for today
+                rolling_sum = rolling_sum + data_frame_early
+
+                # calculate average = sum / n
+                self._techind = rolling_sum / tech_params.sma_period
+
+                narray = numpy.where(data_frame_early > self._techind, 1, -1)
+            else:
+                self._techind = pandas.rolling_mean(data_frame, tech_params.sma_period)
+
+                narray = numpy.where(data_frame > self._techind, 1, -1)
 
             self._signal = pandas.DataFrame(index = data_frame.index, data = narray)
             self._signal.columns = [x + " SMA Signal" for x in data_frame.columns.values]
 
             self._techind.columns = [x + " SMA" for x in data_frame.columns.values]
         elif name == "ROC":
-            tsc = TimeSeriesCalcs()
 
-            data_frame = tsc.calculate_returns(data_frame)
+            if (data_frame_non_nan_early is not None):
+                self._techind = data_frame_early / data_frame.shift(tech_params.roc_period) - 1
+            else:
+                self._techind = data_frame / data_frame.shift(tech_params.roc_period) - 1
 
-            self._techind = pandas.rolling_mean(data_frame, tech_params.roc_period)
+            #tsc = TimeSeriesCalcs()
+            #data_frame = tsc.calculate_returns(data_frame)
+            #self._techind = pandas.rolling_mean(data_frame, tech_params.roc_period)
 
             narray = numpy.where(self._techind > 0, 1, -1)
 

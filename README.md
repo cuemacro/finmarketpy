@@ -54,7 +54,7 @@ backtest using cashbacktest_examples.py)*
     <script data-plotly="thalesians:867"  src="https://plot.ly/embed.js" async></script>
 </div>
 
-*Using PyThalesians to plot via Bokeh EUR/USD over FOMC statements
+*Using PyThalesians to plot via Bokeh EUR/USD in the 3 hours following FOMC statements
 (plotting in open source version, calculations in closed source version)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-complex-example.png" width="543"/>

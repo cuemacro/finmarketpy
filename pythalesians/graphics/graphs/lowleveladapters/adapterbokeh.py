@@ -26,6 +26,8 @@ import pandas
 from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
 from pythalesians.util.constants import Constants
 
+import numpy
+
 class AdapterBokeh(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, chart_type):
@@ -40,18 +42,35 @@ class AdapterBokeh(AdapterTemplate):
             output_file(html)
         except: pass
 
+        bar_ind = numpy.arange(1, len(data_frame.index) + 1)
+
+        xd, bar_ind, has_bar, no_of_bars = self.get_bar_indices(data_frame, gp, chart_type, bar_ind)
+
         if type(data_frame.index) == pandas.tslib.Timestamp:
             p1 = figure(
                 x_axis_type = "datetime",
                 plot_width = int(gp.width * scale_factor),
                 plot_height = int(gp.height * scale_factor),
-                x_range=(data_frame.index[0], data_frame.index[-1])
+                x_range=(xd[0], xd[-1])
                 )
+
+        # if has a bar than categorical axis
+        elif has_bar == True:
+            p1 = figure(
+                plot_width = int(gp.width * scale_factor),
+                plot_height = int(gp.height * scale_factor),
+                x_range=[str(x) for x in data_frame.index]
+                )
+
+            from math import pi
+            p1.xaxis.major_label_orientation = pi/2
+
+        # otherwise numerical axis
         else:
             p1 = figure(
                 plot_width = int(gp.width * scale_factor),
                 plot_height = int(gp.height * scale_factor),
-                x_range=(data_frame.index[0], data_frame.index[-1])
+                x_range=(xd[0], xd[-1])
                 )
 
         # set the fonts
@@ -62,10 +81,12 @@ class AdapterBokeh(AdapterTemplate):
         p1.xaxis.axis_label_text_font_size = str(10 * scale_factor) + "pt"
         p1.xaxis.axis_label_text_font = Constants().bokeh_font
         p1.xaxis.axis_label_text_font_style = Constants().bokeh_font_style
+        p1.xaxis.axis_label = gp.x_title
 
         p1.yaxis.axis_label_text_font_size = str(10 * scale_factor) + "pt"
         p1.yaxis.axis_label_text_font = Constants().bokeh_font
         p1.yaxis.axis_label_text_font_style = Constants().bokeh_font_style
+        p1.yaxis.axis_label = gp.y_title
 
         p1.legend.label_text_font_size = str(10 * scale_factor) + "pt"
         p1.legend.label_text_font = Constants().bokeh_font
@@ -84,9 +105,14 @@ class AdapterBokeh(AdapterTemplate):
         #         text_font_size = str(10 * scale_factor) + "pt", text_align = "left",
         #         text_font = Constants().bokeh_font)
 
-        dates = data_frame.index
         color_spec = self.create_color_list(gp, data_frame)
         import matplotlib
+
+        bar_space = 0.2
+        bar_width = (1 - bar_space) / (no_of_bars)
+        bar_index = 0
+
+        has_bar = False
 
         # plot each series in the dataframe separately
         for i in range(0, len(data_frame.columns)):
@@ -96,7 +122,7 @@ class AdapterBokeh(AdapterTemplate):
             # set chart type which can differ for each time series
             if chart_type is not None:
                 if gp.chart_type is not None:
-                    if isinstance(gp.type, list): chart_type = gp.chart_type[i]
+                    if isinstance(gp.chart_type, list): chart_type = gp.chart_type[i]
                     else: chart_type = gp.chart_type
 
             # get the color
@@ -107,6 +133,8 @@ class AdapterBokeh(AdapterTemplate):
                 color_spec[i] = matplotlib.colors.rgb2hex(color_spec[i])
             except: pass
 
+            yd = data_frame.ix[:,i]
+
             # plot each time series as appropriate line, scatter etc.
             if chart_type == 'line':
                 linewidth_t = self.get_linewidth(label,
@@ -115,19 +143,36 @@ class AdapterBokeh(AdapterTemplate):
                 if linewidth_t is None: linewidth_t = 1
 
                 if gp.display_legend:
-                    p1.line(dates, data_frame.ix[:,i], color = color_spec[i], line_width=linewidth_t, name = glyph_name,
+                    p1.line(xd, yd, color = color_spec[i], line_width=linewidth_t, name = glyph_name,
                             legend = label,
                     )
                 else:
-                   p1.line(dates, data_frame.ix[:,i], color = color_spec[i], line_width=linewidth_t, name = glyph_name)
+                    p1.line(xd, data_frame.ix[:,i], color = color_spec[i], line_width=linewidth_t, name = glyph_name)
+
+            elif(chart_type == 'bar'):
+                bar_pos = [k - (1 - bar_space) / 2. + bar_index * bar_width for k in range(1,len(bar_ind) + 1)]
+                bar_pos_right = [x + bar_width for x in bar_pos]
+
+                if gp.display_legend:
+                    p1.quad(top=yd, bottom=0 * yd, left=bar_pos, right=bar_pos_right, color=color_spec[i], legend=label)
+                else:
+                    p1.quad(top=yd, bottom=0 * yd, left=bar_pos, right=bar_pos_right, color=color_spec[i])
+
+                bar_index = bar_index + 1
+                bar_ind = bar_ind + bar_width
 
             elif chart_type == 'scatter':
+                linewidth_t = self.get_linewidth(label,
+                    gp.linewidth, gp.linewidth_2, gp.linewidth_2_series)
+
+                if linewidth_t is None: linewidth_t = 1
+
                 if gp.display_legend:
-                    p1.circle(dates, data_frame.ix[:,i], color = color_spec[i], line_width=linewidth_t, name = glyph_name,
+                    p1.circle(xd, yd, color = color_spec[i], line_width=linewidth_t, name = glyph_name,
                             legend = label,
                     )
                 else:
-                   p1.circle(dates, data_frame.ix[:,i], color = color_spec[i], line_width=linewidth_t, name = glyph_name)
+                    p1.circle(xd, yd, color = color_spec[i], line_width=linewidth_t, name = glyph_name)
 
             # set common properties
             # glyph = p1.select(name=glyph_name)[0].glyph

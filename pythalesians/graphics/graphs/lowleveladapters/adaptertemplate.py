@@ -18,6 +18,7 @@ from math import log10, floor
 from pythalesians.util.constants import Constants
 
 import matplotlib
+import numpy
 
 class AdapterTemplate:
 
@@ -27,6 +28,29 @@ class AdapterTemplate:
     @abc.abstractmethod
     def plot_2d_graph(self, data_frame, gp, type):
         return
+
+
+    def get_bar_indices(self, data_frame, gp, chart_type, bar_ind):
+        has_bar = False
+        xd = data_frame.index
+        no_of_bars = len(data_frame.columns)
+
+        if chart_type is not None:
+            if gp.chart_type is not None:
+                if isinstance(gp.chart_type, list):
+                    if 'bar' in gp.chart_type:
+                        xd = bar_ind
+                        no_of_bars = gp.chart_type.count('bar')
+                        has_bar = True
+                elif 'bar' == gp.chart_type:
+                    xd = bar_ind
+                    has_bar = True
+
+            if chart_type == 'bar':
+                xd = bar_ind
+                has_bar = True
+
+        return xd, bar_ind, has_bar, no_of_bars
 
     def assign(self, structure, field, default):
         if hasattr(structure, field): default = getattr(structure, field)

@@ -23,11 +23,9 @@ Plotly, Cufflinks (Plotly wrapper), Seaborne (Matplotlib wrapper)
 """
 
 from pythalesians.graphics.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
-
 try:
     from pythalesians.graphics.graphs.lowleveladapters.adapterplotly import AdapterPlotly
 except: pass
-
 from pythalesians.graphics.graphs.lowleveladapters.adaptercufflinks import AdapterCufflinks
 from pythalesians.graphics.graphs.lowleveladapters.adapterbokeh import AdapterBokeh
 
@@ -53,6 +51,9 @@ class PlotFactory:
     def plot_bar_graph(self, data_frame, adapter =  default_adapter, gp = None):
         return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, 'bar')
 
+    def plot_stacked_graph(self, data_frame, adapter =  default_adapter, gp = None):
+        return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, 'stacked')
+
     def tweet_line_graph(self, data_frame, adapter =  default_adapter, gp = None, twitter_msg = None, twitter_on = None):
         return self.tweet_generic_graph(data_frame, type = 'line', adapter = adapter, gp = gp,
                                         twitter_msg = twitter_msg, twitter_on = twitter_on)
@@ -69,7 +70,7 @@ class PlotFactory:
 
         if twitter_on: twitter.update_status(twitter_msg, picture = gp.file_output)
 
-    def plot_generic_graph(self, data_frame, adapter =  default_adapter, type = 'line', gp = None, excel_file = None,
+    def plot_generic_graph(self, data_frame, adapter =  default_adapter, type = None, gp = None, excel_file = None,
                            excel_sheet = None, freq = 'daily'):
 
 
@@ -78,7 +79,7 @@ class PlotFactory:
 
             data_frame = tio.read_excel_data_frame(excel_file, excel_sheet, freq)
 
-        if type in ['line', 'bar', 'scatter', 'choropleth']: return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, type)
+        return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, type)
 
     def get_adapter(self, adapter):
 

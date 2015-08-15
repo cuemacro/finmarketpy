@@ -66,6 +66,9 @@ class AdapterPyThalesians(AdapterTemplate):
         y_formatter = matplotlib.ticker.ScalarFormatter(useOffset = False)
         ax.yaxis.set_major_formatter(y_formatter)
 
+        if gp.x_title != '': ax.set_xlabel(gp.x_title)
+        if gp.y_title != '': ax.set_ylabel(gp.y_title)
+
         # create a second y axis if necessary
         ax2 = []
 
@@ -76,23 +79,34 @@ class AdapterPyThalesians(AdapterTemplate):
             ax.yaxis.grid(False)
             ax2.yaxis.grid(False)
 
+        color_cycle = matplotlib.rcParams['axes.color_cycle']
+
+        bar_ind = np.arange(0, len(data_frame.index))
+
+        xd, bar_ind, has_bar, no_of_bars = self.get_bar_indices(data_frame, gp, chart_type, bar_ind)
+
         # plot the lines (using custom palettes as appropriate)
         try:
             # get all the correct colors (and construct gradients if necessary eg. from 'blues')
             color_spec = self.create_color_list(gp, data_frame)
 
-            if type == 'bar':
-                # bottom = np.cumsum(np.vstack((np.zeros(data_frame.values.shape[1]), data_frame.values)), axis=0)[:-1]
-                # bottom = np.vstack((np.zeros((data_frame.values.shape[1],), dtype=data_frame.dtype),
-                #                    np.cumsum(data_frame.values, axis=0)[:-1]))
-                yoff = np.zeros(len(data_frame.index.values)) # the bottom values for stacked bar chart
+            # for stacked bar
+            yoff = np.zeros(len(data_frame.index.values)) # the bottom values for stacked bar chart
+
+            # for bar chart
+            # bar_ind = np.arange(len(data_frame.index))
+            # has_bar = False
+
+            bar_space = 0.2
+            bar_width = (1 - bar_space) / (no_of_bars)
+            bar_index = 0
 
             # some lines we should exclude from the color and use the default palette
             for i in range(0, len(data_frame.columns.values)):
 
                 if chart_type is not None:
                     if gp.chart_type is not None:
-                        if isinstance(gp.type, list):
+                        if isinstance(gp.chart_type, list):
                             chart_type = gp.chart_type[i]
                         else:
                             chart_type = gp.chart_type
@@ -101,7 +115,7 @@ class AdapterPyThalesians(AdapterTemplate):
 
                 ax_temp = self.get_axis(ax, ax2, label, gp.y_axis_2_series)
 
-                xd = data_frame.index; yd = data_frame.ix[:,i]
+                yd = data_frame.ix[:,i]
 
                 if (chart_type == 'line'):
                     linewidth_t = self.get_linewidth(label,
@@ -111,9 +125,27 @@ class AdapterPyThalesians(AdapterTemplate):
 
                     ax_temp.plot(xd, yd, label = label, color = color_spec[i],
                                      linewidth = linewidth_t)
+
                 elif(chart_type == 'bar'):
+                    bar_pos = [k - (1 - bar_space) / 2. + bar_index * bar_width for k in range(0,len(bar_ind))]
+
+                    if color_spec[i] is not None:
+                        ax_temp.bar(bar_pos, yd, bar_width, label = label,
+                                        color = color_spec[i])
+                    else:
+                        ax_temp.bar(bar_pos, yd, bar_width, label = label,
+                                        color = color_cycle[i % len(color_cycle)])
+
+                    bar_index = bar_index + 1
+                    # bar_ind = bar_ind + bar_width
+
+                    has_bar = True
+
+                elif(chart_type == 'stacked'):
                     ax_temp.bar(xd, yd, label = label, color = color_spec[i], bottom = yoff)
                     yoff = yoff + yd
+
+                    has_bar = True
 
                 elif(chart_type == 'scatter'):
                     ax_temp.scatter(xd, yd, label = label, color = color_spec[i])
@@ -121,10 +153,14 @@ class AdapterPyThalesians(AdapterTemplate):
                     if gp.line_of_best_fit is True:
                         self.trendline(ax_temp, xd.values, yd.values, order=1, color= color_spec[i], alpha=1,
                                            scale_factor = gp.scale_factor)
+
+            # format X axis
+            self.format_x_axis(ax, data_frame, gp, has_bar, bar_ind)
+
         except: pass
 
-        # format X axis
-        self.format_x_axis(ax, data_frame, gp)
+        plt.xlabel(gp.x_title)
+        plt.ylabel(gp.y_title)
 
         fig.suptitle(gp.title, fontsize = 14 * gp.scale_factor)
 
@@ -203,7 +239,18 @@ class AdapterPyThalesians(AdapterTemplate):
         except:
             pass
 
-    def format_x_axis(self, ax, data_frame, gp):
+    def format_x_axis(self, ax, data_frame, gp, has_bar, bar_ind):
+
+        if has_bar:
+            ax.set_xticks(bar_ind)
+            ax.set_xticklabels(data_frame.index)
+            ax.set_xlim([-1, len(bar_ind)])
+
+            if len(bar_ind) > 6:
+                plt.setp(plt.xticks()[1], rotation=90)
+
+            return
+
         # format X axis
         dates = data_frame.index
 
@@ -293,6 +340,7 @@ class AdapterPyThalesians(AdapterTemplate):
             except:
                 try:
                     # otherwise we have integers, rather than dates
+                    # TODO needs smarter more generalised mapping of dates
                     max = dates.max()
                     min = dates.min()
 
@@ -314,7 +362,7 @@ class AdapterPyThalesians(AdapterTemplate):
 
 
     def trendline(self, ax, xd, yd, order=1, color='red', alpha=1, Rval=False, scale_factor = 1):
-        """Make a line of best fit"""
+        """ Make a line of best fit """
 
         # Calculate trendline
         xd[np.isnan(xd)] = 0

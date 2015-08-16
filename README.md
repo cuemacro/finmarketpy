@@ -7,7 +7,7 @@ more generic elements to the community, many of whom have encouraged me to publi
 At present the latest open source version of PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
-* Produces beautiful line plots with PyThalesians wrapper (via Matplotlib) and a simple wrapper for Bokeh
+* Produces beautiful line plots with PyThalesians wrapper (via Matplotlib), Plotly (via cufflinks) and a simple wrapper for Bokeh
 * Basic seasonality analysis of markets
 * Calculates some technical indicators and gives trading signals based on these
 * Helper functions built on top of Pandas

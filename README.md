@@ -127,6 +127,7 @@ We plan to add the following features:
 * Add Reuters as a historic data source
 * Add ability to stream data from Bloomberg and Reuters
 * Use event driven code to generate trading signals (to be used live and historically)
+* Add more interesting trading analysis tools
 * Add support for live trading via Interactive Brokers
 * Integrate support for zipline as an alternative trading system
 * Support Python 2.7+

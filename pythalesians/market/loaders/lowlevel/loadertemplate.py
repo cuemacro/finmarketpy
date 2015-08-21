@@ -22,14 +22,15 @@ Abstract class for various data source loaders.
 import abc
 import copy
 
-from pythalesians.util.constants import Constants
+from pythalesians.util.configmanager import ConfigManager
 
 class LoaderTemplate:
     def __init__(self):
+        self.config = None
 
-        if Constants().default_time_series_factory == "cachedtimeseriesfactory":
-            from pythalesians.util.configmanager import ConfigManager
+        try:
             self.config = ConfigManager()
+        except: pass
 
         return
 

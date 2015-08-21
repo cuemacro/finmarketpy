@@ -144,6 +144,7 @@ More generally, we want to:
 
 # Coding log
 
+* 21 Aug 2015 - Added stacked charts (with matplotlib & bokeh) & several bug fixes
 * 15 Aug 2015 - Added bar charts (with matplotlib & bokeh) & added more time series filter functions
 * 09 Aug 2015 - Improved Bokeh support
 * 07 Aug 2015 - Added Plotly support (via Jorge Santos Cufflinks wrapper)

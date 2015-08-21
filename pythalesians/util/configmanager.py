@@ -1,4 +1,23 @@
-__author__ = 'saeedamen'
+__author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
+
+#
+# Copyright 2015 Thalesians Ltd. - http//www.thalesians.com / @thalesians
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#
+# See the License for the specific language governing permissions and limitations under the License.
+#
+
+"""
+ConfigManager
+
+Functions for converting between vendor tickers and Thalesians tickers (and vice-versa).
+
+"""
 
 import csv
 from pythalesians.util.constants import Constants
@@ -26,8 +45,10 @@ class ConfigManager(object):
 
     def __init__(self, *args, **kwargs):
         if ConfigManager._is_init == 0:
-            ConfigManager.populate_time_series_dictionaries()
-            ConfigManager._is_init = 1
+            try:
+                ConfigManager.populate_time_series_dictionaries()
+                ConfigManager._is_init = 1
+            except: pass
         #logger = LoggerManager().getLogger(__name__)
         pass
 
@@ -115,8 +136,6 @@ class ConfigManager(object):
             # conversion from library category to library startdate
             ConfigManager._dict_time_series_category_startdate_library_to_library[
                 category + '.' + source + '.' + freq + '.' + cut] = parse(startdate).date()
-
-        x = 5
 
     @staticmethod
     def get_categories_from_fields():

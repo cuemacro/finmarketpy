@@ -55,6 +55,7 @@ class TwitterPyThalesians:
             self.twitter.update_status_with_media(status=msg, media=photo)
 
 if __name__ == '__main__':
+    # see twitterpythalesians_examples
     pass
 
 

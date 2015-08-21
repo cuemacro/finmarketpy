@@ -7,7 +7,7 @@ more generic elements to the community, many of whom have encouraged me to publi
 At present the latest open source version of PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
-* Produces beautiful line plots with PyThalesians wrapper (via Matplotlib) and a simple wrapper for Bokeh
+* Produces beautiful line plots with PyThalesians wrapper (via Matplotlib), Plotly (via cufflinks) and a simple wrapper for Bokeh
 * Basic seasonality analysis of markets
 * Calculates some technical indicators and gives trading signals based on these
 * Helper functions built on top of Pandas
@@ -58,6 +58,11 @@ backtest using cashbacktest_examples.py)*
 (plotting in open source version, calculations in closed source version)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-complex-example.png" width="543"/>
+
+*Using PyThalesians to plot combination of bar/line/scatter for recent equity returns
+(in open source version - you can run this analysis using bokeh_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-bar-example.png" width="543"/>
 
 # Requirements
 
@@ -122,6 +127,7 @@ We plan to add the following features:
 * Add Reuters as a historic data source
 * Add ability to stream data from Bloomberg and Reuters
 * Use event driven code to generate trading signals (to be used live and historically)
+* Add more interesting trading analysis tools
 * Add support for live trading via Interactive Brokers
 * Integrate support for zipline as an alternative trading system
 * Support Python 2.7+
@@ -138,6 +144,7 @@ More generally, we want to:
 
 # Coding log
 
+* 15 Aug 2015 - Added bar charts (with matplotlib & bokeh) & added more time series filter functions
 * 09 Aug 2015 - Improved Bokeh support
 * 07 Aug 2015 - Added Plotly support (via Jorge Santos Cufflinks wrapper)
 * 04 Aug 2015 - Added ability to download from FRED and example for downloading from FRED.

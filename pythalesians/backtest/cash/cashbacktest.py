@@ -257,7 +257,7 @@ class CashBacktest:
 
     def get_pnl_tsd(self):
         """
-        get_pnl_tsd - Gets P&L return statistics class which can be queried.
+        get_pnl_tsd - Gets P&L return statistics of individual strategies as class to be queried
 
         Returns
         -------

@@ -31,6 +31,7 @@ from pythalesians.util.commonman import CommonMan
 class Seasonality:
 
     def __init__(self):
+        self.config = ConfigManager()
         self.logger = LoggerManager().getLogger(__name__)
         return
 
@@ -60,12 +61,25 @@ class Seasonality:
 
         return intraday_seasonality
 
+    def bus_day_of_month_seasonality_from_prices(self, data_frame,
+                                 month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum = True,
+                                 cal = "FX", partition_by_month = True, add_average = False):
+
+        return self.bus_day_of_month_seasonality(self, data_frame,
+                                 month_list = month_list, cum = cum,
+                                 cal = cal, partition_by_month = partition_by_month,
+                                 add_average = add_average, price_index = True)
+
     def bus_day_of_month_seasonality(self, data_frame,
                                  month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum = True,
-                                     cal = "FX", partition_by_month = True):
+                                 cal = "FX", partition_by_month = True, add_average = False, price_index = False):
 
         tsc = TimeSeriesCalcs()
         tsf = TimeSeriesFilter()
+
+        if price_index:
+            data_frame = data_frame.resample('B')           # resample into business days
+            data_frame = tsc.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
         data_frame = tsf.filter_time_series_by_holidays(data_frame, cal)
@@ -76,12 +90,42 @@ class Seasonality:
         if partition_by_month:
             monthly_seasonality = monthly_seasonality.unstack(level=0)
 
-        if cum is True:
-            monthly_seasonality.ix[0] = numpy.zeros(len(monthly_seasonality.columns))
+            if add_average:
+               monthly_seasonality['Avg'] = monthly_seasonality.mean(axis=1)
 
+        if cum is True:
             if partition_by_month:
-                monthly_seasonality.index = monthly_seasonality.index + 1   # shifting index
-                monthly_seasonality = monthly_seasonality.sort()            # sorting by index
+                monthly_seasonality.loc[0] = numpy.zeros(len(monthly_seasonality.columns))
+                # monthly_seasonality.index = monthly_seasonality.index + 1       # shifting index
+                monthly_seasonality = monthly_seasonality.sort()
+
+            monthly_seasonality = tsc.create_mult_index(monthly_seasonality)
+
+        return monthly_seasonality
+
+    def monthly_seasonality_from_prices(self, data_frame, cum = True, add_average = False):
+        return self.monthly_seasonality(data_frame, cum, add_average, price_index=True)
+
+    def monthly_seasonality(self, data_frame,
+                                  cum = True,
+                                  add_average = False, price_index = False):
+
+        tsc = TimeSeriesCalcs()
+
+        if price_index:
+            data_frame = data_frame.resample('BM')          # resample into month end
+            data_frame = tsc.calculate_returns(data_frame)
+
+        data_frame.index = pandas.to_datetime(data_frame.index)
+
+        monthly_seasonality = tsc.average_by_month(data_frame)
+
+        if add_average:
+            monthly_seasonality['Avg'] = monthly_seasonality.mean(axis=1)
+
+        if cum is True:
+            monthly_seasonality.loc[0] = numpy.zeros(len(monthly_seasonality.columns))
+            monthly_seasonality = monthly_seasonality.sort()
 
             monthly_seasonality = tsc.create_mult_index(monthly_seasonality)
 

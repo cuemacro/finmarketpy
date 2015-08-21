@@ -162,6 +162,12 @@ class GraphProperties:
         self.convert_matplotlib_to_plotly = convert_matplotlib_to_plotly
 
     def str_list(self, original):
+
+        # if is of the form pandas index
+        try:
+            original = original.tolist()
+        except: pass
+
         if isinstance(original, list):
             original = [str(x) for x in original]
 

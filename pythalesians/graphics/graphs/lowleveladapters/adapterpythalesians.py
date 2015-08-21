@@ -55,7 +55,11 @@ class AdapterPyThalesians(AdapterTemplate):
         except:
             plt.style.use(gp.style_sheet)
 
+        # adjust font size for scale factor
         matplotlib.rcParams.update({'font.size': matplotlib.rcParams['font.size'] * gp.scale_factor})
+
+        # do not use offsets/scientific notation
+        matplotlib.rcParams.update({'axes.formatter.useoffset': False})
 
         # create figure & add a subplot
         fig = plt.figure(figsize = ((gp.width * gp.scale_factor)/gp.dpi,
@@ -83,6 +87,7 @@ class AdapterPyThalesians(AdapterTemplate):
 
         bar_ind = np.arange(0, len(data_frame.index))
 
+        # for bar charts, create a proxy x-axis (then relabel)
         xd, bar_ind, has_bar, no_of_bars = self.get_bar_indices(data_frame, gp, chart_type, bar_ind)
 
         # plot the lines (using custom palettes as appropriate)
@@ -91,12 +96,12 @@ class AdapterPyThalesians(AdapterTemplate):
             color_spec = self.create_color_list(gp, data_frame)
 
             # for stacked bar
-            yoff = np.zeros(len(data_frame.index.values)) # the bottom values for stacked bar chart
+            yoff_pos = np.zeros(len(data_frame.index.values)) # the bottom values for stacked bar chart
+            yoff_neg = np.zeros(len(data_frame.index.values)) # the bottom values for stacked bar chart
+
+            zeros = np.zeros(len(data_frame.index.values))
 
             # for bar chart
-            # bar_ind = np.arange(len(data_frame.index))
-            # has_bar = False
-
             bar_space = 0.2
             bar_width = (1 - bar_space) / (no_of_bars)
             bar_index = 0
@@ -117,6 +122,9 @@ class AdapterPyThalesians(AdapterTemplate):
 
                 yd = data_frame.ix[:,i]
 
+                if color_spec[i] is None:
+                    color_spec[i] = color_cycle[i % len(color_cycle)]
+
                 if (chart_type == 'line'):
                     linewidth_t = self.get_linewidth(label,
                                                      gp.linewidth, gp.linewidth_2, gp.linewidth_2_series)
@@ -127,25 +135,24 @@ class AdapterPyThalesians(AdapterTemplate):
                                      linewidth = linewidth_t)
 
                 elif(chart_type == 'bar'):
+                    # for multiple bars we need to allocate space properly
                     bar_pos = [k - (1 - bar_space) / 2. + bar_index * bar_width for k in range(0,len(bar_ind))]
 
-                    if color_spec[i] is not None:
-                        ax_temp.bar(bar_pos, yd, bar_width, label = label,
-                                        color = color_spec[i])
-                    else:
-                        ax_temp.bar(bar_pos, yd, bar_width, label = label,
-                                        color = color_cycle[i % len(color_cycle)])
+                    ax_temp.bar(bar_pos, yd, bar_width, label = label, color = color_spec[i])
 
                     bar_index = bar_index + 1
-                    # bar_ind = bar_ind + bar_width
-
-                    has_bar = True
 
                 elif(chart_type == 'stacked'):
-                    ax_temp.bar(xd, yd, label = label, color = color_spec[i], bottom = yoff)
-                    yoff = yoff + yd
+                    bar_pos = [k - (1 - bar_space) / 2. + bar_index * bar_width for k in range(0,len(bar_ind))]
 
-                    has_bar = True
+                    yoff = np.where(yd > 0, yoff_pos, yoff_neg)
+
+                    ax_temp.bar(bar_pos, yd, label = label, color = color_spec[i], bottom = yoff)
+
+                    yoff_pos = yoff_pos + np.maximum(yd, zeros)
+                    yoff_neg = yoff_neg + np.minimum(yd, zeros)
+
+                    # bar_index = bar_index + 1
 
                 elif(chart_type == 'scatter'):
                     ax_temp.scatter(xd, yd, label = label, color = color_spec[i])
@@ -233,7 +240,7 @@ class AdapterPyThalesians(AdapterTemplate):
         except:
             pass
 
-        # display in Matplotlib
+        # display in matplotlib window
         try:
             if gp.silent_display == False: plt.show()
         except:
@@ -246,9 +253,14 @@ class AdapterPyThalesians(AdapterTemplate):
             ax.set_xticklabels(data_frame.index)
             ax.set_xlim([-1, len(bar_ind)])
 
+            # if lots of labels make text smaller and rotate
             if len(bar_ind) > 6:
                 plt.setp(plt.xticks()[1], rotation=90)
-
+                # plt.gca().tight_layout()
+                # matplotlib.rcParams.update({'figure.autolayout': True})
+                # plt.gcf().subplots_adjust(bottom=5)
+                plt.tight_layout()
+                # ax.tick_params(axis='x', labelsize=matplotlib.rcParams['font.size'] * 0.5)
             return
 
         # format X axis

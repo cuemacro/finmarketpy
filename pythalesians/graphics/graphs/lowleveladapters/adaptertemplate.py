@@ -18,7 +18,6 @@ from math import log10, floor
 from pythalesians.util.constants import Constants
 
 import matplotlib
-import numpy
 
 class AdapterTemplate:
 
@@ -42,11 +41,18 @@ class AdapterTemplate:
                         xd = bar_ind
                         no_of_bars = gp.chart_type.count('bar')
                         has_bar = True
+                    elif 'stacked' in gp.chart_type:
+                        xd = bar_ind
+                        no_of_bars = 1
+                        has_bar = True
                 elif 'bar' == gp.chart_type:
                     xd = bar_ind
                     has_bar = True
+                elif 'stacked' == gp.chart_type:
+                    xd = bar_ind
+                    has_bar = True
 
-            if chart_type == 'bar':
+            if chart_type == 'bar' or chart_type == 'stacked':
                 xd = bar_ind
                 has_bar = True
 

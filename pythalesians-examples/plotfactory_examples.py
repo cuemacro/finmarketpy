@@ -66,7 +66,7 @@ if True:
         pf.plot_line_graph(daily_vals, adapter = 'bokeh', gp = gp)
 
     # do more complicated charts using several different Matplotib stylesheets (which have been customised)
-    if True:
+    if False:
         ltsf = LightTimeSeriesFactory()
 
         # load market data
@@ -124,7 +124,7 @@ if True:
         pf.plot_line_graph(daily_vals, adapter = 'bokeh', gp = gp)
 
     # test simple PyThalesians bar charts - calculate yearly returns for various assets
-    if True:
+    if False:
         ltsf = LightTimeSeriesFactory()
 
         start = '01 Jan 2000'
@@ -156,11 +156,14 @@ if True:
 
         gp = GraphProperties()
 
-        gp.file_output = 'output_data/yearly-changes-spot-1.png'
         gp.source = 'Thalesians/BBG'
         gp.title = 'Yearly changes in spot'
         gp.scale_factor = 3
+        gp.y_title = "Percent Change"
 
-        # plot using PyThalesians
+        daily_vals = daily_vals * 100
+
+        # plot using PyThalesians (stacked & then bar graph)
+        pf.plot_stacked_graph(daily_vals, adapter = 'pythalesians', gp = gp)
         pf.plot_bar_graph(daily_vals, adapter = 'pythalesians', gp = gp)
 

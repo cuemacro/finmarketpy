@@ -8,8 +8,7 @@ from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.graphics.graphs.plotfactory import PlotFactory
 from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
-if False:
-
+if True:
     time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2013",                     # start date
                 finish_date = datetime.date.today(),            # finish date
@@ -30,10 +29,8 @@ if False:
     gp.html_file_output = "output_data/apple.htm"
     gp.title = "S&P500 vs Apple"
 
-    # plot first with PyThalesians and then Plotly (via Cufflinks)
+    # plot first with PyThalesians and then Bokeh
     # just needs 1 word to change
-    # (although, note that AdapterCufflinks does have some extra parameters that can be set in
-    # GraphProperties)
     gp.display_legend = False
 
     pf = PlotFactory()
@@ -84,8 +81,6 @@ if True:
     gp.x_title = 'Dates'
     gp.y_title = 'Pc'
 
-    # plot using Bokeh
+    # plot using Bokeh then PyThalesians
     pf.plot_bar_graph(daily_vals * 100, adapter = 'bokeh', gp = gp)
-
-    # plot using PyThalesians
     pf.plot_bar_graph(daily_vals * 100, adapter = 'pythalesians', gp = gp)

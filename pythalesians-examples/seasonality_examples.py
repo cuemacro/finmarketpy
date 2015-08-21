@@ -67,8 +67,8 @@ if True:
 
     gp = GraphProperties()
     gp.date_formatter = '%b'
-    gp.title = 'FX spot moves by time of year'
+    gp.title = 'FX spot moves by day of month'
     gp.scale_factor = 3
-    gp.file_output = "output_data/20150724 FX spot seas.png"
+    gp.file_output = "output_data/FX spot DOM seasonality.png"
 
     pf.plot_line_graph(day_of_month_seasonality, adapter='pythalesians', gp = gp)

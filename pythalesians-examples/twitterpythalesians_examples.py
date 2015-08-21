@@ -21,7 +21,7 @@ Gives example of how to update Twitter status with text and plot directly (as op
 
 from pythalesians.util.twitterpythalesians import TwitterPyThalesians
 
-if False:
+if True:
     APP_KEY             = "XXXX"
     APP_SECRET          = "XXXX"
     OAUTH_TOKEN	        = "XXXX"

@@ -38,12 +38,16 @@ from datetime import timedelta
 import numpy as np
 
 from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-
+from pythalesians.graphics.graphs.graphproperties import GraphProperties
 from pythalesians.util.constants import Constants
 
 class AdapterPyThalesians(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, chart_type):
+
+        if gp is None: gp = GraphProperties()
+        if gp.chart_type is None and chart_type is None: chart_type = 'line'
+
         if gp.resample is not None: data_frame = data_frame.asfreq(gp.resample)
 
         # set the matplotlib style sheet & defaults
@@ -109,12 +113,11 @@ class AdapterPyThalesians(AdapterTemplate):
             # some lines we should exclude from the color and use the default palette
             for i in range(0, len(data_frame.columns.values)):
 
-                if chart_type is not None:
-                    if gp.chart_type is not None:
-                        if isinstance(gp.chart_type, list):
-                            chart_type = gp.chart_type[i]
-                        else:
-                            chart_type = gp.chart_type
+                if gp.chart_type is not None:
+                    if isinstance(gp.chart_type, list):
+                        chart_type = gp.chart_type[i]
+                    else:
+                        chart_type = gp.chart_type
 
                 label = str(data_frame.columns[i])
 
@@ -259,6 +262,11 @@ class AdapterPyThalesians(AdapterTemplate):
                 # plt.gca().tight_layout()
                 # matplotlib.rcParams.update({'figure.autolayout': True})
                 # plt.gcf().subplots_adjust(bottom=5)
+                import matplotlib.dates as mdates
+
+                if gp.date_formatter is not None:
+                    ax.format_xdata = mdates.DateFormatter(gp.date_formatter)
+
                 plt.tight_layout()
                 # ax.tick_params(axis='x', labelsize=matplotlib.rcParams['font.size'] * 0.5)
             return
@@ -316,9 +324,17 @@ class AdapterPyThalesians(AdapterTemplate):
                         locator = HourLocator(interval=1)
                         ax.xaxis.set_major_locator(locator)
                         ax.xaxis.set_minor_locator(MinuteLocator(interval=30))
-                    elif diff < timedelta(days=4):
+                    elif diff < timedelta(days=3):
                         ax.xaxis.set_major_locator(HourLocator(interval=6))
                         ax.xaxis.set_minor_locator(HourLocator(interval=1))
+
+                elif diff < timedelta(days=10):
+                    locator = DayLocator(interval=2)
+                    ax.xaxis.set_major_locator(locator)
+                    ax.xaxis.set_major_formatter(md.DateFormatter('%d %b %y'))
+
+                    day_locator = DayLocator(interval=1)
+                    ax.xaxis.set_minor_locator(day_locator)
 
                 elif diff < timedelta(days=40):
                     locator = DayLocator(interval=10)

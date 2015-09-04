@@ -2,6 +2,7 @@ __author__ = 'saeedamen'
 
 from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
+from pythalesians.timeseries.techind.techparams import TechParams
 
 
 class BacktestRequest(TimeSeriesRequest):
@@ -9,6 +10,25 @@ class BacktestRequest(TimeSeriesRequest):
     def __init__(self):
         super(TimeSeriesRequest, self).__init__()
         self.logger = LoggerManager().getLogger(__name__)
+
+        self.__signal_name = None
+        self.__tech_params = TechParams()
+
+    @property
+    def signal_name(self):
+        return self.__signal_name
+
+    @signal_name.setter
+    def signal_name(self, signal_name):
+        self.__signal_name = signal_name
+
+    @property
+    def tech_params(self):
+        return self.__tech_params
+
+    @tech_params.setter
+    def tech_params(self, tech_params):
+        self.__tech_params = tech_params
 
     @property
     def opt_tc_bp(self):

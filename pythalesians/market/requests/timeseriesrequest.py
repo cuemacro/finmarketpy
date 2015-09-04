@@ -25,7 +25,7 @@ class TimeSeriesRequest:
                  gran_freq = None, cut = None,
                  fields = None, cache_algo = None,
                  vendor_tickers = None, vendor_fields = None,
-                 environment = None
+                 environment = "backtest", trade_side = 'trade'
                  ):
 
         self.logger = LoggerManager().getLogger(__name__)
@@ -37,6 +37,7 @@ class TimeSeriesRequest:
         if finish_date is not None: self.finish_date = finish_date
         if tickers is not None: self.tickers = tickers
         if category is not None: self.category = category
+        if gran_freq is not None: self.gran_freq = gran_freq
         if freq_mult is not None: self.freq_mult = freq_mult
         if freq is not None: self.freq = freq
         if cut is not None: self.cut = cut
@@ -45,6 +46,7 @@ class TimeSeriesRequest:
         if vendor_tickers is not None: self.vendor_tickers = vendor_tickers
         if vendor_fields is not None: self.vendor_fields = vendor_fields
         if environment is not None: self.environment = environment
+        if trade_side is not None: self.trade_side = trade_side
 
     @property
     def data_source(self):
@@ -246,6 +248,21 @@ class TimeSeriesRequest:
         valid_environment= ['prod', 'backtest']
 
         if not environment in valid_environment:
-            self.logger.warning(environment & " is not a defined environment.")
+            self.logger.warning(environment + " is not a defined environment.")
 
         self.__environment = environment
+
+    @property
+    def trade_side(self):
+        return self.__trade_side
+
+    @trade_side.setter
+    def trade_side(self, trade_side):
+        trade_side = trade_side.lower()
+
+        valid_trade_side = ['trade', 'bid', 'ask']
+
+        if not trade_side in valid_trade_side:
+            self.logger.warning(trade_side + " is not a defined trade side.")
+
+        self.__trade_side = trade_side

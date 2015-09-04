@@ -12,6 +12,13 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
+"""
+TechIndicator
+
+Calculates various technical indicators and associated trading signals.
+
+"""
+
 import pandas
 import numpy
 
@@ -53,6 +60,7 @@ class TechIndicator:
                 narray = numpy.where(data_frame > self._techind, 1, -1)
 
             self._signal = pandas.DataFrame(index = data_frame.index, data = narray)
+            self._signal.loc[0:tech_params.sma_period] = numpy.nan
             self._signal.columns = [x + " SMA Signal" for x in data_frame.columns.values]
 
             self._techind.columns = [x + " SMA" for x in data_frame.columns.values]
@@ -63,13 +71,10 @@ class TechIndicator:
             else:
                 self._techind = data_frame / data_frame.shift(tech_params.roc_period) - 1
 
-            #tsc = TimeSeriesCalcs()
-            #data_frame = tsc.calculate_returns(data_frame)
-            #self._techind = pandas.rolling_mean(data_frame, tech_params.roc_period)
-
             narray = numpy.where(self._techind > 0, 1, -1)
 
             self._signal = pandas.DataFrame(index = data_frame.index, data = narray)
+            self._signal.loc[0:tech_params.roc_period] = numpy.nan
             self._signal.columns = [x + " ROC Signal" for x in data_frame.columns.values]
 
             self._techind.columns = [x + " ROC" for x in data_frame.columns.values]
@@ -85,6 +90,8 @@ class TechIndicator:
 
             sma.columns = [x + " SMA" for x in data_frame.columns.values]
             sma2.columns = [x + " SMA2" for x in data_frame.columns.values]
+            most = max(tech_params.sma_period, tech_params.sma2_period)
+            self._signal.loc[0:most] = numpy.nan
             self._techind = pandas.concat([sma, sma2], axis = 1)
 
         elif name in ['RSI']:
@@ -143,6 +150,8 @@ class TechIndicator:
             signal = signal.fillna(method = 'ffill')
 
             self._signal = signal
+
+            self._signal.loc[0:tech_params.rsi_period] = numpy.nan
             self._signal.columns = [x + " RSI Signal" for x in data_frame.columns.values]
 
         elif name in ["BB"]:
@@ -169,6 +178,7 @@ class TechIndicator:
             signal = signal.fillna(method = 'ffill')
 
             self._signal = signal
+            self._signal.loc[0:tech_params.bb_period] = numpy.nan
             self._signal.columns = [x + " " + name + " Signal" for x in data_frame.columns.values]
 
             lower.columns = [x + " BB Lower" for x in data_frame.columns.values]

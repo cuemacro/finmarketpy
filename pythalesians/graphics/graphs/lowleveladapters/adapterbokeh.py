@@ -24,6 +24,7 @@ from bokeh.plotting import figure, output_file, show
 import pandas
 
 from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from pythalesians.graphics.graphs.graphproperties import GraphProperties
 from pythalesians.util.constants import Constants
 
 import numpy
@@ -31,6 +32,10 @@ import numpy
 class AdapterBokeh(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, chart_type):
+
+        if gp is None: gp = GraphProperties()
+
+        if gp.chart_type is None and chart_type is None: chart_type = 'line'
 
         scale_factor = gp.scale_factor / 2.0
 

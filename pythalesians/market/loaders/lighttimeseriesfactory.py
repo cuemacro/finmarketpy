@@ -129,7 +129,8 @@ class LightTimeSeriesFactory:
         # also handle single tickers/list tickers
         create_tickers = False
 
-        if tickers is None : create_tickers = True
+        if tickers is None :
+            create_tickers = True
         elif isinstance(tickers, str):
             if tickers == '': create_tickers = True
         elif isinstance(tickers, list):
@@ -220,8 +221,7 @@ class LightTimeSeriesFactory:
         if(isinstance(ticker, list)):
             ticker = ticker[0]
 
-        return self.create_cache_file_name(
-            self.create_category_key(time_series_request, ticker))
+        return self.create_cache_file_name(self.create_category_key(time_series_request, ticker))
 
     def download_intraday_tick(self, time_series_request, loader):
         """
@@ -314,13 +314,14 @@ class LightTimeSeriesFactory:
 
         if hasattr(time_series_request, 'category'): category = time_series_request.category
 
+        environment = time_series_request.environment
         source = time_series_request.data_source
         freq = time_series_request.freq
 
         if hasattr(time_series_request, 'cut'): cut = time_series_request.cut
 
-        if (ticker is not None): key = category + '.' + source + '.' + freq + '.' + cut + '.' + ticker
-        else: key = category + '.' + source + '.' + freq + '.' + cut
+        if (ticker is not None): key = environment + "." + category + '.' + source + '.' + freq + '.' + cut + '.' + ticker
+        else: key = environment + "." + category + '.' + source + '.' + freq + '.' + cut
 
         return key
 

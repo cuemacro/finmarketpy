@@ -72,6 +72,7 @@ class CashBacktest:
         for i in range(0, len(returns_cols)):
             pnl_cols.append(returns_cols[i] + " / " + signal_cols[i])
 
+        # do we have a vol target for individual signals?
         if hasattr(br, 'signal_vol_adjust'):
             if br.signal_vol_adjust is True:
                 leverage_df = self.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
@@ -81,33 +82,41 @@ class CashBacktest:
                 signal_df = pandas.DataFrame(
                     signal_df.values * leverage_df.values, index = signal_df.index, columns = signal_df.columns)
 
-                self._individual_leverage = leverage_df
+                self._individual_leverage = leverage_df     # contains leverage of individual signal (before portfolio vol target)
 
         _pnl = tsc.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc = tc)
         _pnl.columns = pnl_cols
 
-        # portfolio is average of the underlying signals
-        interim_portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
+        # portfolio is average of the underlying signals: should we sum them or average them?
+        if hasattr(br, 'portfolio_combination'):
+            if br.portfolio_combination == 'sum':
+                 portfolio = pandas.DataFrame(data = _pnl.sum(axis = 1), index = _pnl.index, columns = ['Portfolio'])
+            elif br.portfolio_combination == 'mean':
+                 portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
+        else:
+            portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
 
         portfolio_leverage_df = pandas.DataFrame(data = numpy.ones(len(_pnl.index)), index = _pnl.index, columns = ['Portfolio'])
 
+        # should we apply vol target on a portfolio level basis?
         if hasattr(br, 'portfolio_vol_adjust'):
             if br.portfolio_vol_adjust is True:
-                interim_portfolio, portfolio_leverage_df = self.calculate_vol_adjusted_returns(interim_portfolio, br = br)
+                portfolio, portfolio_leverage_df = self.calculate_vol_adjusted_returns(portfolio, br = br)
 
-        self._portfolio = interim_portfolio
-        self._signal = signal_df
-        self._portfolio_leverage = portfolio_leverage_df
+        self._portfolio = portfolio
+        self._signal = signal_df                            # individual signals (before portfolio leverage)
+        self._portfolio_leverage = portfolio_leverage_df    # leverage on portfolio
 
         # multiply portfolio leverage * individual signals to get final position signals
         length_cols = len(signal_df.columns)
         leverage_matrix = numpy.repeat(portfolio_leverage_df.values.flatten()[numpy.newaxis,:], length_cols, 0)
 
+        # final portfolio signals (including signal & portfolio leverage)
         self._portfolio_signal = pandas.DataFrame(
             data = numpy.multiply(numpy.transpose(leverage_matrix), signal_df.values),
             index = signal_df.index, columns = signal_df.columns) / float(length_cols)
 
-        self._pnl = _pnl
+        self._pnl = _pnl                                                            # individual signals P&L
 
         self._tsd_pnl = TimeSeriesDesc()
         self._tsd_pnl.calculate_ret_stats(self._pnl, br.ann_factor)
@@ -116,10 +125,10 @@ class CashBacktest:
         self._tsd_portfolio = TimeSeriesDesc()
         self._tsd_portfolio.calculate_ret_stats(self._portfolio, br.ann_factor)
 
-        self._cumpnl = tsc.create_mult_index(self._pnl)
+        self._cumpnl = tsc.create_mult_index(self._pnl)                             # individual signals cumulative P&L
         self._cumpnl.columns = pnl_cols
 
-        self._cumportfolio = tsc.create_mult_index(self._portfolio)
+        self._cumportfolio = tsc.create_mult_index(self._portfolio)                 # portfolio cumulative P&L
         self._cumportfolio.columns = ['Port']
 
     def calculate_vol_adjusted_index_from_prices(self, prices_df, br):

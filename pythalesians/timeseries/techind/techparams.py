@@ -12,5 +12,14 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
+"""
+TechParams
+
+Holds parameters for calculation of technical indicators
+
+"""
+
 class TechParams:
     pass
+
+    # TODO add specific fields so can error check fields

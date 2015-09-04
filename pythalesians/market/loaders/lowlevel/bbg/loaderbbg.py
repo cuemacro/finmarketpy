@@ -110,10 +110,14 @@ class LoaderBBG(LoaderTemplate):
 
         # convert from vendor to Thalesians tickers/fields
         if data_frame is not None:
+            if data_frame.empty:
+                self.logger.infro("No tickers returned")
+
+                return None
+
             returned_fields = data_frame.columns.get_level_values(0)
             returned_tickers = data_frame.columns.get_level_values(1)
 
-        if data_frame is not None:
             # TODO if empty try downloading again a year later
             fields = self.translate_from_vendor_field(returned_fields, time_series_request)
             tickers = self.translate_from_vendor_ticker(returned_tickers, time_series_request)

@@ -442,6 +442,18 @@ class TimeSeriesCalcs:
 
         return data_frame
 
+    def all_by_hour_min_of_day_pretty_output(self, data_frame):
+
+        df_new = []
+
+        for group in data_frame.groupby(data_frame.index.date):
+            df_temp = group[1]
+            df_temp.index = df_temp.index.time
+            df_temp.columns = [group[0]]
+            df_new.append(df_temp)
+
+        return pandas.concat(df_new, axis=1)
+
     def average_by_year_hour_min_of_day_pretty_output(self, data_frame):
         # years = range(data_frame.index[0].year, data_frame.index[-1].year)
         #
@@ -464,6 +476,12 @@ class TimeSeriesCalcs:
     def average_by_annualised_year(self, data_frame, obs_in_year = 252):
         data_frame = data_frame.\
             groupby([data_frame.index.year]).mean() * obs_in_year
+
+        return data_frame
+
+    def average_by_month(self, data_frame):
+        data_frame = data_frame.\
+            groupby([data_frame.index.month]).mean()
 
         return data_frame
 

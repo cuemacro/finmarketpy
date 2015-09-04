@@ -125,13 +125,24 @@ class TimeSeriesIO:
             data frame to be written to disk
         """
 
-        store = pandas.HDFStore(self.get_h5_filename(fname), complib="blosc", complevel=9)
+        h5_filename_temp = self.get_h5_filename(fname + ".temp")
+        h5_filename = self.get_h5_filename(fname)
+
+        store = pandas.HDFStore(h5_filename_temp, complib="blosc", complevel=9)
 
         if ('intraday' in fname):
             data_frame = data_frame.astype('float32')
 
         store['data'] = data_frame
         store.close()
+
+        # delete the old copy
+        try:
+            os.remove(h5_filename)
+        except: pass
+
+        # once written to disk rename
+        os.rename(h5_filename_temp, h5_filename)
 
     def get_h5_filename(self, fname):
         """

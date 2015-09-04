@@ -34,24 +34,23 @@ class AdapterTemplate:
         xd = data_frame.index
         no_of_bars = len(data_frame.columns)
 
-        if chart_type is not None:
-            if gp.chart_type is not None:
-                if isinstance(gp.chart_type, list):
-                    if 'bar' in gp.chart_type:
-                        xd = bar_ind
-                        no_of_bars = gp.chart_type.count('bar')
-                        has_bar = True
-                    elif 'stacked' in gp.chart_type:
-                        xd = bar_ind
-                        no_of_bars = 1
-                        has_bar = True
-                elif 'bar' == gp.chart_type:
+        if gp.chart_type is not None:
+            if isinstance(gp.chart_type, list):
+                if 'bar' in gp.chart_type:
                     xd = bar_ind
+                    no_of_bars = gp.chart_type.count('bar')
                     has_bar = True
-                elif 'stacked' == gp.chart_type:
+                elif 'stacked' in gp.chart_type:
                     xd = bar_ind
+                    no_of_bars = 1
                     has_bar = True
-
+            elif 'bar' == gp.chart_type:
+                xd = bar_ind
+                has_bar = True
+            elif 'stacked' == gp.chart_type:
+                xd = bar_ind
+                has_bar = True
+        else:
             if chart_type == 'bar' or chart_type == 'stacked':
                 xd = bar_ind
                 has_bar = True

@@ -481,7 +481,7 @@ class BBGLowLevelIntraday(BBGLowLevelTemplate):
         self._options = OptionsBBG()
 
         self._options.security = time_series_request.tickers[0]    # get 1st ticker only!
-        self._options.event = "TRADE"
+        self._options.event = time_series_request.trade_side.upper()
         self._options.barInterval = time_series_request.freq_mult
         self._options.startDateTime = time_series_request.start_date
         self._options.endDateTime = time_series_request.finish_date

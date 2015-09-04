@@ -23,9 +23,6 @@ Plotly, Cufflinks (Plotly wrapper), Seaborne (Matplotlib wrapper)
 """
 
 from pythalesians.graphics.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
-try:
-    from pythalesians.graphics.graphs.lowleveladapters.adapterplotly import AdapterPlotly
-except: pass
 from pythalesians.graphics.graphs.lowleveladapters.adaptercufflinks import AdapterCufflinks
 from pythalesians.graphics.graphs.lowleveladapters.adapterbokeh import AdapterBokeh
 
@@ -91,6 +88,8 @@ class PlotFactory:
             return AdapterBokeh()
 
         elif adapter == 'plotly':
+            # TODO not implemented yet
+            from pythalesians.graphics.graphs.lowleveladapters.adapterplotly import AdapterPlotly
             return AdapterPlotly()
 
         elif adapter == 'cufflinks':

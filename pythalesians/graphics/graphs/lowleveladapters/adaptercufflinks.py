@@ -32,25 +32,34 @@ try:
 except: pass
 
 from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
 class AdapterCufflinks(AdapterTemplate):
 
-    def plot_2d_graph(self, data_frame, gp, type):
+    def plot_2d_graph(self, data_frame, gp, chart_type):
         plotly.tools.set_credentials_file(username=gp.plotly_username, api_key=gp.plotly_api_key)
 
         mode = 'line'
+
+        if gp is None: gp = GraphProperties()
+
+        if gp.chart_type is None:
+            if chart_type is None: chart_type = 'line'
+        else:
+            chart_type = gp.chart_type
+
 
         marker_size = 1
         scale_factor = gp.scale_factor
 
         x = ''; y = ''; z = ''
 
-        if type == 'line':
-            type = 'scatter'
-        elif type == 'scatter':
+        if chart_type == 'line':
+            chart_type = 'scatter'
+        elif chart_type == 'scatter':
             mode = 'markers'
             marker_size = 5
-        elif type == 'bubble':
+        elif chart_type == 'bubble':
             x = data_frame.columns[0]
             y = data_frame.columns[1]
             z = data_frame.columns[2]
@@ -72,7 +81,7 @@ class AdapterCufflinks(AdapterTemplate):
                 color = 'rgba' + str(color)
                 color_spec.append(color)
 
-        data_frame.iplot(kind=type,
+        data_frame.iplot(kind=chart_type,
             filename=gp.plotly_url,
             title=gp.title,
             xTitle=gp.x_title,

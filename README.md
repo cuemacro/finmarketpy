@@ -144,6 +144,7 @@ More generally, we want to:
 
 # Coding log
 
+* 04 Sep 2015 - Added StrategyTemplate for backtesting (with example) & bug fixes
 * 21 Aug 2015 - Added stacked charts (with matplotlib & bokeh) & several bug fixes
 * 15 Aug 2015 - Added bar charts (with matplotlib & bokeh) & added more time series filter functions
 * 09 Aug 2015 - Improved Bokeh support

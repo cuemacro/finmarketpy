@@ -72,11 +72,12 @@ class TradeAnalysis:
 
         fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
 
-        plt.show()
-
         try:
             plt.savefig (strategy.DUMP_PATH + "stats.png")
         except: pass
+
+        plt.show()
+
 
 
 

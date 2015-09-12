@@ -160,13 +160,23 @@ class StrategyFXCTA_Example(StrategyTemplate):
         return df
 
 if __name__ == '__main__':
-    strategy = StrategyFXCTA_Example()
 
-    strategy.construct_strategy()
-    strategy.plot_strategy_pnl()
-    strategy.plot_strategy_leverage()
-    strategy.plot_strategy_group_benchmark_pnl()
-    strategy.plot_strategy_group_leverage()
-    strategy.plot_strategy_group_benchmark_annualised_pnl()
+    # create a FX CTA strategy then chart the returns, leverage over time
+    if True:
+        strategy = StrategyFXCTA_Example()
 
-    # strategy_signal = strategy.get_strategy_signal()
+        strategy.construct_strategy()
+        strategy.plot_strategy_pnl()
+        strategy.plot_strategy_leverage()
+        strategy.plot_strategy_group_benchmark_pnl()
+        strategy.plot_strategy_group_leverage()
+        strategy.plot_strategy_group_benchmark_annualised_pnl()
+
+    # create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
+    if True:
+        from pythalesians.backtest.stratanalysis.tradeanalysis import TradeAnalysis
+        strategy = StrategyFXCTA_Example()
+        strategy.construct_strategy()
+
+        tradeanalysis = TradeAnalysis()
+        tradeanalysis.run_strategy_returns_stats(strategy)

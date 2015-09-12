@@ -64,6 +64,11 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-bar-example.png" width="543"/>
 
+*Using PyThalesians and PyFolio to plot return statistics of FX CTA strategy
+(in open source version - you can run this analysis using strategyfxcta_example.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/tradeanalysis-stats.png" width="543"/>
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 & 10, running Bloomberg terminal software. Potentially, it could also work on the 

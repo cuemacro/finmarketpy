@@ -2,8 +2,10 @@ from setuptools import setup, find_packages
 
 setup(name='pythalesians',
       version='0.1a',
-      description='Financial analysis library',
-      author='Saeed Amen',
+      description='Financial analysis library in Python to backtest trading strategies with plotting',
+      maintainer='Thalesians Ltd, Saeed Amen',
+      maintainer_email='saeed@thalesians.com',
+      author='Thalesians Ltd, Saeed Amen',
       author_email='saeed@thalesians.com',
       license='Apache 2.0',
       keywords = ['pandas', 'bloomberg', 'plot', 'finance', 'fx'],
@@ -16,4 +18,5 @@ setup(name='pythalesians',
                           'pytz',
                           'requests',
                           'numpy'],
+      extra_requires = ['pyfolio'],
 	  zip_safe=False)

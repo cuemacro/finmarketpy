@@ -66,18 +66,20 @@ backtest using cashbacktest_examples.py)*
 
 # Requirements
 
-PyThalesians has been tested on Windows 8 running Bloomberg terminal software. Potentially, it could also work on the 
+PyThalesians has been tested on Windows 8 & 10, running Bloomberg terminal software. Potentially, it could also work on the 
 Bloomberg Server API (but I have not explicitly tested this).
 
 Major requirements
-* Python 3.4+
-* pandas, matplotlib etc.
+* Required: Python 3.4+
+* Required: pandas, matplotlib, numpy etc.
 * Recommended: Bloomberg Python Open API (use Python 3 version from https://github.com/filmackay/blpapi-py) or 
 alternatively to access Bloomberg, the software also supports the old COM API
-* To use Bloomberg you will need to have a installed licence
-* Recommended: Plotly for funky interactive plots (https://github.com/plotly/python-api) and Cufflinks a nice Plotly
+* To use Bloomberg you will need to have a installed licence 
+* Recommended: Plotly for funky interactive plots (https://github.com/plotly/python-api) and 
+* Recommended: Cufflinks a nice Plotly
 wrapper when using Pandas dataframes(my fork of Jorge Santos project has been modified slightly for Python 3 
 https://github.com/thalesians/cufflinks)
+* Recommended: PyFolio for statistical analysis of trading strategy returns (https://github.com/quantopian/pyfolio/)
 
 # Installation
 
@@ -130,6 +132,7 @@ We plan to add the following features:
 * Add more interesting trading analysis tools
 * Add support for live trading via Interactive Brokers
 * Integrate support for zipline as an alternative trading system
+* Improve support for PyFolio
 * Support Python 2.7+
 
 More generally, we want to:
@@ -144,6 +147,7 @@ More generally, we want to:
 
 # Coding log
 
+* 12 Sep 2015 - Added basic support for PyFolio for statistical analysis of strategies
 * 04 Sep 2015 - Added StrategyTemplate for backtesting (with example) & bug fixes
 * 21 Aug 2015 - Added stacked charts (with matplotlib & bokeh) & several bug fixes
 * 15 Aug 2015 - Added bar charts (with matplotlib & bokeh) & added more time series filter functions

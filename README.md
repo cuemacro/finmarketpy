@@ -67,7 +67,7 @@ backtest using cashbacktest_examples.py)*
 *Using PyThalesians and PyFolio to plot return statistics of FX CTA strategy
 (in open source version - you can run this analysis using strategyfxcta_example.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/tradeanalysis-stats.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/tradeanalysis-stat.png" width="543"/>
 
 # Requirements
 

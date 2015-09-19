@@ -69,6 +69,17 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/tradeanalysis-stat.png" width="543"/>
 
+*Using PyThalesians to plot with Plotly map of USA unemployment rate by state (using FRED data)
+(in open source version - you can run this analysis using histecondata_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/usa-states-unemployment.png" width="543"/>
+
+*Using PyThalesians to plot G10 CPI YoY rates (using FRED data)
+(in open source version - you can run this analysis using histecondata_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/g10-cpi.png" width="543"/>
+
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 & 10, running Bloomberg terminal software. Potentially, it could also work on the 
@@ -152,6 +163,7 @@ More generally, we want to:
 
 # Coding log
 
+* 19 Sep 2015 - Added support for Plotly choropleth map plots & easy downloading of economic data via FRED/Bloomberg/Quandl
 * 12 Sep 2015 - Added basic support for PyFolio for statistical analysis of strategies
 * 04 Sep 2015 - Added StrategyTemplate for backtesting (with example) & bug fixes
 * 21 Aug 2015 - Added stacked charts (with matplotlib & bokeh) & several bug fixes

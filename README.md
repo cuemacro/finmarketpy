@@ -72,7 +72,7 @@ backtest using cashbacktest_examples.py)*
 *Using PyThalesians to plot with Plotly map of USA unemployment rate by state (using FRED data)
 (in open source version - you can run this analysis using histecondata_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/usa-states-unemployment.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/usa-states-unemployment-rate.png" width="543"/>
 
 *Using PyThalesians to plot G10 CPI YoY rates (using FRED data)
 (in open source version - you can run this analysis using histecondata_examples.py)*

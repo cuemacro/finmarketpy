@@ -60,6 +60,7 @@ if True:
     br.signal_vol_periods = 60
     br.signal_vol_obs_in_year = 252
     br.signal_vol_rebalance_freq = 'BM'
+    br.signal_vol_resample_freq = None
 
     tech_params = TechParams(); tech_params.sma_period = 200; indicator = 'SMA'
 
@@ -112,5 +113,100 @@ if True:
     gp.source = 'Thalesians/BBG (calc with PyThalesians Python library)'
     gp.scale_factor = 1
     gp.file_output = 'output_data/fx-trend-example.png'
+
+    pf.plot_line_graph(port, adapter = 'pythalesians', gp = gp)
+
+###### backtest simple trend following strategy for FX spot basket
+if True:
+    # for backtest and loading data
+    from pythalesians.market.requests.backtestrequest import BacktestRequest
+    from pythalesians.backtest.cash.cashbacktest import CashBacktest
+    from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
+    from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
+    from pythalesians.util.fxconv import FXConv
+    from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+
+    # for logging
+    from pythalesians.util.loggermanager import LoggerManager
+
+    # for signal generation
+    from pythalesians.timeseries.techind.techindicator import TechIndicator
+    from pythalesians.timeseries.techind.techparams import TechParams
+
+    # for plotting
+    from pythalesians.graphics.graphs.graphproperties import GraphProperties
+    from pythalesians.graphics.graphs.plotfactory import PlotFactory
+
+    logger = LoggerManager().getLogger(__name__)
+
+    import datetime
+
+    cash_backtest = CashBacktest()
+    br = BacktestRequest()
+    fxconv = FXConv()
+
+    # get all asset data
+    br.start_date = "02 Jan 1990"
+    br.finish_date = datetime.datetime.utcnow()
+    br.spot_tc_bp = 2.5                             # 2.5 bps bid/ask spread
+    br.ann_factor = 252
+
+    tech_params = TechParams(); tech_params.sma_period = 200; indicator = 'SMA'
+    tech_params.only_allow_longs = True
+    # tech_params.only_allow_shorts = True
+
+    # pick USD crosses in G10 FX
+    # note: we are calculating returns from spot (it is much better to use to total return
+    # indices for FX, which include carry)
+    logger.info("Loading asset data...")
+
+    tickers = ['EURUSD']
+
+    vendor_tickers = ['FRED/DEXUSEU']
+
+    time_series_request = TimeSeriesRequest(
+                start_date = "01 Jan 1989",                     # start date
+                finish_date = datetime.date.today(),            # finish date
+                freq = 'daily',                                 # daily data
+                data_source = 'quandl',                         # use Quandl as data source
+                tickers = tickers,                              # ticker (Thalesians)
+                fields = ['close'],                                 # which fields to download
+                vendor_tickers = vendor_tickers,                    # ticker (Quandl)
+                vendor_fields = ['close'],                          # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+    ltsf = LightTimeSeriesFactory()
+
+    asset_df = ltsf.harvest_time_series(time_series_request)
+    spot_df = asset_df
+
+    logger.info("Running backtest...")
+
+    # use technical indicator to create signals
+    # (we could obviously create whatever function we wanted for generating the signal dataframe)
+    tech_ind = TechIndicator()
+    tech_ind.create_tech_ind(spot_df, indicator, tech_params); signal_df = tech_ind.get_signal()
+
+    # use the same data for generating signals
+    cash_backtest.calculate_trading_PnL(br, asset_df, signal_df)
+    port = cash_backtest.get_cumportfolio()
+    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(cash_backtest.get_portfolio_pnl_desc()[0])]
+    signals = cash_backtest.get_porfolio_signal()   # get final signals for each series
+    returns = cash_backtest.get_pnl()               # get P&L for each series
+
+    time_series_calcs = TimeSeriesCalcs()
+    trade_returns = time_series_calcs.calculate_individual_trade_gains(signals, returns)
+
+    print(trade_returns)
+
+    # print the last positions (we could also save as CSV etc.)
+    print(signals.tail(1))
+
+    pf = PlotFactory()
+    gp = GraphProperties()
+    gp.title = "EUR/USD trend model"
+    gp.source = 'Thalesians/BBG (calc with PyThalesians Python library)'
+    gp.scale_factor = 1
+    gp.file_output = 'output_data/eurusd-trend-example.png'
 
     pf.plot_line_graph(port, adapter = 'pythalesians', gp = gp)

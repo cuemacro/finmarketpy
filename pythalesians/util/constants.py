@@ -29,7 +29,7 @@ class Constants:
         self.root_pythalesians_folder = "D:/Remote/pythalesians/pythalesians/"
         self.temp_pythalesians_folder = self.root_pythalesians_folder + "temp"
 
-        ###### FOR FUTURE VERSIONS (which include caching) - DO NOT REMOVE!
+        ###### FOR FUTURE VERSIONS (which include caching and aliasing of tickers) - DO NOT REMOVE!
         # folders for holding market data
         self.folder_time_series_data = "D:/timeseriesdata"
         self.folder_historic_CSV = "D:/tickdata/historicCSV"
@@ -43,6 +43,11 @@ class Constants:
                                          self.root_pythalesians_folder + "conf/g10_vol_tickers.csv"
 
         self.time_series_fields_list = self.root_pythalesians_folder + "conf/time_series_fields_list.csv"
+
+        # config file for long term econ data
+        self.all_econ_tickers = self.root_pythalesians_folder + "conf/all_econ_tickers.csv"
+        self.econ_country_codes = self.root_pythalesians_folder + "conf/econ_country_codes.csv"
+        self.econ_country_groups = self.root_pythalesians_folder + "conf/econ_country_groups.csv"
 
         # for events filtering
         self.events_category = 'events'

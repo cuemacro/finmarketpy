@@ -92,12 +92,63 @@ if True:
 
     gp = GraphProperties()
 
-    gp.source = 'Thalesians/BBG'
+    gp.source = 'Thalesians/BBG (created with PyThalesians Python library)'
     gp.html_file_output = "output_data/equities.htm"
     gp.title = 'Recent monthly changes in equity markets'
     gp.scale_factor = 2
     gp.display_legend = True
     gp.chart_type = ['bar', 'scatter', 'line']
+    gp.x_title = 'Dates'
+    gp.y_title = 'Pc'
+
+    # plot using Bokeh then PyThalesians
+    pf.plot_bar_graph(daily_vals * 100, adapter = 'bokeh', gp = gp)
+    pf.plot_bar_graph(daily_vals * 100, adapter = 'pythalesians', gp = gp)
+
+# plot daily changes in FX
+if True:
+    from datetime import timedelta
+    ltsf = LightTimeSeriesFactory()
+
+    end = datetime.datetime.utcnow()
+    start = end - timedelta(days=5)
+
+    tickers = ['EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'CHF', 'NOK', 'SEK', 'JPY']
+    vendor_tickers = [x + 'USD BGN Curncy' for x in tickers]
+
+    time_series_request = TimeSeriesRequest(
+        start_date = start,                                             # start date
+        finish_date = end,                                              # finish date
+        freq = 'daily',                                                 # daily data
+        data_source = 'bloomberg',                                      # use Bloomberg as data source
+        tickers = tickers,                                              # ticker (Thalesians)
+        fields = ['close'],                                             # which fields to download
+        vendor_tickers = vendor_tickers,                # ticker (Bloomberg)
+        vendor_fields = ['PX_LAST'],                    # which Bloomberg fields to download
+        cache_algo = 'internet_load_return')                # how to return data
+
+    daily_vals = ltsf.harvest_time_series(time_series_request)
+
+    daily_vals = daily_vals / daily_vals.shift(1) - 1
+
+    last_row_name = daily_vals.index[-1]
+    daily_vals = daily_vals.T.sort(columns=last_row_name).T
+
+    daily_vals.columns = [x.replace('.close', '') for x in daily_vals.columns.values]
+
+    daily_vals = daily_vals.tail(1)
+    daily_vals = daily_vals.T
+
+    pf = PlotFactory()
+
+    gp = GraphProperties()
+
+    gp.source = 'Thalesians/BBG (created with PyThalesians Python library)'
+    gp.html_file_output = "output_data/FX.htm"
+    gp.file_output = "output_data/daily-fx-changes.png"
+    gp.title = 'FX changes today (vs USD)'
+    gp.scale_factor = 3
+    gp.display_legend = True
     gp.x_title = 'Dates'
     gp.y_title = 'Pc'
 

@@ -89,6 +89,55 @@ class TimeSeriesCalcs:
         """
         return signal_data_frame.shift(period_shift) * returns_data_frame
 
+    def calculate_individual_trade_gains(self, signal_data_frame, strategy_returns_data_frame):
+        """
+        calculate_individual_trade_gains - Calculates profits on every trade
+
+        Parameters
+        ----------
+        signal_data_frame : DataFrame
+            trading signals
+        strategy_returns_data_frame: DataFrame
+            returns of strategy to be tested
+        period_shift : int
+            number of periods to shift signal
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        # signal need to be aligned to NEXT period for returns
+        signal_data_frame_pushed = signal_data_frame.shift(1)
+
+        # find all the trade points
+        # trade_no = ((signal_data_frame - signal_data_frame.shift(1)).abs()).cumsum()
+        trade_points = ((signal_data_frame - signal_data_frame.shift(1)).abs())
+        cumulative_sum = strategy_returns_data_frame.cumsum()
+
+        indices = trade_points > 0
+        indices.columns = signal_data_frame_pushed.columns
+
+        exit_signals = signal_data_frame_pushed[indices]
+        # exit_signals = exit_signals.dropna()
+
+        indices.columns = cumulative_sum.columns
+
+        # get P&L for every trade (from the end point - start point)
+        #exit_trades = cumulative_sum[indices]           # get exit trades
+        # exit_trades = exit_trades.dropna()
+
+        trade_returns = numpy.nan * cumulative_sum
+        # non_flat_signal = exit_signals != 0
+        # non_flat_signal.columns = cumulative_sum.columns
+        indices_shift = indices.shift(1)
+
+        trade_returns[indices] = - cumulative_sum[indices_shift]
+        # trade_returns = trade_returns[non_flat_signal]
+        # trade_returns = trade_returns.dropna()
+
+        return trade_returns
+
     def calculate_signal_returns_matrix(self, signal_data_frame, returns_data_frame, period_shift = 1):
         """
         calculate_signal_returns_matrix - Calculates the trading strategy returns for given signal and asset
@@ -527,6 +576,18 @@ class TimeSeriesCalcs:
 
     def remove_NaN_rows(self, data_frame):
         return data_frame.dropna()
+
+    def get_top_valued_sorted(self, df, order_column, n = 20):
+        df_sorted = df.sort(columns=order_column)
+        df_sorted = df_sorted.tail(n=n)
+
+        return df_sorted
+
+    def get_bottom_valued_sorted(self, df, order_column, n = 20):
+        df_sorted = df.sort(columns=order_column)
+        df_sorted = df_sorted.head(n=n)
+
+        return df_sorted
 
     def convert_month_day_to_date_time(self, df, year = 1970):
         new_index = []

@@ -25,6 +25,8 @@ from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.graphics.graphs.plotfactory import PlotFactory
 from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
+# just change "False" to "True" to run any of the below examples
+
 if True:
     pf = PlotFactory()
 

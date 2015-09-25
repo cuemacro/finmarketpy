@@ -73,6 +73,7 @@ class StrategyFXCTA_Example(StrategyTemplate):
         br.signal_vol_periods = 20
         br.signal_vol_obs_in_year = 252
         br.signal_vol_rebalance_freq = 'BM'
+        br.signal_vol_resample_freq = None
 
         # have vol target for portfolio
         br.portfolio_vol_adjust = True
@@ -81,6 +82,7 @@ class StrategyFXCTA_Example(StrategyTemplate):
         br.portfolio_vol_periods = 20
         br.portfolio_vol_obs_in_year = 252
         br.portfolio_vol_rebalance_freq = 'BM'
+        br.portfolio_vol_resample_freq = None
 
         # tech params
         br.tech_params.sma_period = 200
@@ -161,8 +163,10 @@ class StrategyFXCTA_Example(StrategyTemplate):
 
 if __name__ == '__main__':
 
-    # create FX CTA strategy then chart the returns, leverage over time
-    if True:
+# just change "False" to "True" to run any of the below examples
+
+    # create a FX CTA strategy then chart the returns, leverage over time
+    if False:
         strategy = StrategyFXCTA_Example()
 
         strategy.construct_strategy()
@@ -172,7 +176,7 @@ if __name__ == '__main__':
         strategy.plot_strategy_group_leverage()
         strategy.plot_strategy_group_benchmark_annualised_pnl()
 
-    # create FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
+    # create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
     if True:
         from pythalesians.backtest.stratanalysis.tradeanalysis import TradeAnalysis
         strategy = StrategyFXCTA_Example()

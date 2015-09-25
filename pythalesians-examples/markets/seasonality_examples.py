@@ -42,6 +42,8 @@ logger = LoggerManager().getLogger(__name__)
 
 pf = PlotFactory()
 
+# just change "False" to "True" to run any of the below examples
+
 ###### calculate seasonal moves in EUR/USD and GBP/USD (using Quandl data)
 if True:
     time_series_request = TimeSeriesRequest(

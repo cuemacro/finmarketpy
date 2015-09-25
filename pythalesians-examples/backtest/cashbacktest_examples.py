@@ -19,6 +19,8 @@ Gives several examples of backtesting simple trading strategies.
 
 """
 
+# just change "False" to "True" to run any of the below examples
+
 ###### backtest simple trend following strategy for FX spot basket
 if True:
     # for backtest and loading data

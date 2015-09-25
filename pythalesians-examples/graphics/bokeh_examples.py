@@ -28,6 +28,8 @@ from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.graphics.graphs.plotfactory import PlotFactory
 from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
+# just change "False" to "True" to run any of the below examples
+
 if True:
     time_series_request = TimeSeriesRequest(
                 start_date = "01 Jan 2013",                     # start date

@@ -36,9 +36,11 @@ from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.economics.events.histecondatafactory import HistEconDataFactory
 from pythalesians.economics.events.popular.commonecondatafactory import CommonEconDataFactory
 
+# just change "False" to "True" to run any of the below examples
+
 #### Plot US economic data by state using a choropleth Plotly plot
 ####
-if True:
+if False:
     logger = LoggerManager.getLogger(__name__)
 
     hist = HistEconDataFactory()
@@ -98,4 +100,5 @@ if True:
     # cedf.world_plot_une(start_date, finish_date)
     # cedf.world_plot_cpi(start_date, finish_date)
     # cedf.europe_plot_une(start_date, finish_date)
-    cedf.g10_line_plot_cpi(start_date, finish_date)
+    # cedf.g10_line_plot_cpi(start_date, finish_date)
+    cedf.g10_line_plot_une(start_date, finish_date)

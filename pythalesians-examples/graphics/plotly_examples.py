@@ -93,4 +93,4 @@ if True:
     gp.y_title = 'Pc'
 
     # plot using Cufflinks
-    pf.plot_bar_graph(slope_monthly, adapter = 'cufflinks', gp = gp)
+    pf.plot_bar_graph(slope_monthly, adapter = 'bokeh', gp = gp)

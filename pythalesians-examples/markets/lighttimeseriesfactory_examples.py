@@ -39,6 +39,8 @@ if True:
 
     import datetime
 
+    # just change "False" to "True" to run any of the below examples
+
     ###### download daily data from Bloomberg for EUR/USD and GBP/USD spot and then plot
     if False:
 
@@ -212,7 +214,7 @@ if True:
 
     # downloading historical tick data from Dukascopy broker for EUR/USD
     # (past month of data cannot be downloaded, hence cannot be used for live trading)
-    if False:
+    if True:
         time_series_request = TimeSeriesRequest(
                 start_date = "01 Jun 2015",                     # start date
                 finish_date = "02 Jun 2015",                    # finish date
@@ -228,8 +230,11 @@ if True:
 
         df = ltsf.harvest_time_series(time_series_request)
 
+        gp = GraphProperties()
+        gp.y_axis_2_series = ['GBPUSD.bid', 'GBPUSD.ask']
+
         pf = PlotFactory()
-        pf.plot_line_graph(df, adapter = 'pythalesians')
+        pf.plot_line_graph(df, adapter = 'pythalesians', gp = gp)
 
     ###### download daily data from Google for Apple and S&P500 ETF (and then rebase, before plotting)
     if False:

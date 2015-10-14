@@ -65,5 +65,22 @@ class LoaderQuandl(LoaderTemplate):
         return data_frame
 
     def download_daily(self, time_series_request):
-        return Quandl.get(time_series_request.tickers, authtoken=Constants().quandl_api_key, trim_start=time_series_request.start_date,
-                          trim_end=time_series_request.finish_date)
+        trials = 0
+
+        data_frame = None
+
+        while(trials < 5):
+            try:
+                data_frame = Quandl.get(time_series_request.tickers, authtoken=Constants().quandl_api_key, trim_start=time_series_request.start_date,
+                            trim_end=time_series_request.finish_date)
+
+                break
+            except:
+                trials = trials + 1
+                self.logger.info("Attempting... " + str(trials) + " request to download from Quandl")
+
+        if trials == 5:
+            self.logger.error("Couldn't download from Quandl after several attempts!")
+
+        return data_frame
+

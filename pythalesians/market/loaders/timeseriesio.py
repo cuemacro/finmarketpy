@@ -128,6 +128,12 @@ class TimeSeriesIO:
         h5_filename_temp = self.get_h5_filename(fname + ".temp")
         h5_filename = self.get_h5_filename(fname)
 
+        # delete the old copy
+        try:
+            # os.remove(h5_filename_temp)
+            p =0
+        except: pass
+
         store = pandas.HDFStore(h5_filename_temp, complib="blosc", complevel=9)
 
         if ('intraday' in fname):

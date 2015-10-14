@@ -96,10 +96,16 @@ class LoaderBBG(LoaderTemplate):
 
             data_frame = self.download_intraday(time_series_request_vendor)
 
-            cols = data_frame.columns.values
-            data_frame.tz_localize('UTC')
-            cols = time_series_request.tickers[0] + "." + cols
-            data_frame.columns = cols
+            if data_frame is not None:
+                if data_frame.empty:
+                    self.logger.info("No tickers returned for: " + time_series_request_vendor.tickers)
+
+                    return None
+
+                cols = data_frame.columns.values
+                data_frame.tz_localize('UTC')
+                cols = time_series_request.tickers[0] + "." + cols
+                data_frame.columns = cols
 
         self.logger.info("Completed request from Bloomberg.")
 
@@ -111,7 +117,11 @@ class LoaderBBG(LoaderTemplate):
         # convert from vendor to Thalesians tickers/fields
         if data_frame is not None:
             if data_frame.empty:
-                self.logger.infro("No tickers returned")
+                self.logger.info("No tickers returned for...")
+
+                try:
+                    self.logger.info(str(time_series_request_vendor.tickers))
+                except: pass
 
                 return None
 

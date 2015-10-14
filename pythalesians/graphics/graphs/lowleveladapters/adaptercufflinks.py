@@ -64,6 +64,62 @@ class AdapterCufflinks(AdapterTemplate):
             y = data_frame.columns[1]
             z = data_frame.columns[2]
 
+        # special case for choropleth which has yet to be implemented in Cufflinks
+        # will likely remove this in the future
+        elif chart_type == 'choropleth':
+            import plotly.plotly as py
+
+            for col in data_frame.columns:
+                try:
+                    data_frame[col] = data_frame[col].astype(str)
+                except:
+                    pass
+
+            if gp.color != []:
+                color = gp.color
+            else:
+                color = [[0.0, 'rgb(242,240,247)'],[0.2, 'rgb(218,218,235)'],[0.4, 'rgb(188,189,220)'],\
+                [0.6, 'rgb(158,154,200)'],[0.8, 'rgb(117,107,177)'],[1.0, 'rgb(84,39,143)']]
+
+            text = ''
+
+            if 'text' in data_frame.columns:
+                text = data_frame['Text']
+
+            data = [ dict(
+                    type='choropleth',
+                    colorscale = color,
+                    autocolorscale = False,
+                    locations = data_frame['Code'],
+                    z = data_frame[gp.plotly_choropleth_field].astype(float),
+                    locationmode = gp.plotly_location_mode,
+                    text = text,
+                    marker = dict(
+                        line = dict (
+                            color = 'rgb(255,255,255)',
+                            width = 1
+                        )
+                    ),
+                    colorbar = dict(
+                        title = gp.units
+                    )
+                ) ]
+
+            layout = dict(
+                    title = gp.title,
+                    geo = dict(
+                        scope=gp.plotly_scope,
+                        projection=dict( type=gp.plotly_projection ),
+                        showlakes = True,
+                        lakecolor = 'rgb(255, 255, 255)',
+                    ),
+                )
+
+            fig = dict( data=data, layout=layout )
+
+            url = py.plot(fig, validate=False, filename=gp.plotly_url, world_readable=gp.plotly_world_readable)
+            return
+
         # check other plots implemented by Cufflinks
 
         # get all the correct colors (and construct gradients if necessary eg. from 'blues')

@@ -126,6 +126,7 @@ class StrategyTemplate:
                 self._strategy_pnl_tsd = cash_backtest.get_portfolio_pnl_tsd()
                 self._strategy_leverage = cash_backtest.get_porfolio_leverage()
                 self._strategy_signal = cash_backtest.get_porfolio_signal()
+                self._strategy_pnl_trades = cash_backtest.get_pnl_trades()
 
         # get benchmark for comparison
         benchmark = self.construct_strategy_benchmark()
@@ -245,8 +246,14 @@ class StrategyTemplate:
 
         return strategy_df
 
+    def get_strategy_name(self):
+        return self.FINAL_STRATEGY
+
     def get_individual_leverage(self):
         return self._individual_leverage
+
+    def get_strategy_group_pnl_trades(self):
+        return self._strategy_pnl_trades
 
     def get_strategy_pnl(self):
         return self._strategy_pnl
@@ -317,6 +324,23 @@ class StrategyTemplate:
             pf.plot_line_graph(self.reduce_plot(self._individual_leverage), adapter = 'pythalesians', gp = gp)
         except: pass
 
+    def plot_strategy_group_pnl_trades(self):
+        pf = PlotFactory()
+        gp = GraphProperties()
+
+        gp.title = self.FINAL_STRATEGY + " (bp)"
+        gp.display_legend = True
+        gp.scale_factor = self.SCALE_FACTOR
+
+        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Individual Trade PnL).png'
+
+        # zero when there isn't a trade exit
+        strategy_pnl_trades = self._strategy_pnl_trades.fillna(0) * 100 * 100
+
+        try:
+            pf.plot_line_graph(self.reduce_plot(strategy_pnl_trades), adapter = 'pythalesians', gp = gp)
+        except: pass
+
     def plot_strategy_pnl(self):
         pf = PlotFactory()
         gp = GraphProperties()
@@ -359,19 +383,22 @@ class StrategyTemplate:
         # plot cumulative line of returns
         pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_pnl), adapter = 'pythalesians', gp = gp)
 
-        keys = self._strategy_group_benchmark_tsd.keys()
-        ir = []
+        # needs write stats flag turned on
+        try:
+            keys = self._strategy_group_benchmark_tsd.keys()
+            ir = []
 
-        for key in keys: ir.append(self._strategy_group_benchmark_tsd[key].inforatio()[0])
+            for key in keys: ir.append(self._strategy_group_benchmark_tsd[key].inforatio()[0])
 
-        ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
-        ret_stats = ret_stats.sort()
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR).png'
+            ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
+            ret_stats = ret_stats.sort()
+            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR).png'
 
-        gp.display_brand_label = False
+            gp.display_brand_label = False
 
-        # plot ret stats
-        pf.plot_bar_graph(ret_stats, adapter = 'pythalesians', gp = gp)
+            # plot ret stats
+            pf.plot_bar_graph(ret_stats, adapter = 'pythalesians', gp = gp)
+        except: pass
 
     def plot_strategy_group_benchmark_annualised_pnl(self, cols = None):
         # TODO - unfinished, needs checking!

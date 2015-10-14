@@ -151,7 +151,7 @@ class LightTimeSeriesFactory:
             self.logger.debug("Internet loading.. ")
 
             # signal to loader template to exit session
-            if loader is not None and kill_session == True: loader.kill_session()
+            # if loader is not None and kill_session == True: loader.kill_session()
 
         if(time_series_request.cache_algo == 'cache_algo'):
             self.logger.debug("Only caching data in memory, do not return any time series."); return
@@ -241,34 +241,123 @@ class LightTimeSeriesFactory:
 
         ticker_cycle = 0
 
+        # single threaded version
         # handle intraday ticker calls separately one by one
-        for ticker in time_series_request.tickers:
-            time_series_request_single = copy.copy(time_series_request)
-            time_series_request_single.tickers = ticker
+        if len(time_series_request.tickers) == 1 or Constants().time_series_factory_thread_no['other'] == 1:
+            for ticker in time_series_request.tickers:
+                time_series_request_single = copy.copy(time_series_request)
+                time_series_request_single.tickers = ticker
 
-            if hasattr(time_series_request, 'vendor_tickers'):
-                time_series_request_single.vendor_tickers = [time_series_request.vendor_tickers[ticker_cycle]]
-                ticker_cycle = ticker_cycle + 1
+                if hasattr(time_series_request, 'vendor_tickers'):
+                    time_series_request_single.vendor_tickers = [time_series_request.vendor_tickers[ticker_cycle]]
+                    ticker_cycle = ticker_cycle + 1
 
-            # we downscale into float32, to avoid memory problems in Python (32 bit)
-            # data is stored on disk as float32 anyway
-            data_frame_single = loader.load_ticker(time_series_request_single)
+                # we downscale into float32, to avoid memory problems in Python (32 bit)
+                # data is stored on disk as float32 anyway
+                data_frame_single = loader.load_ticker(time_series_request_single)
 
-            # if the vendor doesn't provide any data, don't attempt to append
-            if data_frame_single is not None:
-                if data_frame_single.empty == False:
-                    data_frame_single.index.name = 'Date'
-                    data_frame_single = data_frame_single.astype('float32')
+                # if the vendor doesn't provide any data, don't attempt to append
+                if data_frame_single is not None:
+                    if data_frame_single.empty == False:
+                        data_frame_single.index.name = 'Date'
+                        data_frame_single = data_frame_single.astype('float32')
 
-                    # if you call for returning multiple tickers, be careful with memory considerations!
+                        # if you call for returning multiple tickers, be careful with memory considerations!
+                        if data_frame_agg is not None:
+                            data_frame_agg = data_frame_agg.join(data_frame_single, how='outer')
+                        else:
+                            data_frame_agg = data_frame_single
+
+                # key = self.create_category_key(time_series_request, ticker)
+                # fname = self.create_cache_file_name(key)
+                # self._time_series_cache[fname] = data_frame_agg  # cache in memory (disable for intraday)
+
+            return data_frame_agg
+        else:
+            time_series_request_list = []
+
+            # create a list of TimeSeriesRequests
+            for ticker in time_series_request.tickers:
+                time_series_request_single = copy.copy(time_series_request)
+                time_series_request_single.tickers = ticker
+
+                if hasattr(time_series_request, 'vendor_tickers'):
+                    time_series_request_single.vendor_tickers = [time_series_request.vendor_tickers[ticker_cycle]]
+                    ticker_cycle = ticker_cycle + 1
+
+                time_series_request_list.append(time_series_request_single)
+
+            return self.fetch_group_time_series(time_series_request_list)
+
+    def fetch_single_time_series(self, time_series_request):
+        data_frame_single = self.get_loader(time_series_request.data_source).load_ticker(time_series_request)
+
+        if data_frame_single is not None:
+            if data_frame_single.empty == False:
+                data_frame_single.index.name = 'Date'
+                data_frame_single = data_frame_single.astype('float32')
+
+        return data_frame_single
+
+    def fetch_group_time_series(self, time_series_request_list):
+
+        data_frame_agg = None
+
+        # depends on the nature of operation as to whether we should use threading or multiprocessing library
+        if Constants().time_series_factory_thread_technique is "thread":
+            from multiprocessing.dummy import Pool
+        else:
+            # most of the time is spend waiting for Bloomberg to return, so can use threads rather than multiprocessing
+            # must use the multiprocessing_on_dill library otherwise can't pickle objects correctly
+            # note: currently not very stable
+            from multiprocessing_on_dill import Pool
+
+        thread_no = Constants().time_series_factory_thread_no['other']
+
+        if time_series_request_list[0].data_source in Constants().time_series_factory_thread_no:
+            thread_no = Constants().time_series_factory_thread_no[time_series_request_list[0].data_source]
+
+        pool = Pool(thread_no)
+
+        # open the market data downloads in their own threads and return the results
+        result = pool.map_async(self.fetch_single_time_series, time_series_request_list)
+        data_frame_group = result.get()
+
+        pool.close()
+        pool.join()
+
+        # data_frame_group = results.get()
+        # data_frame_group = results
+        # data_frame_group = None
+
+        #import multiprocessing as multiprocessing
+        # close the pool and wait for the work to finish
+
+        # processes = []
+
+        # for x in range(0, len(time_series_request_list)):
+        #    time_series_request = time_series_request_list[x]
+        # processes =   [multiprocessing.Process(target = self.fetch_single_time_series,
+        #                                           args = (x)) for x in time_series_request_list]
+
+        # pool.apply_async(tsf.harvest_category, args = (category_desc, environment, freq,
+        #             exclude_freq_cat, force_new_download_freq_cat, include_freq_cat))
+
+        # Run processes
+        # for p in processes: p.start()
+
+        # Exit the completed processes
+        # for p in processes: p.join()
+
+        # collect together all the time series
+        if data_frame_group is not None:
+            for data_frame_single in data_frame_group:
+                # if you call for returning multiple tickers, be careful with memory considerations!
+                if data_frame_single is not None:
                     if data_frame_agg is not None:
                         data_frame_agg = data_frame_agg.join(data_frame_single, how='outer')
                     else:
                         data_frame_agg = data_frame_single
-
-            # key = self.create_category_key(time_series_request, ticker)
-            # fname = self.create_cache_file_name(key)
-            # self._time_series_cache[fname] = data_frame_agg  # cache in memory (disable for intraday)
 
         return data_frame_agg
 
@@ -287,7 +376,28 @@ class LightTimeSeriesFactory:
         """
 
         # daily data does not include ticker in the key, as multiple tickers in the same file
-        data_frame_agg = loader.load_ticker(time_series_request)
+
+        if Constants().time_series_factory_thread_no['other'] == 1:
+            data_frame_agg = loader.load_ticker(time_series_request)
+        else:
+            time_series_request_list = []
+
+            group_size = int(len(time_series_request.tickers) / Constants().time_series_factory_thread_no['other'] - 1)
+
+            if group_size == 0: group_size = 1
+
+            # split up tickers into groups related to number of threads to call
+            for i in range(0, len(time_series_request.tickers), group_size):
+                time_series_request_single = copy.copy(time_series_request)
+                time_series_request_single.tickers = time_series_request.tickers[i:i + group_size]
+
+                if hasattr(time_series_request, 'vendor_tickers'):
+                    time_series_request_single.vendor_tickers = \
+                        time_series_request.vendor_tickers[i:i + group_size]
+
+                time_series_request_list.append(time_series_request_single)
+
+            data_frame_agg = self.fetch_group_time_series(time_series_request_list)
 
         key = self.create_category_key(time_series_request)
         fname = self.create_cache_file_name(key)

@@ -77,7 +77,7 @@ class CashBacktest:
             if br.signal_vol_adjust is True:
                 leverage_df = self.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
                                                br.signal_vol_periods, br.signal_vol_obs_in_year,
-                                               br.signal_vol_rebalance_freq)
+                                               br.signal_vol_rebalance_freq, br.signal_vol_resample_freq)
 
                 signal_df = pandas.DataFrame(
                     signal_df.values * leverage_df.values, index = signal_df.index, columns = signal_df.columns)
@@ -86,6 +86,8 @@ class CashBacktest:
 
         _pnl = tsc.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc = tc)
         _pnl.columns = pnl_cols
+
+        _pnl_trades = tsc.calculate_individual_trade_gains(signal_df, _pnl)
 
         # portfolio is average of the underlying signals: should we sum them or average them?
         if hasattr(br, 'portfolio_combination'):
@@ -103,6 +105,7 @@ class CashBacktest:
             if br.portfolio_vol_adjust is True:
                 portfolio, portfolio_leverage_df = self.calculate_vol_adjusted_returns(portfolio, br = br)
 
+        self._pnl_trades = _pnl_trades
         self._portfolio = portfolio
         self._signal = signal_df                            # individual signals (before portfolio leverage)
         self._portfolio_leverage = portfolio_leverage_df    # leverage on portfolio
@@ -114,7 +117,15 @@ class CashBacktest:
         # final portfolio signals (including signal & portfolio leverage)
         self._portfolio_signal = pandas.DataFrame(
             data = numpy.multiply(numpy.transpose(leverage_matrix), signal_df.values),
-            index = signal_df.index, columns = signal_df.columns) / float(length_cols)
+            index = signal_df.index, columns = signal_df.columns)
+
+        if hasattr(br, 'portfolio_combination'):
+            if br.portfolio_combination == 'sum':
+                pass
+            elif br.portfolio_combination == 'mean':
+                self._portfolio_signal = self._portfolio_signal / float(length_cols)
+        else:
+            self._portfolio_signal = self._portfolio_signal / float(length_cols)
 
         self._pnl = _pnl                                                            # individual signals P&L
 
@@ -178,7 +189,7 @@ class CashBacktest:
         leverage_df = self.calculate_leverage_factor(returns_df,
                                                                br.portfolio_vol_target, br.portfolio_vol_max_leverage,
                                                                br.portfolio_vol_periods, br.portfolio_vol_obs_in_year,
-                                                               br.portfolio_vol_rebalance_freq)
+                                                               br.portfolio_vol_rebalance_freq, br.portfolio_vol_resample_freq)
 
         vol_returns_df = tsc.calculate_signal_returns_with_tc_matrix(leverage_df, returns_df, tc = br.spot_tc_bp)
         vol_returns_df.columns = returns_df.columns
@@ -186,7 +197,7 @@ class CashBacktest:
         return vol_returns_df, leverage_df
 
     def calculate_leverage_factor(self, returns_df, vol_target, vol_max_leverage, vol_periods = 60, vol_obs_in_year = 252,
-                                  vol_rebalance_freq = 'BM', returns = True, period_shift = 0):
+                                  vol_rebalance_freq = 'BM', data_resample_freq = None, returns = True, period_shift = 0):
         """
         calculate_leverage_factor - Calculates the time series of leverage for a specified vol target
 
@@ -210,6 +221,9 @@ class CashBacktest:
         vol_rebalance_freq : str
             how often to rebalance
 
+        vol_resample_freq : str
+            do we need to resample the underlying data first? (eg. have we got intraday data?)
+
         returns : boolean
             is this returns time series or prices?
 
@@ -222,6 +236,10 @@ class CashBacktest:
         """
 
         tsc = TimeSeriesCalcs()
+
+        if data_resample_freq is not None:
+            return
+            # TODO not implemented yet
 
         if not returns: returns_df = tsc.calculate_returns(returns_df)
 
@@ -253,6 +271,16 @@ class CashBacktest:
         pandas.Dataframe
         """
         return self._pnl
+
+    def get_pnl_trades(self):
+        """
+        get_pnl_trades - Gets P&L of each individual trade per signal
+
+        Returns
+        -------
+        pandas.Dataframe
+        """
+        return self._pnl_trades
 
     def get_pnl_desc(self):
         """
@@ -296,6 +324,17 @@ class CashBacktest:
         """
 
         return self._cumportfolio
+
+    def get_portfolio_pnl(self):
+        """
+        get_portfolio_pnl - Gets portfolio returns in raw form (ie. not indexed into cumulative form)
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
+
+        return self._portfolio
 
     def get_portfolio_pnl_desc(self):
         """

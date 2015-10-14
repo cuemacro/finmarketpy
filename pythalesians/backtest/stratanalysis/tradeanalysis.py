@@ -32,6 +32,7 @@ import pandas
 from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.timeseries.calcs.timeseriestimezone import TimeSeriesTimezone
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+from pythalesians.util.constants import Constants
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -64,7 +65,13 @@ class TradeAnalysis:
             pnl = tz.localise_index_as_UTC(pnl)
         except: pass
 
-        # TODO for intraday strategy make daily
+        # set the matplotlib style sheet & defaults
+        try:
+            matplotlib.rcdefaults()
+            plt.style.use(Constants().plotfactory_pythalesians_style_sheet['pythalesians'])
+        except: pass
+
+        # TODO for intraday strategies, make daily
 
         # convert DataFrame (assumed to have only one column) to Series
         pnl = tsc.calculate_returns(pnl)
@@ -77,7 +84,6 @@ class TradeAnalysis:
         except: pass
 
         plt.show()
-
 
 
 

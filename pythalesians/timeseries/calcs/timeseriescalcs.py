@@ -111,30 +111,25 @@ class TimeSeriesCalcs:
         signal_data_frame_pushed = signal_data_frame.shift(1)
 
         # find all the trade points
-        # trade_no = ((signal_data_frame - signal_data_frame.shift(1)).abs()).cumsum()
         trade_points = ((signal_data_frame - signal_data_frame.shift(1)).abs())
-        cumulative_sum = strategy_returns_data_frame.cumsum()
+        cumulative = self.create_mult_index(strategy_returns_data_frame)
 
         indices = trade_points > 0
-        indices.columns = signal_data_frame_pushed.columns
-
-        exit_signals = signal_data_frame_pushed[indices]
-        # exit_signals = exit_signals.dropna()
-
-        indices.columns = cumulative_sum.columns
+        indices.columns = cumulative.columns
 
         # get P&L for every trade (from the end point - start point)
-        #exit_trades = cumulative_sum[indices]           # get exit trades
-        # exit_trades = exit_trades.dropna()
+        trade_returns = numpy.nan * cumulative
+        trade_points_cumulative = cumulative[indices]
 
-        trade_returns = numpy.nan * cumulative_sum
-        # non_flat_signal = exit_signals != 0
-        # non_flat_signal.columns = cumulative_sum.columns
-        indices_shift = indices.shift(1)
+        # for each set of signals/returns, calculate the trade returns - where there isn't a trade
+        # assign a NaN
+        # TODO do in one vectorised step without for loop
+        for col_name in trade_points_cumulative:
+            col = trade_points_cumulative[col_name]
+            col = col.dropna()
+            col = col / col.shift(1) - 1
 
-        trade_returns[indices] = - cumulative_sum[indices_shift]
-        # trade_returns = trade_returns[non_flat_signal]
-        # trade_returns = trade_returns.dropna()
+            trade_returns.ix[col.index, col_name] = col
 
         return trade_returns
 

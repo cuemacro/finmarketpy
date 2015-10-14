@@ -78,9 +78,10 @@ class LoaderBBGOpen(LoaderBBG):
         return data_frame
 
     def kill_session(self):
-        BBGLowLevelDaily().kill_session()
-        BBGLowLevelRef().kill_session()
-        BBGLowLevelIntraday().kill_session()
+        # TODO not really needed, because we automatically kill sessions
+        BBGLowLevelDaily().kill_session(None)
+        BBGLowLevelRef().kill_session(None)
+        BBGLowLevelIntraday().kill_session(None)
 
 ########################################################################################################################
 #### Lower level code to interact with Bloomberg Open API
@@ -103,10 +104,10 @@ class BBGLowLevelTemplate:
 
         options = self.fill_options(time_series_request)
 
-        if(BBGLowLevelTemplate._session is None):
-            session = self.start_bloomberg_session()
-        else:
-            session = BBGLowLevelTemplate._session
+        #if(BBGLowLevelTemplate._session is None):
+        session = self.start_bloomberg_session()
+        #else:
+        #    session = BBGLowLevelTemplate._session
 
         try:
             # if can't open the session, kill existing one
@@ -117,7 +118,7 @@ class BBGLowLevelTemplate:
                 if session is not None:
                     if not session.openService("//blp/refdata"):
                         self.logger.info("Try reopening Bloomberg session... try " + str(i))
-                        self.kill_session() # need to forcibly kill_session since can't always reopen
+                        self.kill_session(session) # need to forcibly kill_session since can't always reopen
                         session = self.start_bloomberg_session()
 
                         if session is not None:
@@ -204,7 +205,7 @@ class BBGLowLevelTemplate:
             # self.logger.info(msg)
 
             if msg.hasElement(self.RESPONSE_ERROR):
-                self.logger.error("REQUEST FAILED: ", msg.getElement(self.RESPONSE_ERROR))
+                self.logger.error("REQUEST FAILED: " + str(msg.getElement(self.RESPONSE_ERROR)))
                 continue
 
             data_frame_slice = self.process_message(msg)
@@ -251,7 +252,7 @@ class BBGLowLevelTemplate:
 
         self.logger.info("Returning session...")
 
-        BBGLowLevelTemplate._session = session
+        # BBGLowLevelTemplate._session = session
 
         return session
 
@@ -278,16 +279,16 @@ class BBGLowLevelTemplate:
         # to be implemented by subclass
         return
 
-    def kill_session(self):
-        if (BBGLowLevelTemplate._session is not None):
+    def kill_session(self, session):
+        if (session is not None):
             try:
-                BBGLowLevelTemplate._session.stop()
+                session.stop()
 
                 self.logger.info("Stopping session...")
             finally:
                 self.logger.info("Finally stopping session...")
 
-            BBGLowLevelTemplate._session = None
+            session = None
 
 class BBGLowLevelDaily(BBGLowLevelTemplate):
 

@@ -74,3 +74,37 @@ if True:
     gp.file_output = "output_data/FX spot DOM seasonality.png"
 
     pf.plot_line_graph(day_of_month_seasonality, adapter='pythalesians', gp = gp)
+
+###### calculate seasonal moves in FX vol (using Bloomberg data)
+if True:
+    tickers = [ 'EURUSD',                                       # ticker (Thalesians)
+                'GBPUSD',
+                'USDJPY']
+
+    time_series_request = TimeSeriesRequest(
+                start_date = "01 Jan 1999",                     # start date
+                finish_date = datetime.date.today(),            # finish date
+                freq = 'daily',                                 # daily data
+                data_source = 'bloomberg',                      # use bloomberg as data source
+                tickers = tickers,
+                fields = ['close'],                                 # which fields to download
+                vendor_tickers = [x + 'V1M BGN Curncy' for x in tickers],  # ticker (Bloomberg)
+                    vendor_fields = ['PX_LAST'],                    # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+    ltsf = LightTimeSeriesFactory()
+
+    df = ltsf.harvest_time_series(time_series_request)
+
+    df_ret = tsc.calculate_returns(df)
+
+    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret, partition_by_month = False)
+    day_of_month_seasonality = tsc.convert_month_day_to_date_time(day_of_month_seasonality)
+
+    gp = GraphProperties()
+    gp.date_formatter = '%b'
+    gp.title = 'FX vols moves by day of month'
+    gp.scale_factor = 3
+    gp.file_output = "output_data/FX vol DOM seasonality.png"
+
+    pf.plot_line_graph(day_of_month_seasonality, adapter='pythalesians', gp = gp)

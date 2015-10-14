@@ -96,6 +96,8 @@ alternatively to access Bloomberg, the software also supports the old COM API
 wrapper when using Pandas dataframes(my fork of Jorge Santos project has been modified slightly for Python 3 
 https://github.com/thalesians/cufflinks)
 * Recommended: PyFolio for statistical analysis of trading strategy returns (https://github.com/quantopian/pyfolio/)
+* Recommended: multiprocessor_on_dill because standard multiprocessing library pickle causes issues 
+(from https://github.com/sixty-north/multiprocessing_on_dill)
 
 # Installation
 
@@ -163,6 +165,9 @@ More generally, we want to:
 
 # Coding log
 
+* 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an 
+example for benhcmarking and bug fixes for Bloomberg downloader
+* 25 Sep 2015 - Refactored examples into different folders / more seasonality examples
 * 19 Sep 2015 - Added support for Plotly choropleth map plots & easy downloading of economic data via FRED/Bloomberg/Quandl
 * 12 Sep 2015 - Added basic support for PyFolio for statistical analysis of strategies
 * 04 Sep 2015 - Added StrategyTemplate for backtesting (with example) & bug fixes

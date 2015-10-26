@@ -192,7 +192,7 @@ class BBGLowLevelTemplate:
         # make sure we do not have any duplicates in the time series
         if data_frame is not None:
             if data_frame.empty == False:
-                data_frame.drop_duplicates(take_last = True)
+                data_frame.drop_duplicates(keep='last')
 
         self._data_frame = data_frame
 
@@ -234,25 +234,40 @@ class BBGLowLevelTemplate:
 
     # create a session for Bloomberg with appropriate server & port
     def start_bloomberg_session(self):
+        tries = 0
 
-        # fill SessionOptions
-        sessionOptions = blpapi.SessionOptions()
-        sessionOptions.setServerHost(Constants().bbg_server)
-        sessionOptions.setServerPort(Constants().bbg_server_port)
+        session = None
 
-        self.logger.info("Starting Bloomberg session...")
+        # try up to 5 times to start a session
+        while(tries < 5):
+            try:
+                # fill SessionOptions
+                sessionOptions = blpapi.SessionOptions()
+                sessionOptions.setServerHost(Constants().bbg_server)
+                sessionOptions.setServerPort(Constants().bbg_server_port)
 
-        # create a Session
-        session = blpapi.Session(sessionOptions)
+                self.logger.info("Starting Bloomberg session...")
 
-        # start a Session
-        if not session.start():
+                # create a Session
+                session = blpapi.Session(sessionOptions)
+
+                # start a Session
+                if not session.start():
+                    self.logger.error("Failed to start session.")
+                    return
+
+                self.logger.info("Returning session...")
+
+                tries = 5
+            except:
+                tries = tries + 1
+
+        # BBGLowLevelTemplate._session = session
+
+        if session is None:
             self.logger.error("Failed to start session.")
             return
 
-        self.logger.info("Returning session...")
-
-        # BBGLowLevelTemplate._session = session
 
         return session
 

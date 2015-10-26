@@ -165,6 +165,7 @@ More generally, we want to:
 
 # Coding log
 
+* 26 Oct 2015 - Various bug fixes for Bloomberg Open API downloader
 * 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an 
 example for benhcmarking and bug fixes for Bloomberg downloader
 * 25 Sep 2015 - Refactored examples into different folders / more seasonality examples

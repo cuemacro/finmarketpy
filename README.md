@@ -6,6 +6,7 @@ more generic elements to the community, many of whom have encouraged me to publi
 
 At present the latest open source version of PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets
+* Sensitivity analysis for systematic trading strategies parameters
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
 * Produces beautiful line plots with PyThalesians wrapper (via Matplotlib), Plotly (via cufflinks) and a simple wrapper for Bokeh
 * Basic seasonality analysis of markets
@@ -165,6 +166,7 @@ More generally, we want to:
 
 # Coding log
 
+* 28 Oct 2015 - Added more sensitivity analysis for trading strategies
 * 26 Oct 2015 - Various bug fixes for Bloomberg Open API downloader
 * 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an 
 example for benhcmarking and bug fixes for Bloomberg downloader

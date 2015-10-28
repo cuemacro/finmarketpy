@@ -166,15 +166,51 @@ if __name__ == '__main__':
 # just change "False" to "True" to run any of the below examples
 
     # create a FX CTA strategy then chart the returns, leverage over time
-    if False:
+    if True:
         strategy = StrategyFXCTA_Example()
 
         strategy.construct_strategy()
-        strategy.plot_strategy_pnl()
-        strategy.plot_strategy_leverage()
-        strategy.plot_strategy_group_benchmark_pnl()
-        strategy.plot_strategy_group_leverage()
+
+        strategy.plot_strategy_pnl()                        # plot the final strategy
+        strategy.plot_strategy_leverage()                   # plot the leverage of the portfolio
+        strategy.plot_strategy_group_pnl_trades()           # plot the individual trade P&Ls
+        strategy.plot_strategy_group_benchmark_pnl()        # plot all the cumulative P&Ls of each component
+        strategy.plot_strategy_group_leverage()             # plot all the individual leverages
         strategy.plot_strategy_group_benchmark_annualised_pnl()
+
+    # create a FX CTA strategy, then examine how P&L changes with different vol targeting
+    # and later transaction costs
+    if True:
+        strategy = StrategyFXCTA_Example()
+
+        from pythalesians.backtest.stratanalysis.tradeanalysis import TradeAnalysis
+
+        ta = TradeAnalysis()
+
+        # which backtesting parameters to change
+        # names of the portfolio
+        # broad type of parameter name
+        parameter_list = [
+            {'portfolio_vol_adjust': True, 'signal_vol_adjust' : True},
+            {'portfolio_vol_adjust': False, 'signal_vol_adjust' : False}]
+
+        pretty_portfolio_names = \
+            ['Vol target',
+             'No vol target']
+
+        parameter_type = 'vol target'
+
+        ta.run_arbitrary_sensitivity(strategy,
+                                     parameter_list=parameter_list,
+                                     pretty_portfolio_names=pretty_portfolio_names,
+                                     parameter_type=parameter_type)
+
+        # now examine sensitivity to different transaction costs
+        tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]
+        ta.run_tc_shock(strategy, tc = tc)
+
+        # how does P&L change on day of month
+        ta.run_day_of_month_analysis(strategy)
 
     # create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
     if True:

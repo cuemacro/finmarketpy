@@ -473,6 +473,62 @@ class TimeSeriesCalcs:
 
         return pandas.ewma(data_frame, span=periods)
 
+    ##### correlation methods
+    def rolling_corr(self, data_frame1, periods, data_frame2 = None, pairwise = False, flatten_labels = True):
+        """
+        rolling_ewma - Calculates exponentially weighted moving average
+
+        Parameters
+        ----------
+        data_frame1 : DataFrame
+            contains time series to run correlations on
+        periods : int
+            period of rolling correlations
+        data_frame2 : DataFrame (optional)
+            contains times series to run correlation against
+        pairwise : boolean
+            should we do pairwise correlations only?
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        panel = pandas.rolling_corr(data_frame1, data_frame2, periods, pairwise = pairwise)
+
+        try:
+            df = panel.to_frame(filter_observations=False).transpose()
+
+        except:
+            df = panel
+
+        if flatten_labels:
+            if pairwise:
+                series1 = df.columns.get_level_values(0)
+                series2 = df.columns.get_level_values(1)
+                new_labels = []
+
+                for i in range(len(series1)):
+                    new_labels.append(series1[i] + " v " + series2[i])
+
+            else:
+                new_labels = []
+
+                try:
+                    series1 = data_frame1.columns
+                except:
+                    series1 = [data_frame1.name]
+
+                series2 = data_frame2.columns
+
+                for i in range(len(series1)):
+                    for j in range(len(series2)):
+                        new_labels.append(series1[i] + " v " + series2[j])
+
+            df.columns = new_labels
+
+        return df
+
     ##### various methods for averaging time series by hours, mins and days to create summary time series
     def average_by_hour_min_of_day(self, data_frame):
         return data_frame.\

@@ -80,6 +80,11 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/g10-cpi.png" width="543"/>
 
+*Using PyThalesians to plot rolling correlatons in FX (using Bloomberg data)
+(in open source version - you can run this analysis using correlation_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/rolling-correlations.png" width="543"/>
+
 
 # Requirements
 
@@ -166,6 +171,7 @@ More generally, we want to:
 
 # Coding log
 
+* 02 Nov 2015 - Added easy wrapper for doing rolling correlations (and example)
 * 28 Oct 2015 - Added more sensitivity analysis for trading strategies
 * 26 Oct 2015 - Various bug fixes for Bloomberg Open API downloader
 * 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an 

@@ -14,7 +14,7 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 
 """
 eventstudy_examples
-
+ 
 Shows how to do event studies for assets
 
 """

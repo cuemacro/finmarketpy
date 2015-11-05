@@ -171,6 +171,7 @@ class LoaderBBG(LoaderTemplate):
 
             data_frame.columns = ticker_combined
 
+            # TODO coerce will be deprecated from pandas
             data_frame = data_frame.convert_objects(convert_dates = 'coerce', convert_numeric= 'coerce')
 
         return data_frame

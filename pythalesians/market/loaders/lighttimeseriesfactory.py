@@ -295,7 +295,11 @@ class LightTimeSeriesFactory:
         if data_frame_single is not None:
             if data_frame_single.empty == False:
                 data_frame_single.index.name = 'Date'
-                data_frame_single = data_frame_single.astype('float32')
+
+                # will fail for dataframes which includes dates
+                try:
+                    data_frame_single = data_frame_single.astype('float32')
+                except: pass
 
         return data_frame_single
 

@@ -171,6 +171,7 @@ More generally, we want to:
 
 # Coding log
 
+* 05 Nov 2015 - Added intraday event study class (and example)
 * 02 Nov 2015 - Added easy wrapper for doing rolling correlations (and example)
 * 28 Oct 2015 - Added more sensitivity analysis for trading strategies
 * 26 Oct 2015 - Various bug fixes for Bloomberg Open API downloader

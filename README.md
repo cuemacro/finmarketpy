@@ -85,6 +85,10 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/rolling-correlations.png" width="543"/>
 
+*Using PyThalesians to plot seconds data around last NFP (using Bloomberg data)
+(in open source version - you can run this analysis using tick_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/second-download.png" width="543"/>
 
 # Requirements
 
@@ -171,6 +175,7 @@ More generally, we want to:
 
 # Coding log
 
+* 07 Nov 2015 - Added feature to download tick data from Bloomberg (with example)
 * 05 Nov 2015 - Added intraday event study class (and example)
 * 02 Nov 2015 - Added easy wrapper for doing rolling correlations (and example)
 * 28 Oct 2015 - Added more sensitivity analysis for trading strategies

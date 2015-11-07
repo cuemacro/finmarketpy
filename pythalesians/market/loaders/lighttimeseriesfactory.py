@@ -141,7 +141,7 @@ class LightTimeSeriesFactory:
             time_series_request.category, time_series_request.source, time_series_request.freq, time_series_request.cut)
 
         # intraday or tick: only one ticker per cache file
-        if (time_series_request.freq in ['intraday', 'tick']):
+        if (time_series_request.freq in ['intraday', 'tick', 'second', 'hour', 'minute']):
             data_frame_agg = self.download_intraday_tick(time_series_request, loader)
 
         # daily: multiple tickers per cache file - assume we make one API call to vendor library
@@ -300,6 +300,9 @@ class LightTimeSeriesFactory:
                 try:
                     data_frame_single = data_frame_single.astype('float32')
                 except: pass
+
+                if time_series_request.freq == "second":
+                    data_frame_single = data_frame_single.resample("1s")
 
         return data_frame_single
 

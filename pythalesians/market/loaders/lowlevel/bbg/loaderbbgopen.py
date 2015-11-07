@@ -41,6 +41,18 @@ class LoaderBBGOpen(LoaderBBG):
         super(LoaderBBGOpen, self).__init__()
         self.logger = LoggerManager().getLogger(__name__)
 
+    def download_tick(self, time_series_request):
+        # Bloomberg OpenAPI implementation
+        low_level_loader = BBGLowLevelTick()
+
+        # by default we download all available fields!
+        data_frame = low_level_loader.load_time_series(time_series_request)
+
+        # self.kill_session() # need to forcibly kill_session since can't always reopen
+
+        return data_frame
+
+
     def download_intraday(self, time_series_request):
         # Bloomberg OpenAPI implementation
         low_level_loader = BBGLowLevelIntraday()
@@ -597,6 +609,107 @@ class BBGLowLevelIntraday(BBGLowLevelTemplate):
             request.append("gapFillInitialBar", True)
 
         self.logger.info("Sending Intraday Bloomberg Request...")
+
+        session.sendRequest(request)
+
+class BBGLowLevelTick(BBGLowLevelTemplate):
+
+    def __init__(self):
+        super(BBGLowLevelTick, self).__init__()
+
+        self.logger = LoggerManager().getLogger(__name__)
+
+        # constants
+        self.TICK_DATA = blpapi.Name("tickData")
+        self.COND_CODE = blpapi.Name("conditionCodes")
+        self.TICK_SIZE = blpapi.Name("size")
+        self.TIME = blpapi.Name("time")
+        self.TYPE = blpapi.Name("type")
+        self.VALUE = blpapi.Name("value")
+        self.RESPONSE_ERROR = blpapi.Name("responseError")
+        self.CATEGORY = blpapi.Name("category")
+        self.MESSAGE = blpapi.Name("message")
+        self.SESSION_TERMINATED = blpapi.Name("SessionTerminated")
+
+    def combine_slices(self, data_frame, data_frame_slice):
+        return data_frame.append(data_frame_slice)
+
+    # populate options for Bloomberg request for asset intraday request
+    def fill_options(self, time_series_request):
+        self._options = OptionsBBG()
+
+        self._options.security = time_series_request.tickers[0]    # get 1st ticker only!
+        self._options.event = time_series_request.trade_side.upper()
+        # self._options.barInterval = time_series_request.freq_mult
+        self._options.startDateTime = time_series_request.start_date
+        self._options.endDateTime = time_series_request.finish_date
+        # self._options.gapFillInitialBar = False
+
+        if hasattr(self._options.startDateTime, 'microsecond'):
+            self._options.startDateTime = self._options.startDateTime.replace(microsecond=0)
+
+        if hasattr(self._options.endDateTime, 'microsecond'):
+            self._options.endDateTime = self._options.endDateTime.replace(microsecond=0)
+
+        return self._options
+
+    # iterate through Bloomberg output creating a DataFrame output
+    # implements abstract method
+    def process_message(self, msg):
+        data = msg.getElement(self.TICK_DATA).getElement(self.TICK_DATA)
+
+        self.logger.info("Processing tick data for " + str(self._options.security))
+        tuple = []
+
+        data_vals = data.values()
+
+        # for item in list(data_vals):
+        #     if item.hasElement(self.COND_CODE):
+        #         cc = item.getElementAsString(self.COND_CODE)
+        #     else:
+        #         cc = ""
+        #
+        #     # each price time point has multiple fields - marginally quicker
+        #     tuple.append(([item.getElementAsFloat(self.VALUE),
+        #                     item.getElementAsInteger(self.TICK_SIZE)],
+        #                     item.getElementAsDatetime(self.TIME)))
+
+        # slightly faster this way (note, we are skipping trade & CC fields)
+        tuple = [([item.getElementAsFloat(self.VALUE),
+                             item.getElementAsInteger(self.TICK_SIZE)],
+                             item.getElementAsDatetime(self.TIME)) for item in data_vals]
+
+        data_table = list(map(itemgetter(0), tuple))
+        time_list = list(map(itemgetter(1), tuple))
+
+        try:
+            self.logger.info("Dates between " + str(time_list[0]) + " - " + str(time_list[-1]))
+        except:
+            self.logger.info("No dates retrieved")
+            return None
+
+        # create pandas dataframe with the Bloomberg output
+        return pandas.DataFrame(data = data_table, index = time_list,
+                      columns=['close', 'ticksize'])
+
+    # implement abstract method: create request for data
+    def send_bar_request(self, session, eventQueue):
+        refDataService = session.getService("//blp/refdata")
+        request = refDataService.createRequest("IntradayTickRequest")
+
+        # only one security/eventType per request
+        request.set("security", self._options.security)
+        request.getElement("eventTypes").appendValue("TRADE")
+        # request.set("eventTypes", self._options.event)
+        request.set("includeConditionCodes", True)
+
+        # self.add_override(request, 'TIME_ZONE_OVERRIDE', 'GMT')
+
+        if self._options.startDateTime and self._options.endDateTime:
+            request.set("startDateTime", self._options.startDateTime)
+            request.set("endDateTime", self._options.endDateTime)
+
+        self.logger.info("Sending Tick Bloomberg Request...")
 
         session.sendRequest(request)
 

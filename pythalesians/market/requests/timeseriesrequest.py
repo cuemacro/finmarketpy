@@ -130,7 +130,7 @@ class TimeSeriesRequest:
     def freq(self, freq):
         freq = freq.lower()
 
-        valid_freq = ['tick', 'intraday', 'daily']
+        valid_freq = ['tick', 'second', 'minute', 'intraday', 'hourly', 'daily']
 
         if not freq in valid_freq:
             self.logger.warning(freq & " is not a defined frequency")
@@ -145,14 +145,14 @@ class TimeSeriesRequest:
     def gran_freq(self, gran_freq):
         gran_freq = gran_freq.lower()
 
-        valid_gran_freq = ['tick', 'minute', 'hourly', 'pseudodaily', 'daily', 'weekly', 'monthly', 'quarterly', 'yearly']
+        valid_gran_freq = ['tick', 'second', 'minute', 'hourly', 'pseudodaily', 'daily', 'weekly', 'monthly', 'quarterly', 'yearly']
 
         if not gran_freq in valid_gran_freq:
             self.logger.warning(gran_freq & " is not a defined frequency")
 
         if gran_freq in ['minute', 'hourly']:
             self.__freq = 'intraday'
-        elif gran_freq in ['tick']:
+        elif gran_freq in ['tick', 'second']:
             self.__freq = 'tick'
         else:
             self.__freq = 'daily'

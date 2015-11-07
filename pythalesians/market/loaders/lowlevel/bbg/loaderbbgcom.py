@@ -27,6 +27,10 @@ class LoaderBBGCOM(LoaderBBG):
         super(LoaderBBGCOM, self).__init__()
         self.logger = LoggerManager().getLogger(__name__)
 
+    def download_tick(self, time_series_request):
+        # TODO not implemented
+        return None
+
     def download_intraday(self, time_series_request):
         low_level_loader = IntradayBarRequest(time_series_request.tickers, interval=time_series_request.freq_mult,
                 start = time_series_request.start_date, end = time_series_request.finish_date)

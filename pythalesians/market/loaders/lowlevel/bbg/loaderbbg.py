@@ -91,10 +91,13 @@ class LoaderBBG(LoaderTemplate):
 
         # assume one ticker only
         # for intraday data we use IntradayDataRequest to Bloomberg
-        if (time_series_request.freq in ['intraday', 'minute', 'hourly']):
+        if (time_series_request.freq in ['tick', 'intraday', 'second', 'minute', 'hourly']):
             time_series_request_vendor.tickers = time_series_request_vendor.tickers[0]
 
-            data_frame = self.download_intraday(time_series_request_vendor)
+            if time_series_request.freq in ['tick', 'second']:
+                data_frame = self.download_tick(time_series_request_vendor)
+            else:
+                data_frame = self.download_intraday(time_series_request_vendor)
 
             if data_frame is not None:
                 if data_frame.empty:
@@ -103,7 +106,7 @@ class LoaderBBG(LoaderTemplate):
                     return None
 
                 cols = data_frame.columns.values
-                data_frame.tz_localize('UTC')
+                data_frame = data_frame.tz_localize('UTC')
                 cols = time_series_request.tickers[0] + "." + cols
                 data_frame.columns = cols
 
@@ -179,6 +182,10 @@ class LoaderBBG(LoaderTemplate):
     # implement method in abstract superclass
     @abc.abstractmethod
     def kill_session(self):
+        return
+
+    @abc.abstractmethod
+    def download_tick(self, time_series_request):
         return
 
     @abc.abstractmethod

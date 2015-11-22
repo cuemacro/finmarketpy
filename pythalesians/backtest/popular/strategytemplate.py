@@ -391,7 +391,7 @@ class StrategyTemplate:
             for key in keys: ir.append(self._strategy_group_benchmark_tsd[key].inforatio()[0])
 
             ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
-            ret_stats = ret_stats.sort()
+            ret_stats = ret_stats.sort_index()
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR).png'
 
             gp.display_brand_label = False

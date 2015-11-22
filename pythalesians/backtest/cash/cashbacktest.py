@@ -75,9 +75,13 @@ class CashBacktest:
         # do we have a vol target for individual signals?
         if hasattr(br, 'signal_vol_adjust'):
             if br.signal_vol_adjust is True:
+                if not(hasattr(br, 'signal_vol_resample_type')):
+                    br.signal_vol_resample_type = 'mean'
+
                 leverage_df = self.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
                                                br.signal_vol_periods, br.signal_vol_obs_in_year,
-                                               br.signal_vol_rebalance_freq, br.signal_vol_resample_freq)
+                                               br.signal_vol_rebalance_freq, br.signal_vol_resample_freq,
+                                               br.signal_vol_resample_type)
 
                 signal_df = pandas.DataFrame(
                     signal_df.values * leverage_df.values, index = signal_df.index, columns = signal_df.columns)
@@ -186,10 +190,14 @@ class CashBacktest:
 
         if not returns: returns_df = tsc.calculate_returns(returns_df)
 
+        if not(hasattr(br, 'portfolio_vol_resample_type')):
+            br.portfolio_vol_resample_type = 'mean'
+
         leverage_df = self.calculate_leverage_factor(returns_df,
                                                                br.portfolio_vol_target, br.portfolio_vol_max_leverage,
                                                                br.portfolio_vol_periods, br.portfolio_vol_obs_in_year,
-                                                               br.portfolio_vol_rebalance_freq, br.portfolio_vol_resample_freq)
+                                                               br.portfolio_vol_rebalance_freq, br.portfolio_vol_resample_freq,
+                                                               br.portfolio_vol_resample_type)
 
         vol_returns_df = tsc.calculate_signal_returns_with_tc_matrix(leverage_df, returns_df, tc = br.spot_tc_bp)
         vol_returns_df.columns = returns_df.columns
@@ -197,7 +205,8 @@ class CashBacktest:
         return vol_returns_df, leverage_df
 
     def calculate_leverage_factor(self, returns_df, vol_target, vol_max_leverage, vol_periods = 60, vol_obs_in_year = 252,
-                                  vol_rebalance_freq = 'BM', data_resample_freq = None, returns = True, period_shift = 0):
+                                  vol_rebalance_freq = 'BM', data_resample_freq = None, data_resample_type = 'mean',
+                                  returns = True, period_shift = 0):
         """
         calculate_leverage_factor - Calculates the time series of leverage for a specified vol target
 
@@ -251,11 +260,12 @@ class CashBacktest:
         lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
         # only allow the leverage change at resampling frequency (eg. monthly 'BM')
-        lev_df = lev_df.resample(vol_rebalance_freq)
+        lev_df = lev_df.resample(vol_rebalance_freq, how=data_resample_type)
 
         returns_df, lev_df = returns_df.align(lev_df, join='left', axis = 0)
 
         lev_df = lev_df.fillna(method='ffill')
+        lev_df.ix[0:vol_periods] = numpy.nan    # ignore the first elements before the vol window kicks in
 
         return lev_df
 

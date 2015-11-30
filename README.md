@@ -103,8 +103,8 @@ alternatively to access Bloomberg, the software also supports the old COM API
 * To use Bloomberg you will need to have a installed licence 
 * Recommended: Plotly for funky interactive plots (https://github.com/plotly/python-api) and 
 * Recommended: Cufflinks a nice Plotly
-wrapper when using Pandas dataframes(my fork of Jorge Santos project has been modified slightly for Python 3 
-https://github.com/thalesians/cufflinks)
+wrapper when using Pandas dataframes (Jorge Santos project now supports Python 3 
+https://github.com/jorgesantos/cufflinks - so I recommend using that rather than my fork)
 * Recommended: PyFolio for statistical analysis of trading strategy returns (https://github.com/quantopian/pyfolio/)
 * Recommended: multiprocessor_on_dill because standard multiprocessing library pickle causes issues 
 (from https://github.com/sixty-north/multiprocessing_on_dill)

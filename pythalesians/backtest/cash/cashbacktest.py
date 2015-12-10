@@ -91,6 +91,9 @@ class CashBacktest:
         _pnl = tsc.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc = tc)
         _pnl.columns = pnl_cols
 
+        _pnl_trades = None
+
+        # TODO FIX very slow
         _pnl_trades = tsc.calculate_individual_trade_gains(signal_df, _pnl)
 
         # portfolio is average of the underlying signals: should we sum them or average them?

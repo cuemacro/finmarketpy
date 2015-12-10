@@ -27,13 +27,25 @@ class TimeSeriesTimezone:
 
     def convert_index_from_UTC_to_new_york_time(self, data_frame):
         new_york = pytz.timezone('America/New_York')
-        data_frame = data_frame.tz_localize(pytz.utc).tz_convert(new_york)
+
+        try:
+            data_frame = data_frame.tz_localize(pytz.utc)
+        except:
+            pass
+
+        data_frame = data_frame.tz_convert(new_york)
 
         return data_frame
 
     def convert_index_from_UTC_to_london_time(self, data_frame):
         london = pytz.timezone('Europe/London')
-        data_frame = data_frame.tz_localize(pytz.utc).tz_convert(london)
+
+        try:
+            data_frame = data_frame.tz_localize(pytz.utc)
+        except:
+            pass
+
+        data_frame = data_frame.tz_convert(london)
 
         return data_frame
 

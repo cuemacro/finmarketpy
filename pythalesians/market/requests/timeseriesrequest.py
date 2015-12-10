@@ -21,7 +21,8 @@ class TimeSeriesRequest:
     # cache_algo (eg. internet, disk, memory) - internet will forcibly download from the internet
     # environment (eg. prod, backtest) - old data is saved with prod, backtest will overwrite the last data point
     def __init__(self, data_source = None,
-                 start_date = None, finish_date = None, tickers = None, category = None, freq_mult = None, freq = None,
+                 start_date = None, finish_date = datetime.utcnow(),
+                 tickers = None, category = None, freq_mult = None, freq = None,
                  gran_freq = None, cut = None,
                  fields = None, cache_algo = None,
                  vendor_tickers = None, vendor_fields = None,
@@ -130,7 +131,7 @@ class TimeSeriesRequest:
     def freq(self, freq):
         freq = freq.lower()
 
-        valid_freq = ['tick', 'second', 'minute', 'intraday', 'hourly', 'daily']
+        valid_freq = ['tick', 'second', 'minute', 'intraday', 'hourly', 'daily', 'weekly']
 
         if not freq in valid_freq:
             self.logger.warning(freq & " is not a defined frequency")

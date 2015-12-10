@@ -336,6 +336,8 @@ class StrategyTemplate:
 
         # zero when there isn't a trade exit
         strategy_pnl_trades = self._strategy_pnl_trades.fillna(0) * 100 * 100
+        # strategy_pnl_trades = self._strategy_pnl_trades * 100 * 100
+        # strategy_pnl_trades = strategy_pnl_trades.dropna()
 
         try:
             pf.plot_line_graph(self.reduce_plot(strategy_pnl_trades), adapter = 'pythalesians', gp = gp)

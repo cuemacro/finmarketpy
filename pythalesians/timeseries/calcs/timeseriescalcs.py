@@ -129,7 +129,13 @@ class TimeSeriesCalcs:
             col = col.dropna()
             col = col / col.shift(1) - 1
 
-            trade_returns.ix[col.index, col_name] = col
+            # TODO experiment with quicker ways of writing below?
+            # for val in col.index:
+                # trade_returns.set_value(val, col_name, col[val])
+                # trade_returns.ix[val, col_name] = col[val]
+
+            date_indices = trade_returns.index.searchsorted(col.index)
+            trade_returns.ix[date_indices, col_name] = col
 
         return trade_returns
 
@@ -476,7 +482,7 @@ class TimeSeriesCalcs:
     ##### correlation methods
     def rolling_corr(self, data_frame1, periods, data_frame2 = None, pairwise = False, flatten_labels = True):
         """
-        rolling_ewma - Calculates exponentially weighted moving average
+        rolling_corr - Calculates rolling correlation wrapping around pandas functions
 
         Parameters
         ----------

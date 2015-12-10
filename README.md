@@ -175,6 +175,7 @@ More generally, we want to:
 
 # Coding log
 
+* 10 Dec 2015 - Various bug fixes
 * 22 Nov 2015 - Increased vol targeting features for doing backtesting
 * 07 Nov 2015 - Added feature to download tick data from Bloomberg (with example)
 * 05 Nov 2015 - Added intraday event study class (and example)

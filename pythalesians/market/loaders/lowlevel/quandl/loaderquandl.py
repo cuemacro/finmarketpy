@@ -38,7 +38,7 @@ class LoaderQuandl(LoaderTemplate):
 
         data_frame = self.download_daily(time_series_request_vendor)
 
-        if data_frame.index is []: return None
+        if data_frame is None or data_frame.index is []: return None
 
         # convert from vendor to Thalesians tickers/fields
         if data_frame is not None:

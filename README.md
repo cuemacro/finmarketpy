@@ -99,7 +99,7 @@ Major requirements
 * Required: Python 3.4+
 * Required: pandas, matplotlib, numpy etc.
 * Recommended: Bloomberg Python Open API
-** Use experimental Python 3 version from Bloomberg http://www.bloomberglabs.com/api/libraries/
+** Use experimental Python 3.4 version from Bloomberg http://www.bloomberglabs.com/api/libraries/
 ** Might need to tweak registry to avoid "Python 3.4 not found in registry error" (blppython.reg example)
 ** Alternatively to access Bloomberg, the software also supports the old COM API (but this deprecated)
 ** To use Bloomberg you will need to have a installed licence

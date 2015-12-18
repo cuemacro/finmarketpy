@@ -1,4 +1,4 @@
-Windows Registry Editor Version 5.00
+Windows Registry Editor Version 5.0
 [HKEY_LOCAL_MACHINE\SOFTWARE\Python]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Python\PythonCore]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Python\PythonCore\3.4]

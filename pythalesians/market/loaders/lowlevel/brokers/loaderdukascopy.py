@@ -41,9 +41,6 @@ try:
 except ImportError:
     from backports import lzma
 
-# for parsing binary files fetched from Dukascopy
-import pythalesians.market.loaders.lowlevel.brokers.parserows
-
 # abstract class on which this is based
 from pythalesians.market.loaders.lowlevel.loadertemplate import LoaderTemplate
 
@@ -134,11 +131,15 @@ class LoaderDukasCopy(LoaderTemplate):
 
         # single threaded
         df_list = [self.fetch_file(time, symbol) for time in
-                   self.hour_range(time_series_request.start_date, time_series_request.finish_date)]
+                  self.hour_range(time_series_request.start_date, time_series_request.finish_date)]
 
-        # parallel (has pickle issues)
+        # TODO parallel (has pickle issues)
         # time_list = self.hour_range(time_series_request.start_date, time_series_request.finish_date)
-        # df_list = Parallel(n_jobs=-1)(delayed(self.fetch_file)(time, symbol) for time in time_list)
+        # import multiprocessing_on_dill as multiprocessing
+        #
+        # pool = multiprocessing.Pool(processes=4)
+        # results = [pool.apply_async(self.fetch_file, args=(time, symbol)) for time in time_list]
+        # df_list = [p.get() for p in results]
 
         try:
             return pandas.concat(df_list)
@@ -201,7 +202,7 @@ class LoaderDukasCopy(LoaderTemplate):
         return [list[i:i + n] for i in range(0, len(list), n)]
 
     def retrieve_df(self, data, symbol, epoch):
-        date, tuple = pythalesians.market.loaders.lowlevel.brokers.parserows.parse_tick_data(data, epoch)
+        date, tuple = self.parse_tick_data(data, epoch)
 
         df = pandas.DataFrame(data = tuple, columns=['temp', 'bid', 'ask', 'bidv', 'askv'], index = date)
         df.drop('temp', axis = 1)
@@ -223,8 +224,36 @@ class LoaderDukasCopy(LoaderTemplate):
           delta_t = end_date - start_date
 
           delta_hours = (delta_t.days *  24.0) + (delta_t.seconds / 3600.0)
+
           for n in range(int (delta_hours)):
               yield start_date + timedelta(0, 0, 0, 0, 0, n) # Hours
+
+    def parse_tick_data(self, data, epoch):
+        import struct
+
+        # tick = namedtuple('Tick', 'Date ask bid askv bidv')
+
+        chunks_list = self.chunks(data, 20)
+        parsed_list = []
+        date = []
+
+        # note: Numba can speed up for loops
+        for row in chunks_list:
+            d = struct.unpack(">LLLff", row)
+            date.append((epoch + timedelta(0,0,0, d[0])))
+
+            # SLOW: no point using named tuples!
+            # row_data = tick._asdict(tick._make(d))
+            # row_data['Date'] = (epoch + timedelta(0,0,0,row_data['Date']))
+
+            parsed_list.append(d)
+
+        return date, parsed_list
+
+    def chunks(self, list, n):
+        if n < 1: n = 1
+
+        return [list[i:i + n] for i in range(0, len(list), n)]
 
     def get_daily_data(self):
         pass
@@ -303,21 +332,5 @@ class LoaderDukasCopy(LoaderTemplate):
         #     df_list.append(self.retrieve_df(data, symbol, time))
 
 if __name__ == '__main__':
-    from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
-    import datetime
-
-    dc = LoaderDukasCopy()
-
-    time_series_request = TimeSeriesRequest(
-                start_date = "01 Jun 2015",                     # start date
-                finish_date = "02 Jun 2015",            # finish date
-                freq = 'tick',                                  # tick data
-                data_source = 'dukascopy',                      # use Bloomberg as data source
-                tickers = ['EURUSD'],                           # ticker (Thalesians)
-                fields = ['bid', 'ask'],              # which fields to download
-                vendor_tickers = ['EURUSD',          # ticker (Bloomberg)
-                                  'GBPUSD'],
-                vendor_fields = ['bid', 'ask'],   # which Bloomberg fields to download
-                cache_algo = 'internet_load_return')                # how to return data
-
-    dc.load_ticker(time_series_request)
+    pass
+    # see pythalesians_examples/lighttimeseriesfactory_examples.py for a Dukascopy download example

@@ -177,6 +177,7 @@ More generally, we want to:
 
 # Coding log
 
+* 19 Dec 2015 - Refactored Dukascopy downloader
 * 10 Dec 2015 - Various bug fixes
 * 22 Nov 2015 - Increased vol targeting features for doing backtesting
 * 07 Nov 2015 - Added feature to download tick data from Bloomberg (with example)

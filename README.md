@@ -177,6 +177,7 @@ More generally, we want to:
 
 # Coding log
 
+* 26 Dec 2015 - Fixed problem with econ data downloaders
 * 24 Dec 2015 - Added datafactory templates for creating custom indicators
 * 19 Dec 2015 - Refactored Dukascopy downloader
 * 10 Dec 2015 - Various bug fixes

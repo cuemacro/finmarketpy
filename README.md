@@ -90,6 +90,11 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/second-download.png" width="543"/>
 
+*Using PyThalesians to plot AUD/USD total returns from spot & deposit data (comparing with spot and Bloomberg
+generated total return index) (in open source version - you can run this analysis using indicesfx_examples.py)*
+
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/audusd-total-returns.png" width="543"/>
+
 # Requirements
 
 PyThalesians has been tested on Windows 8 & 10, running Bloomberg terminal software. Potentially, it could also work on the 
@@ -177,6 +182,7 @@ More generally, we want to:
 
 # Coding log
 
+* 05 Jan 2016 - Added total return (spot) indices construction for FX and example
 * 26 Dec 2015 - Fixed problem with econ data downloaders
 * 24 Dec 2015 - Added datafactory templates for creating custom indicators
 * 19 Dec 2015 - Refactored Dukascopy downloader

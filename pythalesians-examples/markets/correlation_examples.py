@@ -74,7 +74,7 @@ if True:
         pf = PlotFactory()
         pf.plot_line_graph(df, adapter = 'pythalesians', gp = gp)
 
-    ###### download daily data from Bloomberg for AUD/JPY, NZD/JPY spot & S&P500, then calculate correlation
+    ###### download daily data from Bloomberg for AUD/JPY, NZD/JPY spot with S&P500, then calculate correlation
     if True:
         time_series_request = TimeSeriesRequest(
                 start_date="01 Jan 2015",  # start date

@@ -69,7 +69,41 @@ if True:
 
         gp = GraphProperties()
         gp.title = "1M FX rolling correlations"
+        gp.scale_factor = 3
 
         pf = PlotFactory()
         pf.plot_line_graph(df, adapter = 'pythalesians', gp = gp)
 
+    ###### download daily data from Bloomberg for AUD/JPY, NZD/JPY spot and S&P500, then calculate correlation
+    if True:
+        time_series_request = TimeSeriesRequest(
+                start_date="01 Jan 2015",  # start date
+                finish_date=datetime.date.today(),  # finish date
+                freq='daily',  # daily data
+                data_source='bloomberg',  # use Bloomberg as data source
+                tickers=['AUDJPY',  # ticker (Thalesians)
+                         'NZDJPY',
+                         'S&P500'],
+                fields=['close'],  # which fields to download
+                vendor_tickers=['AUDJPY BGN Curncy',  # ticker (Bloomberg)
+                                'NZDJPY BGN Curncy',
+                                'SPX Index'],
+                vendor_fields=['PX_LAST'],  # which Bloomberg fields to download
+                cache_algo='internet_load_return')  # how to return data
+
+        ltsf = LightTimeSeriesFactory()
+
+        df = None
+        df = ltsf.harvest_time_series(time_series_request)
+
+        tsc = TimeSeriesCalcs()
+        df = df.fillna(method='ffill')
+        df = tsc.calculate_returns(df)
+        df = tsc.rolling_corr(df['S&P500.close'], 20, data_frame2=df[['AUDJPY.close', 'NZDJPY.close']])
+
+        gp = GraphProperties()
+        gp.title = "1M FX rolling correlations"
+        gp.scale_factor = 3
+
+        pf = PlotFactory()
+        pf.plot_line_graph(df, adapter='pythalesians', gp=gp)

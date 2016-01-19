@@ -34,20 +34,20 @@ Below we give some examples of analysis which we've done using the full code of 
 *Using PyThalesians to create a simple FX trend following strategy (in open source version - you can run this 
 backtest using cashbacktest_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/fx-trend-example.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/fx-trend-example.png" width="543"/>
 
 *Using PyThalesians to plot & calculate USD/JPY intraday moves around non-farm payrolls over past 10 years*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/usdjpy-nfp-delta.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/usdjpy-nfp-delta.png" width="543"/>
 
 *Using PyThalesians to calculate intraday vol in major FX crosses by time of day*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/fx-intraday-vol.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/fx-intraday-vol.png" width="543"/>
 
 *Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark 
 (in closed source version)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/replicating-cta.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/replicating-cta.png" width="543"/>
 
 *Using PyThalesians with Cufflinks (Plotly wrapper) to plot interactive Plotly chart (using plotly_examples.py) - click the below to get to the interactive chart*
 <div>
@@ -58,42 +58,42 @@ backtest using cashbacktest_examples.py)*
 *Using PyThalesians to plot via Bokeh EUR/USD in the 3 hours following FOMC statements
 (plotting in open source version, calculations in closed source version)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-complex-example.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/bokeh-complex-example.png" width="543"/>
 
 *Using PyThalesians to plot combination of bar/line/scatter for recent equity returns
 (in open source version - you can run this analysis using bokeh_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/bokeh-bar-example.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/bokeh-bar-example.png" width="543"/>
 
 *Using PyThalesians and PyFolio to plot return statistics of FX CTA strategy
 (in open source version - you can run this analysis using strategyfxcta_example.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/tradeanalysis-stat.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/tradeanalysis-stat.png" width="543"/>
 
 *Using PyThalesians to plot with Plotly map of USA unemployment rate by state (using FRED data)
 (in open source version - you can run this analysis using histecondata_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/usa-states-unemployment-rate.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/usa-states-unemployment-rate.png" width="543"/>
 
 *Using PyThalesians to plot G10 CPI YoY rates (using FRED data)
 (in open source version - you can run this analysis using histecondata_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/g10-cpi.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/g10-cpi.png" width="543"/>
 
 *Using PyThalesians to plot rolling correlatons in FX (using Bloomberg data)
 (in open source version - you can run this analysis using correlation_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/rolling-correlations.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/rolling-correlations.png" width="543"/>
 
 *Using PyThalesians to plot seconds data around last NFP (using Bloomberg data)
 (in open source version - you can run this analysis using tick_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/second-download.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/second-download.png" width="543"/>
 
 *Using PyThalesians to plot AUD/USD total returns from spot & deposit data (comparing with spot and Bloomberg
 generated total return index) (in open source version - you can run this analysis using indicesfx_examples.py)*
 
-<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians-examples/audusd-total-returns.png" width="543"/>
+<img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/audusd-total-returns.png" width="543"/>
 
 # Requirements
 
@@ -209,7 +209,7 @@ example for benhcmarking and bug fixes for Bloomberg downloader
 * 29 Jul 2015 - Added backtesting functions (including simple FX trend following strategy) and various bug fixes/comments.
 * 24 Jul 2015 - Added functions for doing simple seasonality studies and added examples.
 * 17 Jul 2015 - Created example to show how to use technical indicators.
-* 13 Jul 2015 - Changed location of conf, renamed examples folder to pythalesians-examples. Can now be installed using setup.py.
+* 13 Jul 2015 - Changed location of conf, renamed examples folder to pythalesians_examples. Can now be installed using setup.py.
 * 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use - check Dukascopy terms & conditions). Note that past month of data is generally not made available by Dukascopy
 
 End of note

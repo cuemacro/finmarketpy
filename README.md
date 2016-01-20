@@ -182,7 +182,7 @@ More generally, we want to:
 
 # Coding log
 
-* 20 Jan 2016 - Added kurtosis measure for trading strategy results
+* 20 Jan 2016 - Added kurtosis measure for trading strategy results, fixed Quandl issue
 * 19 Jan 2016 - Changed examples folder name
 * 15 Jan 2016 - Added risk on/off FX correlation example
 * 05 Jan 2016 - Added total return (spot) indices construction for FX and example

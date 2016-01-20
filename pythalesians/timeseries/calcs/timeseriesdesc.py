@@ -66,6 +66,7 @@ class TimeSeriesDesc:
         self._rets = returns_df.mean(axis=0) * ann_factor
         self._vol = returns_df.std(axis=0) * math.sqrt(ann_factor)
         self._inforatio = self._rets / self._vol
+        self._kurtosis = returns_df.kurtosis(axis=0)
 
         index_df = tsc.create_mult_index(returns_df)
         max2here = pandas.expanding_max(index_df)
@@ -113,6 +114,16 @@ class TimeSeriesDesc:
         """
         return self._dd
 
+    def kurtosis(self):
+        """
+        kurtosis - Gets kurtosis for an asset or strategy
+
+        Returns
+        -------
+        float
+        """
+        return self._kurtosis
+
     def summary(self):
         """
         summary - Gets summary string contains various return statistics
@@ -127,6 +138,7 @@ class TimeSeriesDesc:
             stat_list.append(self._rets.index[i] + " Ret = " + str(round(self._rets[i] * 100, 1))
                              + "% Vol = " + str(round(self._vol[i] * 100, 1))
                              + "% IR = " + str(round(self._inforatio[i], 2))
-                             + " Dr = " + str(round(self._dd[i] * 100, 1)) + "%")
+                             + " Dr = " + str(round(self._dd[i] * 100, 1))
+                             + "% Kurt = " + str(round(self._kurtosis[i], 2)))
 
         return stat_list

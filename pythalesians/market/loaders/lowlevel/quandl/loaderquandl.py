@@ -47,6 +47,7 @@ class LoaderQuandl(LoaderTemplate):
         if data_frame is not None:
             # tidy up tickers into a format that is more easily translatable
             returned_tickers = [x.replace(' - Value', '') for x in returned_tickers]
+            returned_tickers = [x.replace(' - VALUE', '') for x in returned_tickers]
             returned_tickers = [x.replace('.', '/') for x in returned_tickers]
 
             fields = self.translate_from_vendor_field(['close' for x in returned_tickers], time_series_request)

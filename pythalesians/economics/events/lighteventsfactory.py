@@ -56,7 +56,7 @@ class LightEventsFactory(EventStudy):
 
     _econ_data_frame = None
 
-    # where your HDF5 file is stored with economic data MUST CHANGE!
+    # where your HDF5 file is stored with economic data MUST CHANGE!!
     _hdf5_file_econ_file = "somefilnename.h5"
 
     ### manual offset for certain events where Bloomberg displays the wrong date (usually because of time differences)

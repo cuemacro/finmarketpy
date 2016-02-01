@@ -56,8 +56,8 @@ class LightEventsFactory(EventStudy):
 
     _econ_data_frame = None
 
-    # where your HDF5 file is stored with economic data
-    _hdf5_file_econ_file = "E:/timeseriesdata/backtest.events.bloomberg.daily.NYC.h5"
+    # where your HDF5 file is stored with economic data MUST CHANGE!
+    _hdf5_file_econ_file = "somefilnename.h5"
 
     ### manual offset for certain events where Bloomberg displays the wrong date (usually because of time differences)
     _offset_events = {'AUD-Australia Labor Force Employment Change SA.release-dt' : 1}

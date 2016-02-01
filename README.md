@@ -182,6 +182,7 @@ More generally, we want to:
 
 # Coding log
 
+* 01 Feb 2016 - Added LightEventsFactory to make it easier to deal with econ data events (stored as HDF5 files)
 * 20 Jan 2016 - Added kurtosis measure for trading strategy results, fixed Quandl issue
 * 19 Jan 2016 - Changed examples folder name
 * 15 Jan 2016 - Added risk on/off FX correlation example

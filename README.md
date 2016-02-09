@@ -1,6 +1,6 @@
 # PyThalesians
 
-PyThalesians is a Python financial library developed by the Thalesians (http://www.thalesians.com). I have used the library to develop my own trading strategies and I've included samples which show some of the functionality including an FX trend following model.
+PyThalesians is a Python financial library developed by the Thalesians (http://www.thalesians.com). I have used the library to develop my own trading strategies and I've included samples which show some of the functionality including an FX trend following model and other bits of financial analysis.
 
 At present the PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets

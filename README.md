@@ -1,10 +1,8 @@
 # PyThalesians
 
-PyThalesians is a Python financial library developed by the Thalesians (http://www.thalesians.com). Whilst elements of 
-the project will remain proprietary (such as our proprietary trading algorithms), we are keen to publish many of the 
-more generic elements to the community, many of whom have encouraged me to publish my code.
+PyThalesians is a Python financial library developed by the Thalesians (http://www.thalesians.com). I have used the library to develop my own trading strategies and I've included samples which show some of the functionality including an FX trend following model.
 
-At present the latest open source version of PyThalesians offers:
+At present the PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets
 * Sensitivity analysis for systematic trading strategies parameters
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
@@ -18,20 +16,11 @@ At present the latest open source version of PyThalesians offers:
 documented
 * Uses Apache 2.0 licence
 
-The proprietary version of PyThalesians also has:
-
-* Comprehensive backtesting systematic trading strategies for cash markets
-* Analysis of intraday price action around data events
-* Comprehensive number crunching of FX volatility market around data events
-* Backtesting systematic trading strategies in FX vanilla options
-* Elegant caching framework for historical market data
-* Proprietary trading algorithms used in my own personal trading - which will not be open sourced :-)
-
 # Gallery
 
 Below we give some examples of analysis which we've done using the full code of PyThalesians (which currently includes more features than the open source version).
 
-*Using PyThalesians to create a simple FX trend following strategy (in open source version - you can run this 
+*Using PyThalesians to create a simple FX trend following strategy (you can run this 
 backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/fx-trend-example.png" width="543"/>
@@ -55,43 +44,42 @@ backtest using cashbacktest_examples.py)*
     <script data-plotly="thalesians:867"  src="https://plot.ly/embed.js" async></script>
 </div>
 
-*Using PyThalesians to plot via Bokeh EUR/USD in the 3 hours following FOMC statements
-(plotting in open source version, calculations in closed source version)*
+*Using PyThalesians to plot via Bokeh EUR/USD in the 3 hours following FOMC statements*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/bokeh-complex-example.png" width="543"/>
 
 *Using PyThalesians to plot combination of bar/line/scatter for recent equity returns
-(in open source version - you can run this analysis using bokeh_examples.py)*
+(you can run this analysis using bokeh_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/bokeh-bar-example.png" width="543"/>
 
 *Using PyThalesians and PyFolio to plot return statistics of FX CTA strategy
-(in open source version - you can run this analysis using strategyfxcta_example.py)*
+(you can run this analysis using strategyfxcta_example.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/tradeanalysis-stat.png" width="543"/>
 
 *Using PyThalesians to plot with Plotly map of USA unemployment rate by state (using FRED data)
-(in open source version - you can run this analysis using histecondata_examples.py)*
+(you can run this analysis using histecondata_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/usa-states-unemployment-rate.png" width="543"/>
 
 *Using PyThalesians to plot G10 CPI YoY rates (using FRED data)
-(in open source version - you can run this analysis using histecondata_examples.py)*
+(you can run this analysis using histecondata_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/g10-cpi.png" width="543"/>
 
 *Using PyThalesians to plot rolling correlatons in FX (using Bloomberg data)
-(in open source version - you can run this analysis using correlation_examples.py)*
+(you can run this analysis using correlation_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/rolling-correlations.png" width="543"/>
 
 *Using PyThalesians to plot seconds data around last NFP (using Bloomberg data)
-(in open source version - you can run this analysis using tick_examples.py)*
+(you can run this analysis using tick_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/second-download.png" width="543"/>
 
 *Using PyThalesians to plot AUD/USD total returns from spot & deposit data (comparing with spot and Bloomberg
-generated total return index) (in open source version - you can run this analysis using indicesfx_examples.py)*
+generated total return index) (you can run this analysis using indicesfx_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/audusd-total-returns.png" width="543"/>
 
@@ -145,7 +133,7 @@ on systematic trading and also consult in the area. One of our clients is RavenP
 
 # Major contributors to PyThalesians
 
-* Saeed Amen - Saeed is managing director and co-founder of the Thalesians. He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. He is also a co-founder of Argonautae.
+* Saeed Amen - Saeed is managing director and co-founder of the Thalesians. He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. 
 
 # Supporting PyThalesians project
 

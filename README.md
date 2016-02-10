@@ -1,15 +1,15 @@
 # PyThalesians
 
-PyThalesians is a Python financial library developed by the Thalesians (http://www.thalesians.com). I have used the library to develop my own trading strategies and I've included samples which show some of the functionality including an FX trend following model and other bits of financial analysis. 
+PyThalesians is a Python financial library developed by the Thalesians (http://www.thalesians.com). I have used the library to develop my own trading strategies and I've included simple samples which show some of the functionality including an FX trend following model and other bits of financial analysis.
 
-There are many open source Python libraries for making trading strategies around! However, I've developed this one to be as flexible as possible in terms of what types of strategies you can develop with it. In addition, a lot of the library can be used to analyse and plot financial data for broader based analysis, of the type that I've had to face being markets over the years, so it can be used by a wider array of users.
+There are many open source Python libraries for making trading strategies around! However, I've developed this one to be as flexible as possible in terms of what types of strategies you can develop with it. In addition, a lot of the library can be used to analyse and plot financial data for broader based analysis, of the type that I've had to face being in markets over the years. Hence, it can be used by a wider array of users.
 
 At present the PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets (including cross sectional style trading strategies)
 * Sensitivity analysis for systematic trading strategies parameters
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
 * Produces beautiful line plots with PyThalesians wrapper (via Matplotlib), Plotly (via cufflinks) and a simple wrapper for Bokeh
-* Basic seasonality analysis of markets
+* Analyse seasonality analysis of markets
 * Calculates some technical indicators and gives trading signals based on these
 * Helper functions built on top of Pandas
 * Automatic tweeting of charts
@@ -140,7 +140,7 @@ on systematic trading and also consult in the area. One of our clients is RavenP
 # Supporting PyThalesians project
 
 If you find PyThalesians useful (and in particular if you are commercial company) please consider supporting the project
-through sponsorship or by using our consultancy/research services in systematic trading. If you would like to contribute to the project, also let me know.
+through sponsorship or by using our consultancy/research services in systematic trading. If you would like to contribute to the project, also let me know: it's a big task to try to build up this library on my own!
 
 For the UK election Plot.ly code - please visit https://github.com/plotly/IPython-plotly/tree/master/notebooks/ukelectionbbg
 
@@ -172,6 +172,7 @@ More generally, we want to:
 
 # Coding log
 
+* 10 Feb 2016 - Updated project description
 * 01 Feb 2016 - Added LightEventsFactory to make it easier to deal with econ data events (stored as HDF5 files)
 * 20 Jan 2016 - Added kurtosis measure for trading strategy results, fixed Quandl issue
 * 19 Jan 2016 - Changed examples folder name

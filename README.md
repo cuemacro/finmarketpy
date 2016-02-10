@@ -18,7 +18,7 @@ documented
 
 # Gallery
 
-Below we give some examples of analysis which we've done using the full code of PyThalesians (which currently includes more features than the open source version).
+Below we give some examples of analysis we've done with PyThalesians. Some of these can be run by scripts in the examples folder.
 
 *Using PyThalesians to create a simple FX trend following strategy (you can run this 
 backtest using cashbacktest_examples.py)*

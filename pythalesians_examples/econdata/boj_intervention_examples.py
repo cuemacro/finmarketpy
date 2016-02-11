@@ -41,7 +41,7 @@ if True:
     # just change "False" to "True" to run any of the below examples
 
     ###### download daily data from Bloomberg for USD/JPY
-    ###### download BoJ intervention data
+    ###### download BoJ intervention data from FRED
     if True:
 
         time_series_request = TimeSeriesRequest(

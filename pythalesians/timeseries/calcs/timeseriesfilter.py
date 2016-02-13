@@ -102,6 +102,7 @@ class TimeSeriesFilter:
         -------
         list
         """
+
         # TODO use Pandas CustomBusinessDays to get more calendars
         holidays_list = []
 
@@ -116,7 +117,8 @@ class TimeSeriesFilter:
 
             holidays_list = pandas.date_range(start_date, end_date, freq=bday)
 
-        holidays_list = pandas.to_datetime(holidays_list).order()
+        # holidays_list = pandas.to_datetime(holidays_list).order()
+        holidays_list = pandas.to_datetime(holidays_list).sort_values()
 
         # floor start date
         start = np.datetime64(start_date) - np.timedelta64(1, 'D')
@@ -451,6 +453,32 @@ class TimeSeriesFilter:
         DataFrame
         """
         return data_frame[columns]
+
+    def pad_time_series_columns(self, columns, data_frame):
+        """
+        pad_time_series - Selects time series from a dataframe and if necessary creates empty columns
+
+        Parameters
+        ----------
+        columns : str
+            columns to be included with this keyword
+        data_frame : DataFrame
+            data frame to be filtered
+
+        Returns
+        -------
+        DataFrame
+        """
+        old_columns = data_frame.columns
+
+        common_columns = [val for val in columns if val in old_columns]
+        uncommon_columns = [val for val in columns if val not in old_columns]
+
+        data_frame = data_frame[common_columns]
+
+        for x in uncommon_columns: data_frame[x] = np.nan
+
+        return data_frame
 
     def filter_time_series_by_excluded_keyword(self, keyword, data_frame):
         """

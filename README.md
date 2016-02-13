@@ -172,6 +172,7 @@ More generally, we want to:
 
 # Coding log
 
+* 13 Feb 2016 - Edited time series filter methods
 * 11 Feb 2016 - Added example to plot BoJ interventions against USDJPY spot
 * 10 Feb 2016 - Updated project description
 * 01 Feb 2016 - Added LightEventsFactory to make it easier to deal with econ data events (stored as HDF5 files)

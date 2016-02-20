@@ -129,7 +129,7 @@ class StrategyFXCTA_Example(StrategyTemplate):
 
         return asset_df, spot_df, spot_df2, basket_dict
 
-    def construct_signal(self, spot_df, spot_df2, tech_params):
+    def construct_signal(self, spot_df, spot_df2, tech_params, br):
 
         ##### FILL IN WITH YOUR OWN SIGNALS
 

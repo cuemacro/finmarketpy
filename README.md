@@ -172,6 +172,7 @@ More generally, we want to:
 
 # Coding log
 
+* 20 Feb 2016 - Added more paramters for StrategyTemplate
 * 13 Feb 2016 - Edited time series filter methods
 * 11 Feb 2016 - Added example to plot BoJ interventions against USDJPY spot
 * 10 Feb 2016 - Updated project description

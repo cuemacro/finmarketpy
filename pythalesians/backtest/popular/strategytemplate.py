@@ -175,7 +175,7 @@ class StrategyTemplate:
         """
         cash_backtest = CashBacktest()
 
-        signal_df = self.construct_signal(spot_df, spot_df2, tech_params)       # get trading signal
+        signal_df = self.construct_signal(spot_df, spot_df2, tech_params, br)   # get trading signal
         cash_backtest.calculate_trading_PnL(br, asset_df, signal_df)            # calculate P&L
 
         cumpnl = cash_backtest.get_cumpnl()

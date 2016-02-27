@@ -96,7 +96,7 @@ class TradeAnalysis:
         pretty_portfolio_names = [str(x) + 'bp' for x in tc]    # names of the portfolio
         parameter_type = 'TC analysis'                          # broad type of parameter name
 
-        self.run_arbitrary_sensitivity(strategy,
+        return self.run_arbitrary_sensitivity(strategy,
                                  parameter_list=parameter_list,
                                  pretty_portfolio_names=pretty_portfolio_names,
                                  parameter_type=parameter_type)

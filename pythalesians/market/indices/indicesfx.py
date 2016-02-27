@@ -70,13 +70,14 @@ class IndicesFX:
             base_deposit = deposit_df[cross[0:3] + tenor + ".close"].to_frame()
             terms_deposit = deposit_df[cross[3:6] + tenor + ".close"].to_frame()
             carry = base_deposit.join(terms_deposit, how='inner')
-            carry = carry.fillna(method = 'ffill') / 100.0
 
-            base_daycount = self.get_day_count_conv(cross[0:4])
-            terms_daycount = self.get_day_count_conv(cross[3:6])
+
+            base_daycount = self.get_day_count_conv(cross[0:3])
+            terms_daycount = self.get_day_count_conv(cross[4:6])
 
             # align the base & terms deposits series to spot
-            spot, carry = spot.align(carry)
+            spot, carry = spot.align(carry, join='left', axis = 0)
+            carry = carry.fillna(method = 'ffill') / 100.0
             spot = spot[cross + ".close"].to_frame()
             base_deposit = carry[base_deposit.columns]
             terms_deposit = carry[terms_deposit.columns]
@@ -108,4 +109,4 @@ class IndicesFX:
 
 if __name__ == '__main__':
     pass
-    # see pythalesians-examples/markets/indicesfx_examples.py
+    # see pythalesians_examples/markets/indicesfx_examples.py

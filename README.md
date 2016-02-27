@@ -172,6 +172,7 @@ More generally, we want to:
 
 # Coding log
 
+* 27 Feb 2016 - Fixed total returns FX example
 * 20 Feb 2016 - Added more parameters for StrategyTemplate
 * 13 Feb 2016 - Edited time series filter methods
 * 11 Feb 2016 - Added example to plot BoJ interventions against USDJPY spot

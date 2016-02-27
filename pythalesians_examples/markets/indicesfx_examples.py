@@ -50,7 +50,7 @@ if True:
 
         # tickers for spot data
         time_series_request_spot = TimeSeriesRequest(
-                start_date = "01 Jan 1999",                     # start date
+                start_date = "01 Jan 2000",                     # start date
                 finish_date = datetime.date.today(),            # finish date
                 freq = 'daily',                                 # daily data
                 data_source = 'bloomberg',                      # use Bloomberg as data source
@@ -80,6 +80,9 @@ if True:
         df = None
         spot_df = ltsf.harvest_time_series(time_series_request_spot)
         deposit_df = ltsf.harvest_time_series(time_series_request_deposit)
+
+        deposit_df = deposit_df.fillna(method = 'ffill')
+        deposit_df = deposit_df.fillna(method = 'bfill') # bit of a hack - because some deposit data sparse
         tot_df = ltsf.harvest_time_series(time_series_request_total_ret)
         tsc = TimeSeriesCalcs()
 

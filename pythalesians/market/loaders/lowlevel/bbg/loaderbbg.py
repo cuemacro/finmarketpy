@@ -147,7 +147,9 @@ class LoaderBBG(LoaderTemplate):
 
     def get_reference_data(self, time_series_request_vendor, time_series_request):
         end = datetime.datetime.today()
-        end = end.replace(year = end.year + 1)
+
+        from datetime import timedelta
+        end = end + timedelta(days=365)# end.replace(year = end.year + 1)
 
         time_series_request_vendor.finish_date = end
 

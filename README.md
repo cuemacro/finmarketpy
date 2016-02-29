@@ -35,8 +35,7 @@ backtest using cashbacktest_examples.py)*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/fx-intraday-vol.png" width="543"/>
 
-*Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark 
-(in closed source version)*
+*Using PyThalesians to create the Thalesians CTA index (trend following), which replicates Newedge CTA index benchmark*
 
 <img src="https://raw.github.com/thalesians/pythalesians/master/pythalesians_examples/replicating-cta.png" width="543"/>
 

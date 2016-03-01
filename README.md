@@ -171,6 +171,7 @@ More generally, we want to:
 
 # Coding log
 
+* 01 Mar 2016 - Added IPython notebook to demonstrate how to download market data and plot
 * 27 Feb 2016 - Fixed total returns FX example
 * 20 Feb 2016 - Added more parameters for StrategyTemplate
 * 13 Feb 2016 - Edited time series filter methods

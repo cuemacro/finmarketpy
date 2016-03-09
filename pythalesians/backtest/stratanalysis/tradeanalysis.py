@@ -178,6 +178,10 @@ class TradeAnalysis:
             strat.plot_strategy_leverage()
             strat.plot_strategy_group_benchmark_pnl(strip = strip)
 
+        # reset the parameters of the strategy
+        strat.br = strat.fill_backtest_request()
+        strat.FINAL_STRATEGY = final_strategy
+
     def run_day_of_month_analysis(self, strat):
         from pythalesians.economics.seasonality.seasonality import Seasonality
         from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs

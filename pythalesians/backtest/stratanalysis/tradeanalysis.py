@@ -120,7 +120,7 @@ class TradeAnalysis:
 
             strat.br = br   # for calculating signals
 
-            signal_df = strat.construct_signal(spot_df, spot_df2, br.tech_params)
+            signal_df = strat.construct_signal(spot_df, spot_df2, br.tech_params, br)
 
             cash_backtest = CashBacktest()
             self.logger.info("Calculating... " + pretty_portfolio_names[i])
@@ -136,15 +136,47 @@ class TradeAnalysis:
             else:
                 port_list = port_list.join(port)
 
+        # reset the parameters of the strategy
+        strat.br = strat.fill_backtest_request()
+
         pf = PlotFactory()
         gp = GraphProperties()
 
-        gp.color = 'Blues'
+        # gp.color = 'Blues'
         gp.resample = 'B'
         gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + '.png'
         gp.scale_factor = self.scale_factor
         gp.title = strat.FINAL_STRATEGY + ' ' + parameter_type
         pf.plot_line_graph(port_list, adapter = 'pythalesians', gp = gp)
+
+        return port_list
+
+    ###### Parameters and signal generations (need to be customised for every model)
+    ###### Plot all the output seperately
+    def run_arbitrary_sensitivity_separately(self, strat, parameter_list = None,
+                                  pretty_portfolio_names = None, strip = None):
+
+        # asset_df, spot_df, spot_df2, basket_dict = strat.fill_assets()
+        final_strategy = strat.FINAL_STRATEGY
+
+        for i in range(0, len(parameter_list)):
+            br = strat.fill_backtest_request()
+
+            current_parameter = parameter_list[i]
+
+            # for calculating P&L
+            for k in current_parameter.keys():
+                setattr(br, k, current_parameter[k])
+
+            strat.FINAL_STRATEGY = final_strategy + " " + pretty_portfolio_names[i]
+
+            self.logger.info("Calculating... " + pretty_portfolio_names[i])
+            strat.br = br
+            strat.construct_strategy(br = br)
+
+            strat.plot_strategy_pnl()
+            strat.plot_strategy_leverage()
+            strat.plot_strategy_group_benchmark_pnl(strip = strip)
 
     def run_day_of_month_analysis(self, strat):
         from pythalesians.economics.seasonality.seasonality import Seasonality
@@ -190,6 +222,8 @@ class TradeAnalysis:
         gp.title = strat.FINAL_STRATEGY + ' month of year seasonality'
 
         pf.plot_line_graph(month, adapter = 'pythalesians', gp = gp)
+
+        return month
 
 
 

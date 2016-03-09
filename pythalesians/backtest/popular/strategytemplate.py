@@ -78,7 +78,7 @@ class StrategyTemplate:
         return
 
     ####### Generic functions for every backtest
-    def construct_strategy(self):
+    def construct_strategy(self, br = None):
         """
         construct_strategy - Constructs the returns for all the strategies which have been specified.
 
@@ -92,7 +92,7 @@ class StrategyTemplate:
         # get the parameters for backtesting
         if hasattr(self, 'br'):
             br = self.br
-        else:
+        elif br is None:
             br = self.fill_backtest_request()
 
         # get market data for backtest
@@ -371,7 +371,7 @@ class StrategyTemplate:
             pf.plot_line_graph(self.reduce_plot(self._strategy_leverage), adapter = 'pythalesians', gp = gp)
         except: pass
 
-    def plot_strategy_group_benchmark_pnl(self):
+    def plot_strategy_group_benchmark_pnl(self, strip = None):
         pf = PlotFactory()
         gp = GraphProperties()
 
@@ -381,6 +381,11 @@ class StrategyTemplate:
         #gp.color = 'RdYlGn'
 
         gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - cumulative).png'
+
+        strat_list = self._strategy_group_benchmark_pnl.columns.sort_values()
+
+        for line in strat_list:
+            self.logger.info(line)
 
         # plot cumulative line of returns
         pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_pnl), adapter = 'pythalesians', gp = gp)
@@ -392,6 +397,8 @@ class StrategyTemplate:
 
             for key in keys: ir.append(self._strategy_group_benchmark_tsd[key].inforatio()[0])
 
+            if strip is not None: keys = [k.replace(strip, '') for k in keys]
+
             ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
             ret_stats = ret_stats.sort_index()
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR).png'
@@ -400,6 +407,7 @@ class StrategyTemplate:
 
             # plot ret stats
             pf.plot_bar_graph(ret_stats, adapter = 'pythalesians', gp = gp)
+
         except: pass
 
     def plot_strategy_group_benchmark_annualised_pnl(self, cols = None):

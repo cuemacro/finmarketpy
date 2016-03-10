@@ -108,6 +108,7 @@ class TradeAnalysis:
         asset_df, spot_df, spot_df2, basket_dict = strat.fill_assets()
 
         port_list = None
+        tsd_list = []
 
         for i in range(0, len(parameter_list)):
             br = strat.fill_backtest_request()
@@ -126,6 +127,7 @@ class TradeAnalysis:
             self.logger.info("Calculating... " + pretty_portfolio_names[i])
 
             cash_backtest.calculate_trading_PnL(br, asset_df, signal_df)
+            tsd_list.append(cash_backtest.get_portfolio_pnl_tsd())
             stats = str(cash_backtest.get_portfolio_pnl_desc()[0])
 
             port = cash_backtest.get_cumportfolio().resample('B')
@@ -142,12 +144,23 @@ class TradeAnalysis:
         pf = PlotFactory()
         gp = GraphProperties()
 
+        ir = [t.inforatio()[0] for t in tsd_list]
+
         # gp.color = 'Blues'
+        # plot all the variations
         gp.resample = 'B'
         gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + '.png'
         gp.scale_factor = self.scale_factor
         gp.title = strat.FINAL_STRATEGY + ' ' + parameter_type
         pf.plot_line_graph(port_list, adapter = 'pythalesians', gp = gp)
+
+        # plot all the IR in a bar chart form (can be easier to read!)
+        gp = GraphProperties()
+        gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + ' IR.png'
+        gp.scale_factor = self.scale_factor
+        gp.title = strat.FINAL_STRATEGY + ' ' + parameter_type
+        summary = pandas.DataFrame(index = pretty_portfolio_names, data = ir, columns = ['IR'])
+        pf.plot_bar_graph(summary, adapter = 'pythalesians', gp = gp)
 
         return port_list
 

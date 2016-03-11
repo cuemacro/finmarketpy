@@ -171,7 +171,7 @@ More generally, we want to:
 
 # Coding log
 
-* 11 Mar 2016 - Fixed warnings in matplotlib 1.5 
+* 11 Mar 2016 - Fixed warnings in matplotlib 1.5
 * 09 Mar 2016 - Added more TradeAnalysis features (for sensitivity analysis of trading strategies)
 * 01 Mar 2016 - Added IPython notebook to demonstrate how to download market data and plot
 * 27 Feb 2016 - Fixed total returns FX example

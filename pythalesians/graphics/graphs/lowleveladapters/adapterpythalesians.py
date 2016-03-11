@@ -13,7 +13,7 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 #
 
 """
-AdapterMatplotlib
+AdapterPyThalesians
 
 Wrapper for matplotlib for charting, with an easier to use common interface. Currently supports simple line, bar and
 scatter plots. Like Seaborne, this wrapper seeks to make "nicer" plots than the matplotlib defaults.
@@ -26,12 +26,6 @@ import matplotlib
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator, HourLocator, MinuteLocator
 from matplotlib.ticker import MultipleLocator
 from matplotlib.ticker import Formatter
-
-# output matplotlib charts externally to D3 based libraries
-import mpld3
-import plotly.plotly as py
-import plotly
-import plotly.tools as tls
 
 # for manipulating dates and maths
 from datetime import timedelta
@@ -50,32 +44,24 @@ class AdapterPyThalesians(AdapterTemplate):
 
         if gp.resample is not None: data_frame = data_frame.asfreq(gp.resample)
 
-        # set the matplotlib style sheet & defaults
-        matplotlib.rcdefaults()
-
-        # first search PyThalesians styles, then try matplotlib
-        try:
-            plt.style.use(Constants().plotfactory_pythalesians_style_sheet[gp.style_sheet])
-        except:
-            plt.style.use(gp.style_sheet)
-
-        # adjust font size for scale factor
-        matplotlib.rcParams.update({'font.size': matplotlib.rcParams['font.size'] * gp.scale_factor})
-
-        # do not use offsets/scientific notation
-        matplotlib.rcParams.update({'axes.formatter.useoffset': False})
+        self.apply_style_sheet(gp)
 
         # create figure & add a subplot
         fig = plt.figure(figsize = ((gp.width * gp.scale_factor)/gp.dpi,
                                     (gp.height * gp.scale_factor)/gp.dpi), dpi = gp.dpi)
         ax = fig.add_subplot(111)
 
+        if gp.x_title != '': ax.set_xlabel(gp.x_title)
+        if gp.y_title != '': ax.set_ylabel(gp.y_title)
+
+        plt.xlabel(gp.x_title)
+        plt.ylabel(gp.y_title)
+
+        fig.suptitle(gp.title, fontsize = 14 * gp.scale_factor)
+
         # format Y axis
         y_formatter = matplotlib.ticker.ScalarFormatter(useOffset = False)
         ax.yaxis.set_major_formatter(y_formatter)
-
-        if gp.x_title != '': ax.set_xlabel(gp.x_title)
-        if gp.y_title != '': ax.set_ylabel(gp.y_title)
 
         # create a second y axis if necessary
         ax2 = []
@@ -87,7 +73,14 @@ class AdapterPyThalesians(AdapterTemplate):
             ax.yaxis.grid(False)
             ax2.yaxis.grid(False)
 
-        color_cycle = matplotlib.rcParams['axes.color_cycle']
+        # matplotlib 1.5
+        try:
+            cyc = matplotlib.rcParams['axes.prop_cycle']
+            color_cycle =  [x['color'] for x in cyc]
+        except KeyError:
+            # pre 1.5
+            pass
+            # color_cycle =  matplotlib.rcParams['axes.color_cycle']
 
         bar_ind = np.arange(0, len(data_frame.index))
 
@@ -110,6 +103,8 @@ class AdapterPyThalesians(AdapterTemplate):
             bar_width = (1 - bar_space) / (no_of_bars)
             bar_index = 0
 
+            has_matrix = False
+
             # some lines we should exclude from the color and use the default palette
             for i in range(0, len(data_frame.columns.values)):
 
@@ -118,6 +113,14 @@ class AdapterPyThalesians(AdapterTemplate):
                         chart_type = gp.chart_type[i]
                     else:
                         chart_type = gp.chart_type
+
+                if chart_type == 'heatmap':
+                    # TODO experimental!
+                    # ax.set_frame_on(False)
+                    ax.pcolor(data_frame, cmap=plt.cm.Blues, alpha=0.8)
+                    # plt.colorbar()
+                    has_matrix = True
+                    break
 
                 label = str(data_frame.columns[i])
 
@@ -165,14 +168,9 @@ class AdapterPyThalesians(AdapterTemplate):
                                            scale_factor = gp.scale_factor)
 
             # format X axis
-            self.format_x_axis(ax, data_frame, gp, has_bar, bar_ind)
+            self.format_x_axis(ax, data_frame, gp, has_bar, bar_ind, has_matrix)
 
         except: pass
-
-        plt.xlabel(gp.x_title)
-        plt.ylabel(gp.y_title)
-
-        fig.suptitle(gp.title, fontsize = 14 * gp.scale_factor)
 
         if gp.display_source_label == True:
             ax.annotate('Source: ' + gp.source, xy = (1, 0), xycoords='axes fraction', fontsize=7 * gp.scale_factor,
@@ -215,6 +213,9 @@ class AdapterPyThalesians(AdapterTemplate):
         ####### various matplotlib converters are unstable
         # convert to D3 format with mpld3
         try:
+            # output matplotlib charts externally to D3 based libraries
+            import mpld3
+
             if gp.display_mpld3 == True:
                 mpld3.save_d3_html(fig, gp.html_file_output)
                 mpld3.show(fig)
@@ -234,6 +235,10 @@ class AdapterPyThalesians(AdapterTemplate):
         # FRAGILE! convert matplotlib chart to Plotly format
         # recommend using AdapterCufflinks instead to directly plot to Plotly
         try:
+            import plotly.plotly as py
+            import plotly
+            import plotly.tools as tls
+
             if gp.convert_matplotlib_to_plotly == True:
                 plotly.tools.set_credentials_file(username = gp.plotly_username,
                                                   api_key = gp.plotly_api_key)
@@ -249,7 +254,33 @@ class AdapterPyThalesians(AdapterTemplate):
         except:
             pass
 
-    def format_x_axis(self, ax, data_frame, gp, has_bar, bar_ind):
+    def apply_style_sheet(self, gp):
+        # set the matplotlib style sheet & defaults
+        matplotlib.rcdefaults()
+
+        # first search PyThalesians styles, then try matplotlib
+        try: plt.style.use(Constants().plotfactory_pythalesians_style_sheet[gp.style_sheet])
+        except: plt.style.use(gp.style_sheet)
+
+        # adjust font size for scale factor
+        matplotlib.rcParams.update({'font.size': matplotlib.rcParams['font.size'] * gp.scale_factor})
+
+        # do not use offsets/scientific notation
+        matplotlib.rcParams.update({'axes.formatter.useoffset': False})
+
+    def format_x_axis(self, ax, data_frame, gp, has_bar, bar_ind, has_matrix):
+
+        if has_matrix:
+            # ax.colorbar()
+            # ax.xticks(rotation=90)
+            ax.set_xticks(bar_ind)
+            ax.set_xlim([0, len(bar_ind)])
+            ax.set_yticks(bar_ind)
+            ax.set_ylim([0, len(bar_ind)])
+            ax.set_xticklabels(data_frame.columns, minor=False)
+            ax.set_yticklabels(data_frame.index, minor=False)
+
+            return
 
         if has_bar:
             ax.set_xticks(bar_ind)

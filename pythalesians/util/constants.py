@@ -25,13 +25,13 @@ import os
 class Constants:
 
     ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER
-    root_pythalesians_folder = "D:/Remote/pythalesians/pythalesians/"
+    root_pythalesians_folder = "E:/Remote/pythalesians/pythalesians/"
     temp_pythalesians_folder = root_pythalesians_folder + "temp"
 
     ###### FOR FUTURE VERSIONS (which include caching and aliasing of tickers) - DO NOT REMOVE!
     # folders for holding market data
-    folder_time_series_data = "D:/timeseriesdata"
-    folder_historic_CSV = "D:/tickdata/historicCSV"
+    folder_time_series_data = "E:/timeseriesdata"
+    folder_historic_CSV = "E:/tickdata/historicCSV"
 
     # config file for time series categories
     time_series_categories_fields = \
@@ -87,6 +87,7 @@ class Constants:
     dukascopy_write_temp_tick_disk = False
 
     # for plots
+    plotfactory_silent_display = False
     plotfactory_default_adapter = "pythalesians"
     plotfactory_source = "Thalesians/BBG (created with PyThalesians Python library)"
     plotfactory_brand_label = "@thalesians"
@@ -124,7 +125,7 @@ class Constants:
     ########## API KEYS
 
     # Plotly default username
-    plotly_default_username = 'argonautae'
+    plotly_default_username = 'thalesians'
 
     # Plotly settings (username : api_key)
     plotly_creds = {"x" : "x",

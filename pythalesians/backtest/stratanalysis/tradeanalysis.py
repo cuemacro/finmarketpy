@@ -16,7 +16,7 @@ __author__ = 'saeedamen'
 TradeAnalysis
 
 Applies some basic trade analysis for a trading strategy (as defined by StrategyTemplate). Use PyFolio to create some
-basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC).
+basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC etc).
 
 """
 

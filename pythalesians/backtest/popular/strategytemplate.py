@@ -357,6 +357,40 @@ class StrategyTemplate:
             pf.plot_line_graph(self.reduce_plot(self._strategy_pnl), adapter = 'pythalesians', gp = gp)
         except: pass
 
+    def plot_strategy_signal_proportion(self, strip = None):
+
+        signal = self._strategy_signal
+
+        long = signal[signal > 0].count()
+        short = signal[signal < 0].count()
+        flat = signal[signal == 0].count()
+
+        keys = long.index
+
+        df = pandas.DataFrame(index = keys, columns = ['Long', 'Short', 'Flat'])
+
+        df['Long'] = long
+        df['Short']  = short
+        df['Flat'] = flat
+
+        if strip is not None: keys = [k.replace(strip, '') for k in keys]
+
+        df.index = keys
+        df = df.sort_index()
+
+        pf = PlotFactory()
+        gp = GraphProperties()
+
+        gp.title = self.FINAL_STRATEGY
+        gp.display_legend = True
+        gp.scale_factor = self.SCALE_FACTOR
+
+        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
+
+        try:
+            pf.plot_bar_graph(self.reduce_plot(df), adapter = 'pythalesians', gp = gp)
+        except: pass
+
     def plot_strategy_leverage(self):
         pf = PlotFactory()
         gp = GraphProperties()

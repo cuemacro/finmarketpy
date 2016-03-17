@@ -29,6 +29,7 @@ import pandas.tseries.offsets
 from pythalesians.util.calendar import Calendar
 
 from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
+from pandas.stats.api import ols
 
 class TimeSeriesCalcs:
 
@@ -342,6 +343,9 @@ class TimeSeriesCalcs:
 
         return pandas.rolling_std(data_frame, periods) * math.sqrt(obs_in_year)
 
+    def rolling_mean(self, data_frame, periods):
+        return self.rolling_average(data_frame, periods)
+
     def rolling_average(self, data_frame, periods):
         """
         rolling_average - Calculates the rolling moving average
@@ -533,6 +537,53 @@ class TimeSeriesCalcs:
 
             df.columns = new_labels
 
+        return df
+
+    def linear_regression(self, df_y, df_x):
+        return pandas.stats.api.ols(y = df_y, x = df_x)
+
+    def linear_regression_single_vars(self, df_y, df_x, y_vars, x_vars):
+        stats = []
+
+        for i in range(0, len(y_vars)):
+            y = df_y[y_vars[i]]
+            x = df_x[x_vars[i]]
+
+            try:
+                out = pandas.stats.api.ols(y = y, x = x)
+            except:
+                out = None
+
+            stats.append(out)
+
+        return stats
+
+    def strip_linear_regression_output(self, indices, ols_list, var):
+
+        if not(isinstance(var, list)):
+            var = [var]
+
+        df = pandas.DataFrame(index = indices, columns=var)
+
+        for v in var:
+            list_o = []
+
+            for o in ols_list:
+                if o is None:
+                    list_o.append(numpy.nan)
+                else:
+                    if v == 't_stat':
+                        list_o.append(o.t_stat.x)
+                    elif v == 't_stat_intercept':
+                        list_o.append(o.t_stat.intercept)
+                    elif v == 'beta':
+                        list_o.append(o.beta.x)
+                    elif v == 'beta_intercept':
+                        list_o.append(o.beta.intercept)
+                    else:
+                        return None
+
+            df[v] = list_o
         return df
 
     ##### various methods for averaging time series by hours, mins and days to create summary time series

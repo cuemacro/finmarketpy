@@ -171,7 +171,7 @@ More generally, we want to:
 
 # Coding log
 
-* 17 Mar 2016 - Refactored some of graph/time series functions
+* 17 Mar 2016 - Refactored some of graph/time series functions and StrategyTemplate
 * 11 Mar 2016 - Fixed warnings in matplotlib 1.5
 * 09 Mar 2016 - Added more TradeAnalysis features (for sensitivity analysis of trading strategies)
 * 01 Mar 2016 - Added IPython notebook to demonstrate how to download market data and plot

@@ -39,6 +39,9 @@ class PlotFactory:
     def __init__(self):
         pass
 
+    def plot_heatmap_graph(self, data_frame, adapter = default_adapter, gp = None):
+        return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, 'heatmap')
+
     def plot_scatter_graph(self, data_frame, adapter = default_adapter, gp = None):
         return self.get_adapter(adapter).plot_2d_graph(data_frame, gp, 'scatter')
 
@@ -70,7 +73,6 @@ class PlotFactory:
     def plot_generic_graph(self, data_frame, adapter =  default_adapter, type = None, gp = None, excel_file = None,
                            excel_sheet = None, freq = 'daily'):
 
-
         if (excel_file is not None):
             tio = TimeSeriesIO()
 
@@ -84,11 +86,14 @@ class PlotFactory:
             # use pythalesians wrapper for matplotlib
             return AdapterPyThalesians()
 
+        elif adapter == 'seaborn':
+            from pythalesians.graphics.graphs.lowleveladapters.adapterseaborn import AdapterSeaborn
+            return AdapterSeaborn()
+
         elif adapter == 'bokeh':
             return AdapterBokeh()
 
         elif adapter == 'plotly':
-            # TODO not implemented yet
             from pythalesians.graphics.graphs.lowleveladapters.adapterplotly import AdapterPlotly
             return AdapterPlotly()
 

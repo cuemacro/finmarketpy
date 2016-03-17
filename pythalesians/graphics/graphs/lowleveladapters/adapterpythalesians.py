@@ -250,7 +250,11 @@ class AdapterPyThalesians(AdapterTemplate):
 
         # display in matplotlib window
         try:
-            if gp.silent_display == False: plt.show()
+            if Constants.plotfactory_silent_display == True:
+                pass
+            elif gp.silent_display == False:
+                plt.show()
+
         except:
             pass
 
@@ -279,6 +283,15 @@ class AdapterPyThalesians(AdapterTemplate):
             ax.set_ylim([0, len(bar_ind)])
             ax.set_xticklabels(data_frame.columns, minor=False)
             ax.set_yticklabels(data_frame.index, minor=False)
+
+            # ax.plot([], [])
+
+            for y in range(len(data_frame.index)):
+                for x in range(len(data_frame.columns)):
+                    plt.text(x + 0.5, y + 0.5, '%.0f' % data_frame.loc[y, x],
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         )
 
             return
 

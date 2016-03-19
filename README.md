@@ -86,17 +86,29 @@ generated total return index) (you can run this analysis using indicesfx_example
 
 # Requirements
 
-PyThalesians has been tested on Windows 8 & 10, running Bloomberg terminal software. Potentially, it could also work on the 
-Bloomberg Server API (but I have not explicitly tested this).
+PyThalesians has been tested on Windows 8 & 10, running Bloomberg Terminal software. 
+I currently run PyThalesians using Anaconda 2.5 (Python 3.5 64bit) on Windows 10. Potentially, it could also work on the 
+Bloomberg Server API (but I have not explicitly tested this). I have also tried running it on Ubuntu and Mac OS X (excluding Bloomberg API)
 
 Major requirements
-* Required: Python 3.4+
+* Required: Python 3.4, 3.5
 * Required: pandas, matplotlib, numpy etc.
 * Recommended: Bloomberg Python Open API
+    * To use Bloomberg you will need to have a licence
     * Use experimental Python 3.4 version from Bloomberg http://www.bloomberglabs.com/api/libraries/
-    * Might need to tweak registry to avoid "Python 3.4 not found in registry error" (blppython.reg example)
-    * Alternatively to access Bloomberg, the software also supports the old COM API (but this deprecated)
-    * To use Bloomberg you will need to have a installed licence
+    * Also download C++ version of Bloomberg API and extract into any location
+        * eg. C:\blp\blpapi_cpp_3.9.10.1
+    * For Python 3.5 - need to compile blpapi source using Microsoft Visual Studio 2015 yourself
+        * Install Microsoft Visual Studio 2015 (Community Edition is free)
+        * Before doing do be sure to add environment variables for the Bloomberg DLL (blpapi3_64.dll) to PATH variable
+            * eg. C:\blp\blpapi_cpp_3.9.10.1\bin
+        * Make sure BLPAPI_ROOT root is set as an environmental variable in Windows
+            * eg. C:\blp\blpapi_cpp_3.9.10.1
+        * python setup.py build
+        * python setup.py install
+    * For Python 3.4 - prebuilt executable can be run, which means we can skip the build steps above
+        * Might need to tweak registry to avoid "Python 3.4 not found in registry error" (blppython.reg example) when using this executable 
+    * Alternatively to access Bloomberg, the software also supports the old COM API (but I'm going to remove it because very slow)
 * Recommended: Plotly for funky interactive plots (https://github.com/plotly/python-api) and 
 * Recommended: Cufflinks a nice Plotly
 wrapper when using Pandas dataframes (Jorge Santos project now supports Python 3 
@@ -171,6 +183,7 @@ More generally, we want to:
 
 # Coding log
 
+* 19 Mar 2016 - Tested with Python 3.5 64 bit (Anaconda 2.5 on Windows 10)
 * 17 Mar 2016 - Refactored some of graph/time series functions and StrategyTemplate
 * 11 Mar 2016 - Fixed warnings in matplotlib 1.5
 * 09 Mar 2016 - Added more TradeAnalysis features (for sensitivity analysis of trading strategies)

@@ -183,6 +183,7 @@ More generally, we want to:
 
 # Coding log
 
+* 21 Mar 2016 - Added IPython notebook to demonstrate how to backtest a simple FX trend following trading strategy
 * 19 Mar 2016 - Tested with Python 3.5 64 bit (Anaconda 2.5 on Windows 10)
 * 17 Mar 2016 - Refactored some of graph/time series functions and StrategyTemplate
 * 11 Mar 2016 - Fixed warnings in matplotlib 1.5

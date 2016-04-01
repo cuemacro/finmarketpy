@@ -24,6 +24,8 @@ import pandas
 import math
 import datetime
 
+import functools
+
 import numpy
 import pandas.tseries.offsets
 from pythalesians.util.calendar import Calendar
@@ -539,6 +541,45 @@ class TimeSeriesCalcs:
 
         return df
 
+    # several types of outer join (TODO finalise which one should appear!)
+    def pandas_outer_join(self, df_list):
+        if df_list is None: return None
+
+        # remove any None elements (which can't be joined!)
+        df_list = [i for i in df_list if i is not None]
+
+        if len(df_list) == 0: return None
+        elif len(df_list) == 1: return df_list[0]
+
+        return df_list[0].join(df_list[1:], how="outer")
+
+    def functional_outer_join(self, df_list):
+        def join_dfs(ldf, rdf):
+            return ldf.join(rdf, how='outer')
+
+        return functools.reduce(join_dfs, df_list)
+
+    # experimental!
+    def iterative_outer_join(self, df_list):
+        while(True):
+            # split into two
+            length = len(df_list)
+
+            if length == 1: break
+
+            # mid_point = length // 2
+            df_mini = []
+
+            for i in range(0, length, 2):
+                if i == length - 1:
+                    df_mini.append(df_list[i])
+                else:
+                    df_mini.append(df_list[i].join(df_list[i+1], how="outer"))
+
+            df_list = df_mini
+
+        return df_list[0]
+
     def linear_regression(self, df_y, df_x):
         return pandas.stats.api.ols(y = df_y, x = df_x)
 
@@ -580,6 +621,10 @@ class TimeSeriesCalcs:
                         list_o.append(o.beta.x)
                     elif v == 'beta_intercept':
                         list_o.append(o.beta.intercept)
+                    elif v == 'r2':
+                        list_o.append(o.r2)
+                    elif v == 'r2_adj':
+                        list_o.append(o.r2_adj)
                     else:
                         return None
 

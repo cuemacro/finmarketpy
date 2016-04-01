@@ -25,6 +25,7 @@ import copy
 from pythalesians.util.configmanager import ConfigManager
 from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.util.constants import Constants
+from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 from pythalesians.market.loaders.timeseriesio import TimeSeriesIO
@@ -238,8 +239,11 @@ class LightTimeSeriesFactory:
         """
 
         data_frame_agg = None
+        time_series_calcs = TimeSeriesCalcs()
 
         ticker_cycle = 0
+
+        data_frame_group = []
 
         # single threaded version
         # handle intraday ticker calls separately one by one
@@ -262,15 +266,22 @@ class LightTimeSeriesFactory:
                         data_frame_single.index.name = 'Date'
                         data_frame_single = data_frame_single.astype('float32')
 
-                        # if you call for returning multiple tickers, be careful with memory considerations!
-                        if data_frame_agg is not None:
-                            data_frame_agg = data_frame_agg.join(data_frame_single, how='outer')
-                        else:
-                            data_frame_agg = data_frame_single
+                        data_frame_group.append(data_frame_single)
+
+                        # # if you call for returning multiple tickers, be careful with memory considerations!
+                        # if data_frame_agg is not None:
+                        #     data_frame_agg = data_frame_agg.join(data_frame_single, how='outer')
+                        # else:
+                        #     data_frame_agg = data_frame_single
 
                 # key = self.create_category_key(time_series_request, ticker)
                 # fname = self.create_cache_file_name(key)
                 # self._time_series_cache[fname] = data_frame_agg  # cache in memory (disable for intraday)
+
+
+            # if you call for returning multiple tickers, be careful with memory considerations!
+            if data_frame_group is not None:
+                data_frame_agg = time_series_calcs.pandas_outer_join(data_frame_group)
 
             return data_frame_agg
         else:
@@ -310,6 +321,8 @@ class LightTimeSeriesFactory:
 
         data_frame_agg = None
 
+        time_series_calcs = TimeSeriesCalcs()
+
         # depends on the nature of operation as to whether we should use threading or multiprocessing library
         if Constants().time_series_factory_thread_technique is "thread":
             from multiprocessing.dummy import Pool
@@ -337,7 +350,7 @@ class LightTimeSeriesFactory:
         # data_frame_group = results
         # data_frame_group = None
 
-        #import multiprocessing as multiprocessing
+        # import multiprocessing as multiprocessing
         # close the pool and wait for the work to finish
 
         # processes = []
@@ -358,13 +371,18 @@ class LightTimeSeriesFactory:
 
         # collect together all the time series
         if data_frame_group is not None:
-            for data_frame_single in data_frame_group:
-                # if you call for returning multiple tickers, be careful with memory considerations!
-                if data_frame_single is not None:
-                    if data_frame_agg is not None:
-                        data_frame_agg = data_frame_agg.join(data_frame_single, how='outer')
-                    else:
-                        data_frame_agg = data_frame_single
+            data_frame_group = [i for i in data_frame_group if i is not None]
+
+            if data_frame_group is not None:
+                data_frame_agg = time_series_calcs.pandas_outer_join(data_frame_group)
+
+            # for data_frame_single in data_frame_group:
+            #     # if you call for returning multiple tickers, be careful with memory considerations!
+            #     if data_frame_single is not None:
+            #         if data_frame_agg is not None:
+            #             data_frame_agg = data_frame_agg.join(data_frame_single, how='outer')
+            #         else:
+            #             data_frame_agg = data_frame_single
 
         return data_frame_agg
 

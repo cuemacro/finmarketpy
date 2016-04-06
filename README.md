@@ -183,6 +183,7 @@ More generally, we want to:
 
 # Coding log
 
+* 06 Apr 2016 - Added more trade statistics output
 * 01 Apr 2016 - Speeded up joining operations, noticeable when fetching high freq time series
 * 21 Mar 2016 - Added IPython notebook to demonstrate how to backtest simple FX trend following trading strategy
 * 19 Mar 2016 - Tested with Python 3.5 64 bit (Anaconda 2.5 on Windows 10)

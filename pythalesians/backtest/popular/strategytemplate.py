@@ -39,6 +39,8 @@ from pythalesians.timeseries.techind.techparams import TechParams
 from pythalesians.graphics.graphs.plotfactory import PlotFactory
 from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
+from collections import OrderedDict
+
 from pythalesians.util.constants import Constants
 
 class StrategyTemplate:
@@ -105,7 +107,9 @@ class StrategyTemplate:
 
         cumresults = pandas.DataFrame(index = asset_df.index)
         portleverage = pandas.DataFrame(index = asset_df.index)
-        tsdresults = {}
+
+        from collections import OrderedDict
+        tsdresults = OrderedDict()
 
         # each portfolio key calculate returns - can put parts of the portfolio in the key
         for key in basket_dict.keys():
@@ -335,11 +339,12 @@ class StrategyTemplate:
         gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Individual Trade PnL).png'
 
         # zero when there isn't a trade exit
-        strategy_pnl_trades = self._strategy_pnl_trades.fillna(0) * 100 * 100
         # strategy_pnl_trades = self._strategy_pnl_trades * 100 * 100
         # strategy_pnl_trades = strategy_pnl_trades.dropna()
 
+        # note only works with single large basket trade
         try:
+            strategy_pnl_trades = self._strategy_pnl_trades.fillna(0) * 100 * 100
             pf.plot_line_graph(self.reduce_plot(strategy_pnl_trades), adapter = 'pythalesians', gp = gp)
         except: pass
 
@@ -367,6 +372,11 @@ class StrategyTemplate:
 
         keys = long.index
 
+        trades = abs(signal - signal.shift(-1))
+        trades = trades[trades > 0].count()
+
+        df_trades = pandas.DataFrame(index = keys, columns = ['Trades'], data = trades)
+
         df = pandas.DataFrame(index = keys, columns = ['Long', 'Short', 'Flat'])
 
         df['Long'] = long
@@ -376,7 +386,8 @@ class StrategyTemplate:
         if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
         df.index = keys
-        df = df.sort_index()
+        df_trades.index = keys
+        # df = df.sort_index()
 
         pf = PlotFactory()
         gp = GraphProperties()
@@ -385,10 +396,12 @@ class StrategyTemplate:
         gp.display_legend = True
         gp.scale_factor = self.SCALE_FACTOR
 
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
-
         try:
+            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
             pf.plot_bar_graph(self.reduce_plot(df), adapter = 'pythalesians', gp = gp)
+
+            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
+            pf.plot_bar_graph(self.reduce_plot(df_trades), adapter = 'pythalesians', gp = gp)
         except: pass
 
     def plot_strategy_leverage(self):
@@ -416,7 +429,7 @@ class StrategyTemplate:
 
         gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - cumulative).png'
 
-        strat_list = self._strategy_group_benchmark_pnl.columns.sort_values()
+        strat_list = self._strategy_group_benchmark_pnl.columns #.sort_values()
 
         for line in strat_list:
             self.logger.info(line)
@@ -434,7 +447,7 @@ class StrategyTemplate:
             if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
             ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
-            ret_stats = ret_stats.sort_index()
+            # ret_stats = ret_stats.sort_index()
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR).png'
 
             gp.display_brand_label = False

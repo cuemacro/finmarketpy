@@ -27,6 +27,8 @@ from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
 from pythalesians.util.constants import Constants
 
+import pandas
+
 tsc = TimeSeriesCalcs()
 
 class TimeSeriesReport:
@@ -44,7 +46,7 @@ class TimeSeriesReport:
 
         # strip out the field(s) from the regression output which we want
         stats_df = tsc.strip_linear_regression_output(pretty_index, stats, statistic)
-        stats_df = stats_df.sort_index()
+        # stats_df = stats_df.sort_index()
 
         return stats_df
 
@@ -54,26 +56,44 @@ class TimeSeriesReport:
                                           title = None,
                                           pretty_index = None, output_path = None,
                                           scale_factor = Constants.plotfactory_scale_factor,
-                                          silent_plot = False):
+                                          silent_plot = False,
+                                          shift=[0]):
 
-        stats_df = self.report_single_var_regression(y, x, y_variable_names, x_variable_names, statistic,
-                                                     pretty_index)
+        if not(isinstance(statistic, list)):
+            statistic = [statistic]
 
-        if silent_plot: return stats_df
+        # TODO optimise loop so that we are calculating each regression *once* at present calculating it
+        # for each statistic, which is redundant
+        for st in statistic:
+            stats_df = []
 
-        pf = PlotFactory()
-        gp = GraphProperties()
+            for sh in shift:
+                x_sh = x.shift(sh)
+                stats_temp = self.report_single_var_regression(y, x_sh, y_variable_names, x_variable_names, st,
+                                                             pretty_index)
 
-        if title is None: title = statistic
+                stats_temp.columns = [ x + "_" + str(sh) for x in stats_temp.columns]
 
-        gp.title = title
-        gp.display_legend = True
-        gp.scale_factor = scale_factor
-        # gp.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
+                stats_df.append(stats_temp)
 
-        if output_path is not None:
-            gp.file_output = output_path + ' (' + tag + ').png'
+            stats_df = pandas.concat(stats_df, axis=1)
+            stats_df = stats_df.dropna(how='all')
 
-        pf.plot_bar_graph(stats_df, adapter = 'pythalesians', gp = gp)
+            if silent_plot: return stats_df
+
+            pf = PlotFactory()
+            gp = GraphProperties()
+
+            if title is None: title = statistic
+
+            gp.title = title
+            gp.display_legend = True
+            gp.scale_factor = scale_factor
+            # gp.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
+
+            if output_path is not None:
+                gp.file_output = output_path + ' (' + tag + ' ' + st + ').png'
+
+            pf.plot_bar_graph(stats_df, adapter = 'pythalesians', gp = gp)
 
         return stats_df

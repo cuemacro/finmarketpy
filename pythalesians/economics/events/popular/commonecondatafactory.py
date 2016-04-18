@@ -22,6 +22,7 @@ country groups.
 
 from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.economics.events.histecondatafactory import HistEconDataFactory
+from pythalesians.util.constants import Constants
 
 import datetime
 
@@ -38,6 +39,9 @@ class CommonEconDataFactory:
         df = df.fillna(method='pad')
 
         return df
+
+    def get_GDP_QoQ(self, start_date, finish_date, country_group, source = 'bloomberg'):
+        return self.get_econ_data_group(start_date, finish_date, country_group, 'GDP QoQ (SAAR)', source = source)
 
     def get_GDP_QoQ(self, start_date, finish_date, country_group, source = 'bloomberg'):
         return self.get_econ_data_group(start_date, finish_date, country_group, 'GDP QoQ (SAAR)', source = source)
@@ -78,7 +82,7 @@ class CommonEconDataFactory:
         if data_type == 'cpi':
             df = self.get_CPI_YoY(start_date, finish_date, country_group)
         elif data_type == 'gdp':
-            df = self.get_GDP_YoY(start_date, finish_date, country_group)
+            df = self.get_GDP_QoQ(start_date, finish_date, country_group)
         elif data_type == 'une':
             df = self.get_UNE(start_date, finish_date, country_group)
 
@@ -165,7 +169,7 @@ class CommonEconDataFactory:
 
         gp.title = "G10 CPI YoY"
         gp.units = '%'
-        gp.scale_factor = 3
+        gp.scale_factor = Constants.plotfactory_scale_factor
         gp.file_output = today_root + 'G10 CPI YoY ' + str(gp.scale_factor) + '.png'
         cpi.columns = [x.split('-')[0] for x in cpi.columns]
         gp.linewidth_2 = 3
@@ -173,6 +177,57 @@ class CommonEconDataFactory:
 
         pf.plot_generic_graph(cpi, type = 'line', adapter = 'pythalesians', gp = gp)
 
+    def g10_line_plot_une(self, start_date, finish_date):
+        today_root = datetime.date.today().strftime("%Y%m%d") + " "
+        country_group = 'g10-ez'
+        une = self.get_UNE(start_date, finish_date, country_group)
+
+        from pythalesians.graphics.graphs.plotfactory import PlotFactory
+        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+
+        gp = GraphProperties()
+        pf = PlotFactory()
+
+        gp.title = "G10 Unemployment Rate (%)"
+        gp.units = '%'
+        gp.scale_factor = Constants.plotfactory_scale_factor
+        gp.file_output = today_root + 'G10 UNE ' + str(gp.scale_factor) + '.png'
+        une.columns = [x.split('-')[0] for x in une.columns]
+        gp.linewidth_2 = 3
+        gp.linewidth_2_series = ['United States']
+
+        pf.plot_generic_graph(une, type = 'line', adapter = 'pythalesians', gp = gp)
+
+    def g10_line_plot_gdp(self, start_date, finish_date):
+        today_root = datetime.date.today().strftime("%Y%m%d") + " "
+        country_group = 'g10-ez'
+        gdp = self.get_GDP_QoQ(start_date, finish_date, country_group)
+
+        from pythalesians.graphics.graphs.plotfactory import PlotFactory
+        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+
+        gp = GraphProperties()
+        pf = PlotFactory()
+
+        gp.title = "G10 GDP"
+        gp.units = 'Rebased'
+        gp.scale_factor = Constants.plotfactory_scale_factor
+        gp.file_output = today_root + 'G10 UNE ' + str(gp.scale_factor) + '.png'
+        gdp.columns = [x.split('-')[0] for x in gdp.columns]
+        gp.linewidth_2 = 3
+        gp.linewidth_2_series = ['United Kingdom']
+
+        from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+        tsc = TimeSeriesCalcs()
+        gdp = gdp / 100
+        gdp = tsc.create_mult_index_from_prices(gdp)
+        pf.plot_generic_graph(gdp, type = 'line', adapter = 'pythalesians', gp = gp)
+
 if __name__ == '__main__':
-    pass
+    # pass
+
+    start_date = '01 Jan 2009'
+    finish_date = datetime.datetime.utcnow()
+    cedf = CommonEconDataFactory()
+    cedf.g10_line_plot_gdp(start_date=start_date, finish_date=finish_date)
     # see histecondata_examples

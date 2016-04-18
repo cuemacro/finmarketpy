@@ -16,7 +16,7 @@ __author__ = 'saeedamen'
 TradeAnalysis
 
 Applies some basic trade analysis for a trading strategy (as defined by StrategyTemplate). Use PyFolio to create some
-basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC etc).
+basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC).
 
 """
 
@@ -130,7 +130,7 @@ class TradeAnalysis:
             tsd_list.append(cash_backtest.get_portfolio_pnl_tsd())
             stats = str(cash_backtest.get_portfolio_pnl_desc()[0])
 
-            port = cash_backtest.get_cumportfolio().resample('B')
+            port = cash_backtest.get_cumportfolio().resample('B').mean()
             port.columns = [pretty_portfolio_names[i] + ' ' + stats]
 
             if port_list is None:
@@ -205,12 +205,12 @@ class TradeAnalysis:
         pnl = strat.get_strategy_pnl()
 
         # get seasonality by day of the month
-        pnl = pnl.resample('B')
+        pnl = pnl.resample('B').mean()
         rets = tsc.calculate_returns(pnl)
         bus_day = seas.bus_day_of_month_seasonality(rets, add_average = True)
 
         # get seasonality by month
-        pnl = pnl.resample('BM')
+        pnl = pnl.resample('BM').mean()
         rets = tsc.calculate_returns(pnl)
         month = seas.monthly_seasonality(rets)
 

@@ -52,9 +52,9 @@ class CashBacktest:
         """
 
         tsc = TimeSeriesCalcs()
-
+        # signal_df.to_csv('e:/temp0.csv')
         # make sure the dates of both traded asset and signal are aligned properly
-        asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 0)
+        asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
 
         # only allow signals to change on the days when we can trade assets
         signal_df = signal_df.mask(numpy.isnan(asset_df.values))    # fill asset holidays with NaN signals
@@ -263,7 +263,11 @@ class CashBacktest:
         lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
         # only allow the leverage change at resampling frequency (eg. monthly 'BM')
-        lev_df = lev_df.resample(vol_rebalance_freq, how=data_resample_type)
+        if data_resample_type == 'mean':
+            lev_df = lev_df.resample(vol_rebalance_freq).mean()
+        else:
+            # TODO implement other types
+            return
 
         returns_df, lev_df = returns_df.align(lev_df, join='left', axis = 0)
 

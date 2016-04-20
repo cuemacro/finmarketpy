@@ -567,7 +567,7 @@ class TimeSeriesFilter:
         return data_frame.asfreq(freq, method = 'pad')
 
     def make_FX_1_min_working_days(self, data_frame):
-        data_frame = data_frame.resample('1min')
+        data_frame = data_frame.resample('1min').mean()
         data_frame = self.filter_time_series_by_holidays(data_frame, 'FX')
         data_frame = data_frame.fillna(method='ffill')
         data_frame = self.remove_out_FX_out_of_hours(data_frame)

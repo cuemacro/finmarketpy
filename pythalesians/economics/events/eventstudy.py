@@ -135,7 +135,7 @@ class EventStudy:
         else:
             if vol is True:
                 # annualise (if vol)
-                data_frame = pandas.rolling_std(data_frame, window=5) * math.sqrt(ann_factor)
+                data_frame = data_frame.rolling(center=False,window=5).std() * math.sqrt(ann_factor)
             else:
                 data_frame = data_frame.cumsum()
 
@@ -148,7 +148,7 @@ class EventStudy:
         ticker = event_fx + "-" + event_name + ".release-date-time-full"
 
         data_frame_agg = None
-        data_frame_cross_orig = data_frame_cross_orig.resample('T')         # resample to minute freq - in case there are missing values
+        data_frame_cross_orig = data_frame_cross_orig.resample('T').mean()  # resample to minute freq - in case there are missing values
 
         ef_time_start = ef_time_frame[ticker] - timedelta(minutes=1)        # start time
         indices_start = data_frame_cross_orig.index.isin(ef_time_start)

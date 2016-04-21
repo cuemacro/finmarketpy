@@ -183,6 +183,7 @@ More generally, we want to:
 
 # Coding log
 
+* 21 Apr 2016 - Got rid of deprecated Pandas methods in EventStudy
 * 18 Apr 2016 - Fixed some incompatibility issues with Pandas 0.18
 * 06 Apr 2016 - Added more trade statistics output
 * 01 Apr 2016 - Speeded up joining operations, noticeable when fetching high freq time series

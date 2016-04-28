@@ -262,9 +262,13 @@ class CashBacktest:
         lev_df = vol_target / roll_vol_df
         lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
-        # only allow the leverage change at resampling frequency (eg. monthly 'BM')
+        # should we take the mean, first, last in our resample
         if data_resample_type == 'mean':
             lev_df = lev_df.resample(vol_rebalance_freq).mean()
+        elif data_resample_type == 'first':
+            lev_df = lev_df.resample(vol_rebalance_freq).first()
+        elif data_resample_type == 'last':
+            lev_df = lev_df.resample(vol_rebalance_freq).last()
         else:
             # TODO implement other types
             return

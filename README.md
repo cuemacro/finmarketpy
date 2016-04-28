@@ -183,6 +183,7 @@ More generally, we want to:
 
 # Coding log
 
+* 28 Apr 2016 - Updated cashbacktest (for Pandas 0.18)
 * 21 Apr 2016 - Got rid of deprecated Pandas methods in EventStudy
 * 18 Apr 2016 - Fixed some incompatibility issues with Pandas 0.18
 * 06 Apr 2016 - Added more trade statistics output

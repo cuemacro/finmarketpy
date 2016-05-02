@@ -4,7 +4,6 @@ from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.techind.techparams import TechParams
 
-
 class BacktestRequest(TimeSeriesRequest):
 
     def __init__(self):
@@ -29,14 +28,6 @@ class BacktestRequest(TimeSeriesRequest):
     @tech_params.setter
     def tech_params(self, tech_params):
         self.__tech_params = tech_params
-
-    @property
-    def opt_tc_bp(self):
-        return self.__opt_tc_bp
-
-    @opt_tc_bp.setter
-    def opt_tc_bp(self, opt_tc_bp):
-        self.__opt_tc_bp = opt_tc_bp / (2.0 * 100.0 * 100.0)
 
     @property
     def spot_tc_bp(self):
@@ -71,28 +62,4 @@ class BacktestRequest(TimeSeriesRequest):
             self.logger.warning(instrument & " is not a defined trading instrument.")
 
         self.__instrument = instrument
-
-    @property
-    def tenor(self):
-        return self.__tenor
-
-    @tenor.setter
-    def tenor(self, tenor):
-        self.__tenor = tenor
-
-    @property
-    def strike(self):
-        return self.__strike
-
-    @tenor.setter
-    def strike(self, strike):
-        self.__strike = strike
-
-    @property
-    def delta_threshold(self):
-        return self.__delta_threshold
-
-    @delta_threshold.setter
-    def delta_threshold(self, delta_threshold):
-        self.__delta_threshold = delta_threshold
 

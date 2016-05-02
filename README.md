@@ -183,7 +183,7 @@ More generally, we want to:
 
 # Coding log
 
-* 02 May 2016 - Tidied up BacktestRequest
+* 02 May 2016 - Tidied up BacktestRequest, added SPX seasonality example
 * 28 Apr 2016 - Updated cashbacktest (for Pandas 0.18)
 * 21 Apr 2016 - Got rid of deprecated Pandas methods in EventStudy
 * 18 Apr 2016 - Fixed some incompatibility issues with Pandas 0.18
@@ -216,7 +216,7 @@ More generally, we want to:
 * 28 Oct 2015 - Added more sensitivity analysis for trading strategies
 * 26 Oct 2015 - Various bug fixes for Bloomberg Open API downloader
 * 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an 
-example for benhcmarking and bug fixes for Bloomberg downloader
+example for benchmarking and bug fixes for Bloomberg downloader
 * 25 Sep 2015 - Refactored examples into different folders / more seasonality examples
 * 19 Sep 2015 - Added support for Plotly choropleth map plots & easy downloading of economic data via FRED/Bloomberg/Quandl
 * 12 Sep 2015 - Added basic support for PyFolio for statistical analysis of strategies

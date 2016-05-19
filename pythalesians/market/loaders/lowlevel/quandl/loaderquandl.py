@@ -18,7 +18,12 @@ Class for reading in data from Quandl into PyThalesians library
 
 """
 
-import quandl as Quandl
+# support Quandl 3.x.x
+try:
+    import quandl as Quandl
+except:
+    # if import fails use Quandl 2.x.x
+    import Quandl
 
 from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.market.loaders.lowlevel.loadertemplate import LoaderTemplate

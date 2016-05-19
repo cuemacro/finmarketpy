@@ -18,7 +18,7 @@ Class for reading in data from Quandl into PyThalesians library
 
 """
 
-import Quandl
+import quandl as Quandl
 
 from pythalesians.util.loggermanager import LoggerManager
 from pythalesians.market.loaders.lowlevel.loadertemplate import LoaderTemplate

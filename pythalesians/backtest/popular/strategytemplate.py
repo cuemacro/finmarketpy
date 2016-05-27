@@ -366,12 +366,14 @@ class StrategyTemplate:
 
         signal = self._strategy_signal
 
+        # count number of long, short and flat periods in our sample
         long = signal[signal > 0].count()
         short = signal[signal < 0].count()
         flat = signal[signal == 0].count()
 
         keys = long.index
 
+        # how many trades have there been (ignore size of the trades)
         trades = abs(signal - signal.shift(-1))
         trades = trades[trades > 0].count()
 
@@ -485,3 +487,28 @@ class StrategyTemplate:
         gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Leverage).png'
 
         pf.plot_line_graph(self.reduce_plot(self._strategy_group_leverage), adapter = 'pythalesians', gp = gp)
+
+    def plot_strategy_signals(self, date = None, strip = None):
+
+        ######## plot signals
+        strategy_signal = self._strategy_signal
+        strategy_signal = 100 * (strategy_signal)
+
+        if date is None:
+            last_day = strategy_signal.ix[-1].transpose().to_frame()
+        else:
+            last_day = strategy_signal.ix[date].transpose().to_frame()
+
+        if strip is not None:
+            last_day.index = [x.replace(strip, '') for x in last_day.index]
+
+        print(last_day)
+
+        pf = PlotFactory()
+        gp = GraphProperties()
+
+        gp.title = self.FINAL_STRATEGY + " positions (% portfolio notional)"
+        gp.scale_factor = self.SCALE_FACTOR
+        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Positions) ' + str(gp.scale_factor) + '.png'
+
+        pf.plot_generic_graph(last_day, adapter = 'pythalesians', type = 'bar', gp = gp)

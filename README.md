@@ -183,6 +183,7 @@ More generally, we want to:
 
 # Coding log
 
+* 27 May 2016 - Added ability to plot strategy signal at point in time
 * 19 May 2016 - Updated Quandl wrapper to use new Quandl API
 * 02 May 2016 - Tidied up BacktestRequest, added SPX seasonality example
 * 28 Apr 2016 - Updated cashbacktest (for Pandas 0.18)

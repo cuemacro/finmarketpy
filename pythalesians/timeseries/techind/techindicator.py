@@ -45,7 +45,7 @@ class TechIndicator:
 
             if (data_frame_non_nan_early is not None):
                 # calculate the lagged sum of the n-1 point
-                rolling_sum = pandas.rolling_sum(data_frame.shift(1), tech_params.sma_period - 1)
+                rolling_sum = data_frame.shift(1).rolling(center=False, window=tech_params.sma_period - 1).sum()
 
                 # add non-nan one for today
                 rolling_sum = rolling_sum + data_frame_early
@@ -55,7 +55,8 @@ class TechIndicator:
 
                 narray = numpy.where(data_frame_early > self._techind, 1, -1)
             else:
-                self._techind = pandas.rolling_mean(data_frame, tech_params.sma_period)
+                # self._techind = pandas.rolling_mean(data_frame, tech_params.sma_period)
+                self._techind = data_frame.rolling(window=tech_params.sma_period, center=False).mean()
 
                 narray = numpy.where(data_frame > self._techind, 1, -1)
 
@@ -64,6 +65,20 @@ class TechIndicator:
             self._signal.columns = [x + " SMA Signal" for x in data_frame.columns.values]
 
             self._techind.columns = [x + " SMA" for x in data_frame.columns.values]
+
+        elif name == "EMA":
+
+            # self._techind = pandas.ewma(data_frame, span = tech_params.ema_period)
+            self._techind = data_frame.ewm(ignore_na=False,span=tech_params.ema_period,min_periods=0,adjust=True).mean()
+
+            narray = numpy.where(data_frame > self._techind, 1, -1)
+
+            self._signal = pandas.DataFrame(index = data_frame.index, data = narray)
+            self._signal.loc[0:tech_params.ema_period] = numpy.nan
+            self._signal.columns = [x + " EMA Signal" for x in data_frame.columns.values]
+
+            self._techind.columns = [x + " EMA" for x in data_frame.columns.values]
+
         elif name == "ROC":
 
             if (data_frame_non_nan_early is not None):
@@ -79,9 +94,19 @@ class TechIndicator:
 
             self._techind.columns = [x + " ROC" for x in data_frame.columns.values]
 
+        elif name == "polarity":
+            self._techind = data_frame
+
+            narray = numpy.where(self._techind > 0, 1, -1)
+
+            self._signal = pandas.DataFrame(index = data_frame.index, data = narray)
+            self._signal.columns = [x + " Polarity Signal" for x in data_frame.columns.values]
+
+            self._techind.columns = [x + " Polarity" for x in data_frame.columns.values]
+
         elif name == "SMA2":
-            sma = pandas.rolling_mean(data_frame, tech_params.sma_period)
-            sma2 = pandas.rolling_mean(data_frame, tech_params.sma2_period)
+            sma = data_frame.rolling(window=tech_params.sma_period, center=False).mean()
+            sma2 = data_frame.rolling(window=tech_params.sma2_period, center=False).mean()
 
             narray = numpy.where(sma > sma2, 1, -1)
 
@@ -126,8 +151,8 @@ class TechIndicator:
             RSI1 = 100.0 - (100.0 / (1.0 + RS1))
 
             # Calculate the SMA
-            roll_up2 = pandas.rolling_mean(up, tech_params.rsi_period)
-            roll_down2 = pandas.rolling_mean(down.abs(), tech_params.rsi_period)
+            roll_up2 = up.rolling(window=tech_params.rsi_period, center=False).mean()
+            roll_down2 = down.abs().rolling(window=tech_params.rsi_period, center=False).mean()
 
             # Calculate the RSI based on SMA
             RS2 = roll_up2 / roll_down2
@@ -156,8 +181,8 @@ class TechIndicator:
 
         elif name in ["BB"]:
             ## calcuate Bollinger bands
-            mid = pandas.rolling_mean(data_frame, tech_params.bb_period); mid.columns = [x + " BB Mid" for x in data_frame.columns.values]
-            std_dev = pandas.rolling_std(data_frame, tech_params.bb_period)
+            mid = data_frame.rolling(center=False, window=tech_params.bb_period).mean(); mid.columns = [x + " BB Mid" for x in data_frame.columns.values]
+            std_dev = data_frame.rolling(center=False, window=tech_params.bb_period).std()
             BB_std = tech_params.bb_mult * std_dev
 
             lower = pandas.DataFrame(data = mid.values - BB_std.values, index = mid.index,
@@ -198,12 +223,27 @@ class TechIndicator:
             self._techind.columns = [x + " Long Only" for x in data_frame.columns.values]
 
         # TODO create other indicators
+        if hasattr(tech_params, 'only_allow_longs'):
+            self._signal[self._signal < 0] = 0
+
+        # TODO create other indicators
+        if hasattr(tech_params, 'only_allow_shorts'):
+           self._signal[self._signal > 0] = 0
 
         # apply signal multiplier (typically to flip signals)
         if hasattr(tech_params, 'signal_mult'):
             self._signal = self._signal * tech_params.signal_mult
 
+        if hasattr(tech_params, 'strip_signal_name'):
+            if tech_params.strip_signal_name:
+                self._signal.columns = data_frame.columns
+
+        self.create_custom_tech_ind(data_frame_non_nan, name, tech_params, data_frame_non_nan_early)
+
         return self._techind
+
+    def create_custom_tech_ind(self, data_frame_non_nan, name, tech_params, data_frame_non_nan_early):
+        return
 
     def get_techind(self):
         return self._techind

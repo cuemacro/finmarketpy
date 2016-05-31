@@ -188,6 +188,7 @@ More generally, we want to:
 
 # Coding log
 
+* 31 May 2016 - Got rid of deprecated Pandas methods in TechIndicator
 * 27 May 2016 - Added ability to plot strategy signal at point in time
 * 19 May 2016 - Updated Quandl wrapper to use new Quandl API
 * 02 May 2016 - Tidied up BacktestRequest, added SPX seasonality example

@@ -88,7 +88,8 @@ generated total return index) (you can run this analysis using indicesfx_example
 
 PyThalesians has been tested on Windows 8 & 10, running Bloomberg Terminal software. 
 I currently run PyThalesians using Anaconda 2.5 (Python 3.5 64bit) on Windows 10. Potentially, it could also work on the 
-Bloomberg Server API (but I have not explicitly tested this). I have also tried running it on Ubuntu and Mac OS X (excluding Bloomberg API)
+Bloomberg Server API (but I have not explicitly tested this). I have also tried running it on Ubuntu and Mac OS X (excluding Bloomberg API). If you
+do not have a subscription to Bloomberg, PyThalesians can still access free data sources including Quandl.
 
 Major requirements
 * Required: Python 3.4, 3.5
@@ -146,12 +147,16 @@ on systematic trading and also consult in the area. One of our clients is RavenP
 
 # Major contributors to PyThalesians
 
-* Saeed Amen - Saeed is managing director and co-founder of the Thalesians. He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. 
+* Saeed Amen - Saeed is the founder of Dataeau, a finanical data science company, which deciphers how traders can use both existing and novel data sources
+to trade macro markets systematically. He is also managing director and co-founder of the Thalesians. 
+He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. 
+Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). 
+He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. 
 
 # Supporting PyThalesians project
 
 If you find PyThalesians useful (and in particular if you are commercial company) please consider supporting the project
-through sponsorship or by using our consultancy/research services in systematic trading. If you would like to contribute to the project, also let me know: it's a big task to try to build up this library on my own!
+through sponsorship or by using Saeed's consultancy/research services in systematic trading. If you would like to contribute to the project, also let me know: it's a big task to try to build up this library on my own!
 
 For the UK election Plot.ly code - please visit https://github.com/plotly/IPython-plotly/tree/master/notebooks/ukelectionbbg
 

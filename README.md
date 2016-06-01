@@ -110,7 +110,7 @@ Major requirements
     * For Python 3.4 - prebuilt executable can be run, which means we can skip the build steps above
         * Might need to tweak registry to avoid "Python 3.4 not found in registry error" (blppython.reg example) when using this executable 
     * Alternatively to access Bloomberg, the software also supports the old COM API (but I'm going to remove it because very slow)
-* Recommended: Plotly for funky interactive plots (https://github.com/plotly/python-api) and 
+* Recommended: Plotly for funky interactive plots (https://github.com/plotly/plotly.py) and 
 * Recommended: Cufflinks a nice Plotly
 wrapper when using Pandas dataframes (Jorge Santos project now supports Python 3 
 https://github.com/jorgesantos/cufflinks - so I recommend using that rather than my fork)

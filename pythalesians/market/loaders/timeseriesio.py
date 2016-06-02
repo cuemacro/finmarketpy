@@ -25,11 +25,36 @@ import datetime
 from dateutil.parser import parse
 import shutil
 
+try:
+    import bcolz
+except: pass
+
 from openpyxl import load_workbook
 import os.path
 
 from pythalesians.util.constants import Constants
 from pythalesians.util.loggermanager import LoggerManager
+
+_replace_chars = ['_a_',
+                  '_d_',
+                  '_h_',
+                  '_o_',
+                  '_c_',
+                  '_s_',
+                  '_p_',
+                  '_e_',
+                  '_'
+                  ]
+
+_invalid_chars = ['&',
+                  '.',
+                  '-',
+                  '(',
+                  ')',
+                  '/',
+                  '%',
+                  '=',
+                  ' ']
 
 class TimeSeriesIO:
 
@@ -113,9 +138,9 @@ class TimeSeriesIO:
                             postfix = postfix, intraday_tz = intraday_tz, excel_sheet = excel_sheet)
 
     ### functions to handle HDF5 on disk
-    def write_time_series_cache_to_disk(self, fname, data_frame):
+    def write_time_series_cache_to_disk(self, fname, data_frame, use_bcolz = False):
         """
-        write_time_series_cache_to_disk - writes Pandas data frame to disk as HDF5 format
+        write_time_series_cache_to_disk - writes Pandas data frame to disk as HDF5 format or bcolz format
 
         Parmeters
         ---------
@@ -125,30 +150,41 @@ class TimeSeriesIO:
             data frame to be written to disk
         """
 
-        h5_filename_temp = self.get_h5_filename(fname + ".temp")
-        h5_filename = self.get_h5_filename(fname)
+        if (use_bcolz):
+            # convert invalid characters to substitutes (which Bcolz can't deal with)
+            data_frame.columns = self.find_replace_chars(data_frame.columns, _invalid_chars, _replace_chars)
+            data_frame.columns = ['A_' + x for x in data_frame.columns]
 
-        # delete the old copy
-        try:
-            # os.remove(h5_filename_temp)
-            p =0
-        except: pass
+            data_frame['DTS_'] = pandas.to_datetime(data_frame.index, unit='ns')
 
-        store = pandas.HDFStore(h5_filename_temp, complib="blosc", complevel=9)
+            bcolzpath = self.get_bcolz_filename(fname)
+            shutil.rmtree(bcolzpath, ignore_errors=True)
+            zlens = bcolz.ctable.fromdataframe(data_frame, rootdir=bcolzpath)
+        else:
+            h5_filename_temp = self.get_h5_filename(fname + ".temp")
+            h5_filename = self.get_h5_filename(fname)
 
-        if ('intraday' in fname):
-            data_frame = data_frame.astype('float32')
+            # delete the old copy
+            try:
+                # os.remove(h5_filename_temp)
+                temp = 0
+            except: pass
 
-        store['data'] = data_frame
-        store.close()
+            store = pandas.HDFStore(h5_filename_temp, complib="blosc", complevel=9)
 
-        # delete the old copy
-        try:
-            os.remove(h5_filename)
-        except: pass
+            if ('intraday' in fname):
+                data_frame = data_frame.astype('float32')
 
-        # once written to disk rename
-        os.rename(h5_filename_temp, h5_filename)
+            store['data'] = data_frame
+            store.close()
+
+            # delete the old copy
+            try:
+                os.remove(h5_filename)
+            except: pass
+
+            # once written to disk rename
+            os.rename(h5_filename_temp, h5_filename)
 
     def get_h5_filename(self, fname):
         """
@@ -167,6 +203,24 @@ class TimeSeriesIO:
             return fname
 
         return fname + ".h5"
+
+    def get_bcolz_filename(self, fname):
+        """
+        get_bcolz_filename - Strips h5 off filename returning first portion of filename
+
+        Parameters
+        ----------
+        fname : str
+            h5 filename to strip
+
+        Returns
+        -------
+        str
+        """
+        if fname[-6:] == '.bcolz':
+            return fname
+
+        return fname + ".bcolz"
 
     def write_r_compatible_hdf_dataframe(self, data_frame, fname, fields = None):
         """
@@ -207,9 +261,9 @@ class TimeSeriesIO:
         store_export.put('df_for_r', data_frame32, data_columns=cols)
         store_export.close()
 
-    def read_time_series_cache_from_disk(self, fname):
+    def read_time_series_cache_from_disk(self, fname, use_bcolz = False):
         """
-        read_time_series_cache_from_disk - Reads time series cache from disk
+        read_time_series_cache_from_disk - Reads time series cache from disk in either HDF5 or bcolz
 
         Parameters
         ----------
@@ -221,7 +275,25 @@ class TimeSeriesIO:
         DataFrame
         """
 
-        if os.path.isfile(self.get_h5_filename(fname)):
+        if (use_bcolz):
+            try:
+                name = self.get_bcolz_filename(fname)
+                zlens = bcolz.open(rootdir=name)
+                data_frame = zlens.todataframe()
+
+                data_frame.index = pandas.DatetimeIndex(data_frame['DTS_'])
+                data_frame.index.name = 'Date'
+                del data_frame['DTS_']
+
+                # convert invalid characters (which Bcolz can't deal with) to more readable characters for pandas
+                data_frame.columns = self.find_replace_chars(data_frame.columns, _replace_chars, _invalid_chars)
+                data_frame.columns = [x[2:] for x in data_frame.columns]
+
+                return data_frame
+            except:
+                return None
+
+        elif os.path.isfile(self.get_h5_filename(fname)):
             store = pandas.HDFStore(self.get_h5_filename(fname))
             data_frame = store.select("data")
 
@@ -306,7 +378,10 @@ class TimeSeriesIO:
 
             else:
                 if excel_sheet is None:
-                    data_frame = pandas.read_csv(f_name, index_col=0, parse_dates =["DATE"], date_parser = dateparse)
+                    try:
+                        data_frame = pandas.read_csv(f_name, index_col=0, parse_dates =["DATE"], date_parser = dateparse)
+                    except:
+                        data_frame = pandas.read_csv(f_name, index_col=0, parse_dates =["Date"], date_parser = dateparse)
                 else:
                     data_frame = pandas.read_excel(f_name, excel_sheet, index_col = 0, na_values=['NA'])
 
@@ -334,6 +409,13 @@ class TimeSeriesIO:
             data_frame = data_frame.loc[data_frame.index < cutoff]
 
         return data_frame
+
+    def find_replace_chars(self, array, to_find, replace_with):
+
+        for i in range(0, len(to_find)):
+            array = [x.replace(to_find[i], replace_with[i]) for x in array]
+
+        return array
 
     def convert_csv_data_frame(self, f_name, category, freq, cutoff=None, dateparse=None):
         """

@@ -24,8 +24,8 @@ import os
 
 class Constants:
 
-    ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER
-    root_pythalesians_folder = "E:/Remote/pythalesians/pythalesians/"
+    ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER (if autodetect has problems)
+    root_pythalesians_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + "/"
     temp_pythalesians_folder = root_pythalesians_folder + "temp"
 
     ###### FOR FUTURE VERSIONS (which include caching and aliasing of tickers) - DO NOT REMOVE!
@@ -88,6 +88,11 @@ class Constants:
 
     # for plots
     plotfactory_silent_display = False
+
+    if (plotfactory_silent_display == True):
+        import matplotlib
+        matplotlib.use('Agg')
+
     plotfactory_default_adapter = "pythalesians"
     plotfactory_source = "Thalesians/BBG (created with PyThalesians Python library)"
     plotfactory_brand_label = "@thalesians"

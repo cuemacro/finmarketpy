@@ -18,5 +18,6 @@ setup(name='pythalesians',
                           'pytz',
                           'requests',
                           'numpy'],
-      extra_requires = ['pyfolio'],
+      extra_requires = ['pyfolio',
+                        'bcolz'],
 	  zip_safe=False)

@@ -188,8 +188,8 @@ More generally, we want to:
 
 # Coding log
 
-* 02 Jun 2016 - Fixed missing StrategyTemplate file in installation and added autodetection of path 
-to simplify installation
+* 02 Jun 2016 - Fixed missing StrategyTemplate file in installation, added auto-detection of path 
+to simplify installation and added methods for converting between pandas and bcolz
 * 31 May 2016 - Got rid of deprecated Pandas methods in TechIndicator
 * 27 May 2016 - Added ability to plot strategy signal at point in time
 * 19 May 2016 - Updated Quandl wrapper to use new Quandl API

@@ -121,7 +121,7 @@ https://github.com/jorgesantos/cufflinks - so I recommend using that rather than
 # Installation
 
 Once installed please make sure you edit pythalesians.util.constants file for the following variables:
-* Change the root path variable - this will ensure that the logging (and a number of other features works correctly). 
+* PyThalesians should autodetect its own path, but if not, manually change root_pythalesians_folder variable - this will ensure that the logging (and a number of other features works correctly). 
 Failure to do so will result in the project not starting
 * Change the default Bloomberg settings (Which API to use? What server address to use?)
 * Write in API keys for Quandl, Twitter, Plotly etc.
@@ -188,6 +188,8 @@ More generally, we want to:
 
 # Coding log
 
+* 02 Jun 2016 - Fixed missing StrategyTemplate file in installation and added autodetection of path 
+to simplify installation
 * 31 May 2016 - Got rid of deprecated Pandas methods in TechIndicator
 * 27 May 2016 - Added ability to plot strategy signal at point in time
 * 19 May 2016 - Updated Quandl wrapper to use new Quandl API

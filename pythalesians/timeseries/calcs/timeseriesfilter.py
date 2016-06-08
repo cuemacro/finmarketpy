@@ -566,6 +566,26 @@ class TimeSeriesFilter:
     def resample_time_series(self, data_frame, freq):
         return data_frame.asfreq(freq, method = 'pad')
 
+    def resample_time_series_frequency(self, data_frame, data_resample_freq,
+                                       data_resample_type = 'mean', fill_empties = False):
+        # should we take the mean, first, last in our resample
+        if data_resample_type == 'mean':
+            data_frame_r = data_frame.resample(data_resample_freq).mean()
+        elif data_resample_type == 'first':
+            data_frame_r = data_frame.resample(data_resample_freq).first()
+        elif data_resample_type == 'last':
+            data_frame_r = data_frame.resample(data_resample_freq).last()
+        else:
+            # TODO implement other types
+            return
+
+        if fill_empties == True:
+            pass # TODO
+            # data_frame, data_frame_r = data_frame.align(data_frame_r, join='left', axis=0)
+            # data_frame_r = data_frame_r.fillna(method='ffill')
+
+        return data_frame_r
+
     def make_FX_1_min_working_days(self, data_frame):
         data_frame = data_frame.resample('1min').mean()
         data_frame = self.filter_time_series_by_holidays(data_frame, 'FX')

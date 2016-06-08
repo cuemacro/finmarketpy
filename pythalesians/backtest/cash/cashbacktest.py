@@ -26,6 +26,7 @@ import numpy
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.timeseries.calcs.timeseriesdesc import TimeSeriesDesc
 from pythalesians.util.loggermanager import LoggerManager
+from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 
 class CashBacktest:
 
@@ -77,6 +78,9 @@ class CashBacktest:
             if br.signal_vol_adjust is True:
                 if not(hasattr(br, 'signal_vol_resample_type')):
                     br.signal_vol_resample_type = 'mean'
+
+                if not(hasattr(br, 'signal_vol_resample_freq')):
+                    br.signal_vol_resample_freq = None
 
                 leverage_df = self.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
                                                br.signal_vol_periods, br.signal_vol_obs_in_year,
@@ -195,6 +199,9 @@ class CashBacktest:
         if not(hasattr(br, 'portfolio_vol_resample_type')):
             br.portfolio_vol_resample_type = 'mean'
 
+        if not(hasattr(br, 'portfolio_vol_resample_freq')):
+            br.portfolio_vol_resample_freq = None
+
         leverage_df = self.calculate_leverage_factor(returns_df,
                                                                br.portfolio_vol_target, br.portfolio_vol_max_leverage,
                                                                br.portfolio_vol_periods, br.portfolio_vol_obs_in_year,
@@ -232,7 +239,7 @@ class CashBacktest:
         vol_rebalance_freq : str
             how often to rebalance
 
-        vol_resample_freq : str
+        vol_resample_type : str
             do we need to resample the underlying data first? (eg. have we got intraday data?)
 
         returns : boolean
@@ -247,6 +254,7 @@ class CashBacktest:
         """
 
         tsc = TimeSeriesCalcs()
+        tsf = TimeSeriesFilter()
 
         if data_resample_freq is not None:
             return
@@ -261,16 +269,7 @@ class CashBacktest:
         lev_df = vol_target / roll_vol_df
         lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
-        # should we take the mean, first, last in our resample
-        if data_resample_type == 'mean':
-            lev_df = lev_df.resample(vol_rebalance_freq).mean()
-        elif data_resample_type == 'first':
-            lev_df = lev_df.resample(vol_rebalance_freq).first()
-        elif data_resample_type == 'last':
-            lev_df = lev_df.resample(vol_rebalance_freq).last()
-        else:
-            # TODO implement other types
-            return
+        lev_df = tsf.resample_time_series_frequency(lev_df, vol_rebalance_freq, data_resample_type)
 
         returns_df, lev_df = returns_df.align(lev_df, join='left', axis = 0)
 

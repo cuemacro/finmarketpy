@@ -188,6 +188,7 @@ More generally, we want to:
 
 # Coding log
 
+* 08 Jun 2016 - Fix kurtosis issue
 * 03 Jun 2016 - Speed up CashBacktest (construct_strategy method)  
 * 02 Jun 2016 - Fixed missing StrategyTemplate file in installation, added auto-detection of path 
 to simplify installation and added methods for converting between pandas and bcolz

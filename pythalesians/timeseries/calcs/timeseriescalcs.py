@@ -33,6 +33,8 @@ from pythalesians.util.calendar import Calendar
 from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 from pandas.stats.api import ols
 
+import dask.dataframe as dd
+
 class TimeSeriesCalcs:
 
     def calculate_signal_tc(self, signal_data_frame, tc, period_shift = 1):
@@ -343,7 +345,8 @@ class TimeSeriesCalcs:
         DataFrame
         """
 
-        return pandas.rolling_std(data_frame, periods) * math.sqrt(obs_in_year)
+        # return pandas.rolling_std(data_frame, periods) * math.sqrt(obs_in_year)
+        return data_frame.rolling(window=periods,center=False).std() * math.sqrt(obs_in_year)
 
     def rolling_mean(self, data_frame, periods):
         return self.rolling_average(data_frame, periods)
@@ -541,6 +544,15 @@ class TimeSeriesCalcs:
 
         return df
 
+    def calculate_column_matrix_signal_override(self, override_df, signal_df):
+        length_cols = len(signal_df.columns)
+        override_matrix = numpy.repeat(override_df.values.flatten()[numpy.newaxis,:], length_cols, 0)
+
+        # final portfolio signals (including signal & override matrix)
+        return pandas.DataFrame(
+            data = numpy.multiply(numpy.transpose(override_matrix), signal_df.values),
+            index = signal_df.index, columns = signal_df.columns)
+
     # several types of outer join (TODO finalise which one should appear!)
     def pandas_outer_join(self, df_list):
         if df_list is None: return None
@@ -551,7 +563,11 @@ class TimeSeriesCalcs:
         if len(df_list) == 0: return None
         elif len(df_list) == 1: return df_list[0]
 
-        return df_list[0].join(df_list[1:], how="outer")
+        # df_list = [dd.from_pandas(df) for df in df_list]
+
+        df_list = df_list[0].join(df_list[1:], how="outer")
+
+        return df_list
 
     def functional_outer_join(self, df_list):
         def join_dfs(ldf, rdf):

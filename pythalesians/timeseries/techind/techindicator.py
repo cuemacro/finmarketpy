@@ -35,6 +35,7 @@ class TechIndicator:
 
     def create_tech_ind(self, data_frame_non_nan, name, tech_params, data_frame_non_nan_early = None):
         self._signal = None
+        self._techind = None
 
         data_frame = data_frame_non_nan.fillna(method="ffill")
 
@@ -222,6 +223,8 @@ class TechIndicator:
 
             self._techind.columns = [x + " Long Only" for x in data_frame.columns.values]
 
+        self.create_custom_tech_ind(data_frame_non_nan, name, tech_params, data_frame_non_nan_early)
+
         # TODO create other indicators
         if hasattr(tech_params, 'only_allow_longs'):
             self._signal[self._signal < 0] = 0
@@ -237,8 +240,6 @@ class TechIndicator:
         if hasattr(tech_params, 'strip_signal_name'):
             if tech_params.strip_signal_name:
                 self._signal.columns = data_frame.columns
-
-        self.create_custom_tech_ind(data_frame_non_nan, name, tech_params, data_frame_non_nan_early)
 
         return self._techind
 

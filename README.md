@@ -147,8 +147,8 @@ on systematic trading and also consult in the area. One of our clients is RavenP
 
 # Major contributors to PyThalesians
 
-* Saeed Amen - Saeed is the founder of Dataeau, a finanical data science company, which deciphers how traders can use both existing and novel data sources
-to trade macro markets systematically. He is also managing director and co-founder of the Thalesians. 
+* Saeed Amen - Saeed is the founder of Cuemacro (http://www.cuemacro.com), which deciphers how traders can use both existing and novel data sources
+to better understand macro markets. He is also managing director and co-founder of the Thalesians. 
 He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. 
 Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). 
 He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. 

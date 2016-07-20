@@ -251,9 +251,11 @@ class AdapterPyThalesians(AdapterTemplate):
         # display in matplotlib window
         try:
             if Constants.plotfactory_silent_display == True:
-                pass
+                return fig
             elif gp.silent_display == False:
                 plt.show()
+            else:
+                return fig
 
         except:
             pass

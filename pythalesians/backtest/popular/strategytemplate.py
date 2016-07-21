@@ -424,7 +424,7 @@ class StrategyTemplate:
 
             ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
             # ret_stats = ret_stats.sort_index()
-            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR).png'
+            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + gp.SCALE_FACTOR + '.png'
 
             gp.display_brand_label = False
 

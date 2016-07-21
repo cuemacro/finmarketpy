@@ -231,8 +231,10 @@ class StrategyTemplate:
                 if br.portfolio_vol_adjust is True:
                     benchmark_df = cash_backtest.calculate_vol_adjusted_index_from_prices(benchmark_df, br = br)
 
-            # only calculate return statistics if this has been specified
+            # only calculate return statistics if this has been specified (note when different frequencies of data
+            # might underrepresent vol
             if calc_stats:
+                benchmark_df = benchmark_df.fillna(method='ffill')
                 tsd.calculate_ret_stats_from_prices(benchmark_df, br.ann_factor)
                 benchmark_df.columns = tsd.summary()
 
@@ -316,13 +318,8 @@ class StrategyTemplate:
     ##### Quick helper functions to plot aspects of the strategy such as P&L, leverage etc.
     def plot_individual_leverage(self):
         pf = PlotFactory()
-        gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY + ' Leverage'
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Individual Leverage).png'
+        gp = self.create_graph_properties("Leverage", "Individual Leverage")
 
         try:
             pf.plot_line_graph(self.reduce_plot(self._individual_leverage), adapter = 'pythalesians', gp = gp)
@@ -330,13 +327,8 @@ class StrategyTemplate:
 
     def plot_strategy_group_pnl_trades(self):
         pf = PlotFactory()
-        gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY + " (bp)"
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Individual Trade PnL).png'
+        gp = self.create_graph_properties("(bp)", "Individual Trade PnL")
 
         # zero when there isn't a trade exit
         # strategy_pnl_trades = self._strategy_pnl_trades * 100 * 100
@@ -350,13 +342,8 @@ class StrategyTemplate:
 
     def plot_strategy_pnl(self):
         pf = PlotFactory()
-        gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy PnL).png'
+        gp = self.create_graph_properties("", "Strategy PnL")
 
         try:
             pf.plot_line_graph(self.reduce_plot(self._strategy_pnl), adapter = 'pythalesians', gp = gp)
@@ -392,11 +379,8 @@ class StrategyTemplate:
         # df = df.sort_index()
 
         pf = PlotFactory()
-        gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
+        gp = self.create_graph_properties("", "")
 
         try:
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
@@ -410,11 +394,7 @@ class StrategyTemplate:
         pf = PlotFactory()
         gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY + ' Leverage'
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy Leverage).png'
+        gp = self.create_graph_properties("Leverage", "Strategy Leverage")
 
         try:
             pf.plot_line_graph(self.reduce_plot(self._strategy_leverage), adapter = 'pythalesians', gp = gp)
@@ -422,14 +402,8 @@ class StrategyTemplate:
 
     def plot_strategy_group_benchmark_pnl(self, strip = None):
         pf = PlotFactory()
-        gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
-        #gp.color = 'RdYlGn'
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - cumulative).png'
+        gp = self.create_graph_properties("", "Group Benchmark PnL - cumulative")
 
         strat_list = self._strategy_group_benchmark_pnl.columns #.sort_values()
 
@@ -465,14 +439,10 @@ class StrategyTemplate:
         if cols is None: cols = self._strategy_group_benchmark_annualised_pnl.columns
 
         pf = PlotFactory()
-        gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
+        gp = self.create_graph_properties("", "Group Benchmark Annualised PnL")
+
         gp.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark Annualised PnL).png'
 
         pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), adapter = 'pythalesians', gp = gp)
 
@@ -480,11 +450,7 @@ class StrategyTemplate:
         pf = PlotFactory()
         gp = GraphProperties()
 
-        gp.title = self.FINAL_STRATEGY + ' Leverage'
-        gp.display_legend = True
-        gp.scale_factor = self.SCALE_FACTOR
-
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Leverage).png'
+        gp = self.create_graph_properties("Leverage", "Group Leverage")
 
         pf.plot_line_graph(self.reduce_plot(self._strategy_group_leverage), adapter = 'pythalesians', gp = gp)
 
@@ -505,10 +471,20 @@ class StrategyTemplate:
         print(last_day)
 
         pf = PlotFactory()
-        gp = GraphProperties()
-
-        gp.title = self.FINAL_STRATEGY + " positions (% portfolio notional)"
-        gp.scale_factor = self.SCALE_FACTOR
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Positions) ' + str(gp.scale_factor) + '.png'
+        gp = self.create_graph_properties("positions (% portfolio notional)", "Positions")
 
         pf.plot_generic_graph(last_day, adapter = 'pythalesians', type = 'bar', gp = gp)
+
+    def create_graph_properties(self, title, file_add):
+        gp = GraphProperties()
+
+        gp.title = self.FINAL_STRATEGY + " " + title
+        gp.display_legend = True
+        gp.scale_factor = self.SCALE_FACTOR
+        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_add + ') ' + str(gp.scale_factor) + '.png'
+
+        try:
+            gp.silent_display = self.SILENT_DISPLAY
+        except: pass
+
+        return gp

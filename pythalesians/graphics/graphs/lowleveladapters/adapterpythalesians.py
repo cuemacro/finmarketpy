@@ -49,6 +49,7 @@ class AdapterPyThalesians(AdapterTemplate):
         # create figure & add a subplot
         fig = plt.figure(figsize = ((gp.width * gp.scale_factor)/gp.dpi,
                                     (gp.height * gp.scale_factor)/gp.dpi), dpi = gp.dpi)
+
         ax = fig.add_subplot(111)
 
         if gp.x_title != '': ax.set_xlabel(gp.x_title)

@@ -93,11 +93,7 @@ class PlotFactory:
         elif adapter == 'bokeh':
             return AdapterBokeh()
 
-        elif adapter == 'plotly':
-            from pythalesians.graphics.graphs.lowleveladapters.adapterplotly import AdapterPlotly
-            return AdapterPlotly()
-
-        elif adapter == 'cufflinks':
+        elif adapter == 'cufflinks' or adapter == 'plotly':
             return AdapterCufflinks()
 
         return None

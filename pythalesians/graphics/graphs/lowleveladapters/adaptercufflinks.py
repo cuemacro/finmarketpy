@@ -31,13 +31,14 @@ try:
     import cufflinks as cf
 except: pass
 
+import plotly.plotly
+
 from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
 from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
 class AdapterCufflinks(AdapterTemplate):
 
     def plot_2d_graph(self, data_frame, gp, chart_type):
-        plotly.tools.set_credentials_file(username=gp.plotly_username, api_key=gp.plotly_api_key)
 
         mode = 'line'
 
@@ -48,11 +49,10 @@ class AdapterCufflinks(AdapterTemplate):
         else:
             chart_type = gp.chart_type
 
-
         marker_size = 1
-        scale_factor = gp.scale_factor
 
         x = ''; y = ''; z = ''
+        fig = None
 
         if chart_type == 'line':
             chart_type = 'scatter'
@@ -117,39 +117,86 @@ class AdapterCufflinks(AdapterTemplate):
 
             fig = dict( data=data, layout=layout )
 
-            url = py.plot(fig, validate=False, filename=gp.plotly_url, world_readable=gp.plotly_world_readable)
-            return
-
         # check other plots implemented by Cufflinks
 
-        # get all the correct colors (and construct gradients if necessary eg. from 'blues')
-        # need to change to strings for cufflinks
-        color_spec = []
-        color_list = self.create_color_list(gp, data_frame)
+        if fig is None:
 
-        # if no colors are specified strip the list
-        if color_list == [None] * len(color_list):
-            color_spec = None
+            # special case for surface (given coloring)
+            if chart_type == 'surface':
+                # create figure
+                fig = data_frame.iplot(kind=chart_type,
+                    title=gp.title,
+                    xTitle=gp.x_title,
+                    yTitle=gp.y_title,
+                    x=x, y=y, z=z,
+                    mode=mode,
+                    size=marker_size,
+                    theme=gp.plotly_theme,
+                    bestfit=gp.line_of_best_fit,
+                    legend=gp.display_legend,
+                    colorscale=gp.color,
+                    dimensions=(gp.width * gp.scale_factor * 2/3, gp.height * gp.scale_factor * 2/3),
+                    asFigure=True)
+            else:
+                # get all the correct colors (and construct gradients if necessary eg. from 'Blues')
+                # need to change to strings for cufflinks
+                color_spec = []
+                color_list = self.create_color_list(gp, data_frame)
 
-        else:
-            # otherwise assume all the colors are rgba
-            for color in color_list:
-                color = 'rgba' + str(color)
-                color_spec.append(color)
+                # if no colors are specified strip the list
+                if color_list == [None] * len(color_list):
+                    color_spec = None
 
-        data_frame.iplot(kind=chart_type,
-            filename=gp.plotly_url,
-            title=gp.title,
-            xTitle=gp.x_title,
-            yTitle=gp.y_title,
-            x=x, y=y, z=z,
-            mode=mode,
-            size=marker_size,
-            theme=gp.plotly_theme,
-            bestfit=gp.line_of_best_fit,
-            world_readable=gp.plotly_world_readable,
-            legend=gp.display_legend,
-            color = color_spec,
-            dimensions=(gp.width * scale_factor, gp.height * scale_factor),
-            asPlot=not(gp.silent_display),
-            asImage=gp.plotly_as_image)
+                else:
+                    # otherwise assume all the colors are rgba
+                    for color in color_list:
+                        color = 'rgba' + str(color)
+                        color_spec.append(color)
+
+                # create figure
+                fig = data_frame.iplot(kind=chart_type,
+                    title=gp.title,
+                    xTitle=gp.x_title,
+                    yTitle=gp.y_title,
+                    x=x, y=y, z=z,
+                    mode=mode,
+                    size=marker_size,
+                    theme=gp.plotly_theme,
+                    bestfit=gp.line_of_best_fit,
+                    legend=gp.display_legend,
+                    color=color_spec,
+                    dimensions=(gp.width * gp.scale_factor * 2/3, gp.height * gp.scale_factor * 2/3),
+                    asFigure=True)
+
+        self.publish_plot(fig, gp)
+
+    def publish_plot(self, fig, gp):
+
+        if gp.plotly_plot_mode == 'online':
+            plotly.tools.set_credentials_file(username=gp.plotly_username, api_key=gp.plotly_api_key)
+
+            plotly.plotly.plot(fig, filename=gp.plotly_url,
+                    world_readable=gp.plotly_world_readable,
+                    auto_open = not(gp.silent_display),
+                    asImage=gp.plotly_as_image)
+
+        elif gp.plotly_plot_mode == 'offline_html':
+            if gp.html_file_output is not None:
+                temp_html = gp.html_file_output
+            else:
+                temp_html = "temp.html"
+
+            plotly.offline.plot(fig, filename=temp_html, auto_open = not(gp.silent_display))
+
+        elif gp.plotly_plot_mode == 'offline_jupyter':
+
+            # plot in IPython notebook
+            plotly.offline.init_notebook_mode()
+            plotly.offline.iplot(fig)
+
+        # plotly.offline.plot(fig, filename=gp.file_output, format='png',
+        #         width=gp.width * gp.scale_factor, height=gp.height * gp.scale_factor)
+        try:
+            plotly.plotly.image.save_as(fig, filename=gp.file_output, format='png',
+                                width=gp.width * gp.scale_factor, height=gp.height * gp.scale_factor)
+        except: pass

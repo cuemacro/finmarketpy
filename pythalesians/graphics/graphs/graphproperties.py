@@ -82,6 +82,7 @@ class GraphProperties:
         plotly_api_key = None,
         plotly_world_readable = Constants().plotly_world_readable,
         plotly_theme = None,
+        plotly_plot_mode = Constants().plotly_plot_mode,
 
         # plotly choropleth fields
 
@@ -156,6 +157,7 @@ class GraphProperties:
         self.plotly_api_key = plotly_api_key
         self.plotly_world_readable = plotly_world_readable
         self.plotly_theme = plotly_theme
+        self.plotly_plot_mode = plotly_plot_mode    # 'online', 'offline_html', 'offline_jupyter'
 
         # matplotlib only
         self.style_sheet = style_sheet
@@ -370,7 +372,15 @@ class GraphProperties:
     @property
     def plotly_theme(self): return self.__plotly_theme
     @plotly_theme.setter
-    def plotly_theme(self, plotly_theme): self.__plotly_theme = plotly_theme   
+    def plotly_theme(self, plotly_theme): self.__plotly_theme = plotly_theme
+
+    @property
+    def plotly_plot_mode(self):
+        return self.__plotly_plot_mode
+
+    @plotly_plot_mode.setter
+    def plotly_plot_mode(self, plotly_plot_mode):
+        self.__plotly_plot_mode = plotly_plot_mode
 
     ###### matplotlib specific settings
     @property

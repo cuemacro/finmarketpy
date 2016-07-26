@@ -188,6 +188,8 @@ More generally, we want to:
 
 # Coding log
 
+* 26 Jul 2016 - Added more support for Plotly charts
+                Allowed change of plotting engine for backtesting
 * 21 Jul 2016 - Refactor StrategyTemplate graph plotting functions
 * 20 Jul 2016 - Return of figure handle for AdapterPyThalesians
 * 08 Jun 2016 - Fix kurtosis issue, refactored vol scaling in CashBasktest, added resample wrapper in TimeSeriesFilter

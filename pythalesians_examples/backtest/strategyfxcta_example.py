@@ -29,7 +29,6 @@ from pythalesians.backtest.popular.strategytemplate import StrategyTemplate
 from pythalesians.market.requests.backtestrequest import BacktestRequest
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
-from pythalesians.market.loaders.timeseriesio import TimeSeriesIO
 
 from pythalesians.timeseries.techind.techindicator import TechIndicator
 
@@ -45,7 +44,8 @@ class StrategyFXCTA_Example(StrategyTemplate):
         self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime("%Y%m%d") + ' '
         self.FINAL_STRATEGY = 'Thalesians FX CTA'
         self.SCALE_FACTOR = 3
-        
+        self.DEFAULT_PLOT_ENGINE = 'pythalesians'
+
         return
 
     ###### Parameters and signal generations (need to be customised for every model)
@@ -123,9 +123,18 @@ class StrategyFXCTA_Example(StrategyTemplate):
 
         asset_df = self.tsfactory.harvest_time_series(time_series_request)
 
+        # if web connection fails read from CSV
+        if asset_df is None:
+            import pandas
+
+            asset_df = pandas.read_csv("d:/fxcta.csv", index_col=0, parse_dates=['Date'],
+                                       date_parser = lambda x: pandas.datetime.strptime(x, '%Y-%m-%d'))
+
         # signalling variables
         spot_df = asset_df
         spot_df2 = None
+
+        # asset_df
 
         return asset_df, spot_df, spot_df2, basket_dict
 

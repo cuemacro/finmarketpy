@@ -185,7 +185,7 @@ if __name__ == '__main__':
         strategy.plot_strategy_group_pnl_trades()           # plot the individual trade P&Ls
         strategy.plot_strategy_group_benchmark_pnl()        # plot all the cumulative P&Ls of each component
         strategy.plot_strategy_group_leverage()             # plot all the individual leverages
-        strategy.plot_strategy_group_benchmark_annualised_pnl()
+        # strategy.plot_strategy_group_benchmark_annualised_pnl() TODO
 
     # create a FX CTA strategy, then examine how P&L changes with different vol targeting
     # and later transaction costs

@@ -45,6 +45,8 @@ from pythalesians.util.constants import Constants
 
 class StrategyTemplate:
 
+    DEFAULT_PLOT_ENGINE = 'pythalesians'
+
     # to be implemented by every trading strategy
     @abc.abstractmethod
     def fill_backtest_request(self):
@@ -322,7 +324,7 @@ class StrategyTemplate:
         gp = self.create_graph_properties("Leverage", "Individual Leverage")
 
         try:
-            pf.plot_line_graph(self.reduce_plot(self._individual_leverage), adapter = 'pythalesians', gp = gp)
+            pf.plot_line_graph(self.reduce_plot(self._individual_leverage), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
         except: pass
 
     def plot_strategy_group_pnl_trades(self):
@@ -337,7 +339,7 @@ class StrategyTemplate:
         # note only works with single large basket trade
         try:
             strategy_pnl_trades = self._strategy_pnl_trades.fillna(0) * 100 * 100
-            pf.plot_line_graph(self.reduce_plot(strategy_pnl_trades), adapter = 'pythalesians', gp = gp)
+            pf.plot_line_graph(self.reduce_plot(strategy_pnl_trades), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
         except: pass
 
     def plot_strategy_pnl(self):
@@ -346,7 +348,7 @@ class StrategyTemplate:
         gp = self.create_graph_properties("", "Strategy PnL")
 
         try:
-            pf.plot_line_graph(self.reduce_plot(self._strategy_pnl), adapter = 'pythalesians', gp = gp)
+            pf.plot_line_graph(self.reduce_plot(self._strategy_pnl), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
         except: pass
 
     def plot_strategy_signal_proportion(self, strip = None):
@@ -384,10 +386,12 @@ class StrategyTemplate:
 
         try:
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
-            pf.plot_bar_graph(self.reduce_plot(df), adapter = 'pythalesians', gp = gp)
+            gp.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).html'
+            pf.plot_bar_graph(self.reduce_plot(df), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
-            pf.plot_bar_graph(self.reduce_plot(df_trades), adapter = 'pythalesians', gp = gp)
+            gp.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).html'
+            pf.plot_bar_graph(self.reduce_plot(df_trades), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
         except: pass
 
     def plot_strategy_leverage(self):
@@ -397,7 +401,7 @@ class StrategyTemplate:
         gp = self.create_graph_properties("Leverage", "Strategy Leverage")
 
         try:
-            pf.plot_line_graph(self.reduce_plot(self._strategy_leverage), adapter = 'pythalesians', gp = gp)
+            pf.plot_line_graph(self.reduce_plot(self._strategy_leverage), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
         except: pass
 
     def plot_strategy_group_benchmark_pnl(self, strip = None):
@@ -411,7 +415,7 @@ class StrategyTemplate:
             self.logger.info(line)
 
         # plot cumulative line of returns
-        pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_pnl), adapter = 'pythalesians', gp = gp)
+        pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_pnl), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
         # needs write stats flag turned on
         try:
@@ -425,11 +429,12 @@ class StrategyTemplate:
             ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
             # ret_stats = ret_stats.sort_index()
             gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + gp.SCALE_FACTOR + '.png'
+            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + gp.SCALE_FACTOR + '.html'
 
             gp.display_brand_label = False
 
             # plot ret stats
-            pf.plot_bar_graph(ret_stats, adapter = 'pythalesians', gp = gp)
+            pf.plot_bar_graph(ret_stats, adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
         except: pass
 
@@ -444,7 +449,7 @@ class StrategyTemplate:
 
         gp.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
 
-        pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), adapter = 'pythalesians', gp = gp)
+        pf.plot_line_graph(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
     def plot_strategy_group_leverage(self):
         pf = PlotFactory()
@@ -452,7 +457,7 @@ class StrategyTemplate:
 
         gp = self.create_graph_properties("Leverage", "Group Leverage")
 
-        pf.plot_line_graph(self.reduce_plot(self._strategy_group_leverage), adapter = 'pythalesians', gp = gp)
+        pf.plot_line_graph(self.reduce_plot(self._strategy_group_leverage), adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
     def plot_strategy_signals(self, date = None, strip = None):
 
@@ -468,12 +473,10 @@ class StrategyTemplate:
         if strip is not None:
             last_day.index = [x.replace(strip, '') for x in last_day.index]
 
-        print(last_day)
-
         pf = PlotFactory()
         gp = self.create_graph_properties("positions (% portfolio notional)", "Positions")
 
-        pf.plot_generic_graph(last_day, adapter = 'pythalesians', type = 'bar', gp = gp)
+        pf.plot_generic_graph(last_day, adapter = self.DEFAULT_PLOT_ENGINE, type = 'bar', gp = gp)
 
     def create_graph_properties(self, title, file_add):
         gp = GraphProperties()
@@ -481,7 +484,11 @@ class StrategyTemplate:
         gp.title = self.FINAL_STRATEGY + " " + title
         gp.display_legend = True
         gp.scale_factor = self.SCALE_FACTOR
-        gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_add + ') ' + str(gp.scale_factor) + '.png'
+
+        if self.DEFAULT_PLOT_ENGINE != 'cufflinks':
+            gp.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_add + ') ' + str(gp.scale_factor) + '.png'
+
+        gp.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_add + ') ' + str(gp.scale_factor) + '.html'
 
         try:
             gp.silent_display = self.SILENT_DISPLAY

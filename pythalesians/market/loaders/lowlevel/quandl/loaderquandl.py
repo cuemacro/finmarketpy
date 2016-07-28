@@ -54,6 +54,7 @@ class LoaderQuandl(LoaderTemplate):
             # we can often get multiple fields returned (even if we don't ask for them!)
             # convert to lower case
             returned_fields = [(x.split(' - ')[1]).lower().replace(' ', '-') for x in returned_tickers]
+            returned_fields = [x.replace('value', 'close') for x in returned_fields]    # special case for close
 
             returned_tickers = [x.replace('.', '/') for x in returned_tickers]
             returned_tickers = [x.split(' - ')[0] for x in returned_tickers]

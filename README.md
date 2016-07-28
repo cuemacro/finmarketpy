@@ -188,7 +188,7 @@ More generally, we want to:
 
 # Coding log
 
-* 28 Jul 2016 - Fixed issue with multiple fields returned by Quandl
+* 28 Jul 2016 - Fixed issue with multiple fields returned by Quandl, added Quandl downloading example
 * 26 Jul 2016 - Added more support for Plotly charts, added surface vol Plotly example
 * 21 Jul 2016 - Refactor StrategyTemplate graph plotting functions
 * 20 Jul 2016 - Return of figure handle for AdapterPyThalesians

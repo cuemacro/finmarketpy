@@ -15,7 +15,7 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 """
 quandldata_examples
 
-Gives several examples of how to download market data from Quandl using LightTimeSeriesFactory.
+Gives several examples of how to download market data from Quandl using LightTimeSeriesFactory, with multiple fields.
 Also uses PlotFactory to do basic plots.
 
 """
@@ -62,6 +62,27 @@ if True:
 
         pf = PlotFactory()
         pf.plot_line_graph(df, adapter = 'pythalesians')
+
+    ###### download monthly quandl data for Total US nonfarm payrolls
+    if True:
+        time_series_request = TimeSeriesRequest(
+            start_date="01 Jan 1940",  # start date
+            finish_date=datetime.date.today(),  # finish date
+            freq='daily',  # daily data
+            data_source='quandl',  # use quandl as data source
+            tickers=['US Total Nonfarm Payrolls'],  # ticker (Thalesians)
+            fields=['close'],  # which fields to download
+            vendor_tickers=['FRED/PAYEMS'],  # ticker (quandl)
+            vendor_fields=['close'],  # which quandl fields to download
+            cache_algo='internet_load_return')  # how to return data
+
+        ltsf = LightTimeSeriesFactory()
+
+        df = None
+        df = ltsf.harvest_time_series(time_series_request)
+
+        pf = PlotFactory()
+        pf.plot_line_graph(df, adapter='plotly')
 
 
 

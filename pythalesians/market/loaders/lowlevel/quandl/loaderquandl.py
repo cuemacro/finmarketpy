@@ -51,11 +51,14 @@ class LoaderQuandl(LoaderTemplate):
 
         if data_frame is not None:
             # tidy up tickers into a format that is more easily translatable
-            returned_tickers = [x.replace(' - Value', '') for x in returned_tickers]
-            returned_tickers = [x.replace(' - VALUE', '') for x in returned_tickers]
-            returned_tickers = [x.replace('.', '/') for x in returned_tickers]
+            # we can often get multiple fields returned (even if we don't ask for them!)
+            # convert to lower case
+            returned_fields = [(x.split(' - ')[1]).lower().replace(' ', '-') for x in returned_tickers]
 
-            fields = self.translate_from_vendor_field(['close' for x in returned_tickers], time_series_request)
+            returned_tickers = [x.replace('.', '/') for x in returned_tickers]
+            returned_tickers = [x.split(' - ')[0] for x in returned_tickers]
+
+            fields = self.translate_from_vendor_field(returned_fields, time_series_request)
             tickers = self.translate_from_vendor_ticker(returned_tickers, time_series_request)
 
             ticker_combined = []

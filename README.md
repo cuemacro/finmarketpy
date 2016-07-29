@@ -8,7 +8,8 @@ At present the PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets (including cross sectional style trading strategies)
 * Sensitivity analysis for systematic trading strategies parameters
 * Seamless historic data downloading from Bloomberg (requires licence), Yahoo, Quandl, Dukascopy and other market data sources
-* Produces beautiful line plots with PyThalesians wrapper (via Matplotlib), Plotly (via cufflinks) and a simple wrapper for Bokeh
+* Produces beautiful line plots with PyThalesians Graphics wrapper (via Matplotlib), Plotly (via cufflinks) and a simple wrapper for Bokeh
+* Planning to spin out PyThalesians Graphics into a different library
 * Analyse seasonality analysis of markets
 * Calculates some technical indicators and gives trading signals based on these
 * Helper functions built on top of Pandas
@@ -188,7 +189,8 @@ More generally, we want to:
 
 # Coding log
 
-* 29 Jul 2016 - Created Jupyter notebook plot_market_data for plotting with multiple libraries, also fixed Bokeh sizing issue
+* 29 Jul 2016 - Created Jupyter notebook plot_market_data for plotting with multiple libraries, also fixed Bokeh sizing issue,
+refactored library, spinning out chart functionality into pythalesians_graphics
 * 28 Jul 2016 - Fixed issue with multiple fields returned by Quandl, added Quandl downloading example
 * 26 Jul 2016 - Added more support for Plotly charts, added surface vol Plotly example
 * 21 Jul 2016 - Refactor StrategyTemplate graph plotting functions

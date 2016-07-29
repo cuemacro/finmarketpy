@@ -188,6 +188,7 @@ More generally, we want to:
 
 # Coding log
 
+* 29 Jul 2016 - Created Jupyter notebook plot_market_data for plotting with multiple libraries, also fixed Bokeh sizing issue
 * 28 Jul 2016 - Fixed issue with multiple fields returned by Quandl, added Quandl downloading example
 * 26 Jul 2016 - Added more support for Plotly charts, added surface vol Plotly example
 * 21 Jul 2016 - Refactor StrategyTemplate graph plotting functions

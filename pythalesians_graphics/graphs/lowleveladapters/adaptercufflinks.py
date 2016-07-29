@@ -21,9 +21,6 @@ as for PyThalesians (Matplotlib) charts.
 """
 
 import plotly
-import datetime
-
-from pythalesians.util.constants import Constants
 
 cf = None
 
@@ -33,8 +30,8 @@ except: pass
 
 import plotly.plotly
 
-from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
+from pythalesians_graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
 class AdapterCufflinks(AdapterTemplate):
 
@@ -67,7 +64,6 @@ class AdapterCufflinks(AdapterTemplate):
         # special case for choropleth which has yet to be implemented in Cufflinks
         # will likely remove this in the future
         elif chart_type == 'choropleth':
-            import plotly.plotly as py
 
             for col in data_frame.columns:
                 try:

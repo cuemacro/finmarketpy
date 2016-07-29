@@ -33,7 +33,7 @@ from pythalesians.util.calendar import Calendar
 from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 from pandas.stats.api import ols
 
-import dask.dataframe as dd
+# import dask.dataframe as dd
 
 class TimeSeriesCalcs:
 

@@ -20,14 +20,14 @@ simple line charts currently, as a proof of concept.
 
 """
 
-from bokeh.plotting import figure, output_file, show
+import numpy
 import pandas
+from bokeh.plotting import figure, output_file, show
 
-from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
+from pythalesians_graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
 from pythalesians.util.constants import Constants
 
-import numpy
 
 class AdapterBokeh(AdapterTemplate):
 
@@ -37,7 +37,14 @@ class AdapterBokeh(AdapterTemplate):
 
         if gp.chart_type is None and chart_type is None: chart_type = 'line'
 
-        scale_factor = gp.scale_factor / 2.0
+        scale_factor = gp.scale_factor
+
+        try:
+            if gp.bokeh_plot_mode == "offline_jupyter":
+                from bokeh.io import output_notebook
+                output_notebook()
+        except:
+            pass
 
         try:
             html = gp.html_file_output

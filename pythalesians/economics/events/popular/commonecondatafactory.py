@@ -20,11 +20,12 @@ country groups.
 
 """
 
-from pythalesians.util.loggermanager import LoggerManager
+import datetime
+
 from pythalesians.economics.events.histecondatafactory import HistEconDataFactory
 from pythalesians.util.constants import Constants
+from pythalesians.util.loggermanager import LoggerManager
 
-import datetime
 
 class CommonEconDataFactory:
 
@@ -58,8 +59,8 @@ class CommonEconDataFactory:
         une = self.get_UNE(start_date, finish_date, country_group, source = 'bloomberg')
         une = self.hist_econ_data_factory.grasp_coded_entry(une, -1)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()
@@ -88,8 +89,8 @@ class CommonEconDataFactory:
 
         df = self.hist_econ_data_factory.grasp_coded_entry(df, -1)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()
@@ -113,8 +114,8 @@ class CommonEconDataFactory:
         une = self.get_UNE(start_date, finish_date, country_group)
         une = self.hist_econ_data_factory.grasp_coded_entry(une, -1)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()
@@ -137,8 +138,8 @@ class CommonEconDataFactory:
         cpi = self.get_CPI_YoY(start_date, finish_date, country_group)
         cpi = self.hist_econ_data_factory.grasp_coded_entry(cpi, -1)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()
@@ -161,8 +162,8 @@ class CommonEconDataFactory:
         country_group = 'g10-ez'
         cpi = self.get_CPI_YoY(start_date, finish_date, country_group)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()
@@ -182,8 +183,8 @@ class CommonEconDataFactory:
         country_group = 'g10-ez'
         une = self.get_UNE(start_date, finish_date, country_group)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()
@@ -203,8 +204,8 @@ class CommonEconDataFactory:
         country_group = 'g10-ez'
         gdp = self.get_GDP_QoQ(start_date, finish_date, country_group)
 
-        from pythalesians.graphics.graphs.plotfactory import PlotFactory
-        from pythalesians.graphics.graphs.graphproperties import GraphProperties
+        from pythalesians_graphics.graphs import PlotFactory
+        from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
         gp = GraphProperties()
         pf = PlotFactory()

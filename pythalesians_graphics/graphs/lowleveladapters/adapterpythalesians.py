@@ -21,19 +21,18 @@ scatter plots. Like Seaborne, this wrapper seeks to make "nicer" plots than the 
 """
 
 # matplotlib based libraries
-import matplotlib.pyplot as plt
+from datetime import timedelta
+
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator, HourLocator, MinuteLocator
 from matplotlib.ticker import MultipleLocator
-from matplotlib.ticker import Formatter
 
-# for manipulating dates and maths
-from datetime import timedelta
-import numpy as np
+from pythalesians_graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from pythalesians_graphics.graphicsconstants import GraphicsConstants
 
-from pythalesians.graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
-from pythalesians.util.constants import Constants
 
 class AdapterPyThalesians(AdapterTemplate):
 
@@ -251,7 +250,7 @@ class AdapterPyThalesians(AdapterTemplate):
 
         # display in matplotlib window
         try:
-            if Constants.plotfactory_silent_display == True:
+            if GraphicsConstants.plotfactory_silent_display == True:
                 return fig
             elif gp.silent_display == False:
                 plt.show()
@@ -266,7 +265,7 @@ class AdapterPyThalesians(AdapterTemplate):
         matplotlib.rcdefaults()
 
         # first search PyThalesians styles, then try matplotlib
-        try: plt.style.use(Constants().plotfactory_pythalesians_style_sheet[gp.style_sheet])
+        try: plt.style.use(GraphicsConstants().plotfactory_pythalesians_style_sheet[gp.style_sheet])
         except: plt.style.use(gp.style_sheet)
 
         # adjust font size for scale factor
@@ -488,7 +487,7 @@ class AdapterPyThalesians(AdapterTemplate):
                     fontsize = 10 * scale_factor, color = 'white',
                     xytext = (0 * scale_factor, 15 * scale_factor), textcoords = 'offset points',
                     va = "center", ha = "center",
-                    bbox = dict(boxstyle = "round,pad=0.4", facecolor = Constants().plotfactory_brand_colour))
+                    bbox = dict(boxstyle = "round,pad=0.4", facecolor = GraphicsConstants().plotfactory_brand_colour))
 
 
 

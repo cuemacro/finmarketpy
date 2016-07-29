@@ -19,10 +19,11 @@ Properties for graphs plotted in the PlotFactory. Defined properties for every f
 
 """
 
-from pythalesians.util.loggermanager import LoggerManager
-from pythalesians.util.constants import Constants
-
 import datetime
+
+from pythalesians_graphics.graphicsconstants import GraphicsConstants
+from pythalesians.util.loggermanager import LoggerManager
+
 
 class GraphProperties:
 
@@ -44,10 +45,10 @@ class GraphProperties:
         exclude_from_color = [],
 
         # display sizes
-        scale_factor = Constants().plotfactory_scale_factor,
-        dpi = Constants().plotfactory_dpi,
-        width = Constants().plotfactory_width,
-        height = Constants().plotfactory_height,
+        scale_factor = GraphicsConstants().plotfactory_scale_factor,
+        dpi = GraphicsConstants().plotfactory_dpi,
+        width = GraphicsConstants().plotfactory_width,
+        height = GraphicsConstants().plotfactory_height,
         resample = None,
 
         # lines and multiple y-axis
@@ -59,11 +60,11 @@ class GraphProperties:
         line_of_best_fit = False,
 
         # labelling of sources
-        brand_label = Constants().plotfactory_brand_label,
-        display_brand_label = Constants().plotfactory_display_brand_label,
-        source = Constants().plotfactory_source,
+        brand_label = GraphicsConstants().plotfactory_brand_label,
+        display_brand_label = GraphicsConstants().plotfactory_display_brand_label,
+        source = GraphicsConstants().plotfactory_source,
         source_color = 'black',
-        display_source_label =  Constants().plotfactory_display_source_label,
+        display_source_label =  GraphicsConstants().plotfactory_display_source_label,
         display_legend = True,
 
         # display output
@@ -78,17 +79,20 @@ class GraphProperties:
         # plotly only
         plotly_url = None,
         plotly_as_image = False,
-        plotly_username = Constants().plotly_default_username,
+        plotly_username = GraphicsConstants().plotly_default_username,
         plotly_api_key = None,
-        plotly_world_readable = Constants().plotly_world_readable,
+        plotly_world_readable = GraphicsConstants().plotly_world_readable,
         plotly_theme = None,
-        plotly_plot_mode = Constants().plotly_plot_mode,
+        plotly_plot_mode = GraphicsConstants().plotly_plot_mode,
+
+        # bokeh
+        bokeh_plot_mode = GraphicsConstants().bokeh_plot_mode,
 
         # plotly choropleth fields
 
 
         # matplotlib only
-        style_sheet = Constants().plotfactory_default_stylesheet,
+        style_sheet = GraphicsConstants().plotfactory_default_stylesheet,
         convert_matplotlib_to_plotly = False
                  ):
 
@@ -141,6 +145,9 @@ class GraphProperties:
         self.html_file_output = html_file_output
         self.display_mpld3 = display_mpld3
 
+        # bokeh only
+        self.bokeh_plot_mode = bokeh_plot_mode  # 'online', 'offline_html', 'offline_jupyter'
+
         # plotly only
         if plotly_url is None:
             plotly_url = title + datetime.datetime.utcnow().strftime("%b-%d-%Y-%H-%M-%S")
@@ -149,9 +156,9 @@ class GraphProperties:
         self.plotly_as_image = plotly_as_image
         self.plotly_username = plotly_username
 
-        # try to get API key from constants file
+        # try to get API key from GraphicsConstants file
         try:
-            if plotly_api_key is None: plotly_api_key = Constants().plotly_creds[plotly_username]
+            if plotly_api_key is None: plotly_api_key = GraphicsConstants().plotly_creds[plotly_username]
         except: pass
 
         self.plotly_api_key = plotly_api_key
@@ -356,7 +363,7 @@ class GraphProperties:
     def plotly_username(self, plotly_username):
         self.__plotly_username = plotly_username
         try:
-            self.plotly_api_key = Constants().plotly_creds[plotly_username]
+            self.plotly_api_key = GraphicsConstants().plotly_creds[plotly_username]
         except: pass
     
     @property
@@ -381,6 +388,14 @@ class GraphProperties:
     @plotly_plot_mode.setter
     def plotly_plot_mode(self, plotly_plot_mode):
         self.__plotly_plot_mode = plotly_plot_mode
+
+    @property
+    def bokeh_plot_mode(self):
+        return self.__bokeh_plot_mode
+
+    @bokeh_plot_mode.setter
+    def bokeh_plot_mode(self, bokeh_plot_mode):
+        self.__bokeh_plot_mode = bokeh_plot_mode
 
     ###### matplotlib specific settings
     @property

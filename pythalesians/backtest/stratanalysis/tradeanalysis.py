@@ -27,19 +27,21 @@ try:
 except: pass
 
 import datetime
-import pandas
-
-from pythalesians.util.loggermanager import LoggerManager
-from pythalesians.timeseries.calcs.timeseriestimezone import TimeSeriesTimezone
-from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
-from pythalesians.util.constants import Constants
-
-from pythalesians.backtest.cash.cashbacktest import CashBacktest
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas
+
+from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
+
+from pythalesians.backtest.cash.cashbacktest import CashBacktest
+from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+from pythalesians.timeseries.calcs.timeseriestimezone import TimeSeriesTimezone
+from pythalesians.util.constants import Constants
+from pythalesians.util.loggermanager import LoggerManager
+
+
 
 class TradeAnalysis:
 

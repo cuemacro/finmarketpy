@@ -20,14 +20,12 @@ Creates simple statistical reports (via plots) on time series, outputting result
 
 """
 
-from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
-
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
-
-from pythalesians.util.constants import Constants
-
 import pandas
+from pythalesians.graphics.graphs.plotfactory import PlotFactory
+
+from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+from pythalesians.util.constants import Constants
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
 tsc = TimeSeriesCalcs()
 

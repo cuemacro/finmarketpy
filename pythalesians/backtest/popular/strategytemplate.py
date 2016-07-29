@@ -24,24 +24,15 @@ strategy.
 import abc
 
 import pandas
-import numpy
 
-from pythalesians.util.loggermanager import LoggerManager
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from pythalesians_graphics.graphs.plotfactory import PlotFactory
 
 from pythalesians.backtest.cash.cashbacktest import CashBacktest
-
-from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.timeseries.calcs.timeseriesdesc import TimeSeriesDesc
-
+from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
 from pythalesians.timeseries.techind.techparams import TechParams
-
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
-
-from collections import OrderedDict
-
-from pythalesians.util.constants import Constants
 
 class StrategyTemplate:
 

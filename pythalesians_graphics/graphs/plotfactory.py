@@ -22,19 +22,22 @@ Plotly, Cufflinks (Plotly wrapper), Seaborne (Matplotlib wrapper)
 
 """
 
-from pythalesians.graphics.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
-from pythalesians.graphics.graphs.lowleveladapters.adaptercufflinks import AdapterCufflinks
-from pythalesians.graphics.graphs.lowleveladapters.adapterbokeh import AdapterBokeh
+from pythalesians_graphics.graphs.lowleveladapters.adapterbokeh import AdapterBokeh
+from pythalesians_graphics.graphs.lowleveladapters.adaptercufflinks import AdapterCufflinks
+from pythalesians_graphics.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
 
-from pythalesians.util.twitterpythalesians import TwitterPyThalesians
+# pythalesians dependencies are optional
+try:
+    from pythalesians.util.twitterpythalesians import TwitterPyThalesians
+    from pythalesians.market.loaders.timeseriesio import TimeSeriesIO
+except:
+    pass
 
-from pythalesians.market.loaders.timeseriesio import TimeSeriesIO
-
-from pythalesians.util.constants import Constants
+from pythalesians_graphics.graphicsconstants import GraphicsConstants
 
 class PlotFactory:
 
-    default_adapter = Constants().plotfactory_default_adapter
+    default_adapter = GraphicsConstants().plotfactory_default_adapter
     
     def __init__(self):
         pass
@@ -87,7 +90,7 @@ class PlotFactory:
             return AdapterPyThalesians()
 
         elif adapter == 'seaborn':
-            from pythalesians.graphics.graphs.lowleveladapters.adapterseaborn import AdapterSeaborn
+            from pythalesians_graphics import AdapterSeaborn
             return AdapterSeaborn()
 
         elif adapter == 'bokeh':

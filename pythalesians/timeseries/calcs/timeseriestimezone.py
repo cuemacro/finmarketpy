@@ -96,6 +96,12 @@ class TimeSeriesTimezone:
 
         return data_frame
 
+    def localise_index_as_london_time(self, data_frame):
+        london = pytz.timezone('Europe/London')
+        data_frame = data_frame.tz_localize(london)
+
+        return data_frame
+
     def set_as_no_timezone(self, data_frame):
         data_frame.index.tz = None
         return data_frame

@@ -164,6 +164,7 @@ For the UK election Plot.ly code - please visit https://github.com/plotly/IPytho
 # Future Plans for PyThalesians
 
 We plan to add the following features:
+* Spin out PyThalesians Graphics into different project
 * Have a proper setup mechanism (eg. via pip), at present needs (partial) manual deployment
 * Add Plotly & Seaborn wrappers for plotting (partially there)
 * Improve support for Bokeh plotting (partially)

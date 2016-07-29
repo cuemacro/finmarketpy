@@ -117,8 +117,16 @@ class AdapterCufflinks(AdapterTemplate):
 
             fig = dict( data=data, layout=layout )
 
-        # check other plots implemented by Cufflinks
 
+        scale = 1
+
+        try:
+            if (gp.plotly_plot_mode == 'offline_html'):
+                scale = 2/3
+        except:
+            pass
+
+        # check other plots implemented by Cufflinks
         if fig is None:
 
             # special case for surface (given coloring)
@@ -135,7 +143,7 @@ class AdapterCufflinks(AdapterTemplate):
                     bestfit=gp.line_of_best_fit,
                     legend=gp.display_legend,
                     colorscale=gp.color,
-                    dimensions=(gp.width * gp.scale_factor * 2/3, gp.height * gp.scale_factor * 2/3),
+                    dimensions=(gp.width * gp.scale_factor * scale, gp.height * gp.scale_factor * scale),
                     asFigure=True)
             else:
                 # get all the correct colors (and construct gradients if necessary eg. from 'Blues')
@@ -165,7 +173,7 @@ class AdapterCufflinks(AdapterTemplate):
                     bestfit=gp.line_of_best_fit,
                     legend=gp.display_legend,
                     color=color_spec,
-                    dimensions=(gp.width * gp.scale_factor * 2/3, gp.height * gp.scale_factor * 2/3),
+                    dimensions=(gp.width * gp.scale_factor * scale, gp.height * gp.scale_factor * scale),
                     asFigure=True)
 
         self.publish_plot(fig, gp)

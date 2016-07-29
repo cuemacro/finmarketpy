@@ -1,4 +1,4 @@
-__author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
+__author__ = 'saeedamen' # Saeed Amen / saeed@pythalesians.com
 
 #
 # Copyright 2015 Thalesians Ltd. - http//www.pythalesians.com / @pythalesians
@@ -24,8 +24,7 @@ import os
 class GraphicsConstants:
 
     ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER
-    root_pythalesians_graphics_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\',
-                                                                                                            '/') + "/pythalesians_graphics/"
+    root_pythalesians_graphics_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + "/pythalesians_graphics/"
 
     # for plots
     plotfactory_silent_display = False
@@ -43,12 +42,11 @@ class GraphicsConstants:
 
     plotfactory_default_stylesheet = "pythalesians"
 
-    plotfactory_pythalesians_style_sheet = {
-        "pythalesians": root_pythalesians_graphics_folder + "conf/stylesheets/pythalesians.mplstyle",
-        "538-pythalesians": root_pythalesians_graphics_folder + "conf/stylesheets/538-pythalesians.mplstyle",
-        "miletus-pythalesians": root_pythalesians_graphics_folder + "conf/stylesheets/miletus-pythalesians.mplstyle",
-        "ggplot-pythalesians": root_pythalesians_graphics_folder + "conf/stylesheets/ggplot-pythalesians.mplstyle",
-        "ggplot-traditional": root_pythalesians_graphics_folder + "conf/stylesheets/ggplot-traditional.mplstyle"}
+    plotfactory_pythalesians_style_sheet = {"pythalesians" : root_pythalesians_graphics_folder + "conf/stylesheets/pythalesians.mplstyle",
+                                            "538-pythalesians" : root_pythalesians_graphics_folder + "conf/stylesheets/538-pythalesians.mplstyle",
+                                            "miletus-pythalesians" : root_pythalesians_graphics_folder + "conf/stylesheets/miletus-pythalesians.mplstyle",
+                                            "ggplot-pythalesians" : root_pythalesians_graphics_folder + "conf/stylesheets/ggplot-pythalesians.mplstyle",
+                                            "ggplot-traditional" : root_pythalesians_graphics_folder + "conf/stylesheets/ggplot-traditional.mplstyle"}
 
     plotfactory_scale_factor = 3
     plotfactory_dpi = 100
@@ -75,15 +73,14 @@ class GraphicsConstants:
     ########## API KEYS
 
     # Plotly default username
-    # Plotly default username
-    plotly_default_username = 'thalesians'
+    plotly_default_username = 'argonautae'
 
     # Plotly settings (username : api_key)
-    plotly_creds = {"x": "x",
-                    "x1": "x1"
+    plotly_creds = {"argonautae" : "80pck28kqo",
+                    "thalesians" : "7ph55psbkw"
                     }
 
-    plotly_streaming_key = "x2"
+    plotly_streaming_key = "murp1zhvit"
 
     ##### Colors for plotting
     # 'red'   :   '#E24A33',

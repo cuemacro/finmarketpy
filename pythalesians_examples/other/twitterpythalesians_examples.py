@@ -35,8 +35,8 @@ if True:
 
     import datetime
 
-    from pythalesians.graphics.graphs.plotfactory import PlotFactory
-    from pythalesians.graphics.graphs.graphproperties import GraphProperties
+    from pythalesians_graphics.graphs import PlotFactory
+    from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
     end = datetime.datetime.utcnow()
     start_date = end.replace(hour=0, minute=0, second=0, microsecond=0) # Returns a copy

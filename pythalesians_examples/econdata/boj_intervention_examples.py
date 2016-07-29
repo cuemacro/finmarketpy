@@ -20,18 +20,14 @@ Shows how to plot data from FRED on BoJ intervention in USDJPY against USDJPY gr
 """
 
 # for logging
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from pythalesians_graphics.graphs.plotfactory import PlotFactory
+
+from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
+from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.util.loggermanager import LoggerManager
 
-# to download market data
-from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
-from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
-
-# for plotting graphs
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
-
 # for making elementary calculations on the time series
-from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 
 if True:
     logger = LoggerManager().getLogger(__name__)

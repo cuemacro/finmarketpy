@@ -25,7 +25,7 @@ if True:
     from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
     from pythalesians.timeseries.techind.techindicator import TechIndicator
     from pythalesians.timeseries.techind.techparams import TechParams
-    from pythalesians.graphics.graphs.plotfactory import PlotFactory
+    from pythalesians_graphics.graphs.plotfactory import PlotFactory
 
     import datetime
 

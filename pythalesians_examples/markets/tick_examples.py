@@ -20,19 +20,14 @@ Gives several examples of how to get tick data from Bloomberg
 """
 
 # for logging
-from pythalesians.util.loggermanager import LoggerManager
+from pythalesians_graphics.graphs.plotfactory import PlotFactory
 
-# to download market data
-from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
-from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
-
-# for plotting graphs
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
-
-# for making elementary calculations on the time series
+from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+from pythalesians.timeseries.calcs.timeseriesfilter import TimeSeriesFilter
+from pythalesians.util.loggermanager import LoggerManager
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
 if True:
     logger = LoggerManager().getLogger(__name__)

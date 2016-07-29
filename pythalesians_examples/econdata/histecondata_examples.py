@@ -31,10 +31,10 @@ download the data).
 """
 
 import datetime
-from pythalesians.util.loggermanager import LoggerManager
 
 from pythalesians.economics.events.histecondatafactory import HistEconDataFactory
 from pythalesians.economics.events.popular.commonecondatafactory import CommonEconDataFactory
+from pythalesians.util.loggermanager import LoggerManager
 
 # just change "False" to "True" to run any of the below examples
 
@@ -67,8 +67,8 @@ if False:
 
     df = hist.grasp_coded_entry(df, -1)
 
-    from pythalesians.graphics.graphs.plotfactory import PlotFactory
-    from pythalesians.graphics.graphs.graphproperties import GraphProperties
+    from pythalesians_graphics.graphs import PlotFactory
+    from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
     gp = GraphProperties()
     pf = PlotFactory()

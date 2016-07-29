@@ -21,12 +21,14 @@ Shows how to plot using Bokeh library.
 """
 
 import datetime
+
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from pythalesians_graphics.graphs.plotfactory import PlotFactory
+
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
 
 # just change "False" to "True" to run any of the below examples
 

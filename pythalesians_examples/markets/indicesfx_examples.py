@@ -20,22 +20,17 @@ Examples on how to create total return indices using PyThalesians
 """
 
 # for logging
-from pythalesians.util.loggermanager import LoggerManager
+import copy
 
-# to download market data
-from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
-from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
+from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from pythalesians_graphics.graphs.graphproperties import GraphProperties
 
 from pythalesians.market.indices.indicesfx import IndicesFX
-
-# for plotting graphs
-from pythalesians.graphics.graphs.plotfactory import PlotFactory
-from pythalesians.graphics.graphs.graphproperties import GraphProperties
-
-# for making elementary calculations on the time series
+from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
+from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
+from pythalesians.util.loggermanager import LoggerManager
 
-import copy
 
 if True:
     logger = LoggerManager().getLogger(__name__)

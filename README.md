@@ -23,7 +23,8 @@ documented
 
 The Chartesians graphics engine, provides easy to use wrappers for doing simple plots with multiple backend chart libraries
 such as Matplotlib, Plotly (via cufflinks) and Bokeh, without having to learn all the different APIs. We are planning to
-spinout Chartesians into a separate project over time.
+spinout Chartesians into a separate project over time. The PyThalesians project uses the graphics capabilities
+of Chartesians extensively.
 
 # Gallery
 

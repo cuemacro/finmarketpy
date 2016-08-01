@@ -24,7 +24,7 @@ import os
 class GraphicsConstants:
 
     ###### CHANGE THIS TO REFER TO YOUR OWN ROOT FOLDER
-    root_pythalesians_graphics_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + "/pythalesians_graphics/"
+    root_pythalesians_graphics_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + "/chartesians/"
 
     # for plots
     plotfactory_silent_display = False

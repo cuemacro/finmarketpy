@@ -30,8 +30,8 @@ except: pass
 
 import plotly.plotly
 
-from pythalesians_graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from chartesians.graphs.graphproperties import GraphProperties
 
 class AdapterCufflinks(AdapterTemplate):
 

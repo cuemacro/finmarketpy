@@ -24,8 +24,8 @@ import numpy
 import pandas
 from bokeh.plotting import figure, output_file, show
 
-from pythalesians_graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from chartesians.graphs.graphproperties import GraphProperties
 from pythalesians.util.constants import Constants
 
 

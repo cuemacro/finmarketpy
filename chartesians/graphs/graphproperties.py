@@ -21,7 +21,7 @@ Properties for graphs plotted in the PlotFactory. Defined properties for every f
 
 import datetime
 
-from pythalesians_graphics.graphicsconstants import GraphicsConstants
+from chartesians.graphicsconstants import GraphicsConstants
 from pythalesians.util.loggermanager import LoggerManager
 
 

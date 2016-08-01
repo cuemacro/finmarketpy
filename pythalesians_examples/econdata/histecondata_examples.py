@@ -67,8 +67,8 @@ if False:
 
     df = hist.grasp_coded_entry(df, -1)
 
-    from pythalesians_graphics.graphs import PlotFactory
-    from pythalesians_graphics.graphs.graphproperties import GraphProperties
+    from chartesians.graphs import PlotFactory
+    from chartesians.graphs.graphproperties import GraphProperties
 
     gp = GraphProperties()
     pf = PlotFactory()

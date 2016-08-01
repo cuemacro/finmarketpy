@@ -29,9 +29,9 @@ import numpy as np
 from matplotlib.dates import YearLocator, MonthLocator, DayLocator, HourLocator, MinuteLocator
 from matplotlib.ticker import MultipleLocator
 
-from pythalesians_graphics.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
-from pythalesians_graphics.graphicsconstants import GraphicsConstants
+from chartesians.graphs.lowleveladapters.adaptertemplate import AdapterTemplate
+from chartesians.graphs.graphproperties import GraphProperties
+from chartesians.graphicsconstants import GraphicsConstants
 
 
 class AdapterPyThalesians(AdapterTemplate):

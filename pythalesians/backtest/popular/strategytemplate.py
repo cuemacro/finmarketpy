@@ -25,8 +25,8 @@ import abc
 
 import pandas
 
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
 
 from pythalesians.backtest.cash.cashbacktest import CashBacktest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs

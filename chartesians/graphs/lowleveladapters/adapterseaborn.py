@@ -2,8 +2,8 @@ __author__ = 'saeedamen'
 
 import seaborn as sns
 
-from pythalesians_graphics.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.lowleveladapters.adapterpythalesians import AdapterPyThalesians
+from chartesians.graphs.graphproperties import GraphProperties
 
 class AdapterSeaborn(AdapterPyThalesians):
 

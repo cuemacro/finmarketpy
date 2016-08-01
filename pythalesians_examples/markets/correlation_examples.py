@@ -20,8 +20,8 @@ Gives several examples of how to compute and plot correlations of assets.
 """
 
 # for logging
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
 
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest

@@ -22,8 +22,8 @@ Examples on how to create total return indices using PyThalesians
 # for logging
 import copy
 
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
 
 from pythalesians.market.indices.indicesfx import IndicesFX
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory

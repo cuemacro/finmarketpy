@@ -32,8 +32,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas
 
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
 
 from pythalesians.backtest.cash.cashbacktest import CashBacktest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs

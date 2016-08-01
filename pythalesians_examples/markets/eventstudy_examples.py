@@ -23,8 +23,8 @@ Shows how to do event studies for assets
 import pandas
 import pytz
 
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
 
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest

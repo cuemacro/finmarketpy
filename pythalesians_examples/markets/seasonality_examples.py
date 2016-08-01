@@ -22,14 +22,14 @@ Shows how to calculate some seasonal patterns in markets using PyThalesians (Sea
 # loading data
 import datetime
 
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.plotfactory import PlotFactory
 
 from pythalesians.economics.seasonality.seasonality import Seasonality
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.util.loggermanager import LoggerManager
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
+from chartesians.graphs.graphproperties import GraphProperties
 
 seasonality = Seasonality()
 tsc = TimeSeriesCalcs()

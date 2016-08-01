@@ -21,8 +21,8 @@ Shows how to plot using Plotly library (uses Jorge Santos' Cufflinks wrapper)
 
 import datetime
 
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
 
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest

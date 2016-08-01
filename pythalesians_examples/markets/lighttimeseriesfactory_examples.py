@@ -27,8 +27,8 @@ from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFa
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
 
 if True:
     logger = LoggerManager().getLogger(__name__)

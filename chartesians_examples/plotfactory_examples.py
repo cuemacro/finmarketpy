@@ -20,8 +20,8 @@ Examples to show how to use PlotFactory to make charts (at present only line cha
 """
 import datetime
 
-from pythalesians_graphics.graphs.graphproperties import GraphProperties
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.graphproperties import GraphProperties
+from chartesians.graphs.plotfactory import PlotFactory
 
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest

@@ -21,7 +21,7 @@ Also uses PlotFactory to do basic plots.
 """
 
 # for logging
-from pythalesians_graphics.graphs.plotfactory import PlotFactory
+from chartesians.graphs.plotfactory import PlotFactory
 
 from pythalesians.market.loaders.lighttimeseriesfactory import LightTimeSeriesFactory
 from pythalesians.market.requests.timeseriesrequest import TimeSeriesRequest

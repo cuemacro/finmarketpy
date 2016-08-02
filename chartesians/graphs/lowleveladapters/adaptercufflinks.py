@@ -172,6 +172,14 @@ class AdapterCufflinks(AdapterTemplate):
                     dimensions=(gp.width * gp.scale_factor * scale, gp.height * gp.scale_factor * scale),
                     asFigure=True)
 
+                fig.update(dict(layout=dict(legend=dict(
+                        x=0.05,
+                        y=1
+                    ))))
+
+                fig.update(dict(layout=dict(paper_bgcolor='rgba(0,0,0,0)')))
+                fig.update(dict(layout=dict(plot_bgcolor='rgba(0,0,0,0)')))
+
         self.publish_plot(fig, gp)
 
     def publish_plot(self, fig, gp):

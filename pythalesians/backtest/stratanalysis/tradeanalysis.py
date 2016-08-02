@@ -32,23 +32,22 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas
 
-from chartesians.graphs.plotfactory import PlotFactory
 from chartesians.graphs.graphproperties import GraphProperties
-
+from chartesians.graphs.plotfactory import PlotFactory
+from chartesians.graphicsconstants import GraphicsConstants
 from pythalesians.backtest.cash.cashbacktest import CashBacktest
 from pythalesians.timeseries.calcs.timeseriescalcs import TimeSeriesCalcs
 from pythalesians.timeseries.calcs.timeseriestimezone import TimeSeriesTimezone
-from pythalesians.util.constants import Constants
 from pythalesians.util.loggermanager import LoggerManager
-
-
 
 class TradeAnalysis:
 
     def __init__(self):
         self.logger = LoggerManager().getLogger(__name__)
         self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime("%Y%m%d") + ' '
-        self.scale_factor = 3
+        self.SCALE_FACTOR = 3
+        self.DEFAULT_PLOT_ENGINE = GraphicsConstants().plotfactory_default_adapter
+
         return
 
     def run_strategy_returns_stats(self, strategy):
@@ -72,17 +71,18 @@ class TradeAnalysis:
         except: pass
 
         # set the matplotlib style sheet & defaults
+        # at present this only works in Matplotlib engine
         try:
             matplotlib.rcdefaults()
-            plt.style.use(Constants().plotfactory_pythalesians_style_sheet['pythalesians'])
+            plt.style.use(GraphicsConstants().plotfactory_pythalesians_style_sheet['pythalesians-pyfolio'])
         except: pass
 
         # TODO for intraday strategies, make daily
 
         # convert DataFrame (assumed to have only one column) to Series
         pnl = tsc.calculate_returns(pnl)
+        pnl = pnl.dropna()
         pnl = pnl[pnl.columns[0]]
-
         fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
 
         try:
@@ -126,14 +126,14 @@ class TradeAnalysis:
             signal_df = strat.construct_signal(spot_df, spot_df2, br.tech_params, br)
 
             cash_backtest = CashBacktest()
-            self.logger.info("Calculating... " + pretty_portfolio_names[i])
+            self.logger.info("Calculating... " + str(pretty_portfolio_names[i]))
 
             cash_backtest.calculate_trading_PnL(br, asset_df, signal_df)
             tsd_list.append(cash_backtest.get_portfolio_pnl_tsd())
             stats = str(cash_backtest.get_portfolio_pnl_desc()[0])
 
             port = cash_backtest.get_cumportfolio().resample('B').mean()
-            port.columns = [pretty_portfolio_names[i] + ' ' + stats]
+            port.columns = [str(pretty_portfolio_names[i]) + ' ' + stats]
 
             if port_list is None:
                 port_list = port
@@ -148,21 +148,27 @@ class TradeAnalysis:
 
         ir = [t.inforatio()[0] for t in tsd_list]
 
-        # gp.color = 'Blues'
+        # if we have too many combinations remove legend and use scaled shaded colour
+        # if len(port_list) > 10:
+            # gp.color = 'Blues'
+            # gp.display_legend = False
+
         # plot all the variations
         gp.resample = 'B'
         gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + '.png'
-        gp.scale_factor = self.scale_factor
+        gp.html_file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + '.html'
+        gp.scale_factor = self.SCALE_FACTOR
         gp.title = strat.FINAL_STRATEGY + ' ' + parameter_type
-        pf.plot_line_graph(port_list, adapter = 'pythalesians', gp = gp)
+        pf.plot_line_graph(port_list, adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
         # plot all the IR in a bar chart form (can be easier to read!)
         gp = GraphProperties()
         gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + ' IR.png'
-        gp.scale_factor = self.scale_factor
+        gp.html_file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' ' + parameter_type + ' IR.html'
+        gp.scale_factor = self.SCALE_FACTOR
         gp.title = strat.FINAL_STRATEGY + ' ' + parameter_type
         summary = pandas.DataFrame(index = pretty_portfolio_names, data = ir, columns = ['IR'])
-        pf.plot_bar_graph(summary, adapter = 'pythalesians', gp = gp)
+        pf.plot_bar_graph(summary, adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
         return port_list
 
@@ -222,8 +228,9 @@ class TradeAnalysis:
 
         # Plotting spot over day of month/month of year
         gp.color = 'Blues'
-        gp.scale_factor = self.scale_factor
+        gp.scale_factor = self.SCALE_FACTOR
         gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' seasonality day of month.png'
+        gp.html_file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' seasonality day of month.html'
         gp.title = strat.FINAL_STRATEGY + ' day of month seasonality'
         gp.display_legend = False
         gp.color_2_series = [bus_day.columns[-1]]
@@ -232,15 +239,16 @@ class TradeAnalysis:
         gp.linewidth_2_series = [bus_day.columns[-1]]
         gp.y_axis_2_series = [bus_day.columns[-1]]
 
-        pf.plot_line_graph(bus_day, adapter = 'pythalesians', gp = gp)
+        pf.plot_line_graph(bus_day, adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
         gp = GraphProperties()
 
-        gp.scale_factor = self.scale_factor
+        gp.scale_factor = self.SCALE_FACTOR
         gp.file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' seasonality month of year.png'
+        gp.html_file_output = self.DUMP_PATH + strat.FINAL_STRATEGY + ' seasonality month of year.html'
         gp.title = strat.FINAL_STRATEGY + ' month of year seasonality'
 
-        pf.plot_line_graph(month, adapter = 'pythalesians', gp = gp)
+        pf.plot_line_graph(month, adapter = self.DEFAULT_PLOT_ENGINE, gp = gp)
 
         return month
 

@@ -15,7 +15,7 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 import abc
 
 from math import log10, floor
-from pythalesians.util.constants import Constants
+from chartesians.graphicsconstants import GraphicsConstants
 
 import matplotlib
 
@@ -144,7 +144,7 @@ class AdapterTemplate:
 
     def get_color_code(self, code):
         # redefine color names
-        dict = Constants().plotfactory_color_overwrites
+        dict = GraphicsConstants().plotfactory_color_overwrites
 
         if code in dict: return dict[code]
 

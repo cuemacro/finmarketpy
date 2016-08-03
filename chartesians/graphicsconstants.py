@@ -75,8 +75,8 @@ class GraphicsConstants:
     plotly_default_username = 'abc1'
 
     # Plotly settings (username : api_key)
-    plotly_creds = {"abc2" : "x",
-                    "abc3" : "x"
+    plotly_creds = {"abc1" : "x",
+                    "abc2" : "x"
                     }
 
     plotly_streaming_key = "x"

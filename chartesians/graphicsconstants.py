@@ -1,7 +1,7 @@
-__author__ = 'saeedamen' # Saeed Amen / saeed@pythalesians.com
+__author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 
 #
-# Copyright 2015 Thalesians Ltd. - http//www.pythalesians.com / @pythalesians
+# Copyright 2015 Thalesians Ltd. - http//www.thalesians.com / @thalesians
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -79,7 +79,6 @@ class GraphicsConstants:
     plotly_creds = {"abc2" : "x",
                     "abc3" : "x"
                     }
-
 
     plotly_streaming_key = "x"
 

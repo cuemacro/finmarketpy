@@ -69,7 +69,6 @@ class GraphicsConstants:
     plotly_world_readable = False
     plotly_plot_mode = 'offline_html' # 'online', 'offline_jupyter'
 
-
     ########## API KEYS
 
     # Plotly default username

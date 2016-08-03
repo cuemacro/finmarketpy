@@ -80,6 +80,7 @@ class GraphicsConstants:
                     "abc3" : "x"
                     }
 
+
     plotly_streaming_key = "x"
 
     ##### Colors for plotting

@@ -73,14 +73,14 @@ class GraphicsConstants:
     ########## API KEYS
 
     # Plotly default username
-    plotly_default_username = 'argonautae'
+    plotly_default_username = 'abc1'
 
     # Plotly settings (username : api_key)
-    plotly_creds = {"argonautae" : "80pck28kqo",
-                    "thalesians" : "7ph55psbkw"
+    plotly_creds = {"abc2" : "x",
+                    "abc3" : "x"
                     }
 
-    plotly_streaming_key = "murp1zhvit"
+    plotly_streaming_key = "x"
 
     ##### Colors for plotting
     # 'red'   :   '#E24A33',

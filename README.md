@@ -197,6 +197,7 @@ More generally, we want to:
 
 # Coding log
 
+* 03 Aug 2016 - Fixed missing conf files
 * 02 Aug 2016 - Changed default Plotly background color and fixed constants issue with AdapterTemplate
 * 01 Aug 2016 - Renamed pythalesians_graphics as chartesians (preparing eventual spinout)
 * 29 Jul 2016 - Created Jupyter notebook plot_market_data for plotting with multiple libraries, also fixed Bokeh sizing issue,

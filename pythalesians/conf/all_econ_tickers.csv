@@ -1,0 +1,680 @@
+Full Code,Country,Short Name,Full Name,Freq,fred,quandl,bloomberg,Prefix,Postfix
+Alabama-Total Nonfarm,Alabama,Total Nonfarm,All Employees: Total Nonfarm,Monthly,ALNA,FRED/ALNA,,AL,NA
+Alaska-Total Nonfarm,Alaska,Total Nonfarm,All Employees: Total Nonfarm,Monthly,AKNA,FRED/AKNA,,AK,NA
+Arizona-Total Nonfarm,Arizona,Total Nonfarm,All Employees: Total Nonfarm,Monthly,AZNA,FRED/AZNA,,AZ,NA
+Arkansas-Total Nonfarm,Arkansas,Total Nonfarm,All Employees: Total Nonfarm,Monthly,ARNA,FRED/ARNA,,AR,NA
+California-Total Nonfarm,California,Total Nonfarm,All Employees: Total Nonfarm,Monthly,CANA,FRED/CANA,,CA,NA
+Colorado-Total Nonfarm,Colorado,Total Nonfarm,All Employees: Total Nonfarm,Monthly,CONA,FRED/CONA,,CO,NA
+Connecticut-Total Nonfarm,Connecticut,Total Nonfarm,All Employees: Total Nonfarm,Monthly,CTNA,FRED/CTNA,,CT,NA
+Delaware-Total Nonfarm,Delaware,Total Nonfarm,All Employees: Total Nonfarm,Monthly,DENA,FRED/DENA,,DE,NA
+Florida-Total Nonfarm,Florida,Total Nonfarm,All Employees: Total Nonfarm,Monthly,FLNA,FRED/FLNA,,FL,NA
+Georgia-Total Nonfarm,Georgia,Total Nonfarm,All Employees: Total Nonfarm,Monthly,GANA,FRED/GANA,,GA,NA
+Hawaii-Total Nonfarm,Hawaii,Total Nonfarm,All Employees: Total Nonfarm,Monthly,HINA,FRED/HINA,,HI,NA
+Idaho-Total Nonfarm,Idaho,Total Nonfarm,All Employees: Total Nonfarm,Monthly,IDNA,FRED/IDNA,,ID,NA
+Illinois-Total Nonfarm,Illinois,Total Nonfarm,All Employees: Total Nonfarm,Monthly,ILNA,FRED/ILNA,,IL,NA
+Indiana-Total Nonfarm,Indiana,Total Nonfarm,All Employees: Total Nonfarm,Monthly,INNA,FRED/INNA,,IN,NA
+Iowa-Total Nonfarm,Iowa,Total Nonfarm,All Employees: Total Nonfarm,Monthly,IANA,FRED/IANA,,IA,NA
+Kansas-Total Nonfarm,Kansas,Total Nonfarm,All Employees: Total Nonfarm,Monthly,KSNA,FRED/KSNA,,KS,NA
+Kentucky-Total Nonfarm,Kentucky,Total Nonfarm,All Employees: Total Nonfarm,Monthly,KYNA,FRED/KYNA,,KY,NA
+Louisiana-Total Nonfarm,Louisiana,Total Nonfarm,All Employees: Total Nonfarm,Monthly,LANA,FRED/LANA,,LA,NA
+Maine-Total Nonfarm,Maine,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MENA,FRED/MENA,,ME,NA
+Maryland-Total Nonfarm,Maryland,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MDNA,FRED/MDNA,,MD,NA
+Massachusetts-Total Nonfarm,Massachusetts,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MANA,FRED/MANA,,MA,NA
+Michigan-Total Nonfarm,Michigan,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MINA,FRED/MINA,,MI,NA
+Minnesota-Total Nonfarm,Minnesota,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MNNA,FRED/MNNA,,MN,NA
+Mississippi-Total Nonfarm,Mississippi,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MSNA,FRED/MSNA,,MS,NA
+Missouri-Total Nonfarm,Missouri,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MONA,FRED/MONA,,MO,NA
+Montana-Total Nonfarm,Montana,Total Nonfarm,All Employees: Total Nonfarm,Monthly,MTNA,FRED/MTNA,,MT,NA
+Nebraska-Total Nonfarm,Nebraska,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NENA,FRED/NENA,,NE,NA
+Nevada-Total Nonfarm,Nevada,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NVNA,FRED/NVNA,,NV,NA
+New Hampshire-Total Nonfarm,New Hampshire,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NHNA,FRED/NHNA,,NH,NA
+New Jersey-Total Nonfarm,New Jersey,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NJNA,FRED/NJNA,,NJ,NA
+New Mexico-Total Nonfarm,New Mexico,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NMNA,FRED/NMNA,,NM,NA
+New York-Total Nonfarm,New York,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NYNA,FRED/NYNA,,NY,NA
+North Carolina-Total Nonfarm,North Carolina,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NCNA,FRED/NCNA,,NC,NA
+North Dakota-Total Nonfarm,North Dakota,Total Nonfarm,All Employees: Total Nonfarm,Monthly,NDNA,FRED/NDNA,,ND,NA
+Ohio-Total Nonfarm,Ohio,Total Nonfarm,All Employees: Total Nonfarm,Monthly,OHNA,FRED/OHNA,,OH,NA
+Oklahoma-Total Nonfarm,Oklahoma,Total Nonfarm,All Employees: Total Nonfarm,Monthly,OKNA,FRED/OKNA,,OK,NA
+Oregon-Total Nonfarm,Oregon,Total Nonfarm,All Employees: Total Nonfarm,Monthly,ORNA,FRED/ORNA,,OR,NA
+Pennsylvania-Total Nonfarm,Pennsylvania,Total Nonfarm,All Employees: Total Nonfarm,Monthly,PANA,FRED/PANA,,PA,NA
+Rhode Island-Total Nonfarm,Rhode Island,Total Nonfarm,All Employees: Total Nonfarm,Monthly,RINA,FRED/RINA,,RI,NA
+South Carolina-Total Nonfarm,South Carolina,Total Nonfarm,All Employees: Total Nonfarm,Monthly,SCNA,FRED/SCNA,,SC,NA
+South Dakota-Total Nonfarm,South Dakota,Total Nonfarm,All Employees: Total Nonfarm,Monthly,SDNA,FRED/SDNA,,SD,NA
+Tennessee-Total Nonfarm,Tennessee,Total Nonfarm,All Employees: Total Nonfarm,Monthly,TNNA,FRED/TNNA,,TN,NA
+Texas-Total Nonfarm,Texas,Total Nonfarm,All Employees: Total Nonfarm,Monthly,TXNA,FRED/TXNA,,TX,NA
+Utah-Total Nonfarm,Utah,Total Nonfarm,All Employees: Total Nonfarm,Monthly,UTNA,FRED/UTNA,,UT,NA
+Vermont-Total Nonfarm,Vermont,Total Nonfarm,All Employees: Total Nonfarm,Monthly,VTNA,FRED/VTNA,,VT,NA
+Virginia-Total Nonfarm,Virginia,Total Nonfarm,All Employees: Total Nonfarm,Monthly,VANA,FRED/VANA,,VA,NA
+Washington-Total Nonfarm,Washington,Total Nonfarm,All Employees: Total Nonfarm,Monthly,WANA,FRED/WANA,,WA,NA
+West Virginia-Total Nonfarm,West Virginia,Total Nonfarm,All Employees: Total Nonfarm,Monthly,WVNA,FRED/WVNA,,WV,NA
+Wisconsin-Total Nonfarm,Wisconsin,Total Nonfarm,All Employees: Total Nonfarm,Monthly,WINA,FRED/WINA,,WI,NA
+Wyoming-Total Nonfarm,Wyoming,Total Nonfarm,All Employees: Total Nonfarm,Monthly,WYNA,FRED/WYNA,,WY,NA
+Alabama-Real GDP,Alabama,Real GDP,Real Total Gross Domestic Product,Quarterly,ALRGSP,FRED/ALRGSP,,AL,RGSP
+Alaska-Real GDP,Alaska,Real GDP,Real Total Gross Domestic Product,Quarterly,AKRGSP,FRED/AKRGSP,,AK,RGSP
+Arizona-Real GDP,Arizona,Real GDP,Real Total Gross Domestic Product,Quarterly,AZRGSP,FRED/AZRGSP,,AZ,RGSP
+Arkansas-Real GDP,Arkansas,Real GDP,Real Total Gross Domestic Product,Quarterly,ARRGSP,FRED/ARRGSP,,AR,RGSP
+California-Real GDP,California,Real GDP,Real Total Gross Domestic Product,Quarterly,CARGSP,FRED/CARGSP,,CA,RGSP
+Colorado-Real GDP,Colorado,Real GDP,Real Total Gross Domestic Product,Quarterly,CORGSP,FRED/CORGSP,,CO,RGSP
+Connecticut-Real GDP,Connecticut,Real GDP,Real Total Gross Domestic Product,Quarterly,CTRGSP,FRED/CTRGSP,,CT,RGSP
+Delaware-Real GDP,Delaware,Real GDP,Real Total Gross Domestic Product,Quarterly,DERGSP,FRED/DERGSP,,DE,RGSP
+Florida-Real GDP,Florida,Real GDP,Real Total Gross Domestic Product,Quarterly,FLRGSP,FRED/FLRGSP,,FL,RGSP
+Georgia-Real GDP,Georgia,Real GDP,Real Total Gross Domestic Product,Quarterly,GARGSP,FRED/GARGSP,,GA,RGSP
+Hawaii-Real GDP,Hawaii,Real GDP,Real Total Gross Domestic Product,Quarterly,HIRGSP,FRED/HIRGSP,,HI,RGSP
+Idaho-Real GDP,Idaho,Real GDP,Real Total Gross Domestic Product,Quarterly,IDRGSP,FRED/IDRGSP,,ID,RGSP
+Illinois-Real GDP,Illinois,Real GDP,Real Total Gross Domestic Product,Quarterly,ILRGSP,FRED/ILRGSP,,IL,RGSP
+Indiana-Real GDP,Indiana,Real GDP,Real Total Gross Domestic Product,Quarterly,INRGSP,FRED/INRGSP,,IN,RGSP
+Iowa-Real GDP,Iowa,Real GDP,Real Total Gross Domestic Product,Quarterly,IARGSP,FRED/IARGSP,,IA,RGSP
+Kansas-Real GDP,Kansas,Real GDP,Real Total Gross Domestic Product,Quarterly,KSRGSP,FRED/KSRGSP,,KS,RGSP
+Kentucky-Real GDP,Kentucky,Real GDP,Real Total Gross Domestic Product,Quarterly,KYRGSP,FRED/KYRGSP,,KY,RGSP
+Louisiana-Real GDP,Louisiana,Real GDP,Real Total Gross Domestic Product,Quarterly,LARGSP,FRED/LARGSP,,LA,RGSP
+Maine-Real GDP,Maine,Real GDP,Real Total Gross Domestic Product,Quarterly,MERGSP,FRED/MERGSP,,ME,RGSP
+Maryland-Real GDP,Maryland,Real GDP,Real Total Gross Domestic Product,Quarterly,MDRGSP,FRED/MDRGSP,,MD,RGSP
+Massachusetts-Real GDP,Massachusetts,Real GDP,Real Total Gross Domestic Product,Quarterly,MARGSP,FRED/MARGSP,,MA,RGSP
+Michigan-Real GDP,Michigan,Real GDP,Real Total Gross Domestic Product,Quarterly,MIRGSP,FRED/MIRGSP,,MI,RGSP
+Minnesota-Real GDP,Minnesota,Real GDP,Real Total Gross Domestic Product,Quarterly,MNRGSP,FRED/MNRGSP,,MN,RGSP
+Mississippi-Real GDP,Mississippi,Real GDP,Real Total Gross Domestic Product,Quarterly,MSRGSP,FRED/MSRGSP,,MS,RGSP
+Missouri-Real GDP,Missouri,Real GDP,Real Total Gross Domestic Product,Quarterly,MORGSP,FRED/MORGSP,,MO,RGSP
+Montana-Real GDP,Montana,Real GDP,Real Total Gross Domestic Product,Quarterly,MTRGSP,FRED/MTRGSP,,MT,RGSP
+Nebraska-Real GDP,Nebraska,Real GDP,Real Total Gross Domestic Product,Quarterly,NERGSP,FRED/NERGSP,,NE,RGSP
+Nevada-Real GDP,Nevada,Real GDP,Real Total Gross Domestic Product,Quarterly,NVRGSP,FRED/NVRGSP,,NV,RGSP
+New Hampshire-Real GDP,New Hampshire,Real GDP,Real Total Gross Domestic Product,Quarterly,NHRGSP,FRED/NHRGSP,,NH,RGSP
+New Jersey-Real GDP,New Jersey,Real GDP,Real Total Gross Domestic Product,Quarterly,NJRGSP,FRED/NJRGSP,,NJ,RGSP
+New Mexico-Real GDP,New Mexico,Real GDP,Real Total Gross Domestic Product,Quarterly,NMRGSP,FRED/NMRGSP,,NM,RGSP
+New York-Real GDP,New York,Real GDP,Real Total Gross Domestic Product,Quarterly,NYRGSP,FRED/NYRGSP,,NY,RGSP
+North Carolina-Real GDP,North Carolina,Real GDP,Real Total Gross Domestic Product,Quarterly,NCRGSP,FRED/NCRGSP,,NC,RGSP
+North Dakota-Real GDP,North Dakota,Real GDP,Real Total Gross Domestic Product,Quarterly,NDRGSP,FRED/NDRGSP,,ND,RGSP
+Ohio-Real GDP,Ohio,Real GDP,Real Total Gross Domestic Product,Quarterly,OHRGSP,FRED/OHRGSP,,OH,RGSP
+Oklahoma-Real GDP,Oklahoma,Real GDP,Real Total Gross Domestic Product,Quarterly,OKRGSP,FRED/OKRGSP,,OK,RGSP
+Oregon-Real GDP,Oregon,Real GDP,Real Total Gross Domestic Product,Quarterly,ORRGSP,FRED/ORRGSP,,OR,RGSP
+Pennsylvania-Real GDP,Pennsylvania,Real GDP,Real Total Gross Domestic Product,Quarterly,PARGSP,FRED/PARGSP,,PA,RGSP
+Rhode Island-Real GDP,Rhode Island,Real GDP,Real Total Gross Domestic Product,Quarterly,RIRGSP,FRED/RIRGSP,,RI,RGSP
+South Carolina-Real GDP,South Carolina,Real GDP,Real Total Gross Domestic Product,Quarterly,SCRGSP,FRED/SCRGSP,,SC,RGSP
+South Dakota-Real GDP,South Dakota,Real GDP,Real Total Gross Domestic Product,Quarterly,SDRGSP,FRED/SDRGSP,,SD,RGSP
+Tennessee-Real GDP,Tennessee,Real GDP,Real Total Gross Domestic Product,Quarterly,TNRGSP,FRED/TNRGSP,,TN,RGSP
+Texas-Real GDP,Texas,Real GDP,Real Total Gross Domestic Product,Quarterly,TXRGSP,FRED/TXRGSP,,TX,RGSP
+Utah-Real GDP,Utah,Real GDP,Real Total Gross Domestic Product,Quarterly,UTRGSP,FRED/UTRGSP,,UT,RGSP
+Vermont-Real GDP,Vermont,Real GDP,Real Total Gross Domestic Product,Quarterly,VTRGSP,FRED/VTRGSP,,VT,RGSP
+Virginia-Real GDP,Virginia,Real GDP,Real Total Gross Domestic Product,Quarterly,VARGSP,FRED/VARGSP,,VA,RGSP
+Washington-Real GDP,Washington,Real GDP,Real Total Gross Domestic Product,Quarterly,WARGSP,FRED/WARGSP,,WA,RGSP
+West Virginia-Real GDP,West Virginia,Real GDP,Real Total Gross Domestic Product,Quarterly,WVRGSP,FRED/WVRGSP,,WV,RGSP
+Wisconsin-Real GDP,Wisconsin,Real GDP,Real Total Gross Domestic Product,Quarterly,WIRGSP,FRED/WIRGSP,,WI,RGSP
+Wyoming-Real GDP,Wyoming,Real GDP,Real Total Gross Domestic Product,Quarterly,WYRGSP,FRED/WYRGSP,,WY,RGSP
+Alabama-Economic Activity Index,Alabama,Economic Activity Index,Coincident Economic Activity Index,Monthly,ALPHCI,FRED/ALPHCI,,AL,PHCI
+Alaska-Economic Activity Index,Alaska,Economic Activity Index,Coincident Economic Activity Index,Monthly,AKPHCI,FRED/AKPHCI,,AK,PHCI
+Arizona-Economic Activity Index,Arizona,Economic Activity Index,Coincident Economic Activity Index,Monthly,AZPHCI,FRED/AZPHCI,,AZ,PHCI
+Arkansas-Economic Activity Index,Arkansas,Economic Activity Index,Coincident Economic Activity Index,Monthly,ARPHCI,FRED/ARPHCI,,AR,PHCI
+California-Economic Activity Index,California,Economic Activity Index,Coincident Economic Activity Index,Monthly,CAPHCI,FRED/CAPHCI,,CA,PHCI
+Colorado-Economic Activity Index,Colorado,Economic Activity Index,Coincident Economic Activity Index,Monthly,COPHCI,FRED/COPHCI,,CO,PHCI
+Connecticut-Economic Activity Index,Connecticut,Economic Activity Index,Coincident Economic Activity Index,Monthly,CTPHCI,FRED/CTPHCI,,CT,PHCI
+Delaware-Economic Activity Index,Delaware,Economic Activity Index,Coincident Economic Activity Index,Monthly,DEPHCI,FRED/DEPHCI,,DE,PHCI
+Florida-Economic Activity Index,Florida,Economic Activity Index,Coincident Economic Activity Index,Monthly,FLPHCI,FRED/FLPHCI,,FL,PHCI
+Georgia-Economic Activity Index,Georgia,Economic Activity Index,Coincident Economic Activity Index,Monthly,GAPHCI,FRED/GAPHCI,,GA,PHCI
+Hawaii-Economic Activity Index,Hawaii,Economic Activity Index,Coincident Economic Activity Index,Monthly,HIPHCI,FRED/HIPHCI,,HI,PHCI
+Idaho-Economic Activity Index,Idaho,Economic Activity Index,Coincident Economic Activity Index,Monthly,IDPHCI,FRED/IDPHCI,,ID,PHCI
+Illinois-Economic Activity Index,Illinois,Economic Activity Index,Coincident Economic Activity Index,Monthly,ILPHCI,FRED/ILPHCI,,IL,PHCI
+Indiana-Economic Activity Index,Indiana,Economic Activity Index,Coincident Economic Activity Index,Monthly,INPHCI,FRED/INPHCI,,IN,PHCI
+Iowa-Economic Activity Index,Iowa,Economic Activity Index,Coincident Economic Activity Index,Monthly,IAPHCI,FRED/IAPHCI,,IA,PHCI
+Kansas-Economic Activity Index,Kansas,Economic Activity Index,Coincident Economic Activity Index,Monthly,KSPHCI,FRED/KSPHCI,,KS,PHCI
+Kentucky-Economic Activity Index,Kentucky,Economic Activity Index,Coincident Economic Activity Index,Monthly,KYPHCI,FRED/KYPHCI,,KY,PHCI
+Louisiana-Economic Activity Index,Louisiana,Economic Activity Index,Coincident Economic Activity Index,Monthly,LAPHCI,FRED/LAPHCI,,LA,PHCI
+Maine-Economic Activity Index,Maine,Economic Activity Index,Coincident Economic Activity Index,Monthly,MEPHCI,FRED/MEPHCI,,ME,PHCI
+Maryland-Economic Activity Index,Maryland,Economic Activity Index,Coincident Economic Activity Index,Monthly,MDPHCI,FRED/MDPHCI,,MD,PHCI
+Massachusetts-Economic Activity Index,Massachusetts,Economic Activity Index,Coincident Economic Activity Index,Monthly,MAPHCI,FRED/MAPHCI,,MA,PHCI
+Michigan-Economic Activity Index,Michigan,Economic Activity Index,Coincident Economic Activity Index,Monthly,MIPHCI,FRED/MIPHCI,,MI,PHCI
+Minnesota-Economic Activity Index,Minnesota,Economic Activity Index,Coincident Economic Activity Index,Monthly,MNPHCI,FRED/MNPHCI,,MN,PHCI
+Mississippi-Economic Activity Index,Mississippi,Economic Activity Index,Coincident Economic Activity Index,Monthly,MSPHCI,FRED/MSPHCI,,MS,PHCI
+Missouri-Economic Activity Index,Missouri,Economic Activity Index,Coincident Economic Activity Index,Monthly,MOPHCI,FRED/MOPHCI,,MO,PHCI
+Montana-Economic Activity Index,Montana,Economic Activity Index,Coincident Economic Activity Index,Monthly,MTPHCI,FRED/MTPHCI,,MT,PHCI
+Nebraska-Economic Activity Index,Nebraska,Economic Activity Index,Coincident Economic Activity Index,Monthly,NEPHCI,FRED/NEPHCI,,NE,PHCI
+Nevada-Economic Activity Index,Nevada,Economic Activity Index,Coincident Economic Activity Index,Monthly,NVPHCI,FRED/NVPHCI,,NV,PHCI
+New Hampshire-Economic Activity Index,New Hampshire,Economic Activity Index,Coincident Economic Activity Index,Monthly,NHPHCI,FRED/NHPHCI,,NH,PHCI
+New Jersey-Economic Activity Index,New Jersey,Economic Activity Index,Coincident Economic Activity Index,Monthly,NJPHCI,FRED/NJPHCI,,NJ,PHCI
+New Mexico-Economic Activity Index,New Mexico,Economic Activity Index,Coincident Economic Activity Index,Monthly,NMPHCI,FRED/NMPHCI,,NM,PHCI
+New York-Economic Activity Index,New York,Economic Activity Index,Coincident Economic Activity Index,Monthly,NYPHCI,FRED/NYPHCI,,NY,PHCI
+North Carolina-Economic Activity Index,North Carolina,Economic Activity Index,Coincident Economic Activity Index,Monthly,NCPHCI,FRED/NCPHCI,,NC,PHCI
+North Dakota-Economic Activity Index,North Dakota,Economic Activity Index,Coincident Economic Activity Index,Monthly,NDPHCI,FRED/NDPHCI,,ND,PHCI
+Ohio-Economic Activity Index,Ohio,Economic Activity Index,Coincident Economic Activity Index,Monthly,OHPHCI,FRED/OHPHCI,,OH,PHCI
+Oklahoma-Economic Activity Index,Oklahoma,Economic Activity Index,Coincident Economic Activity Index,Monthly,OKPHCI,FRED/OKPHCI,,OK,PHCI
+Oregon-Economic Activity Index,Oregon,Economic Activity Index,Coincident Economic Activity Index,Monthly,ORPHCI,FRED/ORPHCI,,OR,PHCI
+Pennsylvania-Economic Activity Index,Pennsylvania,Economic Activity Index,Coincident Economic Activity Index,Monthly,PAPHCI,FRED/PAPHCI,,PA,PHCI
+Rhode Island-Economic Activity Index,Rhode Island,Economic Activity Index,Coincident Economic Activity Index,Monthly,RIPHCI,FRED/RIPHCI,,RI,PHCI
+South Carolina-Economic Activity Index,South Carolina,Economic Activity Index,Coincident Economic Activity Index,Monthly,SCPHCI,FRED/SCPHCI,,SC,PHCI
+South Dakota-Economic Activity Index,South Dakota,Economic Activity Index,Coincident Economic Activity Index,Monthly,SDPHCI,FRED/SDPHCI,,SD,PHCI
+Tennessee-Economic Activity Index,Tennessee,Economic Activity Index,Coincident Economic Activity Index,Monthly,TNPHCI,FRED/TNPHCI,,TN,PHCI
+Texas-Economic Activity Index,Texas,Economic Activity Index,Coincident Economic Activity Index,Monthly,TXPHCI,FRED/TXPHCI,,TX,PHCI
+Utah-Economic Activity Index,Utah,Economic Activity Index,Coincident Economic Activity Index,Monthly,UTPHCI,FRED/UTPHCI,,UT,PHCI
+Vermont-Economic Activity Index,Vermont,Economic Activity Index,Coincident Economic Activity Index,Monthly,VTPHCI,FRED/VTPHCI,,VT,PHCI
+Virginia-Economic Activity Index,Virginia,Economic Activity Index,Coincident Economic Activity Index,Monthly,VAPHCI,FRED/VAPHCI,,VA,PHCI
+Washington-Economic Activity Index,Washington,Economic Activity Index,Coincident Economic Activity Index,Monthly,WAPHCI,FRED/WAPHCI,,WA,PHCI
+West Virginia-Economic Activity Index,West Virginia,Economic Activity Index,Coincident Economic Activity Index,Monthly,WVPHCI,FRED/WVPHCI,,WV,PHCI
+Wisconsin-Economic Activity Index,Wisconsin,Economic Activity Index,Coincident Economic Activity Index,Monthly,WIPHCI,FRED/WIPHCI,,WI,PHCI
+Wyoming-Economic Activity Index,Wyoming,Economic Activity Index,Coincident Economic Activity Index,Monthly,WYPHCI,FRED/WYPHCI,,WY,PHCI
+Alabama-Total Construction Employees,Alabama,Total Construction Employees,All Employees: Construction,Monthly,ALCONS,FRED/ALCONS,,AL,CONS
+Alaska-Total Construction Employees,Alaska,Total Construction Employees,All Employees: Construction,Monthly,AKCONS,FRED/AKCONS,,AK,CONS
+Arizona-Total Construction Employees,Arizona,Total Construction Employees,All Employees: Construction,Monthly,AZCONS,FRED/AZCONS,,AZ,CONS
+Arkansas-Total Construction Employees,Arkansas,Total Construction Employees,All Employees: Construction,Monthly,ARCONS,FRED/ARCONS,,AR,CONS
+California-Total Construction Employees,California,Total Construction Employees,All Employees: Construction,Monthly,CACONS,FRED/CACONS,,CA,CONS
+Colorado-Total Construction Employees,Colorado,Total Construction Employees,All Employees: Construction,Monthly,COCONS,FRED/COCONS,,CO,CONS
+Connecticut-Total Construction Employees,Connecticut,Total Construction Employees,All Employees: Construction,Monthly,CTCONS,FRED/CTCONS,,CT,CONS
+Delaware-Total Construction Employees,Delaware,Total Construction Employees,All Employees: Construction,Monthly,DECONS,FRED/DECONS,,DE,CONS
+Florida-Total Construction Employees,Florida,Total Construction Employees,All Employees: Construction,Monthly,FLCONS,FRED/FLCONS,,FL,CONS
+Georgia-Total Construction Employees,Georgia,Total Construction Employees,All Employees: Construction,Monthly,GACONS,FRED/GACONS,,GA,CONS
+Hawaii-Total Construction Employees,Hawaii,Total Construction Employees,All Employees: Construction,Monthly,HICONS,FRED/HICONS,,HI,CONS
+Idaho-Total Construction Employees,Idaho,Total Construction Employees,All Employees: Construction,Monthly,IDCONS,FRED/IDCONS,,ID,CONS
+Illinois-Total Construction Employees,Illinois,Total Construction Employees,All Employees: Construction,Monthly,ILCONS,FRED/ILCONS,,IL,CONS
+Indiana-Total Construction Employees,Indiana,Total Construction Employees,All Employees: Construction,Monthly,INCONS,FRED/INCONS,,IN,CONS
+Iowa-Total Construction Employees,Iowa,Total Construction Employees,All Employees: Construction,Monthly,IACONS,FRED/IACONS,,IA,CONS
+Kansas-Total Construction Employees,Kansas,Total Construction Employees,All Employees: Construction,Monthly,KSCONS,FRED/KSCONS,,KS,CONS
+Kentucky-Total Construction Employees,Kentucky,Total Construction Employees,All Employees: Construction,Monthly,KYCONS,FRED/KYCONS,,KY,CONS
+Louisiana-Total Construction Employees,Louisiana,Total Construction Employees,All Employees: Construction,Monthly,LACONS,FRED/LACONS,,LA,CONS
+Maine-Total Construction Employees,Maine,Total Construction Employees,All Employees: Construction,Monthly,MECONS,FRED/MECONS,,ME,CONS
+Maryland-Total Construction Employees,Maryland,Total Construction Employees,All Employees: Construction,Monthly,MDCONS,FRED/MDCONS,,MD,CONS
+Massachusetts-Total Construction Employees,Massachusetts,Total Construction Employees,All Employees: Construction,Monthly,MACONS,FRED/MACONS,,MA,CONS
+Michigan-Total Construction Employees,Michigan,Total Construction Employees,All Employees: Construction,Monthly,MICONS,FRED/MICONS,,MI,CONS
+Minnesota-Total Construction Employees,Minnesota,Total Construction Employees,All Employees: Construction,Monthly,MNCONS,FRED/MNCONS,,MN,CONS
+Mississippi-Total Construction Employees,Mississippi,Total Construction Employees,All Employees: Construction,Monthly,MSCONS,FRED/MSCONS,,MS,CONS
+Missouri-Total Construction Employees,Missouri,Total Construction Employees,All Employees: Construction,Monthly,MOCONS,FRED/MOCONS,,MO,CONS
+Montana-Total Construction Employees,Montana,Total Construction Employees,All Employees: Construction,Monthly,MTCONS,FRED/MTCONS,,MT,CONS
+Nebraska-Total Construction Employees,Nebraska,Total Construction Employees,All Employees: Construction,Monthly,NECONS,FRED/NECONS,,NE,CONS
+Nevada-Total Construction Employees,Nevada,Total Construction Employees,All Employees: Construction,Monthly,NVCONS,FRED/NVCONS,,NV,CONS
+New Hampshire-Total Construction Employees,New Hampshire,Total Construction Employees,All Employees: Construction,Monthly,NHCONS,FRED/NHCONS,,NH,CONS
+New Jersey-Total Construction Employees,New Jersey,Total Construction Employees,All Employees: Construction,Monthly,NJCONS,FRED/NJCONS,,NJ,CONS
+New Mexico-Total Construction Employees,New Mexico,Total Construction Employees,All Employees: Construction,Monthly,NMCONS,FRED/NMCONS,,NM,CONS
+New York-Total Construction Employees,New York,Total Construction Employees,All Employees: Construction,Monthly,NYCONS,FRED/NYCONS,,NY,CONS
+North Carolina-Total Construction Employees,North Carolina,Total Construction Employees,All Employees: Construction,Monthly,NCCONS,FRED/NCCONS,,NC,CONS
+North Dakota-Total Construction Employees,North Dakota,Total Construction Employees,All Employees: Construction,Monthly,NDCONS,FRED/NDCONS,,ND,CONS
+Ohio-Total Construction Employees,Ohio,Total Construction Employees,All Employees: Construction,Monthly,OHCONS,FRED/OHCONS,,OH,CONS
+Oklahoma-Total Construction Employees,Oklahoma,Total Construction Employees,All Employees: Construction,Monthly,OKCONS,FRED/OKCONS,,OK,CONS
+Oregon-Total Construction Employees,Oregon,Total Construction Employees,All Employees: Construction,Monthly,ORCONS,FRED/ORCONS,,OR,CONS
+Pennsylvania-Total Construction Employees,Pennsylvania,Total Construction Employees,All Employees: Construction,Monthly,PACONS,FRED/PACONS,,PA,CONS
+Rhode Island-Total Construction Employees,Rhode Island,Total Construction Employees,All Employees: Construction,Monthly,RICONS,FRED/RICONS,,RI,CONS
+South Carolina-Total Construction Employees,South Carolina,Total Construction Employees,All Employees: Construction,Monthly,SCCONS,FRED/SCCONS,,SC,CONS
+South Dakota-Total Construction Employees,South Dakota,Total Construction Employees,All Employees: Construction,Monthly,SDCONS,FRED/SDCONS,,SD,CONS
+Tennessee-Total Construction Employees,Tennessee,Total Construction Employees,All Employees: Construction,Monthly,TNCONS,FRED/TNCONS,,TN,CONS
+Texas-Total Construction Employees,Texas,Total Construction Employees,All Employees: Construction,Monthly,TXCONS,FRED/TXCONS,,TX,CONS
+Utah-Total Construction Employees,Utah,Total Construction Employees,All Employees: Construction,Monthly,UTCONS,FRED/UTCONS,,UT,CONS
+Vermont-Total Construction Employees,Vermont,Total Construction Employees,All Employees: Construction,Monthly,VTCONS,FRED/VTCONS,,VT,CONS
+Virginia-Total Construction Employees,Virginia,Total Construction Employees,All Employees: Construction,Monthly,VACONS,FRED/VACONS,,VA,CONS
+Washington-Total Construction Employees,Washington,Total Construction Employees,All Employees: Construction,Monthly,WACONS,FRED/WACONS,,WA,CONS
+West Virginia-Total Construction Employees,West Virginia,Total Construction Employees,All Employees: Construction,Monthly,WVCONS,FRED/WVCONS,,WV,CONS
+Wisconsin-Total Construction Employees,Wisconsin,Total Construction Employees,All Employees: Construction,Monthly,WICONS,FRED/WICONS,,WI,CONS
+Wyoming-Total Construction Employees,Wyoming,Total Construction Employees,All Employees: Construction,Monthly,WYCONS,FRED/WYCONS,,WY,CONS
+Alabama-Unemployment Rate,Alabama,Unemployment Rate,Unemployment Rate,Monthly,ALUR,FRED/ALUR,USUSALA  Index,AL,UR
+Alaska-Unemployment Rate,Alaska,Unemployment Rate,Unemployment Rate,Monthly,AKUR,FRED/AKUR,USUSAL   Index,AK,UR
+Arizona-Unemployment Rate,Arizona,Unemployment Rate,Unemployment Rate,Monthly,AZUR,FRED/AZUR,USUSAZ   Index,AZ,UR
+Arkansas-Unemployment Rate,Arkansas,Unemployment Rate,Unemployment Rate,Monthly,ARUR,FRED/ARUR,USUSAR   Index,AR,UR
+California-Unemployment Rate,California,Unemployment Rate,Unemployment Rate,Monthly,CAUR,FRED/CAUR,USUSCALI Index,CA,UR
+Colorado-Unemployment Rate,Colorado,Unemployment Rate,Unemployment Rate,Monthly,COUR,FRED/COUR,USUSCO   Index,CO,UR
+Connecticut-Unemployment Rate,Connecticut,Unemployment Rate,Unemployment Rate,Monthly,CTUR,FRED/CTUR,USUSCONN Index,CT,UR
+Delaware-Unemployment Rate,Delaware,Unemployment Rate,Unemployment Rate,Monthly,DEUR,FRED/DEUR,USUSDE   Index,DE,UR
+Florida-Unemployment Rate,Florida,Unemployment Rate,Unemployment Rate,Monthly,FLUR,FRED/FLUR,USUSFLA  Index,FL,UR
+Georgia-Unemployment Rate,Georgia,Unemployment Rate,Unemployment Rate,Monthly,GAUR,FRED/GAUR,USUSGA   Index,GA,UR
+Hawaii-Unemployment Rate,Hawaii,Unemployment Rate,Unemployment Rate,Monthly,HIUR,FRED/HIUR,USUSHA   Index,HI,UR
+Idaho-Unemployment Rate,Idaho,Unemployment Rate,Unemployment Rate,Monthly,IDUR,FRED/IDUR,USUSID   Index,ID,UR
+Illinois-Unemployment Rate,Illinois,Unemployment Rate,Unemployment Rate,Monthly,ILUR,FRED/ILUR,USUSILL  Index,IL,UR
+Indiana-Unemployment Rate,Indiana,Unemployment Rate,Unemployment Rate,Monthly,INUR,FRED/INUR,USUSIND  Index,IN,UR
+Iowa-Unemployment Rate,Iowa,Unemployment Rate,Unemployment Rate,Monthly,IAUR,FRED/IAUR,USUSIA   Index,IA,UR
+Kansas-Unemployment Rate,Kansas,Unemployment Rate,Unemployment Rate,Monthly,KSUR,FRED/KSUR,USUSKA   Index,KS,UR
+Kentucky-Unemployment Rate,Kentucky,Unemployment Rate,Unemployment Rate,Monthly,KYUR,FRED/KYUR,USUSKY   Index,KY,UR
+Louisiana-Unemployment Rate,Louisiana,Unemployment Rate,Unemployment Rate,Monthly,LAUR,FRED/LAUR,USUSLA   Index,LA,UR
+Maine-Unemployment Rate,Maine,Unemployment Rate,Unemployment Rate,Monthly,MEUR,FRED/MEUR,USUSME   Index,ME,UR
+Maryland-Unemployment Rate,Maryland,Unemployment Rate,Unemployment Rate,Monthly,MDUR,FRED/MDUR,USUSMD   Index,MD,UR
+Massachusetts-Unemployment Rate,Massachusetts,Unemployment Rate,Unemployment Rate,Monthly,MAUR,FRED/MAUR,USUSMASS Index,MA,UR
+Michigan-Unemployment Rate,Michigan,Unemployment Rate,Unemployment Rate,Monthly,MIUR,FRED/MIUR,USUSMICH Index,MI,UR
+Minnesota-Unemployment Rate,Minnesota,Unemployment Rate,Unemployment Rate,Monthly,MNUR,FRED/MNUR,USUSMINN Index,MN,UR
+Mississippi-Unemployment Rate,Mississippi,Unemployment Rate,Unemployment Rate,Monthly,MSUR,FRED/MSUR,USUSMISS Index,MS,UR
+Missouri-Unemployment Rate,Missouri,Unemployment Rate,Unemployment Rate,Monthly,MOUR,FRED/MOUR,USUSMO   Index,MO,UR
+Montana-Unemployment Rate,Montana,Unemployment Rate,Unemployment Rate,Monthly,MTUR,FRED/MTUR,USUSMT   Index,MT,UR
+Nebraska-Unemployment Rate,Nebraska,Unemployment Rate,Unemployment Rate,Monthly,NEUR,FRED/NEUR,USUSNEB  Index,NE,UR
+Nevada-Unemployment Rate,Nevada,Unemployment Rate,Unemployment Rate,Monthly,NVUR,FRED/NVUR,USUSNV   Index,NV,UR
+New Hampshire-Unemployment Rate,New Hampshire,Unemployment Rate,Unemployment Rate,Monthly,NHUR,FRED/NHUR,USUSNH   Index,NH,UR
+New Jersey-Unemployment Rate,New Jersey,Unemployment Rate,Unemployment Rate,Monthly,NJUR,FRED/NJUR,USUSNJ   Index,NJ,UR
+New Mexico-Unemployment Rate,New Mexico,Unemployment Rate,Unemployment Rate,Monthly,NMUR,FRED/NMUR,USUSNM   Index,NM,UR
+New York-Unemployment Rate,New York,Unemployment Rate,Unemployment Rate,Monthly,NYUR,FRED/NYUR,USUSNY   Index,NY,UR
+North Carolina-Unemployment Rate,North Carolina,Unemployment Rate,Unemployment Rate,Monthly,NCUR,FRED/NCUR,USUSNC   Index,NC,UR
+North Dakota-Unemployment Rate,North Dakota,Unemployment Rate,Unemployment Rate,Monthly,NDUR,FRED/NDUR,USUSND   Index,ND,UR
+Ohio-Unemployment Rate,Ohio,Unemployment Rate,Unemployment Rate,Monthly,OHUR,FRED/OHUR,USUSOHIO Index,OH,UR
+Oklahoma-Unemployment Rate,Oklahoma,Unemployment Rate,Unemployment Rate,Monthly,OKUR,FRED/OKUR,USUSOK   Index,OK,UR
+Oregon-Unemployment Rate,Oregon,Unemployment Rate,Unemployment Rate,Monthly,ORUR,FRED/ORUR,USUSOREG Index,OR,UR
+Pennsylvania-Unemployment Rate,Pennsylvania,Unemployment Rate,Unemployment Rate,Monthly,PAUR,FRED/PAUR,USUSPENN Index,PA,UR
+Rhode Island-Unemployment Rate,Rhode Island,Unemployment Rate,Unemployment Rate,Monthly,RIUR,FRED/RIUR,USUSRI   Index,RI,UR
+South Carolina-Unemployment Rate,South Carolina,Unemployment Rate,Unemployment Rate,Monthly,SCUR,FRED/SCUR,USUSSC   Index,SC,UR
+South Dakota-Unemployment Rate,South Dakota,Unemployment Rate,Unemployment Rate,Monthly,SDUR,FRED/SDUR,USUSSD   Index,SD,UR
+Tennessee-Unemployment Rate,Tennessee,Unemployment Rate,Unemployment Rate,Monthly,TNUR,FRED/TNUR,USUSTENN Index,TN,UR
+Texas-Unemployment Rate,Texas,Unemployment Rate,Unemployment Rate,Monthly,TXUR,FRED/TXUR,USUSTX   Index,TX,UR
+Utah-Unemployment Rate,Utah,Unemployment Rate,Unemployment Rate,Monthly,UTUR,FRED/UTUR,USUSUTAH Index,UT,UR
+Vermont-Unemployment Rate,Vermont,Unemployment Rate,Unemployment Rate,Monthly,VTUR,FRED/VTUR,USUSVT   Index,VT,UR
+Virginia-Unemployment Rate,Virginia,Unemployment Rate,Unemployment Rate,Monthly,VAUR,FRED/VAUR,USUSVI   Index,VA,UR
+Washington-Unemployment Rate,Washington,Unemployment Rate,Unemployment Rate,Monthly,WAUR,FRED/WAUR,USUSWASH Index,WA,UR
+West Virginia-Unemployment Rate,West Virginia,Unemployment Rate,Unemployment Rate,Monthly,WVUR,FRED/WVUR,USUSWV   Index,WV,UR
+Wisconsin-Unemployment Rate,Wisconsin,Unemployment Rate,Unemployment Rate,Monthly,WIUR,FRED/WIUR,USUSWI   Index,WI,UR
+Wyoming-Unemployment Rate,Wyoming,Unemployment Rate,Unemployment Rate,Monthly,WYUR,FRED/WYUR,USUSWY   Index,WY,UR
+Alabama-Total Personal Income,Alabama,Total Personal Income,Total Personal Income,Monthly,ALOTOT,FRED/ALOTOT,,AL,OTOT
+Alaska-Total Personal Income,Alaska,Total Personal Income,Total Personal Income,Monthly,AKOTOT,FRED/AKOTOT,,AK,OTOT
+Arizona-Total Personal Income,Arizona,Total Personal Income,Total Personal Income,Monthly,AZOTOT,FRED/AZOTOT,,AZ,OTOT
+Arkansas-Total Personal Income,Arkansas,Total Personal Income,Total Personal Income,Monthly,AROTOT,FRED/AROTOT,,AR,OTOT
+California-Total Personal Income,California,Total Personal Income,Total Personal Income,Monthly,CAOTOT,FRED/CAOTOT,,CA,OTOT
+Colorado-Total Personal Income,Colorado,Total Personal Income,Total Personal Income,Monthly,COOTOT,FRED/COOTOT,,CO,OTOT
+Connecticut-Total Personal Income,Connecticut,Total Personal Income,Total Personal Income,Monthly,CTOTOT,FRED/CTOTOT,,CT,OTOT
+Delaware-Total Personal Income,Delaware,Total Personal Income,Total Personal Income,Monthly,DEOTOT,FRED/DEOTOT,,DE,OTOT
+Florida-Total Personal Income,Florida,Total Personal Income,Total Personal Income,Monthly,FLOTOT,FRED/FLOTOT,,FL,OTOT
+Georgia-Total Personal Income,Georgia,Total Personal Income,Total Personal Income,Monthly,GAOTOT,FRED/GAOTOT,,GA,OTOT
+Hawaii-Total Personal Income,Hawaii,Total Personal Income,Total Personal Income,Monthly,HIOTOT,FRED/HIOTOT,,HI,OTOT
+Idaho-Total Personal Income,Idaho,Total Personal Income,Total Personal Income,Monthly,IDOTOT,FRED/IDOTOT,,ID,OTOT
+Illinois-Total Personal Income,Illinois,Total Personal Income,Total Personal Income,Monthly,ILOTOT,FRED/ILOTOT,,IL,OTOT
+Indiana-Total Personal Income,Indiana,Total Personal Income,Total Personal Income,Monthly,INOTOT,FRED/INOTOT,,IN,OTOT
+Iowa-Total Personal Income,Iowa,Total Personal Income,Total Personal Income,Monthly,IAOTOT,FRED/IAOTOT,,IA,OTOT
+Kansas-Total Personal Income,Kansas,Total Personal Income,Total Personal Income,Monthly,KSOTOT,FRED/KSOTOT,,KS,OTOT
+Kentucky-Total Personal Income,Kentucky,Total Personal Income,Total Personal Income,Monthly,KYOTOT,FRED/KYOTOT,,KY,OTOT
+Louisiana-Total Personal Income,Louisiana,Total Personal Income,Total Personal Income,Monthly,LAOTOT,FRED/LAOTOT,,LA,OTOT
+Maine-Total Personal Income,Maine,Total Personal Income,Total Personal Income,Monthly,MEOTOT,FRED/MEOTOT,,ME,OTOT
+Maryland-Total Personal Income,Maryland,Total Personal Income,Total Personal Income,Monthly,MDOTOT,FRED/MDOTOT,,MD,OTOT
+Massachusetts-Total Personal Income,Massachusetts,Total Personal Income,Total Personal Income,Monthly,MAOTOT,FRED/MAOTOT,,MA,OTOT
+Michigan-Total Personal Income,Michigan,Total Personal Income,Total Personal Income,Monthly,MIOTOT,FRED/MIOTOT,,MI,OTOT
+Minnesota-Total Personal Income,Minnesota,Total Personal Income,Total Personal Income,Monthly,MNOTOT,FRED/MNOTOT,,MN,OTOT
+Mississippi-Total Personal Income,Mississippi,Total Personal Income,Total Personal Income,Monthly,MSOTOT,FRED/MSOTOT,,MS,OTOT
+Missouri-Total Personal Income,Missouri,Total Personal Income,Total Personal Income,Monthly,MOOTOT,FRED/MOOTOT,,MO,OTOT
+Montana-Total Personal Income,Montana,Total Personal Income,Total Personal Income,Monthly,MTOTOT,FRED/MTOTOT,,MT,OTOT
+Nebraska-Total Personal Income,Nebraska,Total Personal Income,Total Personal Income,Monthly,NEOTOT,FRED/NEOTOT,,NE,OTOT
+Nevada-Total Personal Income,Nevada,Total Personal Income,Total Personal Income,Monthly,NVOTOT,FRED/NVOTOT,,NV,OTOT
+New Hampshire-Total Personal Income,New Hampshire,Total Personal Income,Total Personal Income,Monthly,NHOTOT,FRED/NHOTOT,,NH,OTOT
+New Jersey-Total Personal Income,New Jersey,Total Personal Income,Total Personal Income,Monthly,NJOTOT,FRED/NJOTOT,,NJ,OTOT
+New Mexico-Total Personal Income,New Mexico,Total Personal Income,Total Personal Income,Monthly,NMOTOT,FRED/NMOTOT,,NM,OTOT
+New York-Total Personal Income,New York,Total Personal Income,Total Personal Income,Monthly,NYOTOT,FRED/NYOTOT,,NY,OTOT
+North Carolina-Total Personal Income,North Carolina,Total Personal Income,Total Personal Income,Monthly,NCOTOT,FRED/NCOTOT,,NC,OTOT
+North Dakota-Total Personal Income,North Dakota,Total Personal Income,Total Personal Income,Monthly,NDOTOT,FRED/NDOTOT,,ND,OTOT
+Ohio-Total Personal Income,Ohio,Total Personal Income,Total Personal Income,Monthly,OHOTOT,FRED/OHOTOT,,OH,OTOT
+Oklahoma-Total Personal Income,Oklahoma,Total Personal Income,Total Personal Income,Monthly,OKOTOT,FRED/OKOTOT,,OK,OTOT
+Oregon-Total Personal Income,Oregon,Total Personal Income,Total Personal Income,Monthly,OROTOT,FRED/OROTOT,,OR,OTOT
+Pennsylvania-Total Personal Income,Pennsylvania,Total Personal Income,Total Personal Income,Monthly,PAOTOT,FRED/PAOTOT,,PA,OTOT
+Rhode Island-Total Personal Income,Rhode Island,Total Personal Income,Total Personal Income,Monthly,RIOTOT,FRED/RIOTOT,,RI,OTOT
+South Carolina-Total Personal Income,South Carolina,Total Personal Income,Total Personal Income,Monthly,SCOTOT,FRED/SCOTOT,,SC,OTOT
+South Dakota-Total Personal Income,South Dakota,Total Personal Income,Total Personal Income,Monthly,SDOTOT,FRED/SDOTOT,,SD,OTOT
+Tennessee-Total Personal Income,Tennessee,Total Personal Income,Total Personal Income,Monthly,TNOTOT,FRED/TNOTOT,,TN,OTOT
+Texas-Total Personal Income,Texas,Total Personal Income,Total Personal Income,Monthly,TXOTOT,FRED/TXOTOT,,TX,OTOT
+Utah-Total Personal Income,Utah,Total Personal Income,Total Personal Income,Monthly,UTOTOT,FRED/UTOTOT,,UT,OTOT
+Vermont-Total Personal Income,Vermont,Total Personal Income,Total Personal Income,Monthly,VTOTOT,FRED/VTOTOT,,VT,OTOT
+Virginia-Total Personal Income,Virginia,Total Personal Income,Total Personal Income,Monthly,VAOTOT,FRED/VAOTOT,,VA,OTOT
+Washington-Total Personal Income,Washington,Total Personal Income,Total Personal Income,Monthly,WAOTOT,FRED/WAOTOT,,WA,OTOT
+West Virginia-Total Personal Income,West Virginia,Total Personal Income,Total Personal Income,Monthly,WVOTOT,FRED/WVOTOT,,WV,OTOT
+Wisconsin-Total Personal Income,Wisconsin,Total Personal Income,Total Personal Income,Monthly,WIOTOT,FRED/WIOTOT,,WI,OTOT
+Wyoming-Total Personal Income,Wyoming,Total Personal Income,Total Personal Income,Monthly,WYOTOT,FRED/WYOTOT,,WY,OTOT
+Alabama-House Price Index,Alabama,House Price Index,All-Transactions House Price Index,Monthly,ALSTHPI,FRED/ALSTHPI,,AL,STHPI
+Alaska-House Price Index,Alaska,House Price Index,All-Transactions House Price Index,Monthly,AKSTHPI,FRED/AKSTHPI,,AK,STHPI
+Arizona-House Price Index,Arizona,House Price Index,All-Transactions House Price Index,Monthly,AZSTHPI,FRED/AZSTHPI,,AZ,STHPI
+Arkansas-House Price Index,Arkansas,House Price Index,All-Transactions House Price Index,Monthly,ARSTHPI,FRED/ARSTHPI,,AR,STHPI
+California-House Price Index,California,House Price Index,All-Transactions House Price Index,Monthly,CASTHPI,FRED/CASTHPI,,CA,STHPI
+Colorado-House Price Index,Colorado,House Price Index,All-Transactions House Price Index,Monthly,COSTHPI,FRED/COSTHPI,,CO,STHPI
+Connecticut-House Price Index,Connecticut,House Price Index,All-Transactions House Price Index,Monthly,CTSTHPI,FRED/CTSTHPI,,CT,STHPI
+Delaware-House Price Index,Delaware,House Price Index,All-Transactions House Price Index,Monthly,DESTHPI,FRED/DESTHPI,,DE,STHPI
+Florida-House Price Index,Florida,House Price Index,All-Transactions House Price Index,Monthly,FLSTHPI,FRED/FLSTHPI,,FL,STHPI
+Georgia-House Price Index,Georgia,House Price Index,All-Transactions House Price Index,Monthly,GASTHPI,FRED/GASTHPI,,GA,STHPI
+Hawaii-House Price Index,Hawaii,House Price Index,All-Transactions House Price Index,Monthly,HISTHPI,FRED/HISTHPI,,HI,STHPI
+Idaho-House Price Index,Idaho,House Price Index,All-Transactions House Price Index,Monthly,IDSTHPI,FRED/IDSTHPI,,ID,STHPI
+Illinois-House Price Index,Illinois,House Price Index,All-Transactions House Price Index,Monthly,ILSTHPI,FRED/ILSTHPI,,IL,STHPI
+Indiana-House Price Index,Indiana,House Price Index,All-Transactions House Price Index,Monthly,INSTHPI,FRED/INSTHPI,,IN,STHPI
+Iowa-House Price Index,Iowa,House Price Index,All-Transactions House Price Index,Monthly,IASTHPI,FRED/IASTHPI,,IA,STHPI
+Kansas-House Price Index,Kansas,House Price Index,All-Transactions House Price Index,Monthly,KSSTHPI,FRED/KSSTHPI,,KS,STHPI
+Kentucky-House Price Index,Kentucky,House Price Index,All-Transactions House Price Index,Monthly,KYSTHPI,FRED/KYSTHPI,,KY,STHPI
+Louisiana-House Price Index,Louisiana,House Price Index,All-Transactions House Price Index,Monthly,LASTHPI,FRED/LASTHPI,,LA,STHPI
+Maine-House Price Index,Maine,House Price Index,All-Transactions House Price Index,Monthly,MESTHPI,FRED/MESTHPI,,ME,STHPI
+Maryland-House Price Index,Maryland,House Price Index,All-Transactions House Price Index,Monthly,MDSTHPI,FRED/MDSTHPI,,MD,STHPI
+Massachusetts-House Price Index,Massachusetts,House Price Index,All-Transactions House Price Index,Monthly,MASTHPI,FRED/MASTHPI,,MA,STHPI
+Michigan-House Price Index,Michigan,House Price Index,All-Transactions House Price Index,Monthly,MISTHPI,FRED/MISTHPI,,MI,STHPI
+Minnesota-House Price Index,Minnesota,House Price Index,All-Transactions House Price Index,Monthly,MNSTHPI,FRED/MNSTHPI,,MN,STHPI
+Mississippi-House Price Index,Mississippi,House Price Index,All-Transactions House Price Index,Monthly,MSSTHPI,FRED/MSSTHPI,,MS,STHPI
+Missouri-House Price Index,Missouri,House Price Index,All-Transactions House Price Index,Monthly,MOSTHPI,FRED/MOSTHPI,,MO,STHPI
+Montana-House Price Index,Montana,House Price Index,All-Transactions House Price Index,Monthly,MTSTHPI,FRED/MTSTHPI,,MT,STHPI
+Nebraska-House Price Index,Nebraska,House Price Index,All-Transactions House Price Index,Monthly,NESTHPI,FRED/NESTHPI,,NE,STHPI
+Nevada-House Price Index,Nevada,House Price Index,All-Transactions House Price Index,Monthly,NVSTHPI,FRED/NVSTHPI,,NV,STHPI
+New Hampshire-House Price Index,New Hampshire,House Price Index,All-Transactions House Price Index,Monthly,NHSTHPI,FRED/NHSTHPI,,NH,STHPI
+New Jersey-House Price Index,New Jersey,House Price Index,All-Transactions House Price Index,Monthly,NJSTHPI,FRED/NJSTHPI,,NJ,STHPI
+New Mexico-House Price Index,New Mexico,House Price Index,All-Transactions House Price Index,Monthly,NMSTHPI,FRED/NMSTHPI,,NM,STHPI
+New York-House Price Index,New York,House Price Index,All-Transactions House Price Index,Monthly,NYSTHPI,FRED/NYSTHPI,,NY,STHPI
+North Carolina-House Price Index,North Carolina,House Price Index,All-Transactions House Price Index,Monthly,NCSTHPI,FRED/NCSTHPI,,NC,STHPI
+North Dakota-House Price Index,North Dakota,House Price Index,All-Transactions House Price Index,Monthly,NDSTHPI,FRED/NDSTHPI,,ND,STHPI
+Ohio-House Price Index,Ohio,House Price Index,All-Transactions House Price Index,Monthly,OHSTHPI,FRED/OHSTHPI,,OH,STHPI
+Oklahoma-House Price Index,Oklahoma,House Price Index,All-Transactions House Price Index,Monthly,OKSTHPI,FRED/OKSTHPI,,OK,STHPI
+Oregon-House Price Index,Oregon,House Price Index,All-Transactions House Price Index,Monthly,ORSTHPI,FRED/ORSTHPI,,OR,STHPI
+Pennsylvania-House Price Index,Pennsylvania,House Price Index,All-Transactions House Price Index,Monthly,PASTHPI,FRED/PASTHPI,,PA,STHPI
+Rhode Island-House Price Index,Rhode Island,House Price Index,All-Transactions House Price Index,Monthly,RISTHPI,FRED/RISTHPI,,RI,STHPI
+South Carolina-House Price Index,South Carolina,House Price Index,All-Transactions House Price Index,Monthly,SCSTHPI,FRED/SCSTHPI,,SC,STHPI
+South Dakota-House Price Index,South Dakota,House Price Index,All-Transactions House Price Index,Monthly,SDSTHPI,FRED/SDSTHPI,,SD,STHPI
+Tennessee-House Price Index,Tennessee,House Price Index,All-Transactions House Price Index,Monthly,TNSTHPI,FRED/TNSTHPI,,TN,STHPI
+Texas-House Price Index,Texas,House Price Index,All-Transactions House Price Index,Monthly,TXSTHPI,FRED/TXSTHPI,,TX,STHPI
+Utah-House Price Index,Utah,House Price Index,All-Transactions House Price Index,Monthly,UTSTHPI,FRED/UTSTHPI,,UT,STHPI
+Vermont-House Price Index,Vermont,House Price Index,All-Transactions House Price Index,Monthly,VTSTHPI,FRED/VTSTHPI,,VT,STHPI
+Virginia-House Price Index,Virginia,House Price Index,All-Transactions House Price Index,Monthly,VASTHPI,FRED/VASTHPI,,VA,STHPI
+Washington-House Price Index,Washington,House Price Index,All-Transactions House Price Index,Monthly,WASTHPI,FRED/WASTHPI,,WA,STHPI
+West Virginia-House Price Index,West Virginia,House Price Index,All-Transactions House Price Index,Monthly,WVSTHPI,FRED/WVSTHPI,,WV,STHPI
+Wisconsin-House Price Index,Wisconsin,House Price Index,All-Transactions House Price Index,Monthly,WISTHPI,FRED/WISTHPI,,WI,STHPI
+Wyoming-House Price Index,Wyoming,House Price Index,All-Transactions House Price Index,Monthly,WYSTHPI,FRED/WYSTHPI,,WY,STHPI
+Canada-Unemployment Rate,Canada,Unemployment Rate,Unemployment Rate,Monthly,,,CANLXEMR Index,,
+United States-Unemployment Rate,United States,Unemployment Rate,Unemployment Rate,Monthly,,,USURTOT Index,,
+Argentina-Unemployment Rate,Argentina,Unemployment Rate,Unemployment Rate,Monthly,,,ARUERATE Index,,
+Barbados-Unemployment Rate,Barbados,Unemployment Rate,Unemployment Rate,Monthly,,,BBLACMFR Index,,
+Brazil-Unemployment Rate,Brazil,Unemployment Rate,Unemployment Rate,Monthly,,,BZUETOTN Index,,
+Chile-Unemployment Rate,Chile,Unemployment Rate,Unemployment Rate,Monthly,,,CHUETOTL Index,,
+Colombia-Unemployment Rate,Colombia,Unemployment Rate,Unemployment Rate,Monthly,,,COUNTOTN Index,,
+Costa Rica-Unemployment Rate,Costa Rica,Unemployment Rate,Unemployment Rate,Monthly,,,CRUEUN Index,,
+Dominican Republic-Unemployment Rate,Dominican Republic,Unemployment Rate,Unemployment Rate,Monthly,,,BCRDUNEM Index,,
+Ecuador-Unemployment Rate,Ecuador,Unemployment Rate,Unemployment Rate,Monthly,,,EDLBUETO Index,,
+Jamaica-Unemployment Rate,Jamaica,Unemployment Rate,Unemployment Rate,Monthly,,,JMLFTUER Index,,
+Mexico-Unemployment Rate,Mexico,Unemployment Rate,Unemployment Rate,Monthly,,,MXUEUNSA Index,,
+Peru-Unemployment Rate,Peru,Unemployment Rate,Unemployment Rate,Monthly,,,PRUEUER Index,,
+Uruguay-Unemployment Rate,Uruguay,Unemployment Rate,Unemployment Rate,Monthly,,,URURURT Index,,
+Venezuela-Unemployment Rate,Venezuela,Unemployment Rate,Unemployment Rate,Monthly,,,VNUEMTHY Index,,
+Austria-Unemployment Rate,Austria,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTAT Index,,
+Belgium-Unemployment Rate,Belgium,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTBE Index,,
+Cyprus-Unemployment Rate,Cyprus,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTCY Index,,
+Denmark-Unemployment Rate,Denmark,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTDK Index,,
+European Union-Unemployment Rate,European Union,Unemployment Rate,Unemployment Rate,Monthly,,,UMRT27 Index,,
+Eurozone-Unemployment Rate,Eurozone,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTEMU Index,,
+Finland-Unemployment Rate,Finland,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTFI Index,,
+France-Unemployment Rate,France,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTFR Index,,
+Germany-Unemployment Rate,Germany,Unemployment Rate,Unemployment Rate,Monthly,,,GILOURS Index,,
+Greece-Unemployment Rate,Greece,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTGR Index,,
+Iceland-Unemployment Rate,Iceland,Unemployment Rate,Unemployment Rate,Monthly,,,ICUNEMRT Index,,
+Ireland-Unemployment Rate,Ireland,Unemployment Rate,Unemployment Rate,Monthly,,,IEUERT Index,,
+Italy-Unemployment Rate,Italy,Unemployment Rate,Unemployment Rate,Monthly,,,ITMUURS Index,,
+Luxembourg-Unemployment Rate,Luxembourg,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTLU Index,,
+Malta-Unemployment Rate,Malta,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTMT Index,,
+Netherlands-Unemployment Rate,Netherlands,Unemployment Rate,Unemployment Rate,Monthly,,,NEUETOTR Index,,
+Norway-Unemployment Rate,Norway,Unemployment Rate,Unemployment Rate,Monthly,,,NOLBRATE Index,,
+Portugal-Unemployment Rate,Portugal,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTPT Index,,
+Spain-Unemployment Rate,Spain,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTES Index,,
+Sweden-Unemployment Rate,Sweden,Unemployment Rate,Unemployment Rate,Monthly,,,SWUESART Index,,
+Switzerland-Unemployment Rate,Switzerland,Unemployment Rate,Unemployment Rate,Monthly,,,SZUEUEA Index,,
+United Kingdom-Unemployment Rate,United Kingdom,Unemployment Rate,Unemployment Rate,Monthly,,,UKUEILOR Index,,
+Bulgaria-Unemployment Rate,Bulgaria,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTBG Index,,
+Croatia-Unemployment Rate,Croatia,Unemployment Rate,Unemployment Rate,Monthly,,,CQUER Index,,
+Czech Republic-Unemployment Rate,Czech Republic,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTCZ Index,,
+Estonia-Unemployment Rate,Estonia,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTEE Index,,
+Hungary-Unemployment Rate,Hungary,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTHU Index,,
+Latvia-Unemployment Rate,Latvia,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTLV Index,,
+Lithuania-Unemployment Rate,Lithuania,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTLT Index,,
+Poland-Unemployment Rate,Poland,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTPL Index,,
+Romania-Unemployment Rate,Romania,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTRO Index,,
+Russia-Unemployment Rate,Russia,Unemployment Rate,Unemployment Rate,Monthly,,,RUUER Index,,
+Slovakia-Unemployment Rate,Slovakia,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTSK Index,,
+Slovenia-Unemployment Rate,Slovenia,Unemployment Rate,Unemployment Rate,Monthly,,,UMRTSI Index,,
+Turkey-Unemployment Rate,Turkey,Unemployment Rate,Unemployment Rate,Monthly,,,TULSUR Index,,
+Ukraine-Unemployment Rate,Ukraine,Unemployment Rate,Unemployment Rate,Monthly,,,UAUEILO Index,,
+Egypt-Unemployment Rate,Egypt,Unemployment Rate,Unemployment Rate,Monthly,,,EGEAUT Index,,
+Israel-Unemployment Rate,Israel,Unemployment Rate,Unemployment Rate,Monthly,,,ISUMUNER Index,,
+Jordan-Unemployment Rate,Jordan,Unemployment Rate,Unemployment Rate,Monthly,,,JOUERATE Index,,
+Morocco-Unemployment Rate,Morocco,Unemployment Rate,Unemployment Rate,Monthly,,,MOUER Index,,
+South Africa-Unemployment Rate,South Africa,Unemployment Rate,Unemployment Rate,Monthly,,,SAUERATQ Index,,
+Australia-Unemployment Rate,Australia,Unemployment Rate,Unemployment Rate,Monthly,,,AULFUNEM Index,,
+China-Unemployment Rate,China,Unemployment Rate,Unemployment Rate,Monthly,,,CNUERATE Index,,
+Hong Kong-Unemployment Rate,Hong Kong,Unemployment Rate,Unemployment Rate,Monthly,,,HKUERATE Index,,
+Japan-Unemployment Rate,Japan,Unemployment Rate,Unemployment Rate,Monthly,,,JNUE Index,,
+Kazakhstan-Unemployment Rate,Kazakhstan,Unemployment Rate,Unemployment Rate,Monthly,,,KAUERATE Index,,
+Macau-Unemployment Rate,Macau,Unemployment Rate,Unemployment Rate,Monthly,,,MOUNUNEM Index,,
+Malaysia-Unemployment Rate,Malaysia,Unemployment Rate,Unemployment Rate,Monthly,,,MAEPRATE Index,,
+New Zealand-Unemployment Rate,New Zealand,Unemployment Rate,Unemployment Rate,Monthly,,,NZLFUNER Index,,
+Philippines-Unemployment Rate,Philippines,Unemployment Rate,Unemployment Rate,Monthly,,,PHLFUERT Index,,
+Singapore-Unemployment Rate,Singapore,Unemployment Rate,Unemployment Rate,Monthly,,,SIQUTOTA Index,,
+South Korea-Unemployment Rate,South Korea,Unemployment Rate,Unemployment Rate,Monthly,,,KOEAUERS Index,,
+Sri Lanka-Unemployment Rate,Sri Lanka,Unemployment Rate,Unemployment Rate,Monthly,,,SKEMUNER Index,,
+Taiwan-Unemployment Rate,Taiwan,Unemployment Rate,Unemployment Rate,Monthly,,,TWLFADJ Index,,
+Thailand-Unemployment Rate,Thailand,Unemployment Rate,Unemployment Rate,Monthly,,,THLMUERT Index,,
+United States-GDP QoQ (SAAR),United States,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,GDP CHWG Index,,
+Canada-GDP QoQ (SAAR),Canada,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,CGE9ANN Index,,
+Mexico-GDP QoQ (SAAR),Mexico,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,MXGPLEVL Index,,
+Argentina-GDP QoQ (SAAR),Argentina,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,ARADTOTL Index,,
+Brazil-GDP QoQ (SAAR),Brazil,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,BZGDQOQ Index,,
+Chile-GDP QoQ (SAAR),Chile,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,CLGDPSA Index,,
+Colombia-GDP QoQ (SAAR),Colombia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,COCIPIB Index,,
+Costa Rica-GDP QoQ (SAAR),Costa Rica,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,CRADGDP Index,,
+Ecuador-GDP QoQ (SAAR),Ecuador,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EDGQTOTL Index,,
+Eurozone-GDP QoQ (SAAR),Eurozone,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNEMU Index,,
+EU-27-GDP QoQ (SAAR),EU-27,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNEU27 Index,,
+EU-15-GDP QoQ (SAAR),EU-15,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNEU15 Index,,
+Austria-GDP QoQ (SAAR),Austria,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNAT Index,,
+Belgium-GDP QoQ (SAAR),Belgium,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNBE Index,,
+Cyprus-GDP QoQ (SAAR),Cyprus,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNCY Index,,
+Czech Republic-GDP QoQ (SAAR),Czech Republic,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNCZ Index,,
+Denmark-GDP QoQ (SAAR),Denmark,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNDK Index,,
+Estonia-GDP QoQ (SAAR),Estonia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNEE Index,,
+Finland-GDP QoQ (SAAR),Finland,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNFI Index,,
+France-GDP QoQ (SAAR),France,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNFR Index,,
+Germany-GDP QoQ (SAAR),Germany,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNDE Index,,
+Greece-GDP QoQ (SAAR),Greece,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNGR Index,,
+Hungary-GDP QoQ (SAAR),Hungary,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNHU Index,,
+Ireland-GDP QoQ (SAAR),Ireland,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNIE Index,,
+Italy-GDP QoQ (SAAR),Italy,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNIT Index,,
+Latvia-GDP QoQ (SAAR),Latvia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNLV Index,,
+Lithuania-GDP QoQ (SAAR),Lithuania,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNLT Index,,
+Luxembourg-GDP QoQ (SAAR),Luxembourg,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNLU Index,,
+Malta-GDP QoQ (SAAR),Malta,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNMT Index,,
+Netherlands-GDP QoQ (SAAR),Netherlands,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNNL Index,,
+Norway-GDP QoQ (SAAR),Norway,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,NOGDCOSA Index,,
+Poland-GDP QoQ (SAAR),Poland,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNPL Index,,
+Portugal-GDP QoQ (SAAR),Portugal,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNPT Index,,
+Russia-GDP QoQ (SAAR),Russia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,RUDPGDPS Index,,
+Slovakia-GDP QoQ (SAAR),Slovakia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNSK Index,,
+Slovenia-GDP QoQ (SAAR),Slovenia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNSI Index,,
+Spain-GDP QoQ (SAAR),Spain,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNES Index,,
+Sweden-GDP QoQ (SAAR),Sweden,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNSE Index,,
+Switzerland-GDP QoQ (SAAR),Switzerland,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,SZGDPC Index,,
+Turkey-GDP QoQ (SAAR),Turkey,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,TUGPCOSA Index,,
+United Kingdom-GDP QoQ (SAAR),United Kingdom,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,EUGNUK Index,,
+Israel-GDP QoQ (SAAR),Israel,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,ISGSANYY Index,,
+Kenya-GDP QoQ (SAAR),Kenya,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,KNGDPSA Index,,
+South Africa-GDP QoQ (SAAR),South Africa,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,SADXGDE Index,,
+Australia-GDP QoQ (SAAR),Australia,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,AUNAGDP Index,,
+China-GDP QoQ (SAAR),China,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,CGGDPQOA Index,,
+Japan-GDP QoQ (SAAR),Japan,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,JGDPAGDP Index,,
+New Zealand-GDP QoQ (SAAR),New Zealand,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,NZNTEGDP Index,,
+Philippines-GDP QoQ (SAAR),Philippines,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,PHNAGDPS Index,,
+Singapore-GDP QoQ (SAAR),Singapore,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,SGDPQOQ Index,,
+South Korea-GDP QoQ (SAAR),South Korea,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,KOECSTOT Index,,
+Taiwan-GDP QoQ (SAAR),Taiwan,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,TWRGSAAR Index,,
+Thailand-GDP QoQ (SAAR),Thailand,GDP QoQ (SAAR),GDP QoQ (SAAR),Quarterly,,,THG PQSA Index,,
+Canada-CPI YoY,Canada,CPI YoY,CPI YoY,Monthly,,,CACPIYOY Index,,
+United States-CPI YoY,United States,CPI YoY,CPI YoY,Monthly,,,CPI YOY Index,,
+Bahamas-CPI YoY,Bahamas,CPI YoY,CPI YoY,Monthly,,,BSCIALLY Index,,
+Barbados-CPI YoY,Barbados,CPI YoY,CPI YoY,Monthly,,,BBRPCYOY Index,,
+Belize-CPI YoY,Belize,CPI YoY,CPI YoY,Monthly,,,BZHHCPIY Index,,
+Bermuda-CPI YoY,Bermuda,CPI YoY,CPI YoY,Monthly,,,BRMCYOY Index,,
+Bolivia-CPI YoY,Bolivia,CPI YoY,CPI YoY,Monthly,,,BOPIIPCY Index,,
+Brazil-CPI YoY,Brazil,CPI YoY,CPI YoY,Monthly,,,BZPIIPCY Index,,
+Chile-CPI YoY,Chile,CPI YoY,CPI YoY,Monthly,,,CNPINSYO Index,,
+Colombia-CPI YoY,Colombia,CPI YoY,CPI YoY,Monthly,,,COCPIYOY Index,,
+Costa Rica-CPI YoY,Costa Rica,CPI YoY,CPI YoY,Monthly,,,CRCIYOY Index,,
+Dominican Republic-CPI YoY,Dominican Republic,CPI YoY,CPI YoY,Monthly,,,BCRDCPIY Index,,
+Ecuador-CPI YoY,Ecuador,CPI YoY,CPI YoY,Monthly,,,EDCPYOY Index,,
+El Salvador-CPI YoY,El Salvador,CPI YoY,CPI YoY,Monthly,,,ELCPINYO Index,,
+Guatemala-CPI YoY,Guatemala,CPI YoY,CPI YoY,Monthly,,,GUCPIYOY Index,,
+Honduras-CPI YoY,Honduras,CPI YoY,CPI YoY,Monthly,,,HNCPCPIY Index,,
+Jamaica-CPI YoY,Jamaica,CPI YoY,CPI YoY,Monthly,,,JMCPYOY Index,,
+Mexico-CPI YoY,Mexico,CPI YoY,CPI YoY,Monthly,,,MXCPYOY Index,,
+Nicaragua-CPI YoY,Nicaragua,CPI YoY,CPI YoY,Monthly,,,NIPIMNYY Index,,
+Panama-CPI YoY,Panama,CPI YoY,CPI YoY,Monthly,,,PNCPYOY Index,,
+Paraguay-CPI YoY,Paraguay,CPI YoY,CPI YoY,Monthly,,,PYCICHGY Index,,
+Peru-CPI YoY,Peru,CPI YoY,CPI YoY,Monthly,,,PRCPYOY Index,,
+Puerto Rico-CPI YoY,Puerto Rico,CPI YoY,CPI YoY,Monthly,,,RCPITOTY Index,,
+Trinidad & Tobago-CPI YoY,Trinidad & Tobago,CPI YoY,CPI YoY,Monthly,,,RTPIYYRC Index,,
+Uruguay-CPI YoY,Uruguay,CPI YoY,CPI YoY,Monthly,,,URCPYOY Index,,
+Venezuela-CPI YoY,Venezuela,CPI YoY,CPI YoY,Monthly,,,VZCPYOY% Index,,
+Austria-CPI YoY,Austria,CPI YoY,CPI YoY,Monthly,,,ATCPYY10 Index,,
+Belgium-CPI YoY,Belgium,CPI YoY,CPI YoY,Monthly,,,BECPYOY Index,,
+Cyprus-CPI YoY,Cyprus,CPI YoY,CPI YoY,Monthly,,,CYCPNYOY Index,,
+Denmark-CPI YoY,Denmark,CPI YoY,CPI YoY,Monthly,,,DNCPIYOY Index,,
+Estonia-CPI YoY,Estonia,CPI YoY,CPI YoY,Monthly,,,ESCPLYOY Index,,
+European Union-CPI YoY,European Union,CPI YoY,CPI YoY,Monthly,,,ECCPEUY Index,,
+Eurozone-CPI YoY,Eurozone,CPI YoY,CPI YoY,Monthly,,,ECCPEMUY Index,,
+Finland-CPI YoY,Finland,CPI YoY,CPI YoY,Monthly,,,FICP2YOY Index,,
+France-CPI YoY,France,CPI YoY,CPI YoY,Monthly,,,FRCPIYOY Index,,
+Germany-CPI YoY,Germany,CPI YoY,CPI YoY,Monthly,,,GRCP20YY Index,,
+Greece-CPI YoY,Greece,CPI YoY,CPI YoY,Monthly,,,GKCPNEWY Index,,
+Iceland-CPI YoY,Iceland,CPI YoY,CPI YoY,Monthly,,,ICCPIYOY Index,,
+Ireland-CPI YoY,Ireland,CPI YoY,CPI YoY,Monthly,,,IECPIYOY Index,,
+Italy-CPI YoY,Italy,CPI YoY,CPI YoY,Monthly,,,ITCPNICY Index,,
+Luxembourg-CPI YoY,Luxembourg,CPI YoY,CPI YoY,Monthly,,,LXCPIYOY Index,,
+Malta-CPI YoY,Malta,CPI YoY,CPI YoY,Monthly,,,MTCPEHYY Index,,
+Netherlands-CPI YoY,Netherlands,CPI YoY,CPI YoY,Monthly,,,NECPIYOY Index,,
+Norway-CPI YoY,Norway,CPI YoY,CPI YoY,Monthly,,,NOCPIYOY Index,,
+Portugal-CPI YoY,Portugal,CPI YoY,CPI YoY,Monthly,,,PLCPYOY Index,,
+Spain-CPI YoY,Spain,CPI YoY,CPI YoY,Monthly,,,SPIPCYOY Index,,
+Sweden-CPI YoY,Sweden,CPI YoY,CPI YoY,Monthly,,,SWCPYOY Index,,
+Switzerland-CPI YoY,Switzerland,CPI YoY,CPI YoY,Monthly,,,SZCPIYOY Index,,
+United Kingdom-CPI YoY,United Kingdom,CPI YoY,CPI YoY,Monthly,,,UKRPCJYR Index,,
+Armenia-CPI YoY,Armenia,CPI YoY,CPI YoY,Monthly,,,AMPRCPIY Index,,
+Belarus-CPI YoY,Belarus,CPI YoY,CPI YoY,Monthly,,,PIRBCPIY Index,,
+Bosnia & Herzegovina-CPI YoY,Bosnia & Herzegovina,CPI YoY,CPI YoY,Monthly,,,BYCPIYOY Index,,
+Bulgaria-CPI YoY,Bulgaria,CPI YoY,CPI YoY,Monthly,,,BUCPIYOY Index,,
+Croatia-CPI YoY,Croatia,CPI YoY,CPI YoY,Monthly,,,CQPCIYOY Index,,
+Czech Republic-CPI YoY,Czech Republic,CPI YoY,CPI YoY,Monthly,,,CZCPYOY Index,,
+Estonia-CPI YoY,Estonia,CPI YoY,CPI YoY,Monthly,,,ESCPLYOY Index,,
+Georgia-CPI YoY,Georgia,CPI YoY,CPI YoY,Monthly,,,GGCPALLY Index,,
+Hungary-CPI YoY,Hungary,CPI YoY,CPI YoY,Monthly,,,HUCPIYY Index,,
+Latvia-CPI YoY,Latvia,CPI YoY,CPI YoY,Monthly,,,LACPYOY Index,,
+Lithuania-CPI YoY,Lithuania,CPI YoY,CPI YoY,Monthly,,,LICPIYOY Index,,
+Moldova-CPI YoY,Moldova,CPI YoY,CPI YoY,Monthly,,,MDCPIYOY Index,,
+Poland-CPI YoY,Poland,CPI YoY,CPI YoY,Monthly,,,POCPIYOY Index,,
+Romania-CPI YoY,Romania,CPI YoY,CPI YoY,Monthly,,,ROCOPYOY Index,,
+Russia-CPI YoY,Russia,CPI YoY,CPI YoY,Monthly,,,RUCPIYOY Index,,
+Serbia-CPI YoY,Serbia,CPI YoY,CPI YoY,Monthly,,,SEHCYY Index,,
+Slovakia-CPI YoY,Slovakia,CPI YoY,CPI YoY,Monthly,,,SLCPLYOY Index,,
+Slovenia-CPI YoY,Slovenia,CPI YoY,CPI YoY,Monthly,,,SVCPYOY Index,,
+Turkey-CPI YoY,Turkey,CPI YoY,CPI YoY,Monthly,,,TUCPIY Index,,
+Ukraine-CPI YoY,Ukraine,CPI YoY,CPI YoY,Monthly,,,UACPTYOY Index,,
+Abu Dhabi-CPI YoY,Abu Dhabi,CPI YoY,CPI YoY,Monthly,,,ADCPIY Index,,
+Algeria-CPI YoY,Algeria,CPI YoY,CPI YoY,Monthly,,,AGCPIY Index,,
+Angola-CPI YoY,Angola,CPI YoY,CPI YoY,Monthly,,,AOCPYOY Index,,
+Bahrain-CPI YoY,Bahrain,CPI YoY,CPI YoY,Monthly,,,BJCPIYOY Index,,
+Botswana-CPI YoY,Botswana,CPI YoY,CPI YoY,Monthly,,,BWCPIYOY Index,,
+Egypt-CPI YoY,Egypt,CPI YoY,CPI YoY,Monthly,,,EGCPYOY Index,,
+Ghana-CPI YoY,Ghana,CPI YoY,CPI YoY,Monthly,,,GHCPALLY Index,,
+Iran-CPI YoY,Iran,CPI YoY,CPI YoY,Monthly,,,IACIGY Index,,
+Iraq-CPI YoY,Iraq,CPI YoY,CPI YoY,Monthly,,,IQPIGIY Index,,
+Israel-CPI YoY,Israel,CPI YoY,CPI YoY,Monthly,,,ISCPIYYN Index,,
+Jordan-CPI YoY,Jordan,CPI YoY,CPI YoY,Monthly,,,JOCPIYOY Index,,
+Kenya-CPI YoY,Kenya,CPI YoY,CPI YoY,Monthly,,,KNPRIYY Index,,
+Kuwait-CPI YoY,Kuwait,CPI YoY,CPI YoY,Monthly,,,KUCPIYOY Index,,
+Lebanon-CPI YoY,Lebanon,CPI YoY,CPI YoY,Monthly,,,LECMGY Index,,
+Morocco-CPI YoY,Morocco,CPI YoY,CPI YoY,Monthly,,,MOCPIYOY Index,,
+Namibia-CPI YoY,Namibia,CPI YoY,CPI YoY,Monthly,,,NCPIYOY Index,,
+Nigeria-CPI YoY,Nigeria,CPI YoY,CPI YoY,Monthly,,,NGCPIYOY Index,,
+Oman-CPI YoY,Oman,CPI YoY,CPI YoY,Monthly,,,OMCPIYOY Index,,
+Qatar-CPI YoY,Qatar,CPI YoY,CPI YoY,Monthly,,,QAPCGYOY Index,,
+Saudi Arabia-CPI YoY,Saudi Arabia,CPI YoY,CPI YoY,Monthly,,,SRCPIYOY Index,,
+Senegal-CPI YoY,Senegal,CPI YoY,CPI YoY,Monthly,,,SNHICPY Index,,
+South Africa-CPI YoY,South Africa,CPI YoY,CPI YoY,Monthly,,,SACPIYOY Index,,
+Tunisia-CPI YoY,Tunisia,CPI YoY,CPI YoY,Monthly,,,TNCPIYOY Index,,
+United Arab Emirates-CPI YoY,United Arab Emirates,CPI YoY,CPI YoY,Monthly,,,UAPIGY Index,,
+Uganda-CPI YoY,Uganda,CPI YoY,CPI YoY,Monthly,,,UGCPIYOY Index,,
+Yemen-CPI YoY,Yemen,CPI YoY,CPI YoY,Monthly,,,YEPIIAY Index,,
+Zambia-CPI YoY,Zambia,CPI YoY,CPI YoY,Monthly,,,ZMCPIYOY Index,,
+Zimbabwe-CPI YoY,Zimbabwe,CPI YoY,CPI YoY,Monthly,,,ZWCPINEY Index,,
+Australia-CPI YoY,Australia,CPI YoY,CPI YoY,Monthly,,,AUCPIYOY Index,,
+Azerbaijan-CPI YoY,Azerbaijan,CPI YoY,CPI YoY,Monthly,,,AZCPALLY Index,,
+Bangladesh-CPI YoY,Bangladesh,CPI YoY,CPI YoY,Monthly,,,BNINGENY Index,,
+Cambodia-CPI YoY,Cambodia,CPI YoY,CPI YoY,Monthly,,,KHCPIYOY Index,,
+China-CPI YoY,China,CPI YoY,CPI YoY,Monthly,,,CNCPIYOY Index,,
+Fiji-CPI YoY,Fiji,CPI YoY,CPI YoY,Monthly,,,FJCPYOY% Index,,
+Hong Kong-CPI YoY,Hong Kong,CPI YoY,CPI YoY,Monthly,,,HKCPIY Index,,
+India-CPI YoY,India,CPI YoY,CPI YoY,Monthly,,,INFUTOTY Index,,
+Indonesia-CPI YoY,Indonesia,CPI YoY,CPI YoY,Monthly,,,IDCPIY Index,,
+Japan-CPI YoY,Japan,CPI YoY,CPI YoY,Monthly,,,JNCPIYOY Index,,
+Kazakhstan-CPI YoY,Kazakhstan,CPI YoY,CPI YoY,Monthly,,,KACPYOY Index,,
+Kyrgyzstan-CPI YoY,Kyrgyzstan,CPI YoY,CPI YoY,Monthly,,,KYPICMYY Index,,
+Macau-CPI YoY,Macau,CPI YoY,CPI YoY,Monthly,,,MUCPIY Index,,
+Malaysia-CPI YoY,Malaysia,CPI YoY,CPI YoY,Monthly,,,MACPIYOY Index,,
+Maldives-CPI YoY,Maldives,CPI YoY,CPI YoY,Monthly,,,MVCPINFN Index,,
+Mongolia-CPI YoY,Mongolia,CPI YoY,CPI YoY,Monthly,,,MHCPI15 Index,,
+Myanmar-CPI YoY,Myanmar,CPI YoY,CPI YoY,Monthly,,,MMPXINFL Index,,
+Pakistan-CPI YoY,Pakistan,CPI YoY,CPI YoY,Monthly,,,PACPGENY Index,,
+Nepal-CPI YoY,Nepal,CPI YoY,CPI YoY,Monthly,,,NPCPALLY Index,,
+New Zealand-CPI YoY,New Zealand,CPI YoY,CPI YoY,Monthly,,,NZCPIYOY Index,,
+Pakistan-CPI YoY,Pakistan,CPI YoY,CPI YoY,Monthly,,,PACPGENY Index,,
+Philippines-CPI YoY,Philippines,CPI YoY,CPI YoY,Monthly,,,PHC2II Index,,
+Singapore-CPI YoY,Singapore,CPI YoY,CPI YoY,Monthly,,,SICPIYOY Index,,
+South Korea-CPI YoY,South Korea,CPI YoY,CPI YoY,Monthly,,,KOCPIYOY Index,,
+Sri Lanka-CPI YoY,Sri Lanka,CPI YoY,CPI YoY,Monthly,,,SKCPYOY Index,,
+Taiwan-CPI YoY,Taiwan,CPI YoY,CPI YoY,Monthly,,,TWCPIYOY Index,,
+Tajikistan-CPI YoY,Tajikistan,CPI YoY,CPI YoY,Monthly,,,TJCPI Index,,
+Thailand-CPI YoY,Thailand,CPI YoY,CPI YoY,Monthly,,,THCPIYOY Index,,
+Timor-Leste-CPI YoY,Timor-Leste,CPI YoY,CPI YoY,Monthly,,,TLCPIY Index,,
+Vietnam-CPI YoY,Vietnam,CPI YoY,CPI YoY,Monthly,,,VNCPIYOY Index,,
+Brazil-Markit Manufacturing PMIs,Brazil,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIBRMA Index,,
+Canada-Markit Manufacturing PMIs,Canada,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMICAMA Index,,
+Mexico-Markit Manufacturing PMIs,Mexico,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIMXMA Index,,
+United States-Markit Manufacturing PMIs,United States,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIUSMA Index,,
+Austria-Markit Manufacturing PMIs,Austria,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIATMA Index,,
+Czech Republic-Markit Manufacturing PMIs,Czech Republic,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMICZMA Index,,
+France-Markit Manufacturing PMIs,France,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIFRMA Index,,
+Germany-Markit Manufacturing PMIs,Germany,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIDEMA Index,,
+Greece-Markit Manufacturing PMIs,Greece,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIGRMA Index,,
+Ireland-Markit Manufacturing PMIs,Ireland,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIIEMA Index,,
+Italy-Markit Manufacturing PMIs,Italy,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIITMA Index,,
+Netherlands-Markit Manufacturing PMIs,Netherlands,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMINLMA Index,,
+Poland-Markit Manufacturing PMIs,Poland,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIPLMA Index,,
+Russia-Markit Manufacturing PMIs,Russia,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIRUMA Index,,
+Spain-Markit Manufacturing PMIs,Spain,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIESMA Index,,
+Turkey-Markit Manufacturing PMIs,Turkey,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMITRMA Index,,
+United Kingdom-Markit Manufacturing PMIs,United Kingdom,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIGBMA Index,,
+China-Markit Manufacturing PMIs,China,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMICNMA Index,,
+India-Markit Manufacturing PMIs,India,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIINMA Index,,
+Indonesia-Markit Manufacturing PMIs,Indonesia,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIIDMA Index,,
+Japan-Markit Manufacturing PMIs,Japan,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIJPMA Index,,
+Malaysia-Markit Manufacturing PMIs,Malaysia,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIMYMA Index,,
+South Korea-Markit Manufacturing PMIs,South Korea,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIKRMA Index,,
+Taiwan-Markit Manufacturing PMIs,Taiwan,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMITWMA Index,,
+Vietnam-Markit Manufacturing PMIs,Vietnam,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIVNMA Index,,
+Emerging Markets-Markit Manufacturing PMIs,Emerging Markets,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIEMMA Index,,
+Eurozone-Markit Manufacturing PMIs,Eurozone,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIEZMA Index,,
+European Union-Markit Manufacturing PMIs,European Union,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIEUMA Index,,
+Global-Markit Manufacturing PMIs,Global,Markit Manufacturing PMIs,Markit Manufacturing PMIs,Monthly,,,MPMIGLMA Index,,
+Brazil-Markit Service PMIs,Brazil,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIBRSA Index,,
+United States-Markit Service PMIs,United States,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIUSSA Index,,
+France-Markit Service PMIs,France,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIFRSA Index,,
+Germany-Markit Service PMIs,Germany,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIDESA Index,,
+Ireland-Markit Service PMIs,Ireland,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIIESA Index,,
+Italy-Markit Service PMIs,Italy,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIITSA Index,,
+Russia-Markit Service PMIs,Russia,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIRUSA Index,,
+Spain-Markit Service PMIs,Spain,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIESSA Index,,
+United Kingdom-Markit Service PMIs,United Kingdom,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIGBSA Index,,
+China-Markit Service PMIs,China,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMICNSA Index,,
+India-Markit Service PMIs,India,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIINSA Index,,
+Japan-Markit Service PMIs,Japan,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIJPSA Index,,
+Emerging Markets-Markit Service PMIs,Emerging Markets,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIEMSA Index,,
+European Union-Markit Service PMIs,European Union,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIEUSA Index,,
+Eurozone-Markit Service PMIs,Eurozone,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIEZSA Index,,
+Global-Markit Service PMIs,Global,Markit Service PMIs,Markit Service PMIs,Monthly,,,MPMIGLSA Index,,
+Brazil-Markit Composite PMIs,Brazil,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIBRCA Index,,
+United States-Markit Composite PMIs,United States,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIUSCA Index,,
+France-Markit Composite PMIs,France,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIFRCA Index,,
+Germany-Markit Composite PMIs,Germany,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIDECA Index,,
+Ireland-Markit Composite PMIs,Ireland,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIIECA Index,,
+Italy-Markit Composite PMIs,Italy,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIITCA Index,,
+Russia-Markit Composite PMIs,Russia,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIRUCA Index,,
+Spain-Markit Composite PMIs,Spain,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIESCA Index,,
+United Kingdom-Markit Composite PMIs,United Kingdom,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIGBCA Index,,
+China-Markit Composite PMIs,China,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMICNCA Index,,
+India-Markit Composite PMIs,India,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIINCA Index,,
+Japan-Markit Composite PMIs,Japan,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIJPCA Index,,
+Emerging Markets-Markit Composite PMIs,Emerging Markets,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIEMCA Index,,
+European Union-Markit Composite PMIs,European Union,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIEUCA Index,,
+Eurozone-Markit Composite PMIs,Eurozone,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIEZCA Index,,
+Global-Markit Composite PMIs,Global,Markit Composite PMIs,Markit Composite PMIs,Monthly,,,MPMIGLCA Index,,
+Eurozone-Markit Retail Surveys,Eurozone,Markit Retail Surveys,Markit Retail Surveys,Monthly,,,MPMIEZRA Index,,
+Germany-Markit Retail Surveys,Germany,Markit Retail Surveys,Markit Retail Surveys,Monthly,,,MPMIDERA Index,,
+France-Markit Retail Surveys,France,Markit Retail Surveys,Markit Retail Surveys,Monthly,,,MPMIFRRA Index,,
+Italy-Markit Retail Surveys,Italy,Markit Retail Surveys,Markit Retail Surveys,Monthly,,,MPMIITRA Index,,
+Eurozone-Markit Construction Surveys,Eurozone,Markit Construction Surveys,Markit Construction Surveys,Monthly,,,MPMIEZXA Index,,
+France-Markit Construction Surveys,France,Markit Construction Surveys,Markit Construction Surveys,Monthly,,,MPMIFRXA Index,,
+Germany-Markit Construction Surveys,Germany,Markit Construction Surveys,Markit Construction Surveys,Monthly,,,MPMIDEXA Index,,
+Ireland-Markit Construction Surveys,Ireland,Markit Construction Surveys,Markit Construction Surveys,Monthly,,,MPMIIEXA Index,,
+Italy-Markit Construction Surveys,Italy,Markit Construction Surveys,Markit Construction Surveys,Monthly,,,MPMIITXA Index,,
+United Kingdom-Markit Construction Surveys,United Kingdom,Markit Construction Surveys,Markit Construction Surveys,Monthly,,,MPMIGBXA Index,,
+Egypt-Markit Whole Economy Surveys,Egypt,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMIEGWA Index,,
+Hong Kong-Markit Whole Economy Surveys,Hong Kong,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMIHKWA Index,,
+Kenya-Markit Whole Economy Surveys,Kenya,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMIKEWA Index,,
+Lebanon-Markit Whole Economy Surveys,Lebanon,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMILBWA Index,,
+Saudi Arabia-Markit Whole Economy Surveys,Saudi Arabia,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMISAWA Index,,
+Singapore-Markit Whole Economy Surveys,Singapore,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMISGWA Index,,
+South Africa-Markit Whole Economy Surveys,South Africa,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMIZAWA Index,,
+UAE-Markit Whole Economy Surveys,UAE,Markit Whole Economy Surveys,Markit Whole Economy Surveys,Monthly,,,MPMIAEWA Index,,

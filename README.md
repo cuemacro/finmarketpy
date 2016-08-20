@@ -163,33 +163,7 @@ He has a decade of experience creating and successfully running systematic trad
 Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). 
 He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. 
 
-# Supporting PyThalesians project
-
-If you find PyThalesians useful (and in particular if you are commercial company) please consider supporting the project
-through sponsorship or by using Saeed's consultancy/research services in systematic trading. If you would like to contribute to the project, also let me know: it's a big task to try to build up this library on my own!
-
 For the UK election Plot.ly code - please visit https://github.com/plotly/IPython-plotly/tree/master/notebooks/ukelectionbbg
-
-# Future Plans for PyThalesians
-
-We plan to add the following features:
-* Spin out Chartesians into different project
-* Have a proper setup mechanism (eg. via pip), at present needs (partial) manual deployment
-* Add Plotly & Seaborn wrappers for plotting (partially there)
-* Improve support for Bokeh plotting (partially)
-* Add more plots from Matlibplot
-* Add Reuters as a historic data source
-* Add ability to stream data from Bloomberg and Reuters
-* Use event driven code to generate trading signals (to be used live and historically)
-* Add more interesting trading analysis tools
-* Add support for live trading via Interactive Brokers
-* Integrate support for zipline as an alternative trading system
-* Improve support for PyFolio
-* Support Python 2.7+
-
-More generally, we want to:
-* Make existing code more robust
-* Increase documentation and examples
 
 # Release Notes
 

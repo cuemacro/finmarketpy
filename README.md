@@ -21,13 +21,6 @@ At present the PyThalesians offers:
 documented
 * Uses Apache 2.0 licence
 
-# Chartesians
-
-The Chartesians graphics engine, provides easy to use wrappers for doing simple plots with multiple backend chart libraries
-such as Matplotlib, Plotly (via cufflinks) and Bokeh, without having to learn all the different APIs. We are planning to
-spinout Chartesians into a separate project over time. The PyThalesians project uses the graphics capabilities
-of Chartesians extensively.
-
 # Gallery
 
 Below we give some examples of analysis we've done with PyThalesians. Some of these can be run by scripts in the examples folder.

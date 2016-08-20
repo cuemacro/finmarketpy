@@ -4,6 +4,8 @@ PyThalesians is a Python financial library developed by the Thalesians (http://w
 
 There are many open source Python libraries for making trading strategies around! However, I've developed this one to be as flexible as possible in terms of what types of strategies you can develop with it. In addition, a lot of the library can be used to analyse and plot financial data for broader based analysis, of the type that I've had to face being in markets over the years. Hence, it can be used by a wider array of users.
 
+<b>Please note that Saeed Amen is no longer updating this library and will focus on updating several smaller libraries, with redesigned APIs and more functionality (also on GitHub), chartpy (for making charts), findatapy (for downloading market data) and finmarketpy (for backtesting)</b>
+
 At present the PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets (including cross sectional style trading strategies)
 * Sensitivity analysis for systematic trading strategies parameters
@@ -156,7 +158,7 @@ on systematic trading and also consult in the area. One of our clients is RavenP
 # Major contributors to PyThalesians
 
 * Saeed Amen - Saeed is the founder of Cuemacro (http://www.cuemacro.com), which deciphers how traders can use both existing and novel data sources
-to better understand macro markets. He is also managing director and co-founder of the Thalesians. 
+to better understand macro markets. He was also managing director and co-founder of the Thalesians. 
 He has a decade of experience creating and successfully running systematic trading models at Lehman Brothers and Nomura. 
 Independently, he runs a systematic trading model with proprietary capital. He is the author of Trading Thalesians – What the ancient world can teach us about trading today (Palgrave Macmillan). 
 He graduated with a first class honours master’s degree from Imperial College in Mathematics and Computer Science. 

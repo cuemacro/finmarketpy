@@ -4,7 +4,7 @@ PyThalesians is a Python financial library developed by the Thalesians (http://w
 
 There are many open source Python libraries for making trading strategies around! However, I've developed this one to be as flexible as possible in terms of what types of strategies you can develop with it. In addition, a lot of the library can be used to analyse and plot financial data for broader based analysis, of the type that I've had to face being in markets over the years. Hence, it can be used by a wider array of users.
 
-<b>Please note that Saeed Amen is no longer updating this library.</b>
+<b>Please note that Saeed Amen is no longer updating this library, and it will be transitioning to cuemacro/finmarketpy library, with similar functionality, soon (and related cuemacro/findatapy and cuemacro/chartpy), which has an easier to use API (I don't have time to maintain two similar libraries :-)</b>
 
 At present the PyThalesians offers:
 * Backtesting of systematic trading strategies for cash markets (including cross sectional style trading strategies)

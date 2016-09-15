@@ -13,11 +13,11 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 # Merging with pythalesians
 I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
 one set of libraries). This new finmarketpy library has 
-* similar functionality to the trading part of pythalesians
-* I've rewritten the API to make it much cleaner and easier to use, as well as having many 
+* Similar functionality to the trading part of pythalesians
+* rewritten the API to make it much cleaner and easier to use, as well as having many 
 new features. 
-* It requires the libraries, which I've written chartpy (for charts) and findatapy (for loading market data) to function
-* By splitting up into smaller libraries, it should make it easier for contributors
+* finmarketpy requires the libraries, which I've written chartpy (for charts) and findatapy (for loading market data) to function
+* By splitting up into smaller more specialised libraries, it should make it easier for contributors
 * Using findatapy, you can download market data easily from Bloomberg, Quandl, Yahoo etc
 * Using chartpy, you can choose to have results displayed in matplotlib, plotly or bokeh by changing single keyword!
 

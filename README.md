@@ -11,7 +11,8 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 * Written in object orientated way to make code more reusable
 
 # Merging with pythalesians
-I had previously written the open source PyThalesians financial library (which has been merged with this). This new finmarketpy library has 
+I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
+one set of libraries). This new finmarketpy library has 
 * similar functionality to the trading part of pythalesians
 * I've rewritten the API to make it much cleaner and easier to use, as well as having many 
 new features. 
@@ -62,7 +63,7 @@ Major requirements
 
 # Installation
 
-You can install the library using the below. After installation:
+You can install the library using the below (better to get the newest version from repo, as opposed to releases). After installation:
 * Make sure you edit the MarketConstants file
 
 ```
@@ -82,7 +83,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
-* No formal releases yet
+* 0.11 - finmarketpy
+* First prerelease version 
 
 # Coding log
 

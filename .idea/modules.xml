@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pythalesians.iml" filepath="$PROJECT_DIR$/.idea/pythalesians.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/finmarketpy.iml" filepath="$PROJECT_DIR$/.idea/finmarketpy.iml" />
     </modules>
   </component>
 </project>

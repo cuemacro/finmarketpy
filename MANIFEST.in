@@ -1,4 +1,1 @@
-recursive-include pythalesians_examples *.*
-recursive-include pythalesians_notebooks *.*
-recursive-include pythalesians/ *.*
-recursive-include pythalesians/conf/ *.*
+recursive-include finmarketpy/ *.*

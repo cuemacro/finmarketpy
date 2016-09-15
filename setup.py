@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='finmarketpy',
-      version='0.05',
+      version='0.11',
       description='Trading Backtest library',
       author='Saeed Amen',
       author_email='saeed@cuemacro.com',

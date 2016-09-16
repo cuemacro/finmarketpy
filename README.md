@@ -14,7 +14,7 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
 one set of libraries). This new finmarketpy library has 
 * Similar functionality to the trading part of pythalesians
-* rewritten the API to make it much cleaner and easier to use, as well as having many 
+* Rewritten the API to make it much cleaner and easier to use, as well as having many 
 new features. 
 * finmarketpy requires the libraries, which I've written chartpy (for charts) and findatapy (for loading market data) to function
 * By splitting up into smaller more specialised libraries, it should make it easier for contributors
@@ -90,7 +90,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
-* 15 Sep 2016 - Merged finmarketpy and pythalesians fully
+* 15 Sep 2016 - Merged finmarketpy and pythalesians fully, released version 0.11
 * 12 Sep 2016 - Fixed issue with TradeAnalysis (method names)
 * 02 Sep 2016 - Fixed issue with external dataframe eco events, added event study example
 * 01 Sep 2016 - Added seasonality example for FX vol
@@ -163,8 +163,5 @@ example for benchmarking and bug fixes for Bloomberg downloader
 * 17 Jul 2015 - Created example to show how to use technical indicators.
 * 13 Jul 2015 - Changed location of conf, renamed examples folder to pythalesians_examples. Can now be installed using setup.py.
 * 10 Jul 2015 - Added ability to download Dukascopy FX tick data (data is free for personal use - check Dukascopy terms & conditions). Note that past month of data is generally not made available by Dukascopy
-
-End of note
-
 
 End of note

@@ -746,7 +746,15 @@ class TradingModel(object):
         if date is None:
             last_day = strategy_signal.ix[-1].transpose().to_frame()
         else:
-            last_day = strategy_signal.ix[date].transpose().to_frame()
+            if not(isinstance(date, list)):
+                date = [date]
+
+            last_day = []
+
+            for d in date:
+                last_day.append(strategy_signal.ix[d].transpose().to_frame())
+
+            last_day = pandas.concat(last_day, axis=1)
 
         if strip is not None:
             last_day.index = [x.replace(strip, '') for x in last_day.index]

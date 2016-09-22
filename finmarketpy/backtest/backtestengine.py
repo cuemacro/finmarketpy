@@ -755,6 +755,7 @@ class TradingModel(object):
                 last_day.append(strategy_signal.ix[d].transpose().to_frame())
 
             last_day = pandas.concat(last_day, axis=1)
+            last_day = last_day.sort_index(axis=1)
 
         if strip is not None:
             last_day.index = [x.replace(strip, '') for x in last_day.index]

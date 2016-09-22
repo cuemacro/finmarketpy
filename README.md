@@ -90,6 +90,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 22 Sep 2016 - Fixed sorting of columns when signal plotting
 * 21 Sep 2016 - Allow plotting of multiple signal days
 * 15 Sep 2016 - Merged finmarketpy and pythalesians fully, released version 0.11
 * 12 Sep 2016 - Fixed issue with TradeAnalysis (method names)

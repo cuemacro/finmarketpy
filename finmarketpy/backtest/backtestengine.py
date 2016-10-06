@@ -24,7 +24,7 @@ import numpy
 
 from findatapy.util import LoggerManager
 
-class Backtest:
+class Backtest :
 
     def __init__(self):
         self.logger = LoggerManager().getLogger(__name__)
@@ -641,34 +641,42 @@ class TradingModel(object):
             self.chart.plot(self.reduce_plot(self._strategy_pnl), chart_type='line', style=style)
         except: pass
 
+    def plot_strategy_trade_no(self, strip = None):
+        signal = self._strategy_signal
+
+        ####### how many trades have there been (ignore size of the trades)
+        trades = abs(signal - signal.shift(-1))
+        trades = trades[trades > 0].count()
+
+        df_trades = pandas.DataFrame(index=trades.index, columns=['Trades'], data=trades)
+
+        if strip is not None: df_trades.index = [k.replace(strip, '') for k in df_trades.index]
+
+        style = self.create_style("", "")
+
+        try:
+            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
+            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).html'
+            self.chart.plot(self.reduce_plot(df_trades), chart_type='bar', style=style)
+        except:
+            pass
+
     def plot_strategy_signal_proportion(self, strip = None):
 
         signal = self._strategy_signal
 
-        # count number of long, short and flat periods in our sample
+        ####### count number of long, short and flat periods in our sample
         long = signal[signal > 0].count()
         short = signal[signal < 0].count()
         flat = signal[signal == 0].count()
 
-        keys = long.index
-
-        # how many trades have there been (ignore size of the trades)
-        trades = abs(signal - signal.shift(-1))
-        trades = trades[trades > 0].count()
-
-        df_trades = pandas.DataFrame(index = keys, columns = ['Trades'], data = trades)
-
-        df = pandas.DataFrame(index = keys, columns = ['Long', 'Short', 'Flat'])
+        df = pandas.DataFrame(index = long.index, columns = ['Long', 'Short', 'Flat'])
 
         df['Long'] = long
         df['Short']  = short
         df['Flat'] = flat
 
-        if strip is not None: keys = [k.replace(strip, '') for k in keys]
-
-        df.index = keys
-        df_trades.index = keys
-        # df = df.sort_index()
+        if strip is not None: df.index = [k.replace(strip, '') for k in df.index]
 
         style = self.create_style("", "")
 
@@ -676,11 +684,6 @@ class TradingModel(object):
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).html'
             self.chart.plot(self.reduce_plot(df), chart_type='bar', style=style)
-
-            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
-            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).html'
-            self.chart.plot(self.reduce_plot(df_trades), chart_type='bar', style=style)
-
         except: pass
 
     def plot_strategy_leverage(self):

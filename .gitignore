@@ -9,6 +9,7 @@ __pycache__/
 *cred.py
 
 # Distribution / packaging
+.idea/
 .Python
 env/
 build/

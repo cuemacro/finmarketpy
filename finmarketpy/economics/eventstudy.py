@@ -224,7 +224,7 @@ except: pass
 
 class EventsFactory(EventStudy):
 
-    _econ_data_frame = None
+    # _econ_data_frame = None
 
     # where your HDF5 file is stored with economic data
     # TODO integrate with on the fly downloading!
@@ -243,7 +243,7 @@ class EventsFactory(EventStudy):
 
         if df is not None:
             self._econ_data_frame = df
-        elif (self._econ_data_frame is None):
+        else:
             self.load_economic_events()
 
         return

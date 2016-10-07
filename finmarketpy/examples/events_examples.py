@@ -24,6 +24,7 @@ if run_example == 1 or run_example == 0:
 
     import datetime
 
+
     from datetime import timedelta
 
     ###### get intraday data for USD/JPY from the past few months from Bloomberg, NFP date/times from Bloomberg

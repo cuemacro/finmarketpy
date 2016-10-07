@@ -90,6 +90,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 07 Oct 2016 - Add .idea to .gitignore
 * 06 Oct 2016 - Split out plotting of no of trades and position proportion
 * 22 Sep 2016 - Fixed sorting of columns when signal plotting
 * 21 Sep 2016 - Allow plotting of multiple signal days

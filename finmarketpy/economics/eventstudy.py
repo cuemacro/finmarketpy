@@ -229,6 +229,7 @@ class EventsFactory(EventStudy):
     # where your HDF5 file is stored with economic data
     # TODO integrate with on the fly downloading!
     _hdf5_file_econ_file = MarketConstants().hdf5_file_econ_file
+    _arctic_database = MarketConstants().arctic_database_econ_file
 
     ### manual offset for certain events where Bloomberg displays the wrong date (usually because of time differences)
     _offset_events = {'AUD-Australia Labor Force Employment Change SA.release-dt' : 1}
@@ -249,7 +250,9 @@ class EventsFactory(EventStudy):
         return
 
     def load_economic_events(self):
-        self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
+        # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
+        self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._arctic_database, engine='arctic',
+                                                                                db_server=MarketConstants().arctic_server)
 
     def harvest_category(self, category_name):
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)

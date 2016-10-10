@@ -48,7 +48,7 @@ class TradeAnalysis(object):
 
         return
 
-    def run_strategy_returns_stats(self, trading_model):
+    def run_strategy_returns_stats(self, trading_model, index = None, engine = 'pyfolio'):
         """
         run_strategy_returns_stats - Plots useful statistics for the trading strategy (using PyFolio)
 
@@ -56,38 +56,45 @@ class TradeAnalysis(object):
         ----------
         trading_model : TradingModel
             defining trading strategy
+        index: DataFrame
+            define strategy by a time series
 
         """
 
-        pnl = trading_model.get_strategy_pnl()
+        if index is None:
+            pnl = trading_model.get_strategy_pnl()
+        else:
+            pnl = index
+
         tz = Timezone()
         calculations = Calculations()
 
-        # PyFolio assumes UTC time based DataFrames (so force this localisation)
-        try:
-            pnl = tz.localise_index_as_UTC(pnl)
-        except: pass
+        if engine == 'pyfolio':
+            # PyFolio assumes UTC time based DataFrames (so force this localisation)
+            try:
+                pnl = tz.localise_index_as_UTC(pnl)
+            except: pass
 
-        # set the matplotlib style sheet & defaults
-        # at present this only works in Matplotlib engine
-        try:
-            matplotlib.rcdefaults()
-            plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
-        except: pass
+            # set the matplotlib style sheet & defaults
+            # at present this only works in Matplotlib engine
+            try:
+                matplotlib.rcdefaults()
+                plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
+            except: pass
 
-        # TODO for intraday strategies, make daily
+            # TODO for intraday strategies, make daily
 
-        # convert DataFrame (assumed to have only one column) to Series
-        pnl = calculations.calculate_returns(pnl)
-        pnl = pnl.dropna()
-        pnl = pnl[pnl.columns[0]]
-        fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
+            # convert DataFrame (assumed to have only one column) to Series
+            pnl = calculations.calculate_returns(pnl)
+            pnl = pnl.dropna()
+            pnl = pnl[pnl.columns[0]]
+            fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
 
-        try:
-            plt.savefig (trading_model.DUMP_PATH + "stats.png")
-        except: pass
+            try:
+                plt.savefig (trading_model.DUMP_PATH + "stats.png")
+            except: pass
 
-        plt.show()
+            plt.show()
 
     def run_tc_shock(self, strategy, tc = None):
         if tc is None: tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]

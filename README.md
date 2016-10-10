@@ -8,7 +8,7 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 * Investigate seasonality of trading strategies
 * Conduct market event studies around data events
 * In built calculator for risk weighting using volatility targeting
-* Written in object orientated way to make code more reusable
+* Written in object oriented way to make code more reusable
 
 # Merging with pythalesians
 I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
@@ -90,6 +90,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 10 Oct 2016 - Added returns_example to show how to use PyFolio via finmarketpy, added dataframe input for TradeAnalysis, fixed typo in readme
 * 07 Oct 2016 - Add .idea to .gitignore
 * 06 Oct 2016 - Split out plotting of no of trades and position proportion
 * 22 Sep 2016 - Fixed sorting of columns when signal plotting

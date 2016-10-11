@@ -95,6 +95,26 @@ class TradeAnalysis(object):
             except: pass
 
             plt.show()
+        elif engine == 'finmarketpy':
+
+            # assume we have TradingModel
+            # to do to take in a time series
+            from chartpy import Canvas, Chart
+            pnl = trading_model.plot_strategy_pnl(silent_plot=True)                         # plot the final strategy
+            individual = trading_model.plot_strategy_group_pnl_trades(silent_plot=True)     # plot the individual trade P&Ls
+
+            pnl_comp = trading_model.plot_strategy_group_benchmark_pnl(silent_plot=True)    # plot all the cumulative P&Ls of each component
+            ir_comp = trading_model.plot_strategy_group_benchmark_pnl_ir(silent_plot=True)  # plot all the IR of each component
+
+            leverage = trading_model.plot_strategy_leverage(silent_plot=True)               # plot the leverage of the portfolio
+            ind_lev = trading_model.plot_strategy_group_leverage(silent_plot=True)          # plot all the individual leverages
+
+            canvas = Canvas([[pnl, individual],
+                             [pnl_comp, ir_comp],
+                             [leverage, ind_lev]]
+                             )
+
+            canvas.generate_canvas(silent_display=False, canvas_plotter='plain')
 
     def run_tc_shock(self, strategy, tc = None):
         if tc is None: tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]

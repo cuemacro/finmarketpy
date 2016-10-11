@@ -39,7 +39,6 @@ class TradingModelFXTrend_Example(TradingModel):
         self.SCALE_FACTOR = 1
         self.DEFAULT_PLOT_ENGINE = 'matplotlib'
 
-        self.chart = Chart(engine=self.DEFAULT_PLOT_ENGINE)
         self.br = self.load_parameters()
         return
 
@@ -179,7 +178,17 @@ if __name__ == '__main__':
         model.plot_strategy_leverage()                   # plot the leverage of the portfolio
         model.plot_strategy_group_pnl_trades()           # plot the individual trade P&Ls
         model.plot_strategy_group_benchmark_pnl()        # plot all the cumulative P&Ls of each component
+        model.plot_strategy_group_benchmark_pnl_ir()     # plot all the IR of individual components
         model.plot_strategy_group_leverage()             # plot all the individual leverages
+
+        from finmarketpy.backtest import TradeAnalysis
+
+        ta = TradeAnalysis()
+
+        # create statistics for the model returns using both finmarketpy and pyfolio
+        ta.run_strategy_returns_stats(model, engine='finmarketpy')
+        ta.run_strategy_returns_stats(model, engine='pyfolio')
+
         # model.plot_strategy_group_benchmark_annualised_pnl()
 
     # create a FX CTA strategy, then examine how P&L changes with different vol targeting
@@ -190,6 +199,7 @@ if __name__ == '__main__':
         from finmarketpy.backtest import TradeAnalysis
 
         ta = TradeAnalysis()
+        ta.run_strategy_returns_stats(model, engine='finmarketpy')
 
         # which backtesting parameters to change
         # names of the portfolio
@@ -217,7 +227,7 @@ if __name__ == '__main__':
         ta.run_day_of_month_analysis(strategy)
 
     # create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
-    if True:
+    if False:
         from finmarketpy.backtest import TradeAnalysis
         model = TradingModelFXTrend_Example()
         model.construct_strategy()

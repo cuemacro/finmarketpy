@@ -333,7 +333,6 @@ class TradingModel(object):
 
     DUMP_CSV = ''
     DUMP_PATH = datetime.date.today().strftime("%Y%m%d") + ' '
-    chart = Chart(engine=DEFAULT_PLOT_ENGINE)
 
     logger = LoggerManager().getLogger(__name__)
 
@@ -611,15 +610,17 @@ class TradingModel(object):
             return data_frame
 
     ##### Quick helper functions to plot aspects of the strategy such as P&L, leverage etc.
-    def plot_individual_leverage(self):
+    def plot_individual_leverage(self, silent_plot=False):
 
         style = self.create_style("Leverage", "Individual Leverage")
 
         try:
-            self.chart.plot(self.reduce_plot(self._individual_leverage), chart_type='line', style=style)
+            chart = Chart(self.reduce_plot(self._individual_leverage), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+            if not(silent_plot): chart.plot()
+            return chart
         except: pass
 
-    def plot_strategy_group_pnl_trades(self):
+    def plot_strategy_group_pnl_trades(self, silent_plot = False):
 
         style = self.create_style("(bp)", "Individual Trade PnL")
 
@@ -630,18 +631,22 @@ class TradingModel(object):
         # note only works with single large basket trade
         try:
             strategy_pnl_trades = self._strategy_pnl_trades.fillna(0) * 100 * 100
-            self.chart.plot(self.reduce_plot(strategy_pnl_trades), chart_type='line', style=style)
+            chart = Chart(self.reduce_plot(strategy_pnl_trades), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+            if not(silent_plot): chart.plot()
+            return chart
         except: pass
 
-    def plot_strategy_pnl(self):
+    def plot_strategy_pnl(self, silent_plot = False):
 
         style = self.create_style("", "Strategy PnL")
 
         try:
-            self.chart.plot(self.reduce_plot(self._strategy_pnl), chart_type='line', style=style)
+            chart = Chart(self.reduce_plot(self._strategy_pnl), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+            if not(silent_plot): chart.plot()
+            return chart
         except: pass
 
-    def plot_strategy_trade_no(self, strip = None):
+    def plot_strategy_trade_no(self, strip = None, silent_plot = False):
         signal = self._strategy_signal
 
         ####### how many trades have there been (ignore size of the trades)
@@ -657,11 +662,14 @@ class TradingModel(object):
         try:
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).html'
-            self.chart.plot(self.reduce_plot(df_trades), chart_type='bar', style=style)
+
+            chart = Chart(self.reduce_plot(df_trades), engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+            if not(silent_plot): chart.plot()
+            return chart
         except:
             pass
 
-    def plot_strategy_signal_proportion(self, strip = None):
+    def plot_strategy_signal_proportion(self, strip = None, silent_plot = False):
 
         signal = self._strategy_signal
 
@@ -683,17 +691,22 @@ class TradingModel(object):
         try:
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).html'
-            self.chart.plot(self.reduce_plot(df), chart_type='bar', style=style)
+
+            chart = Chart(self.reduce_plot(df), engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+            if not(silent_plot): chart.plot()
+            return chart
         except: pass
 
-    def plot_strategy_leverage(self):
+    def plot_strategy_leverage(self, silent_plot = False):
         style = self.create_style("Leverage", "Strategy Leverage")
 
         try:
-            self.chart.plot(self.reduce_plot(self._strategy_leverage), chart_type='line', style=style)
+            chart = Chart(self.reduce_plot(self._strategy_leverage), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+            if not(silent_plot): chart.plot()
+            return chart
         except: pass
 
-    def plot_strategy_group_benchmark_pnl(self, strip = None):
+    def plot_strategy_group_benchmark_pnl(self, silent_plot = False):
 
         style = self.create_style("", "Group Benchmark PnL - cumulative")
 
@@ -703,10 +716,15 @@ class TradingModel(object):
             self.logger.info(line)
 
         # plot cumulative line of returns
-        self.chart.plot(self.reduce_plot(self._strategy_group_benchmark_pnl), style=style)
+        chart = Chart(self.reduce_plot(self._strategy_group_benchmark_pnl), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                      style=style)
+        if not (silent_plot): chart.plot()
+        return chart
 
+    def plot_strategy_group_benchmark_pnl_ir(self, strip = None, silent_plot = False):
         # needs write stats flag turned on
-        try:
+        #try:
+            style = self.create_style("", "Group Benchmark PnL - cumulative")
             keys = self._strategy_group_benchmark_ret_stats.keys()
             ir = []
 
@@ -714,17 +732,19 @@ class TradingModel(object):
 
             if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
-            ret_stats = pandas.DataFrame(index = keys, data = ir, columns = ['IR'])
+            ret_stats = pandas.DataFrame(index=keys, data=ir, columns=['IR'])
             # ret_stats = ret_stats.sort_index()
-            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + style.SCALE_FACTOR + '.png'
-            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + style.SCALE_FACTOR + '.html'
+            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.png'
+            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.html'
             style.display_brand_label = False
 
-            self.chart.plot(ret_stats, chart_type='bar', style=style)
+            chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+            if not (silent_plot): chart.plot()
+            return chart
+        #except:
+        #    pass
 
-        except: pass
-
-    def plot_strategy_group_benchmark_annualised_pnl(self, cols = None):
+    def plot_strategy_group_benchmark_annualised_pnl(self, cols = None, silent_plot = False):
         # TODO - unfinished, needs checking!
 
         if cols is None: cols = self._strategy_group_benchmark_annualised_pnl.columns
@@ -732,15 +752,19 @@ class TradingModel(object):
         style = self.create_style("", "Group Benchmark Annualised PnL")
         style.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
 
-        self.chart.plot(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), chart_type='line', style=style)
+        chart = Chart(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+        if not (silent_plot): chart.plot()
+        return chart
 
-
-    def plot_strategy_group_leverage(self):
+    def plot_strategy_group_leverage(self, silent_plot = False):
 
         style = self.create_style("Leverage", "Group Leverage")
-        self.chart.plot(self.reduce_plot(self._strategy_group_leverage), chart_type='line', style=style)
 
-    def plot_strategy_signals(self, date = None, strip = None):
+        chart = Chart(self.reduce_plot(self._strategy_group_leverage), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+        if not (silent_plot): chart.plot()
+        return chart
+
+    def plot_strategy_signals(self, date = None, strip = None, silent_plot = False):
 
         ######## plot signals
         strategy_signal = self._strategy_signal
@@ -764,7 +788,10 @@ class TradingModel(object):
             last_day.index = [x.replace(strip, '') for x in last_day.index]
 
         style = self.create_style("positions (% portfolio notional)", "Positions")
-        self.chart.plot(last_day, chart_type='bar', style=style)
+
+        chart = Chart(last_day, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+        if not (silent_plot): chart.plot()
+        return chart
 
     def create_style(self, title, file_add):
         style = Style()

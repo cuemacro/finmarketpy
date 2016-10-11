@@ -723,7 +723,7 @@ class TradingModel(object):
 
     def plot_strategy_group_benchmark_pnl_ir(self, strip = None, silent_plot = False):
         # needs write stats flag turned on
-        #try:
+        try:
             style = self.create_style("", "Group Benchmark PnL - cumulative")
             keys = self._strategy_group_benchmark_ret_stats.keys()
             ir = []
@@ -741,8 +741,8 @@ class TradingModel(object):
             chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
             if not (silent_plot): chart.plot()
             return chart
-        #except:
-        #    pass
+        except:
+            pass
 
     def plot_strategy_group_benchmark_annualised_pnl(self, cols = None, silent_plot = False):
         # TODO - unfinished, needs checking!

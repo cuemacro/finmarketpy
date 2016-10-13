@@ -506,10 +506,10 @@ class TradingModel(object):
         """
 
         include_benchmark = False
-        calc_stats = False
+        # calc_stats = False
 
         if hasattr(br, 'include_benchmark'): include_benchmark = br.include_benchmark
-        if hasattr(br, 'calc_stats'): calc_stats = br.calc_stats
+        # if hasattr(br, 'calc_stats'): calc_stats = br.calc_stats
 
         if include_benchmark:
             ret_stats = RetStats()
@@ -527,10 +527,10 @@ class TradingModel(object):
 
             # only calculate return statistics if this has been specified (note when different frequencies of data
             # might underrepresent vol
-            if calc_stats:
-                benchmark_df = benchmark_df.fillna(method='ffill')
-                ret_stats.calculate_ret_stats_from_prices(benchmark_df, br.ann_factor)
-                benchmark_df.columns = ret_stats.summary()
+            # if calc_stats:
+            benchmark_df = benchmark_df.fillna(method='ffill')
+            ret_stats.calculate_ret_stats_from_prices(benchmark_df, br.ann_factor)
+            benchmark_df.columns = ret_stats.summary()
 
             # realign strategy & benchmark
             strategy_benchmark_df = strategy_df.join(benchmark_df, how='inner')
@@ -724,11 +724,12 @@ class TradingModel(object):
     def plot_strategy_group_benchmark_pnl_ir(self, strip = None, silent_plot = False):
         # needs write stats flag turned on
         try:
-            style = self.create_style("", "Group Benchmark PnL - cumulative")
+            style = self.create_style("", "Group Benchmark PnL IR - cumulative")
             keys = self._strategy_group_benchmark_ret_stats.keys()
             ir = []
 
-            for key in keys: ir.append(self._strategy_group_benchmark_ret_stats[key].inforatio()[0])
+            for key in keys:
+                ir.append(self._strategy_group_benchmark_ret_stats[key].inforatio()[0])
 
             if strip is not None: keys = [k.replace(strip, '') for k in keys]
 

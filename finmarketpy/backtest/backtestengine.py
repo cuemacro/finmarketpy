@@ -757,6 +757,7 @@ class TradingModel(object):
 
         calculations = Calculations()
         ret_stats = calculations.pandas_outer_join(yoy)
+        ret_stats.index = ret_stats.index.year
 
         if strip is not None: ret_stats.columns = [k.replace(strip, '') for k in ret_stats.columns]
 
@@ -764,8 +765,9 @@ class TradingModel(object):
         style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - YoY) ' + str(style.scale_factor) + '.png'
         style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - YoY) ' + str(style.scale_factor) + '.html'
         style.display_brand_label = False
+        style.date_formatter = "%Y"
 
-        chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+        chart = Chart(ret_stats * 100, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
         if not (silent_plot): chart.plot()
         return chart
 

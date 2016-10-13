@@ -506,10 +506,10 @@ class TradingModel(object):
         """
 
         include_benchmark = False
-        # calc_stats = False
+        calc_stats = False
 
         if hasattr(br, 'include_benchmark'): include_benchmark = br.include_benchmark
-        # if hasattr(br, 'calc_stats'): calc_stats = br.calc_stats
+        if hasattr(br, 'calc_stats'): calc_stats = br.calc_stats
 
         if include_benchmark:
             ret_stats = RetStats()
@@ -530,7 +530,9 @@ class TradingModel(object):
             # if calc_stats:
             benchmark_df = benchmark_df.fillna(method='ffill')
             ret_stats.calculate_ret_stats_from_prices(benchmark_df, br.ann_factor)
-            benchmark_df.columns = ret_stats.summary()
+
+            if calc_stats:
+                benchmark_df.columns = ret_stats.summary()
 
             # realign strategy & benchmark
             strategy_benchmark_df = strategy_df.join(benchmark_df, how='inner')

@@ -722,28 +722,50 @@ class TradingModel(object):
         return chart
 
     def plot_strategy_group_benchmark_pnl_ir(self, strip = None, silent_plot = False):
-        # needs write stats flag turned on
-        try:
-            style = self.create_style("", "Group Benchmark PnL IR - cumulative")
-            keys = self._strategy_group_benchmark_ret_stats.keys()
-            ir = []
 
-            for key in keys:
-                ir.append(self._strategy_group_benchmark_ret_stats[key].inforatio()[0])
+        style = self.create_style("", "Group Benchmark PnL IR - cumulative")
+        keys = self._strategy_group_benchmark_ret_stats.keys()
+        ir = []
 
-            if strip is not None: keys = [k.replace(strip, '') for k in keys]
+        for key in keys:
+            ir.append(self._strategy_group_benchmark_ret_stats[key].inforatio()[0])
 
-            ret_stats = pandas.DataFrame(index=keys, data=ir, columns=['IR'])
-            # ret_stats = ret_stats.sort_index()
-            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.png'
-            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.html'
-            style.display_brand_label = False
+        if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
-            chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
-        except:
-            pass
+        ret_stats = pandas.DataFrame(index=keys, data=ir, columns=['IR'])
+        # ret_stats = ret_stats.sort_index()
+        style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.png'
+        style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.html'
+        style.display_brand_label = False
+
+        chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+        if not (silent_plot): chart.plot()
+        return chart
+
+    def plot_strategy_group_benchmark_pnl_yoy(self, strip = None, silent_plot = False):
+
+        style = self.create_style("", "Group Benchmark PnL YoY - cumulative")
+        keys = self._strategy_group_benchmark_ret_stats.keys()
+        yoy = []
+
+        for key in keys:
+            col = self._strategy_group_benchmark_ret_stats[key].yoy_rets()
+            col.columns = [key]
+            yoy.append(col)
+
+        calculations = Calculations()
+        ret_stats = calculations.pandas_outer_join(yoy)
+
+        if strip is not None: ret_stats.columns = [k.replace(strip, '') for k in ret_stats.columns]
+
+        # ret_stats = ret_stats.sort_index()
+        style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - YoY) ' + str(style.scale_factor) + '.png'
+        style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - YoY) ' + str(style.scale_factor) + '.html'
+        style.display_brand_label = False
+
+        chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+        if not (silent_plot): chart.plot()
+        return chart
 
     def plot_strategy_group_benchmark_annualised_pnl(self, cols = None, silent_plot = False):
         # TODO - unfinished, needs checking!

@@ -22,15 +22,17 @@ Has various constants required for the finmarketpy project. These have been defi
 class MarketConstants(object):
 
     hdf5_file_econ_file = "x"
+    arctic_database_econ_file = ''
+    arctic_server = '127.0.0.1'
 
-    # or we can store credentials in a file "chartcred.py" in the same folder, which will overwrite the above
-
+    # or we can store credentials in a file "marketcred.py" in the same folder, which will overwrite the above
     try:
         from finmarketpy.util.marketcred import MarketCred
 
         cred = MarketCred()
 
         hdf5_file_econ_file = cred.hdf5_file_econ_file
+        arctic_database_econ_file = cred.arctic_database_econ_file
 
     except:
         pass

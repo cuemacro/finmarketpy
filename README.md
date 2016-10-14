@@ -90,6 +90,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 14 Oct 2016 - Fixed arctic references in MarketConstants
 * 13 Oct 2016 - Fixed IR plotting for BacktestEngine, added YoY metric plots
 * 11 Oct 2016 - Added to TradeAnalysis another way to plot return statistics for a portfolio
 * 10 Oct 2016 - Added returns_example to show how to use PyFolio via finmarketpy, added dataframe input for TradeAnalysis, fixed typo in readme

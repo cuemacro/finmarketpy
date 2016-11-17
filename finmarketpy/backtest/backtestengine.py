@@ -49,7 +49,7 @@ class Backtest :
         """
 
         calculations = Calculations()
-        # signal_df.to_csv('e:/temp0.csv')
+
         # make sure the dates of both traded asset and signal are aligned properly
         asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
 
@@ -133,7 +133,7 @@ class Backtest :
         else:
             self._portfolio_signal = self._portfolio_signal / float(length_cols)
 
-        self._pnl = _pnl                                                            # individual signals P&L
+        self._pnl = _pnl                                                                    # individual signals P&L
 
         # TODO FIX very slow - hence only calculate on demand
         _pnl_trades = None
@@ -329,7 +329,7 @@ class TradingModel(object):
     SAVE_FIGURES = True
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
-    CHART_SOURCE = 'Web'
+    CHART_SOURCE = ChartConstants().chartfactory_source
 
     DUMP_CSV = ''
     DUMP_PATH = datetime.date.today().strftime("%Y%m%d") + ' '

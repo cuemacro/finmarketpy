@@ -70,7 +70,8 @@ You can install the library using the below (better to get the newest version fr
 pip install git+https://github.com/cuemacro/finmarketpy.git
 ```
 
-But beforehand please make sure you have already installed both chartpy, findatapy and any other dependencies
+But beforehand please make sure you have already installed both chartpy, findatapy and any other dependencies. In chartpy you will need to change the ChartConstants file (to add Plotly API key) and 
+for findatapy, you will also need to change the DataConstants file to add the Quandl API (and possibly change other configuration settings there).
 
 ```
 pip install git+https://github.com/cuemacro/chartpy.git

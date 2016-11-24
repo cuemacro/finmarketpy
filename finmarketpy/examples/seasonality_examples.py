@@ -23,6 +23,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 # choose run_example = 0 for everything
 # run_example = 1 - seasonality of gold
 # run_example = 2 - seasonality of FX vol
+# run_example = 3 - seasonality of gasoline
 
 run_example = 0
 
@@ -78,5 +79,31 @@ if run_example == 2 or run_example == 0:
     style.scale_factor = 3
     style.file_output = "fx-vol-seasonality.png"
     style.source = 'finmarketpy/Bloomberg'
+
+    chart.plot(day_of_month_seasonality, style=style)
+
+###### calculate seasonal moves in Gasoline (using Bloomberg data)
+if run_example == 3 or run_example == 0:
+    md_request = MarketDataRequest(
+                start_date = "01 Jan 1996",                         # start date
+                data_source = 'bloomberg',                          # use Bloomberg as data source
+                tickers = ['Gasoline'],
+                fields = ['close'],                                 # which fields to download
+                vendor_tickers = ['XB1 Comdty'],                    # ticker (Bloomberg)
+                vendor_fields = ['PX_LAST'],                        # which Bloomberg fields to download
+                cache_algo = 'internet_load_return')                # how to return data
+
+    df = market.fetch_market(md_request)
+
+    df_ret = calc.calculate_returns(df)
+
+    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret, partition_by_month = False)
+    day_of_month_seasonality = calc.convert_month_day_to_date_time(day_of_month_seasonality)
+
+    style = Style()
+    style.date_formatter = '%b'
+    style.title = 'Gasoline seasonality'
+    style.scale_factor = 3
+    style.file_output = "gasoline-seasonality.png"
 
     chart.plot(day_of_month_seasonality, style=style)

@@ -24,6 +24,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 1 - seasonality of gold
 # run_example = 2 - seasonality of FX vol
 # run_example = 3 - seasonality of gasoline
+# run_example = 4 - seasonality in NFP
 
 run_example = 0
 
@@ -107,3 +108,28 @@ if run_example == 3 or run_example == 0:
     style.file_output = "gasoline-seasonality.png"
 
     chart.plot(day_of_month_seasonality, style=style)
+
+###### calculate seasonal moves in US non-farm payrolls (using Bloomberg data)
+if run_example == 4 or run_example == 0:
+    # get the NFP NSA from ALFRED/FRED
+    md_request = MarketDataRequest(
+        start_date="01 Jun 2000",       # start date (download data over past decade)
+        data_source='alfred',           # use ALFRED/FRED as data source
+        tickers=['US NFP'],             # ticker
+        fields=['actual-release'],      # which fields to download
+        vendor_tickers=['PAYNSA'],         # ticker (FRED)  PAYEMS (SA)
+        vendor_fields=['actual-release'])  # which FRED fields to download
+
+    df = market.fetch_market(md_request)
+
+    df_ret = calc.calculate_returns(df)
+
+    month_seasonality = seasonality.monthly_seasonality_from_prices(df)
+
+    style = Style()
+    style.date_formatter = '%b'
+    style.title = 'NFP seasonality'
+    style.scale_factor = 3
+    style.file_output = "nfp-seasonality.png"
+
+    chart.plot(month_seasonality, style=style)

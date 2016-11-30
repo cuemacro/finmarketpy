@@ -91,6 +91,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 24 Nov 2016 - Added seasonality example for gasoline
 * 17 Nov 2016 - Changed source to ChartConstants default for TradingModel
 * 14 Oct 2016 - Fixed arctic references in MarketConstants
 * 13 Oct 2016 - Fixed IR plotting for BacktestEngine, added YoY metric plots

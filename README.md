@@ -91,6 +91,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 04 Jan 2017 - Added a period shift parameter for calculating leverage (in RiskEngine)
 * 30 Nov 2016 - Added seasonality example for NFP
 * 24 Nov 2016 - Added seasonality example for gasoline
 * 17 Nov 2016 - Changed source to ChartConstants default for TradingModel

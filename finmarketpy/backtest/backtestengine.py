@@ -80,10 +80,13 @@ class Backtest :
                 if not(hasattr(br, 'signal_vol_resample_freq')):
                     br.signal_vol_resample_freq = None
 
+                if not(hasattr(br, 'signal_vol_period_shift')):
+                    br.signal_vol_period_shift = 0
+
                 leverage_df = risk_engine.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
                                                br.signal_vol_periods, br.signal_vol_obs_in_year,
                                                br.signal_vol_rebalance_freq, br.signal_vol_resample_freq,
-                                               br.signal_vol_resample_type)
+                                               br.signal_vol_resample_type, period_shift=br.signal_vol_period_shift)
 
                 signal_df = pandas.DataFrame(
                     signal_df.values * leverage_df.values, index = signal_df.index, columns = signal_df.columns)
@@ -899,11 +902,15 @@ class RiskEngine(object):
         if not (hasattr(br, 'portfolio_vol_resample_freq')):
             br.portfolio_vol_resample_freq = None
 
+        if not (hasattr(br, 'portfolio_vol_period_shift')):
+            br.portfolio_vol_period_shift = 0
+
         leverage_df = self.calculate_leverage_factor(returns_df,
                                                      br.portfolio_vol_target, br.portfolio_vol_max_leverage,
                                                      br.portfolio_vol_periods, br.portfolio_vol_obs_in_year,
                                                      br.portfolio_vol_rebalance_freq, br.portfolio_vol_resample_freq,
-                                                     br.portfolio_vol_resample_type)
+                                                     br.portfolio_vol_resample_type,
+                                                     period_shift=br.portfolio_vol_period_shift)
 
         vol_returns_df = calculations.calculate_signal_returns_with_tc_matrix(leverage_df, returns_df, tc=br.spot_tc_bp)
         vol_returns_df.columns = returns_df.columns

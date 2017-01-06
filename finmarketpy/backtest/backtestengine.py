@@ -96,17 +96,32 @@ class Backtest :
         _pnl = calculations.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc = tc)
         _pnl.columns = pnl_cols
 
+        adjusted_weights_matrix = None
+
         # portfolio is average of the underlying signals: should we sum them or average them?
         if hasattr(br, 'portfolio_combination'):
             if br.portfolio_combination == 'sum':
-                 portfolio = pandas.DataFrame(data = _pnl.sum(axis = 1), index = _pnl.index, columns = ['Portfolio'])
+                portfolio = pandas.DataFrame(data = _pnl.sum(axis = 1), index = _pnl.index, columns = ['Portfolio'])
             elif br.portfolio_combination == 'mean':
-                 portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
+                portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
+
+                adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
+            elif isinstance(br.portfolio_combination, dict):
+                # get the weights for each asset
+                adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='weighted')
+
+                portfolio = pandas.DataFrame(data=(_pnl.values * adjusted_weights_matrix), index=_pnl.index)
+                is_all_na = pandas.isnull(portfolio).all(axis=1)
+                portfolio = pandas.DataFrame(portfolio.sum(axis = 1), columns = ['Portfolio'])
+
+                # overwrite days when every asset PnL was null is NaN with nan
+                portfolio[is_all_na] = numpy.nan
         else:
             portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
 
-        portfolio_leverage_df = pandas.DataFrame(data = numpy.ones(len(_pnl.index)), index = _pnl.index, columns = ['Portfolio'])
+            adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
 
+        portfolio_leverage_df = pandas.DataFrame(data = numpy.ones(len(_pnl.index)), index = _pnl.index, columns = ['Portfolio'])
 
         # should we apply vol target on a portfolio level basis?
         if hasattr(br, 'portfolio_vol_adjust'):
@@ -131,11 +146,17 @@ class Backtest :
         if hasattr(br, 'portfolio_combination'):
             if br.portfolio_combination == 'sum':
                 pass
-            elif br.portfolio_combination == 'mean':
-                self._portfolio_signal = self._portfolio_signal / float(length_cols)
+            elif br.portfolio_combination == 'mean' or isinstance(br.portfolio_combination, dict):
+                self._portfolio_signal = pandas.DataFrame(data=(self._portfolio_signal.values * adjusted_weights_matrix),
+                                             index=self._portfolio_signal.index,
+                                             columns=self._portfolio_signal.columns)
         else:
-            self._portfolio_signal = self._portfolio_signal / float(length_cols)
+            self._portfolio_signal = pandas.DataFrame(data=(self._portfolio_signal.values * adjusted_weights_matrix),
+                                                      index=self._portfolio_signal.index,
+                                                      columns=self._portfolio_signal.columns)
 
+        # calculate each period of trades
+        self._portfolio_trade = self._portfolio_signal - self._portfolio_signal.shift(1)
         self._pnl = _pnl                                                                    # individual signals P&L
 
         # TODO FIX very slow - hence only calculate on demand
@@ -155,6 +176,34 @@ class Backtest :
 
         self._cumportfolio = calculations.create_mult_index(self._portfolio)                 # portfolio cumulative P&L
         self._cumportfolio.columns = ['Port']
+
+    def create_portfolio_weights(self, br, _pnl, method='mean'):
+        if method == 'mean':
+            weights_vector = numpy.ones(len(_pnl.columns))
+        elif method == 'weighted':
+            # get the weights for each asset
+            weights_vector = numpy.array([float(br.portfolio_combination[col]) for col in _pnl.columns])
+
+        # repeat this down for every day
+        weights_matrix = numpy.repeat(weights_vector[numpy.newaxis, :], len(_pnl.index), 0)
+
+        # where we don't have old price data, make the weights 0 there
+        ind = numpy.isnan(_pnl.values)
+        weights_matrix[ind] = 0
+
+        # the total weights will vary, as historically might not have all the assets trading
+        total_weights = numpy.sum(weights_matrix, axis=1)
+
+        # replicate across columns
+        total_weights = numpy.transpose(numpy.repeat(total_weights[numpy.newaxis, :], len(_pnl.columns), 0))
+
+        # to avoid divide by zero
+        total_weights[total_weights == 0.0] = 1.0
+
+        adjusted_weights_matrix = weights_matrix / total_weights
+        adjusted_weights_matrix[ind] = numpy.nan
+
+        return adjusted_weights_matrix
 
     def get_backtest_output(self):
         return
@@ -271,7 +320,7 @@ class Backtest :
 
         return self._individual_leverage
 
-    def get_porfolio_leverage(self):
+    def get_portfolio_leverage(self):
         """
         get_portfolio_leverage - Gets the leverage for the portfolio
 
@@ -282,7 +331,7 @@ class Backtest :
 
         return self._portfolio_leverage
 
-    def get_porfolio_signal(self):
+    def get_portfolio_signal(self):
         """
         get_portfolio_signal - Gets the signals (with individual leverage & portfolio leverage) for each asset, which
         equates to what we would trade in practice
@@ -293,6 +342,18 @@ class Backtest :
         """
 
         return self._portfolio_signal
+
+    def get_portfolio_trade(self):
+        """
+        get_portfolio_trade - Gets the trades (with individual leverage & portfolio leverage) for each asset, which
+        we'd need to execute
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_trade
 
     def get_signal(self):
         """
@@ -418,15 +479,16 @@ class TradingModel(object):
             results, backtest = self.construct_individual_strategy(br, spot_cut_df, spot_df2, asset_cut_df, tech_params, key)
 
             cumresults[results.columns[0]] = results
-            portleverage[results.columns[0]] = backtest.get_porfolio_leverage()
+            portleverage[results.columns[0]] = backtest.get_portfolio_leverage()
             ret_statsresults[key] = backtest.get_portfolio_pnl_ret_stats()
 
             # for a key, designated as the final strategy save that as the "strategy"
             if key == self.FINAL_STRATEGY:
                 self._strategy_pnl = results
                 self._strategy_pnl_ret_stats = backtest.get_portfolio_pnl_ret_stats()
-                self._strategy_leverage = backtest.get_porfolio_leverage()
-                self._strategy_signal = backtest.get_porfolio_signal()
+                self._strategy_leverage = backtest.get_portfolio_leverage()
+                self._strategy_signal = backtest.get_portfolio_signal()
+                self._strategy_trade = backtest.get_portfolio_trade()
                 self._strategy_pnl_trades = backtest.get_pnl_trades()
 
         # get benchmark for comparison
@@ -580,6 +642,9 @@ class TradingModel(object):
 
     def get_strategy_signal(self):
         return self._strategy_signal
+
+    def get_strategy_trade(self):
+        return self._strategy_trade
 
     def get_benchmark(self):
         return self._benchmark_pnl
@@ -795,11 +860,14 @@ class TradingModel(object):
         return chart
 
     def plot_strategy_signals(self, date = None, strip = None, silent_plot = False):
+        self._plot_signal(self._strategy_signal, label = "positions (% portfolio notional)", caption = "Positions",
+                          date = date, strip = strip, silent_plot=silent_plot)
 
-        ######## plot signals
-        strategy_signal = self._strategy_signal
-        strategy_signal = 100 * (strategy_signal)
+    def plot_strategy_trades(self, date = None, strip = None, silent_plot = False):
+        self._plot_signal(self._strategy_trade, label = "trades (% portfolio notional)", caption = "Trades",
+                          date = date, strip = strip, silent_plot=silent_plot)
 
+    def grab_signals(self, strategy_signal, date = None, strip = None):
         if date is None:
             last_day = strategy_signal.ix[-1].transpose().to_frame()
         else:
@@ -817,7 +885,13 @@ class TradingModel(object):
         if strip is not None:
             last_day.index = [x.replace(strip, '') for x in last_day.index]
 
-        style = self.create_style("positions (% portfolio notional)", "Positions")
+    def _plot_signal(self, sig, label = ' ', caption = '', date = None, strip = None, silent_plot = False):
+
+        ######## plot signals
+        strategy_signal = 100 * (sig)
+        last_day = self.grab_signals(strategy_signal, date=date, strip=None)
+
+        style = self.create_style(label, caption)
 
         chart = Chart(last_day, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
         if not (silent_plot): chart.plot()

@@ -154,6 +154,8 @@ class TradeAnalysis(object):
             recent_signals.to_excel(writer, sheet_name=strategy_name + ' pos', engine='xlsxwriter')
             recent_trades.to_excel(writer, sheet_name=strategy_name + ' trades', engine='xlsxwriter')
 
+        # TODO Add summary sheet comparing return statistics for all the different models in the list
+
         writer.save()
         writer.close()
 

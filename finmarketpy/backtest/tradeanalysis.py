@@ -116,6 +116,47 @@ class TradeAnalysis(object):
 
             canvas.generate_canvas(silent_display=False, canvas_plotter='plain')
 
+    def run_excel_trade_report(self, trading_model, excel_file = 'model.xlsx', notional = 100):
+        """
+        run_excel_trade_report - Creates an Excel spreadsheet with model returns and latest trades
+
+        Parameters
+        ----------
+        trading_model : TradingModel
+            defining trading strategy (potentionally a list)
+
+        """
+
+        trading_model_list = trading_model
+
+        if not(isinstance(trading_model_list, list)):
+            trading_model_list = [trading_model]
+
+        writer = pandas.ExcelWriter(excel_file, engine='xlsxwriter')
+
+        for tm in trading_model_list:
+            strategy_name = tm.FINAL_STRATEGY
+            returns = tm.get_strategy_group_benchmark_pnl()
+
+            returns.to_excel(writer, sheet_name=strategy_name + ' rets', engine='xlsxwriter')
+
+            signals = tm.get_strategy_signal()
+            trades = tm.get_strategy_trade()
+
+            signals.to_excel(writer, sheet_name=strategy_name + ' hist pos', engine='xlsxwriter')
+
+            if hasattr(tm, 'STRIP'):
+                strip = tm.STRIP
+
+            recent_signals = tm.grab_signals(signals, date=[-1,-2,-5,-10,-20], strip=strip) * float(notional)
+            recent_trades = tm.grab_signals(trades, date=[-1,-2,-5,-10,-20], strip=strip) * float(notional)
+
+            recent_signals.to_excel(writer, sheet_name=strategy_name + ' pos', engine='xlsxwriter')
+            recent_trades.to_excel(writer, sheet_name=strategy_name + ' trades', engine='xlsxwriter')
+
+        writer.save()
+        writer.close()
+
     def run_tc_shock(self, strategy, tc = None):
         if tc is None: tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]
 

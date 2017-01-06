@@ -885,11 +885,13 @@ class TradingModel(object):
         if strip is not None:
             last_day.index = [x.replace(strip, '') for x in last_day.index]
 
+        return last_day
+
     def _plot_signal(self, sig, label = ' ', caption = '', date = None, strip = None, silent_plot = False):
 
         ######## plot signals
         strategy_signal = 100 * (sig)
-        last_day = self.grab_signals(strategy_signal, date=date, strip=None)
+        last_day = self.grab_signals(strategy_signal, date=date, strip=strip)
 
         style = self.create_style(label, caption)
 

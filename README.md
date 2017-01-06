@@ -91,6 +91,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 06 Jan 2017 - Added user defined weightings for strategies & general bug fixes
 * 04 Jan 2017 - Added a period shift parameter for calculating leverage (in RiskEngine)
 * 30 Nov 2016 - Added seasonality example for NFP
 * 24 Nov 2016 - Added seasonality example for gasoline

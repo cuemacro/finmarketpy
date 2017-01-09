@@ -1,4 +1,4 @@
-# finmarketpy (formally pythalesians)
+# finmarketpy (formerly pythalesians)
 
 finmarketpy is a Python based library that enables you to analyze market data and also to backtest trading strategies using
 a simple to use API, which has prebuilt templates for you to define backtest. Included in the library

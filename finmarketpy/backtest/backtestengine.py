@@ -32,7 +32,7 @@ class Backtest :
         self._portfolio = None
         return
 
-    def calculate_trading_PnL(self, br, asset_a_df, signal_df):
+    def calculate_trading_PnL(self, br, asset_a_df, signal_df, contract_value_df = None):
         """
         calculate_trading_PnL - Calculates P&L of a trading strategy and statistics to be retrieved later
 
@@ -46,6 +46,9 @@ class Backtest :
 
         signal_df : pandas.DataFrame
             Signals for the trading strategy
+
+        contract_value_df : pandas.DataFrame
+            Daily size of contracts
         """
 
         calculations = Calculations()
@@ -53,10 +56,14 @@ class Backtest :
         # make sure the dates of both traded asset and signal are aligned properly
         asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
 
+        if (contract_value_df is not None):
+            asset_df, contract_value_df = asset_df.align(contract_value_df, join='left', axis='index')
+            contract_value_df = contract_value_df.fillna(method='ffill')  # fill down asset holidays (we won't trade on these days)
+
         # only allow signals to change on the days when we can trade assets
         signal_df = signal_df.mask(numpy.isnan(asset_df.values))    # fill asset holidays with NaN signals
         signal_df = signal_df.fillna(method='ffill')                # fill these down
-        asset_df = asset_df.fillna(method='ffill')                  # fill down asset holidays
+        asset_df = asset_df.fillna(method='ffill')                  # fill down asset holidays (we won't trade on these days)
 
         returns_df = calculations.calculate_returns(asset_df)
         tc = br.spot_tc_bp
@@ -157,6 +164,28 @@ class Backtest :
 
         # calculate each period of trades
         self._portfolio_trade = self._portfolio_signal - self._portfolio_signal.shift(1)
+
+        # also create other measures of portfolio
+        if hasattr(br, 'portfolio_notional_size'):
+            # express positions in terms of the notional size specified
+            self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
+            self._portfolio_signal_trade_notional = self._portfolio_signal_notional - self._portfolio_signal_notional.shift(1)
+
+            # get the positions in terms of the contract sizes
+            notional_copy = self._portfolio_signal_notional.copy(deep=True)
+            notional_copy_cols = [x.split('.')[0] for x in notional_copy.columns]
+            notional_copy_cols = [x + '.contract-value' for x in notional_copy_cols]
+
+            notional_copy.columns = notional_copy_cols
+
+            contract_value_df = contract_value_df[notional_copy_cols]
+            notional_df, contract_value_df = notional_copy.align(contract_value_df, join='left', axis='index')
+
+            # careful make sure orders of magnitude are same for the notional and the contract value
+            self._portfolio_signal_contracts = notional_df / contract_value_df
+            self._portfolio_signal_contracts.columns = self._portfolio_signal_notional.columns
+            self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts - self._portfolio_signal_contracts.shift(1)
+
         self._pnl = _pnl                                                                    # individual signals P&L
 
         # TODO FIX very slow - hence only calculate on demand
@@ -355,6 +384,56 @@ class Backtest :
 
         return self._portfolio_trade
 
+    def get_portfolio_signal_notional(self):
+        """
+        get_portfolio_signal_notional - Gets the signals (with individual leverage & portfolio leverage) for each asset, which
+        equates to what we would have a positions in practice, scaled by a notional amount we have already specified
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_signal_notional
+
+    def get_portfolio_trade_notional(self):
+        """
+        get_portfolio_trade_notional - Gets the trades (with individual leverage & portfolio leverage) for each asset, which
+        we'd need to execute, scaled by a notional amount we have already specified
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_signal_trade_notional
+
+    def get_portfolio_signal_contracts(self):
+        """
+        get_portfolio_signal_contracts - Gets the signals (with individual leverage & portfolio leverage) for each asset, which
+        equates to what we would have a positions in practice, scaled by a notional amount and into contract sizes (eg. for futures)
+        which we need to specify in another dataframe
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_signal_contracts
+
+    def get_portfolio_trade_contracts(self):
+        """
+        get_portfolio_trade_contracts - Gets the trades (with individual leverage & portfolio leverage) for each asset, which
+        we'd need to execute, scaled by a notional amount we have already specified and into contract sizes (eg. for futures)
+        which we need to specify in another dataframe
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_signal_trade_contracts
+
     def get_signal(self):
         """
         get_signal - Gets the signals (with individual leverage, but excluding portfolio leverage) for each asset
@@ -456,7 +535,18 @@ class TradingModel(object):
             br = self.load_parameters()
 
         # get market data for backtest
-        asset_df, spot_df, spot_df2, basket_dict = self.load_assets()
+        market_data = self.load_assets()
+
+        asset_df = market_data[0]
+        spot_df = market_data[1]
+        spot_df2 = market_data[2]
+        basket_dict = market_data[3]
+
+        # optional database output
+        contract_value_df = None
+
+        if len(market_data) == 5:
+            contract_value_df = market_data[4]
 
         if hasattr(br, 'tech_params'):
             tech_params = br.tech_params
@@ -476,7 +566,8 @@ class TradingModel(object):
 
             self.logger.info("Calculating " + key)
 
-            results, backtest = self.construct_individual_strategy(br, spot_cut_df, spot_df2, asset_cut_df, tech_params, key)
+            results, backtest = self.construct_individual_strategy(br, spot_cut_df, spot_df2, asset_cut_df, tech_params, key,
+                                                                   contract_value_df = contract_value_df)
 
             cumresults[results.columns[0]] = results
             portleverage[results.columns[0]] = backtest.get_portfolio_leverage()
@@ -487,8 +578,19 @@ class TradingModel(object):
                 self._strategy_pnl = results
                 self._strategy_pnl_ret_stats = backtest.get_portfolio_pnl_ret_stats()
                 self._strategy_leverage = backtest.get_portfolio_leverage()
+
+                # collect the position sizes and trade sizes (in several different formats)
                 self._strategy_signal = backtest.get_portfolio_signal()
                 self._strategy_trade = backtest.get_portfolio_trade()
+
+                # scaled by notional
+                self._strategy_signal_notional = backtest.get_portfolio_signal_notional()
+                self._strategy_trade_notional = backtest.get_portfolio_trade_notional()
+
+                # scaled by notional and adjusted into contract sizes
+                self._strategy_signal_contracts = backtest.get_portfolio_signal_contracts()
+                self._strategy_trade_contracts = backtest.get_portfolio_trade_contracts()
+
                 self._strategy_pnl_trades = backtest.get_pnl_trades()
 
         # get benchmark for comparison
@@ -512,7 +614,7 @@ class TradingModel(object):
         self._strategy_group_leverage = portleverage
         self._strategy_group_benchmark_annualised_pnl = years
 
-    def construct_individual_strategy(self, br, spot_df, spot_df2, asset_df, tech_params, key):
+    def construct_individual_strategy(self, br, spot_df, spot_df2, asset_df, tech_params, key, contract_value_df = None):
         """
         construct_individual_strategy - Combines the signal with asset returns to find the returns of an individual
         strategy
@@ -531,6 +633,9 @@ class TradingModel(object):
         tech_params : TechParams
             Parameters for generating signals
 
+        contract_value_df : pandas.DataFrame
+            Dataframe with the contract sizes for each asset
+
         Returns
         -------
         cumportfolio : pandas.DataFrame
@@ -538,8 +643,8 @@ class TradingModel(object):
         """
         backtest = Backtest()
 
-        signal_df = self.construct_signal(spot_df, spot_df2, tech_params, br)   # get trading signal
-        backtest.calculate_trading_PnL(br, asset_df, signal_df)            # calculate P&L
+        signal_df = self.construct_signal(spot_df, spot_df2, tech_params, br)       # get trading signal (raw)
+        backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df)   # calculate P&L (and adjust signals for vol etc)
 
         cumpnl = backtest.get_cumpnl()
 
@@ -645,6 +750,18 @@ class TradingModel(object):
 
     def get_strategy_trade(self):
         return self._strategy_trade
+
+    def get_strategy_signal_notional(self):
+        return self._strategy_signal_notional
+
+    def get_strategy_trade_notional(self):
+        return self._strategy_trade_notional
+
+    def get_strategy_signal_contracts(self):
+        return self._strategy_signal_contracts
+
+    def get_strategy_trade_contracts(self):
+        return self._strategy_trade_contracts
 
     def get_benchmark(self):
         return self._benchmark_pnl

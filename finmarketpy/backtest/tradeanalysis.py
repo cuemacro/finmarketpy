@@ -116,7 +116,7 @@ class TradeAnalysis(object):
 
             canvas.generate_canvas(silent_display=False, canvas_plotter='plain')
 
-    def run_excel_trade_report(self, trading_model, excel_file = 'model.xlsx', notional = 100):
+    def run_excel_trade_report(self, trading_model, excel_file = 'model.xlsx'):
         """
         run_excel_trade_report - Creates an Excel spreadsheet with model returns and latest trades
 
@@ -140,24 +140,38 @@ class TradeAnalysis(object):
 
             returns.to_excel(writer, sheet_name=strategy_name + ' rets', engine='xlsxwriter')
 
-            signals = tm.get_strategy_signal()
-            trades = tm.get_strategy_trade()
+            # write raw position/trade sizes
+            self.save_positions_trades(tm, tm.get_strategy_signal(),tm.get_strategy_trade(),
+                                       'pos', 'trades', writer)
 
-            signals.to_excel(writer, sheet_name=strategy_name + ' hist pos', engine='xlsxwriter')
+            if hasattr(tm, '_strategy_signal_notional'):
+                # write position/trade sizes scaled by notional
+                self.save_positions_trades(tm,
+                                           tm.get_strategy_signal_notional(),
+                                           tm.get_strategy_trade_notional(), 'pos - Not', 'trades - Not', writer)
 
-            if hasattr(tm, 'STRIP'):
-                strip = tm.STRIP
-
-            recent_signals = tm.grab_signals(signals, date=[-1,-2,-5,-10,-20], strip=strip) * float(notional)
-            recent_trades = tm.grab_signals(trades, date=[-1,-2,-5,-10,-20], strip=strip) * float(notional)
-
-            recent_signals.to_excel(writer, sheet_name=strategy_name + ' pos', engine='xlsxwriter')
-            recent_trades.to_excel(writer, sheet_name=strategy_name + ' trades', engine='xlsxwriter')
+            if hasattr(tm, '_strategy_signal_contracts'):
+                # write position/trade sizes in terms of contract sizes
+                self.save_positions_trades(tm,
+                                           tm.get_strategy_signal_contracts(),
+                                           tm.get_strategy_trade_contracts(), 'pos - Cont', 'trades - Cont', writer)
 
         # TODO Add summary sheet comparing return statistics for all the different models in the list
 
         writer.save()
         writer.close()
+
+    def save_positions_trades(self, tm, signals, trades, signal_caption, trade_caption, writer):
+        signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' hist ' + signal_caption, engine='xlsxwriter')
+
+        if hasattr(tm, 'STRIP'):
+            strip = tm.STRIP
+
+        recent_signals = tm.grab_signals(signals, date=[-1, -2, -5, -10, -20], strip=strip)
+        recent_trades = tm.grab_signals(trades, date=[-1, -2, -5, -10, -20], strip=strip)
+
+        recent_signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + signal_caption, engine='xlsxwriter')
+        recent_trades.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + trade_caption, engine='xlsxwriter')
 
     def run_tc_shock(self, strategy, tc = None):
         if tc is None: tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]

@@ -984,6 +984,22 @@ class TradingModel(object):
         self._plot_signal(self._strategy_trade, label = "trades (% portfolio notional)", caption = "Trades",
                           date = date, strip = strip, silent_plot=silent_plot)
 
+    def plot_strategy_signals_notional(self, date = None, strip = None, silent_plot = False):
+        self._plot_signal(self._strategy_signal_notional, label = "positions (scaled by notional)", caption = "Positions",
+                          date = date, strip = strip, silent_plot=silent_plot)
+
+    def plot_strategy_trades_notional(self, date = None, strip = None, silent_plot = False):
+        self._plot_signal(self._strategy_trade_notional, label = "trades (scaled by notional)", caption = "Trades",
+                          date = date, strip = strip, silent_plot=silent_plot)
+
+    def plot_strategy_signals_contracts(self, date = None, strip = None, silent_plot = False):
+        self._plot_signal(self._strategy_signal_notional, label = "positions (contracts)", caption = "Positions",
+                          date = date, strip = strip, silent_plot=silent_plot)
+
+    def plot_strategy_trades_notional(self, date = None, strip = None, silent_plot = False):
+        self._plot_signal(self._strategy_trade_notional, label = "trades (contracts)", caption = "Contracts",
+                          date = date, strip = strip, silent_plot=silent_plot)
+
     def grab_signals(self, strategy_signal, date = None, strip = None):
         if date is None:
             last_day = strategy_signal.ix[-1].transpose().to_frame()

@@ -12,19 +12,30 @@ __author__ = 'saeedamen' # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-TechIndicator
-
-Calculates various technical indicators and associated trading signals.
-
-"""
-
 import pandas
 import numpy
 
 from findatapy.util.loggermanager import LoggerManager
 
 class TechIndicator(object):
+    """Calculates various technical indicators and associated trading signals.
+
+    Signals can also be filtered to allow only longs or short and also to flip signals.
+
+    It is possible to create subclasses of
+    TechIndicator to implement your own custom signals and technical indicators.
+
+    At present it implements the following technical indicators (and associated signals)
+        SMA - simple moving averages - buy if spot above SMA, sell if below)
+        EMA - exponential moving average - buy if spot spot above EMA, sell if below)
+        ROC - rate of change - buy if rate of change positive, sell if negative
+        polarity - buy if input is positive, sell if negative
+        SMA2 - double simple moving average - buy if faster SMA above slower SMA, sell if below
+        RSI - relative strength indicator - buy if RSI exits overbought, sell if RSI exits oversold
+        BB - Bollinger bands - buy if spot above upper Bollinger band, sell if below lower Bollinger Band
+        long_only - long only signal
+
+    """
 
     def __init__(self):
         self.logger = LoggerManager().getLogger(__name__)
@@ -221,6 +232,42 @@ class TechIndicator(object):
 
             self._techind.columns = [x + " Long Only" for x in data_frame.columns.values]
 
+        elif name == "ATR":
+            # get all the asset names (assume we have names 'close', 'low', 'high' in the Data)
+            # keep ordering of assets
+            from collections import OrderedDict
+
+            asset_name = list(OrderedDict.fromkeys([x.split('.')[0] for x in data_frame.columns]))
+
+            df = []
+
+            # can improve the performance of this if vectorise more!
+            for a in asset_name:
+                close = [a + '.close']
+                low = [a + '.low']
+                high = [a + '.high']
+
+                prev_close = data_frame[close].shift(1)
+
+                c1 = data_frame[high].values - data_frame[low].values
+                c2 = numpy.abs(data_frame[high].values - prev_close.values)
+                c3 = numpy.abs(data_frame[low].values - prev_close.values)
+
+                true_range = numpy.max((c1,c2,c3), axis=0)
+                true_range = pandas.DataFrame(index=data_frame.index, data=true_range, columns = [a + ' True Range'])
+
+                df.append(true_range)
+
+            from findatapy.timeseries import Calculations
+
+            calc = Calculations()
+            true_range = calc.pandas_outer_join(df)
+
+            self._techind = true_range.rolling(window=tech_params.atr_period, center=False).mean()
+            # self._techind = true_range.ewm(ignore_na=False, span=tech_params.atr_period, min_periods=0, adjust=True).mean()
+
+            self._techind.columns = [x + " ATR" for x in asset_name]
+
         self.create_custom_tech_ind(data_frame_non_nan, name, tech_params, data_frame_non_nan_early)
 
         # TODO create other indicators
@@ -229,7 +276,7 @@ class TechIndicator(object):
 
         # TODO create other indicators
         if hasattr(tech_params, 'only_allow_shorts'):
-           self._signal[self._signal > 0] = 0
+            self._signal[self._signal > 0] = 0
 
         # apply signal multiplier (typically to flip signals)
         if hasattr(tech_params, 'signal_mult'):
@@ -252,14 +299,12 @@ class TechIndicator(object):
 
 #######################################################################################################################
 
-"""
-TechParams
 
-Holds parameters for calculation of technical indicators
-
-"""
 
 class TechParams:
+    """Holds parameters for calculation of technical indicators.
+
+    """
     pass
 
     # TODO add specific fields so can error check fields

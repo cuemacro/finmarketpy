@@ -91,7 +91,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
-* 11 Jan 2017 - Rewrote large number of comments and added ATR calculation
+* 11 Jan 2017 - Rewrote large number of comments, added ATR calculation and basic stop loss/take profit functionality
 * 07 Jan 2017 - Now outputs position sizes scaled by notional & by user defined contract sizes
 * 06 Jan 2017 - Added user defined weightings for strategies & general bug fixes
 * 04 Jan 2017 - Added a period shift parameter for calculating leverage (in RiskEngine)

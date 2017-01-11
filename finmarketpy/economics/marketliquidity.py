@@ -12,19 +12,15 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-MarketLiquidity
-
-Calculates spread between bid/ask and also tick count.
-
-"""
-
 import pandas
 
 from findatapy.util.loggermanager import LoggerManager
 
 
 class MarketLiquidity(object):
+    """Calculates spread between bid/ask and also tick count.
+
+    """
 
     def __init__(self):
         self.logger = LoggerManager().getLogger(__name__)

@@ -12,19 +12,15 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-Backtest
-
-Conducts backtest for strategies trading assets. Assumes we have an input of total returns. Reports historical return statistics
-and returns time series.
-
-"""
-
 import numpy
 
 from findatapy.util import LoggerManager
 
-class Backtest :
+class Backtest(object):
+    """Conducts backtest for strategies trading assets. Assumes we have an input of total returns. Reports historical return statistics
+    and returns time series.
+
+    """
 
     def __init__(self):
         self.logger = LoggerManager().getLogger(__name__)
@@ -33,8 +29,13 @@ class Backtest :
         return
 
     def calculate_trading_PnL(self, br, asset_a_df, signal_df, contract_value_df = None):
-        """
-        calculate_trading_PnL - Calculates P&L of a trading strategy and statistics to be retrieved later
+        """Calculates P&L of a trading strategy and statistics to be retrieved later
+
+        Calculates the P&L for each asset/signal combination and also for the finally strategy applying appropriate
+        weighting in the portfolio, depending on predefined parameters, for example:
+            static weighting for each asset
+            static weighting for each asset + vol weighting for each asset
+            static weighting for each asset + vol weighting for each asset + vol weighting for the portfolio
 
         Parameters
         ----------
@@ -75,6 +76,15 @@ class Backtest :
 
         for i in range(0, len(returns_cols)):
             pnl_cols.append(returns_cols[i] + " / " + signal_cols[i])
+
+        # apply a stop loss/take profit to every trade if this has been specified
+        # do this before we start to do vol weighting etc.
+        if hasattr(br, 'take_profit') and hasattr(br, 'stop_loss'):
+
+            temp_strategy_rets_df = calculations.calculate_signal_returns(signal_df, returns_df)
+            trade_rets_df = calculations.calculate_cum_rets_trades(signal_df, temp_strategy_rets_df)
+
+            signal_df = calculations.calculate_risk_stop_signals(signal_df, trade_rets_df, br.stop_loss, br.take_profit)
 
         # do we have a vol target for individual signals?
         if hasattr(br, 'signal_vol_adjust'):
@@ -165,7 +175,15 @@ class Backtest :
         # calculate each period of trades
         self._portfolio_trade = self._portfolio_signal - self._portfolio_signal.shift(1)
 
+        self._portfolio_signal_notional = None
+        self._portfolio_signal_trade_notional = None
+
+        self._portfolio_signal_contracts = None
+        self._portfolio_signal_trade_contracts = None
+
         # also create other measures of portfolio
+        # portfolio & trades in terms of a predefined notional (in USD)
+        # portfolio & trades in terms of contract sizes (particularly useful for futures)
         if hasattr(br, 'portfolio_notional_size'):
             # express positions in terms of the notional size specified
             self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
@@ -207,6 +225,26 @@ class Backtest :
         self._cumportfolio.columns = ['Port']
 
     def create_portfolio_weights(self, br, _pnl, method='mean'):
+        """Calculates P&L of a trading strategy and statistics to be retrieved later
+
+        Parameters
+        ----------
+        br : BacktestRequest
+            Parameters for the backtest specifying start date, finish data, transaction costs etc.
+
+        _pnl : pandas.DataFrame
+            Contains the daily P&L for the portfolio
+
+        method : String
+            'mean' - assumes equal weighting for each signal
+            'weighted' - can use predefined user weights (eg. if we assign weighting of 1, 1, 0.5, for three signals
+            the third signal will have a weighting of half versus the others)
+
+        Returns
+        -------
+        pandas.DataFrame
+            Contains the portfolio weights
+        """
         if method == 'mean':
             weights_vector = numpy.ones(len(_pnl.columns))
         elif method == 'weighted':
@@ -238,8 +276,7 @@ class Backtest :
         return
 
     def get_pnl(self):
-        """
-        get_pnl - Gets P&L returns
+        """Gets P&L returns
 
         Returns
         -------
@@ -248,8 +285,7 @@ class Backtest :
         return self._pnl
 
     def get_pnl_trades(self):
-        """
-        get_pnl_trades - Gets P&L of each individual trade per signal
+        """Gets P&L of each individual trade per signal
 
         Returns
         -------
@@ -263,8 +299,7 @@ class Backtest :
         return self._pnl_trades
 
     def get_pnl_desc(self):
-        """
-        get_pnl_desc - Gets P&L return statistics in a string format
+        """Gets P&L return statistics in a string format
 
         Returns
         -------
@@ -273,8 +308,7 @@ class Backtest :
         return self._ret_stats_signals.summary()
 
     def get_pnl_ret_stats(self):
-        """
-        get_pnl_ret_stats - Gets P&L return statistics of individual strategies as class to be queried
+        """Gets P&L return statistics of individual strategies as class to be queried
 
         Returns
         -------
@@ -284,8 +318,7 @@ class Backtest :
         return self._ret_stats_pnl
 
     def get_cumpnl(self):
-        """
-        get_cumpnl - Gets P&L as a cumulative time series of individual assets
+        """Gets P&L as a cumulative time series of individual assets
 
         Returns
         -------
@@ -295,8 +328,7 @@ class Backtest :
         return self._cumpnl
 
     def get_cumportfolio(self):
-        """
-        get_cumportfolio - Gets P&L as a cumulative time series of portfolio
+        """Gets P&L as a cumulative time series of portfolio
 
         Returns
         -------
@@ -306,8 +338,7 @@ class Backtest :
         return self._cumportfolio
 
     def get_portfolio_pnl(self):
-        """
-        get_portfolio_pnl - Gets portfolio returns in raw form (ie. not indexed into cumulative form)
+        """Gets portfolio returns in raw form (ie. not indexed into cumulative form)
 
         Returns
         -------
@@ -317,8 +348,7 @@ class Backtest :
         return self._portfolio
 
     def get_portfolio_pnl_desc(self):
-        """
-        get_portfolio_pnl_desc - Gets P&L return statistics of portfolio as string
+        """Gets P&L return statistics of portfolio as string
 
         Returns
         -------
@@ -328,8 +358,7 @@ class Backtest :
         return self._ret_stats_portfolio.summary()
 
     def get_portfolio_pnl_ret_stats(self):
-        """
-        get_portfolio_pnl_ret_stats - Gets P&L return statistics of portfolio as class to be queried
+        """Gets P&L return statistics of portfolio as class to be queried
 
         Returns
         -------
@@ -339,8 +368,7 @@ class Backtest :
         return self._ret_stats_portfolio
 
     def get_individual_leverage(self):
-        """
-        get_individual_leverage - Gets leverage for each asset historically
+        """Gets leverage for each asset historically
 
         Returns
         -------
@@ -350,8 +378,7 @@ class Backtest :
         return self._individual_leverage
 
     def get_portfolio_leverage(self):
-        """
-        get_portfolio_leverage - Gets the leverage for the portfolio
+        """Gets the leverage for the portfolio
 
         Returns
         -------
@@ -361,8 +388,7 @@ class Backtest :
         return self._portfolio_leverage
 
     def get_portfolio_signal(self):
-        """
-        get_portfolio_signal - Gets the signals (with individual leverage & portfolio leverage) for each asset, which
+        """Gets the signals (with individual leverage & portfolio leverage) for each asset, which
         equates to what we would trade in practice
 
         Returns
@@ -373,8 +399,7 @@ class Backtest :
         return self._portfolio_signal
 
     def get_portfolio_trade(self):
-        """
-        get_portfolio_trade - Gets the trades (with individual leverage & portfolio leverage) for each asset, which
+        """Gets the trades (with individual leverage & portfolio leverage) for each asset, which
         we'd need to execute
 
         Returns
@@ -385,8 +410,7 @@ class Backtest :
         return self._portfolio_trade
 
     def get_portfolio_signal_notional(self):
-        """
-        get_portfolio_signal_notional - Gets the signals (with individual leverage & portfolio leverage) for each asset, which
+        """Gets the signals (with individual leverage & portfolio leverage) for each asset, which
         equates to what we would have a positions in practice, scaled by a notional amount we have already specified
 
         Returns
@@ -397,8 +421,7 @@ class Backtest :
         return self._portfolio_signal_notional
 
     def get_portfolio_trade_notional(self):
-        """
-        get_portfolio_trade_notional - Gets the trades (with individual leverage & portfolio leverage) for each asset, which
+        """Gets the trades (with individual leverage & portfolio leverage) for each asset, which
         we'd need to execute, scaled by a notional amount we have already specified
 
         Returns
@@ -409,8 +432,7 @@ class Backtest :
         return self._portfolio_signal_trade_notional
 
     def get_portfolio_signal_contracts(self):
-        """
-        get_portfolio_signal_contracts - Gets the signals (with individual leverage & portfolio leverage) for each asset, which
+        """Gets the signals (with individual leverage & portfolio leverage) for each asset, which
         equates to what we would have a positions in practice, scaled by a notional amount and into contract sizes (eg. for futures)
         which we need to specify in another dataframe
 
@@ -422,8 +444,7 @@ class Backtest :
         return self._portfolio_signal_contracts
 
     def get_portfolio_trade_contracts(self):
-        """
-        get_portfolio_trade_contracts - Gets the trades (with individual leverage & portfolio leverage) for each asset, which
+        """Gets the trades (with individual leverage & portfolio leverage) for each asset, which
         we'd need to execute, scaled by a notional amount we have already specified and into contract sizes (eg. for futures)
         which we need to specify in another dataframe
 
@@ -435,8 +456,7 @@ class Backtest :
         return self._portfolio_signal_trade_contracts
 
     def get_signal(self):
-        """
-        get_signal - Gets the signals (with individual leverage, but excluding portfolio leverage) for each asset
+        """(with individual leverage, but excluding portfolio leverage) for each asset
 
         Returns
         -------
@@ -448,15 +468,6 @@ class Backtest :
 
 ########################################################################################################################
 
-"""
-TradingModel
-
-Abstract class which wraps around Backtest, providing conveninent functions for analaysis. Implement your own
-subclasses of this for your own strategy. See strategyfxcta_example.py for a simple implementation of a FX trend following
-strategy.
-
-"""
-
 import abc
 import pandas
 import datetime
@@ -467,6 +478,11 @@ from finmarketpy.economics import TechParams
 from findatapy.timeseries import Calculations, RetStats, Filter
 
 class TradingModel(object):
+    """Abstract class which wraps around Backtest, providing convenient functions for analaysis. Implement your own
+    subclasses of this for your own strategy. See tradingmodelfxtrend_example.py for a simple implementation of a
+    FX trend following strategy.
+
+    """
 
     #### Default parameters for outputting of results from trading model
     SAVE_FIGURES = True
@@ -485,23 +501,20 @@ class TradingModel(object):
     # to be implemented by every trading strategy
     @abc.abstractmethod
     def load_parameters(self):
-        """
-        load_parameters - Fills parameters for the backtest, such as start-end dates, transaction costs etc. To
+        """Fills parameters for the backtest, such as start-end dates, transaction costs etc. To
         be implemented by subclass.
         """
         return
 
     @abc.abstractmethod
     def load_assets(self):
-        """
-        load_assets - Loads time series for the assets to be traded and also for data for generating signals.
+        """Loads time series for the assets to be traded and also for data for generating signals.
         """
         return
 
     @abc.abstractmethod
     def construct_signal(self, spot_df, spot_df2, tech_params):
-        """
-        construct_signal - Constructs signal from pre-loaded time series
+        """Constructs signal from pre-loaded time series
 
         Parameters
         ----------
@@ -518,11 +531,15 @@ class TradingModel(object):
 
     ####### Generic functions for every backtest
     def construct_strategy(self, br = None):
-        """
-        construct_strategy - Constructs the returns for all the strategies which have been specified.
+        """Constructs the returns for all the strategies which have been specified.
 
-        - gets parameters form fill_backtest_request
-        - market data from fill_assets
+        It gets backtesting parameters from fill_backtest_request (although these can be overwritten
+        and then market data from fill_assets
+
+        Parameters
+        ----------
+        br : BacktestRequest
+            Parameters which define the backtest (for example start date, end date, transaction costs etc.
 
         """
 
@@ -615,9 +632,7 @@ class TradingModel(object):
         self._strategy_group_benchmark_annualised_pnl = years
 
     def construct_individual_strategy(self, br, spot_df, spot_df2, asset_df, tech_params, key, contract_value_df = None):
-        """
-        construct_individual_strategy - Combines the signal with asset returns to find the returns of an individual
-        strategy
+        """Combines the signal with asset returns to find the returns of an individual strategy
 
         Parameters
         ----------
@@ -660,8 +675,7 @@ class TradingModel(object):
         return cumportfolio, backtest
 
     def compare_strategy_vs_benchmark(self, br, strategy_df, benchmark_df):
-        """
-        compare_strategy_vs_benchmark - Compares the trading strategy we are backtesting against a benchmark
+        """Compares the trading strategy we are backtesting against a benchmark
 
         Parameters
         ----------
@@ -775,8 +789,7 @@ class TradingModel(object):
     #### Plotting
 
     def reduce_plot(self, data_frame):
-        """
-        reduce_plot - Reduces the frequency of a time series to every business day so it can be plotted more easily
+        """Reduces the frequency of a time series to every business day so it can be plotted more easily
 
         Parameters
         ----------
@@ -1062,8 +1075,7 @@ Adjusts signal weighting according to risk constraints (volatility targeting)
 
 class RiskEngine(object):
     def calculate_vol_adjusted_index_from_prices(self, prices_df, br):
-        """
-        calculate_vol_adjusted_index_from_price - Adjusts an index of prices for a vol target
+        """Adjusts an index of prices for a vol target
 
         Parameters
         ----------
@@ -1085,8 +1097,7 @@ class RiskEngine(object):
         return calculations.create_mult_index(returns_df)
 
     def calculate_vol_adjusted_returns(self, returns_df, br, returns=True):
-        """
-        calculate_vol_adjusted_returns - Adjusts returns for a vol target
+        """Adjusts returns for a vol target
 
         Parameters
         ----------
@@ -1129,8 +1140,7 @@ class RiskEngine(object):
     def calculate_leverage_factor(self, returns_df, vol_target, vol_max_leverage, vol_periods=60, vol_obs_in_year=252,
                                   vol_rebalance_freq='BM', data_resample_freq=None, data_resample_type='mean',
                                   returns=True, period_shift=0):
-        """
-        calculate_leverage_factor - Calculates the time series of leverage for a specified vol target
+        """Calculates the time series of leverage for a specified vol target
 
         Parameters
         ----------

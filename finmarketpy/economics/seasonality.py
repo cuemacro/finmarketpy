@@ -12,13 +12,6 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-Seasonality
-
-Does simple seasonality calculations on data.
-
-"""
-
 import numpy
 import pandas
 from findatapy.timeseries import Calculations, Filter
@@ -29,6 +22,9 @@ from findatapy.util.loggermanager import LoggerManager
 
 
 class Seasonality(object):
+    """Does simple seasonality calculations on data.
+
+    """
 
     def __init__(self):
         self.config = ConfigManager()

@@ -12,14 +12,6 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-TradeAnalysis
-
-Applies some basic trade analysis for a trading strategy (as defined by TradingModel). Use PyFolio to create some
-basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC).
-
-"""
-
 pf = None
 
 try:
@@ -38,6 +30,10 @@ from findatapy.util.loggermanager import LoggerManager
 from finmarketpy.backtest import Backtest
 
 class TradeAnalysis(object):
+    """Applies some basic trade analysis for a trading strategy (as defined by TradingModel). Use PyFolio to create some
+    basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC).
+
+    """
 
     def __init__(self, engine = ChartConstants().chartfactory_default_engine):
         self.logger = LoggerManager().getLogger(__name__)
@@ -49,8 +45,7 @@ class TradeAnalysis(object):
         return
 
     def run_strategy_returns_stats(self, trading_model, index = None, engine = 'pyfolio'):
-        """
-        run_strategy_returns_stats - Plots useful statistics for the trading strategy (using PyFolio)
+        """Plots useful statistics for the trading strategy (using PyFolio)
 
         Parameters
         ----------
@@ -123,7 +118,7 @@ class TradeAnalysis(object):
         Parameters
         ----------
         trading_model : TradingModel
-            defining trading strategy (potentionally a list)
+            defining trading strategy (can be a list)
 
         """
 

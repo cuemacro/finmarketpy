@@ -6,6 +6,11 @@ from finmarketpy.economics import TechParams
 from findatapy.util.loggermanager import LoggerManager
 
 class BacktestRequest(MarketDataRequest):
+    """Contains parameters necessary to define a backtest, including start date, finish date, transaction cost, etc
+
+    Used by TradingModel and Backtest to construct backtested returns for trading strategies
+
+    """
 
     def __init__(self):
         super(MarketDataRequest, self).__init__()

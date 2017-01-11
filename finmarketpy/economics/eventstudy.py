@@ -12,12 +12,6 @@ __author__ = 'saeedamen' # Saeed Amen / saeed@thalesians.com
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-EventStudy
-
-Provides functions for doing event studies on price action on an intraday basis and daily basis.
-
-"""
 
 import math
 
@@ -26,6 +20,9 @@ from pandas.tseries.offsets import CustomBusinessDay
 from findatapy.timeseries import Calculations, Timezone, Filter, Calendar
 
 class EventStudy(object):
+    """Provides functions for doing event studies on price action on an intraday basis and daily basis.
+
+    """
 
     def __init__(self):
         self.logger = LoggerManager().getLogger(__name__)
@@ -185,30 +182,6 @@ class EventStudy(object):
 
 ########################################################################################################################
 
-"""
-
-EventsFactory
-
-Provides methods to fetch data on economic data events and to perform basic event studies for market data around
-these events. Note, requires a file of input of the following (transposed as columns!) - we give an example for
-NFP released on 7 Feb 2003 (note, that release-date-time-full, need not be fully aligned by row).
-
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.Date	                31/01/2003 00:00
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.close	                xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.actual-release	        143
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-median	        xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-average	        xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high	        xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-low	            xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high.1	        xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.number-observations	xyz
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision	        185
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision-date	20030307
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-dt	            20030207
-USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-date-time-full	08/01/1999 13:30
-
-"""
-
 import datetime
 from datetime import timedelta
 
@@ -223,6 +196,25 @@ try:
 except: pass
 
 class EventsFactory(EventStudy):
+    """Provides methods to fetch data on economic data events and to perform basic event studies for market data around
+    these events. Note, requires a file of input of the following (transposed as columns!) - we give an example for
+    NFP released on 7 Feb 2003 (note, that release-date-time-full, need not be fully aligned by row).
+
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.Date	                31/01/2003 00:00
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.close	                xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.actual-release	        143
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-median	        xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-average	        xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high	        xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-low	            xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high.1	        xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.number-observations	xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision	        185
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision-date	20030307
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-dt	            20030207
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-date-time-full	08/01/1999 13:30
+
+    """
 
     # _econ_data_frame = None
 

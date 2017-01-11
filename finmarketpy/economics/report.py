@@ -12,13 +12,6 @@ __author__ = 'saeedamen' # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-Report
-
-Creates simple statistical reports (via plots) on time series, outputting results
-
-"""
-
 import pandas
 
 from chartpy import Chart, Style
@@ -28,6 +21,9 @@ from findatapy.util.dataconstants import DataConstants
 calculations = Calculations()
 
 class Report(object):
+    """Creates simple statistical reports (via plots) on time series, outputting results
+
+    """
 
     def report_single_var_regression(self, y, x, y_variable_names, x_variable_names, statistic,
                                           pretty_index = None):

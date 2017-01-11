@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
         # create statistics for the model returns using both finmarketpy and pyfolio
         ta.run_strategy_returns_stats(model, engine='finmarketpy')
-        ta.run_strategy_returns_stats(model, engine='pyfolio')
+        # ta.run_strategy_returns_stats(model, engine='pyfolio')
 
         # model.plot_strategy_group_benchmark_annualised_pnl()
 

@@ -14,6 +14,6 @@ setup(name='finmarketpy',
                           'twython',
                           'pytz',
                           'requests',
-                          'numpy'
+                          'numpy',
                           'multiprocessing_on_dill'],
 	  zip_safe=False)

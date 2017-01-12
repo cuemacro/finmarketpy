@@ -58,12 +58,15 @@ Major requirements
 * Required: pandas 0.18, numpy etc.
 * Required: findatapy for downloading market data (https://github.com/cuemacro/findatapy)
 * Required: chartpy for funky interactive plots (https://github.com/cuemacro/chartpy)
-* Recommended: multiprocessor_on_dill because standard multiprocessing library pickle causes issues 
-(from https://github.com/sixty-north/multiprocessing_on_dill)
 
 # Installation
 
-You can install the library using the below (better to get the newest version from repo, as opposed to releases). After installation:
+For detailed installation instructions for finmarketpy and its associated Python libraries go to
+https://github.com/cuemacro/finmarketpy/INSTALL.md (which includes details on how to setup your entire Python environment).
+
+You can install the library using the below (better to get the newest version from repo, as opposed to releases).
+
+After installation:
 * Make sure you edit the MarketConstants file
 
 ```
@@ -91,6 +94,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 12 Jan 2017 - Added detailed installation notes
 * 11 Jan 2017 - Rewrote large number of comments, added ATR calculation and basic stop loss/take profit functionality
 * 07 Jan 2017 - Now outputs position sizes scaled by notional & by user defined contract sizes
 * 06 Jan 2017 - Added user defined weightings for strategies & general bug fixes

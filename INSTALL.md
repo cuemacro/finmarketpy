@@ -10,12 +10,12 @@ which will help you to write your own trading strategies and Python scripts for 
 
 * Programming Tools
     * Anaconda 4.20 64 bit Python - https://www.continuum.io/downloads
-        * This is the most used Python distribution for data science.
-    * As well as installing the core Python libraries, it also installs many useful libraries like the SciPy stack, which
+      * This is the most used Python distribution for data science.
+      * As well as installing the core Python libraries, it also installs many useful libraries like the SciPy stack, which
     contains NumPy, pandas etc. and many other useful libraries like matplotlib which are dependencies for the various Cuemacro libraries
-        * Microsoft Visual Studio 2015 Community Edition- https://www.visualstudio.com/downloads/
-    * Makes sure to do a custom installation and tick Visual C++
-        * Some Python libraries need a C++ compiler in order to build (such as blpapi and arctic)
+    * Microsoft Visual Studio 2015 Community Edition- https://www.visualstudio.com/downloads/
+      * Makes sure to do a custom installation and tick Visual C++
+      * Some Python libraries need a C++ compiler in order to build (such as blpapi and arctic)
     * Git - https://git-scm.com/downloads
         * Version control software
     * Makes it easier to maintain your own Python code

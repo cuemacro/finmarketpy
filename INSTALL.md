@@ -44,6 +44,22 @@ various Python libraries. The Cuemacro libraries will install most Python depend
         * Interact with Bloomberg programmatically via Python to download historical and live data
         * Note that this requires a C++ compiler to build the Python library
         * Follow instructions at https://www.github.com/cuemacro/findatapy/BLOOMBERG.md for all the steps necessary to install blpapi
+    * Whilst Anaconda has most of the dependencies and pip will install all additional ones needed by the Cuemacro Python libraries it is possible to install them manually via pip,
+    below is a list of the dependencies
+        * all libraries
+            * numpy - matrix algebra
+            * pandas - time series
+            * pytz - timezone management
+            * requests - accessing URLs
+            * mulitprocessing_on_dill - multitasking
+        * findatapy
+            * pandas_datareader - accessing market data sources including Yahoo Finance
+            * quandl - accessing market data sources
+        * chartpy
+            * bokeh - visualisation
+            * cufflinks - wrapper on plotly
+            * matplotlib - visualisation
+            * plotly - visualisation
 
 * Cuemacro Python libraries (open source)
     * chartpy - pip install git+https://github.com/cuemacro/chartpy.git

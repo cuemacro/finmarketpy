@@ -37,26 +37,41 @@ class Backtest(object):
         Parameters
         ----------
         asset_a_df : DataFrame
+            Asset prices
+
         signal_df : DataFrame
-        further_df
+            Trade signals (typically +1, -1, 0 etc)
+
+        further_df : DataFrame
+            Further dataframes user wishes to output in the diagnostic output (typically inputs for the signals)
+
         further_df_labels
+            Labels to append to the further dataframes
 
         Returns
         -------
+        DataFrame with asset, trading signals and returns of the trading strategy for diagnostic purposes
 
         """
         calculations = Calculations()
         asset_rets_df = calculations.calculate_returns(asset_a_df)
         strategy_rets = calculations.calculate_signal_returns(signal_df, asset_rets_df)
 
-        asset_rets_df.columns = [x + '_asset_rets' for x in strategy_rets.columns]
+        reset_points = ((signal_df - signal_df.shift(1)).abs())
+
+        asset_a_df_entry = asset_a_df.copy(deep=True)
+        asset_a_df_entry[reset_points == 0] = numpy.nan
+        asset_a_df_entry = asset_a_df_entry.ffill()
+
+        asset_a_df_entry.columns = [x + '_entry' for x in asset_a_df_entry.columns]
+        asset_rets_df.columns = [x + '_asset_rets' for x in asset_rets_df.columns]
         strategy_rets.columns = [x + '_strat_rets' for x in strategy_rets.columns]
         signal_df.columns = [x + '_final_signal' for x in signal_df.columns]
 
         for i in range(0, len(further_df)):
             further_df[i].columns = [x + '_' + further_df_labels[i] for x in further_df[i].columns]
 
-        flatten_df =[asset_a_df, asset_rets_df, strategy_rets, signal_df]
+        flatten_df =[asset_a_df, asset_a_df_entry, asset_rets_df, strategy_rets, signal_df]
 
         for f in further_df:
             flatten_df.append(f)

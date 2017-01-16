@@ -94,6 +94,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 16 Jan 2017 - Added method in BacktestEngine for debugging of P&L (dumps table with signals/assets/returns)
 * 12 Jan 2017 - Added detailed installation notes
 * 11 Jan 2017 - Rewrote large number of comments, added ATR calculation and basic stop loss/take profit functionality
 * 07 Jan 2017 - Now outputs position sizes scaled by notional & by user defined contract sizes

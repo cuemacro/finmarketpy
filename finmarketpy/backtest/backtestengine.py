@@ -28,6 +28,42 @@ class Backtest(object):
         self._portfolio = None
         return
 
+    def calculate_diagnostic_trading_PnL(self, asset_a_df, signal_df, further_df = [], further_df_labels = []):
+        """Calculates P&L table which can be used for debugging purposes,
+
+        The table is populated with asset, signal and further dataframes provided by the user, can be used to check signalling methodology.
+        It does not apply parameters such as transaction costs, vol adjusment and so on.
+
+        Parameters
+        ----------
+        asset_a_df : DataFrame
+        signal_df : DataFrame
+        further_df
+        further_df_labels
+
+        Returns
+        -------
+
+        """
+        calculations = Calculations()
+        asset_rets_df = calculations.calculate_returns(asset_a_df)
+        strategy_rets = calculations.calculate_signal_returns(signal_df, asset_rets_df)
+
+        asset_rets_df.columns = [x + '_asset_rets' for x in strategy_rets.columns]
+        strategy_rets.columns = [x + '_strat_rets' for x in strategy_rets.columns]
+        signal_df.columns = [x + '_final_signal' for x in signal_df.columns]
+
+        for i in range(0, len(further_df)):
+            further_df[i].columns = [x + '_' + further_df_labels[i] for x in further_df[i].columns]
+
+        flatten_df =[asset_a_df, asset_rets_df, strategy_rets, signal_df]
+
+        for f in further_df:
+            flatten_df.append(f)
+
+        return calculations.pandas_outer_join(flatten_df)
+
+
     def calculate_trading_PnL(self, br, asset_a_df, signal_df, contract_value_df = None):
         """Calculates P&L of a trading strategy and statistics to be retrieved later
 
@@ -61,30 +97,57 @@ class Backtest(object):
             asset_df, contract_value_df = asset_df.align(contract_value_df, join='left', axis='index')
             contract_value_df = contract_value_df.fillna(method='ffill')  # fill down asset holidays (we won't trade on these days)
 
-        # only allow signals to change on the days when we can trade assets
-        signal_df = signal_df.mask(numpy.isnan(asset_df.values))    # fill asset holidays with NaN signals
-        signal_df = signal_df.fillna(method='ffill')                # fill these down
-        asset_df = asset_df.fillna(method='ffill')                  # fill down asset holidays (we won't trade on these days)
+        # non-trading days
+        non_trading_days = numpy.isnan(asset_df.values)
 
-        returns_df = calculations.calculate_returns(asset_df)
+        # only allow signals to change on the days when we can trade assets
+        signal_df = signal_df.mask(non_trading_days)                # fill asset holidays with NaN signals
+        signal_df = signal_df.fillna(method='ffill')                # fill these down
+
         tc = br.spot_tc_bp
 
         signal_cols = signal_df.columns.values
-        returns_cols = returns_df.columns.values
+        asset_df_cols = asset_df.columns.values
 
         pnl_cols = []
 
-        for i in range(0, len(returns_cols)):
-            pnl_cols.append(returns_cols[i] + " / " + signal_cols[i])
+        for i in range(0, len(asset_df_cols)):
+            pnl_cols.append(asset_df_cols[i] + " / " + signal_cols[i])
+
+        asset_df_copy = asset_df.copy()
+        asset_df = asset_df.fillna(method='ffill')        # fill down asset holidays (we won't trade on these days)
+        returns_df = calculations.calculate_returns(asset_df)
 
         # apply a stop loss/take profit to every trade if this has been specified
         # do this before we start to do vol weighting etc.
         if hasattr(br, 'take_profit') and hasattr(br, 'stop_loss'):
+            returns_df = calculations.calculate_returns(asset_df)
 
             temp_strategy_rets_df = calculations.calculate_signal_returns(signal_df, returns_df)
             trade_rets_df = calculations.calculate_cum_rets_trades(signal_df, temp_strategy_rets_df)
 
+            # pre_signal_df = signal_df.copy()
+
             signal_df = calculations.calculate_risk_stop_signals(signal_df, trade_rets_df, br.stop_loss, br.take_profit)
+
+            # make sure we can't trade where asset price is undefined and carry over signal
+            signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
+            signal_df = signal_df.fillna(method='ffill')  # fill these down (when asset is not trading
+
+            # signal_df.columns = [x + '_final_signal' for x in signal_df.columns]
+
+            # for debugging purposes
+            # if False:
+            #     signal_df_copy = signal_df.copy()
+            #     trade_rets_df_copy = trade_rets_df.copy()
+            #
+            #     asset_df_copy.columns = [x + '_asset' for x in temp_strategy_rets_df.columns]
+            #     temp_strategy_rets_df.columns = [x + '_strategy_rets' for x in temp_strategy_rets_df.columns]
+            #     signal_df_copy.columns = [x + '_final_signal' for x in signal_df_copy.columns]
+            #     trade_rets_df_copy.columns = [x + '_cum_trade' for x in trade_rets_df_copy.columns]
+            #
+            #     to_plot = calculations.pandas_outer_join([asset_df_copy, pre_signal_df, signal_df_copy, trade_rets_df_copy, temp_strategy_rets_df])
+            #     to_plot.to_csv('test.csv')
 
         # do we have a vol target for individual signals?
         if hasattr(br, 'signal_vol_adjust'):

@@ -63,32 +63,73 @@ various Python libraries. The Cuemacro libraries will install most Python depend
 
 * Cuemacro Python libraries (open source)
     * chartpy - pip install git+https://github.com/cuemacro/chartpy.git
-        * Check constants file configuration findatapy/findatapy/util/dataconstants.py for
+        * Check constants file configuration [chartpy/chartpy/util/chartconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/chartpy/util/chartconstants.py) for
             * Adding your own API keys for Plotly, Twitter etc
             * Changing the default size of plots
             * Changing the default chart engine (eg. Plotly, Bokeh or Matplotlib)
         * Alternatively you can create chartcred.py class in the same folder to put your own API keys
         * This has the benefit of not being overwritten each time you upgrade the project
     * findatapy - pip install git+https://github.com/cuemacro/findatapy.git
-        * Check constants file configuration findatapy/findatapy/util/dataconstants.py for
+        * Check constants file configuration [findatapy/findatapy/util/dataconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/findatatpy/util/dataconstants.py) for
             * adding your own API keys for Quandl etc.
-            * changing path of your local data source (folder_time_series_data)
-            * changing path of the config folder if necessary (config_root_folder) so you can create your own custom
+            * changing path of your local data source (change `folder_time_series_data` attribute)
+            * changing path of the config folder if necessary (change `config_root_folder` attribute) so you can create your own custom
             ticker library (otherwise it will get overwritten each time you upgrade findatapy)
             * changing the ticker library (placed in findatapy/findatapy/conf/*.CSV files)
                 * time_series_categories_fields.csv - define the categories of tickers and what fields they have
                 * time_series_fields_list.csv - define aliases for vendor fields
                 * time_series_tickers_list.csv - defines aliases for vendor tickers
                 * There are already setup with a few FX tickers to act as an example
-                * In addition, you can add your own CSV files to accompany time_series_tickers_list.csv
+                * In addition, you can add your own CSV files to accompany time_series_tickers_list.csv (add to time_series_tickers_list attribute)
                     * fx_vol_tickers.csv - samples of FX vol tickers
                     * fx_forward_tickers.csv - samples of FX forward tickers
             * changing logging.conf
                 * For customising how the project dumps logs to disk
-        * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings
+        * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings. Below we have a sample:
+
+        ```python
+class DataCred(object):
+
+    folder_historic_CSV = "E:/tickdata/historicCSV"
+    folder_time_series_data = "C:/timeseriesdata"
+
+    config_root_folder = "E:/Remote/canary/"
+
+    ###### FOR ALIAS TICKERS
+    # config file for time series categories
+    time_series_categories_fields = \
+        config_root_folder + "conf/time_series_categories_fields.csv"
+
+    # we can have multiple tickers files (separated by ";")
+    time_series_tickers_list = config_root_folder + "conf/time_series_tickers_list.csv;" + \
+                               config_root_folder + "conf/futures_contracts_tickers.csv"
+
+
+    time_series_fields_list = config_root_folder + "conf/time_series_fields_list.csv"
+
+    # config file for long term econ data
+    all_econ_tickers = config_root_folder + "conf/all_econ_tickers.csv"
+    econ_country_codes = config_root_folder + "conf/econ_country_codes.csv"
+    econ_country_groups = config_root_folder + "conf/econ_country_groups.csv"
+
+    default_market_data_generator = "cacheddatagenerator"
+
+    # Quandl settings
+    quandl_api_key = "XYZ"
+
+    # Twitter settings (you need to set these up on Twitter)
+    TWITTER_APP_KEY = "XYZ"
+    TWITTER_APP_SECRET = "XYZ"
+    TWITTER_OAUTH_TOKEN = "XYZ"
+    TWITTER_OAUTH_TOKEN_SECRET = "XYZ"
+
+    # FRED API key
+    fred_api_key = "XYZ"
+
+        ```
         * This has the benefit of not being overwritten each time you upgrade the project
     * finmarketpy - pip install git+https://github.com/cuemacro/finmarketpy.git
-        * Check constants file configuration
+        * Check constants file configuration [finmarketpy/finmarketpy/util/marketconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy/util/marketconstants.py)
         * You can also create your own file marketcred.py (placed in the same folder)
 
 You can then setup your own project in PyCharm to create your own trading strategies on top of it. I'd recommend creating

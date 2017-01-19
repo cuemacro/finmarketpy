@@ -62,6 +62,11 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * plotly - visualisation
 
 * Cuemacro Python libraries (open source)
+    * Before we start make sure we are familiar where your Anaconda site packages folder is (ie. where it will install your Python dependencies),
+    as this will be where we need to edit the various configuation files described in this section.
+        * Typically this is in folders like:
+            * C:\Anaconda3-64\Lib\site-packages
+            * C:\Program Files\Anaconda\Lib\site-packages
     * chartpy - pip install git+https://github.com/cuemacro/chartpy.git
         * Check constants file configuration [chartpy/chartpy/util/chartconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/chartpy/util/chartconstants.py) for
             * Adding your own API keys for Plotly, Twitter etc
@@ -85,7 +90,9 @@ various Python libraries. The Cuemacro libraries will install most Python depend
                     * fx_forward_tickers.csv - samples of FX forward tickers
             * changing logging.conf
                 * For customising how the project dumps logs to disk
-        * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings. Below we have a sample:
+        * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings.
+        * This has the benefit of not being overwritten each time you upgrade the project.
+        * Below we have a sample:
 
         ```python
 class DataCred(object):
@@ -127,7 +134,6 @@ class DataCred(object):
     fred_api_key = "XYZ"
 
         ```
-        * This has the benefit of not being overwritten each time you upgrade the project
     * finmarketpy - pip install git+https://github.com/cuemacro/finmarketpy.git
         * Check constants file configuration [finmarketpy/finmarketpy/util/marketconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy/util/marketconstants.py)
         * You can also create your own file marketcred.py (placed in the same folder)

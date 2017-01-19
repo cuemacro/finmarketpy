@@ -1,1 +1,2 @@
 recursive-include finmarketpy/ *.*
+recursive-include finmarketpy_examples/ *.*

@@ -138,7 +138,9 @@ class Backtest(object):
         if hasattr(br, 'take_profit') and hasattr(br, 'stop_loss'):
             returns_df = calculations.calculate_returns(asset_df)
 
-            temp_strategy_rets_df = calculations.calculate_signal_returns(signal_df, returns_df)
+            temp_strategy_rets_df = calculations.calculate_signal_returns_as_matrix(signal_df, returns_df)
+            temp_strategy_rets_df.columns = signal_df.columns
+
             trade_rets_df = calculations.calculate_cum_rets_trades(signal_df, temp_strategy_rets_df)
 
             # pre_signal_df = signal_df.copy()

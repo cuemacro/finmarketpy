@@ -184,7 +184,13 @@ class TradeAnalysis(object):
     def run_arbitrary_sensitivity(self, trading_model, parameter_list = None, parameter_names = None,
                                   pretty_portfolio_names = None, parameter_type = None):
 
-        asset_df, spot_df, spot_df2, basket_dict = trading_model.load_assets()
+        assets = trading_model.load_assets()
+
+        asset_df = assets[0]
+        spot_df  = assets[1]
+        spot_df2 = assets[2]
+        basket_dict = assets[3]             # for future use
+        contract_value_df = assets[4]
 
         port_list = None
         ret_stats_list = []
@@ -205,7 +211,7 @@ class TradeAnalysis(object):
             backtest = Backtest()
             self.logger.info("Calculating... " + str(pretty_portfolio_names[i]))
 
-            backtest.calculate_trading_PnL(br, asset_df, signal_df)
+            backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=contract_value_df)
             ret_stats_list.append(backtest.get_portfolio_pnl_ret_stats())
             stats = str(backtest.get_portfolio_pnl_desc()[0])
 

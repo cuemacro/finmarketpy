@@ -45,8 +45,9 @@ class TechIndicator(object):
     def create_tech_ind(self, data_frame_non_nan, name, tech_params, data_frame_non_nan_early = None):
         self._signal = None
         self._techind = None
-
-        data_frame = data_frame_non_nan.fillna(method="ffill")
+        
+        if tech_params.fillna:
+            data_frame = data_frame_non_nan.fillna(method="ffill")
 
         if data_frame_non_nan_early is not None:
             data_frame_early = data_frame_non_nan_early.fillna(method="ffill")
@@ -243,18 +244,30 @@ class TechIndicator(object):
 
             # can improve the performance of this if vectorise more!
             for a in asset_name:
+                
                 close = [a + '.close']
                 low = [a + '.low']
                 high = [a + '.high']
 
-                prev_close = data_frame[close].shift(1)
+                # if we don't fill NaNs, we need to remove those rows and then calculate the ATR
+                if not(tech_params.fillna):
+                    data_frame_short = data_frame[[close[0], low[0], high[0]]]
+                    data_frame_short = data_frame_short.dropna()
+                else:
+                    data_frame_short = data_frame
+                    
+                prev_close = data_frame_short[close].shift(1)
 
-                c1 = data_frame[high].values - data_frame[low].values
-                c2 = numpy.abs(data_frame[high].values - prev_close.values)
-                c3 = numpy.abs(data_frame[low].values - prev_close.values)
+                c1 = data_frame_short[high].values - data_frame_short[low].values
+                c2 = numpy.abs(data_frame_short[high].values - prev_close.values)
+                c3 = numpy.abs(data_frame_short[low].values - prev_close.values)
 
                 true_range = numpy.max((c1,c2,c3), axis=0)
-                true_range = pandas.DataFrame(index=data_frame.index, data=true_range, columns = [a + ' True Range'])
+                true_range = pandas.DataFrame(index=data_frame_short.index, data=true_range, columns = [close[0] + ' True Range'])
+
+                # put back NaNs into ATR if necessary
+                if (not(tech_params.fillna)):
+                    true_range = true_range.reindex(data_frame.index, fill_value=numpy.nan)
 
                 df.append(true_range)
 
@@ -266,7 +279,7 @@ class TechIndicator(object):
             self._techind = true_range.rolling(window=tech_params.atr_period, center=False).mean()
             # self._techind = true_range.ewm(ignore_na=False, span=tech_params.atr_period, min_periods=0, adjust=True).mean()
 
-            self._techind.columns = [x + " ATR" for x in asset_name]
+            self._techind.columns = [x + ".close ATR" for x in asset_name]
 
         self.create_custom_tech_ind(data_frame_non_nan, name, tech_params, data_frame_non_nan_early)
 
@@ -305,6 +318,59 @@ class TechParams:
     """Holds parameters for calculation of technical indicators.
 
     """
-    pass
+    
+    def __init__(self, fillna = True, atr_period = 14, sma_period = 20,
+                 green_n = 4, green_count = 9, red_n = 2, red_count = 13):
+        self.fillna = fillna
+        self.atr_period = atr_period
+        self.sma_period = sma_period
+        
+        self.green_n = green_n
+        self.green_count = green_count
+        self.red_n = red_n
+        self.red_count = red_count
 
-    # TODO add specific fields so can error check fields
+    @property
+    def fillna(self): return self.__fillna
+
+    @fillna.setter
+    def fillna(self,fillna): self.__fillna = fillna
+
+    @property
+    def atr_period(self): return self.__atr_period
+
+    @atr_period.setter
+    def atr_period(self, atr_period): self.__atr_period = atr_period
+
+    @property
+    def sma_period(self): return self.__sma_period
+
+    @sma_period.setter
+    def sma_period(self, sma_period): self.__sma_period = sma_period
+    
+    @property
+    def green_n(self): return self.__green_n
+
+    @green_n.setter
+    def green_n(self, green_n): self.__green_n = green_n
+    
+    @property
+    def green_count(self): return self.__green_count
+
+    @green_count.setter
+    def green_count(self, green_count): self.__green_count = green_count
+
+    @property
+    def red_n(self): return self.__red_n
+
+    @red_n.setter
+    def red_n(self, red_n): self.__red_n = red_n
+    
+    @property
+    def red_count(self): return self.__red_count
+
+    @red_count.setter
+    def red_count(self, red_count): self.__red_count = red_count
+
+
+            # TODO add specific fields so can error check fields

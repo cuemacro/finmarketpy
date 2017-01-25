@@ -38,19 +38,23 @@ class TradeAnalysis(object):
     def __init__(self, engine = ChartConstants().chartfactory_default_engine):
         self.logger = LoggerManager().getLogger(__name__)
         self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime("%Y%m%d") + ' '
-        self.SCALE_FACTOR = 3
         self.DEFAULT_PLOT_ENGINE = engine
         self.chart = Chart(engine=self.DEFAULT_PLOT_ENGINE)
 
         return
 
     def run_strategy_returns_stats(self, trading_model, index = None, engine = 'pyfolio'):
-        """Plots useful statistics for the trading strategy (using PyFolio)
+        """Plots useful statistics for the trading strategy using various backends
 
         Parameters
         ----------
         trading_model : TradingModel
             defining trading strategy
+
+        engine : str
+            'pyfolio' - use PyFolio as a backend
+            'finmarketpy' - use finmarketpy as a backend
+
         index: DataFrame
             define strategy by a time series
 
@@ -189,8 +193,12 @@ class TradeAnalysis(object):
         asset_df = assets[0]
         spot_df  = assets[1]
         spot_df2 = assets[2]
-        basket_dict = assets[3]             # for future use
-        contract_value_df = assets[4]
+        basket_dict = assets[3]
+
+        contract_value_df = None
+
+        if len(assets) == 5:# for future use
+            contract_value_df = assets[4]
 
         port_list = None
         ret_stats_list = []
@@ -239,7 +247,7 @@ class TradeAnalysis(object):
         style.resample = 'B'
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + '.png'
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + '.html'
-        style.scale_factor = self.SCALE_FACTOR
+        style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
 
         self.chart.plot(port_list, chart_type='line', style=style)
@@ -248,7 +256,7 @@ class TradeAnalysis(object):
         style = Style()
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' IR.png'
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' IR.html'
-        style.scale_factor = self.SCALE_FACTOR
+        style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
         summary = pandas.DataFrame(index = pretty_portfolio_names, data = ir, columns = ['IR'])
 
@@ -310,7 +318,7 @@ class TradeAnalysis(object):
 
         # Plotting spot over day of month/month of year
         style.color = 'Blues'
-        style.scale_factor = self.SCALE_FACTOR
+        style.scale_factor = trading_model.SCALE_FACTOR
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' seasonality day of month.png'
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' seasonality day of month.html'
         style.title = trading_model.FINAL_STRATEGY + ' day of month seasonality'
@@ -325,7 +333,7 @@ class TradeAnalysis(object):
 
         style = Style()
 
-        style.scale_factor = self.SCALE_FACTOR
+        style.scale_factor = trading_model.SCALE_FACTOR
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' seasonality month of year.png'
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' seasonality month of year.html'
         style.title = trading_model.FINAL_STRATEGY + ' month of year seasonality'

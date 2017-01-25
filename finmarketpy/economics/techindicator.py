@@ -33,6 +33,7 @@ class TechIndicator(object):
         SMA2 - double simple moving average - buy if faster SMA above slower SMA, sell if below
         RSI - relative strength indicator - buy if RSI exits overbought, sell if RSI exits oversold
         BB - Bollinger bands - buy if spot above upper Bollinger band, sell if below lower Bollinger Band
+        ATR - Average True Range - useful for creating stop/take profit levels
         long_only - long only signal
 
     """
@@ -48,6 +49,8 @@ class TechIndicator(object):
         
         if tech_params.fillna:
             data_frame = data_frame_non_nan.fillna(method="ffill")
+        else:
+            data_frame = data_frame_non_nan
 
         if data_frame_non_nan_early is not None:
             data_frame_early = data_frame_non_nan_early.fillna(method="ffill")

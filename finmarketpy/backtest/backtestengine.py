@@ -138,8 +138,8 @@ class Backtest(object):
         if hasattr(br, 'take_profit') and hasattr(br, 'stop_loss'):
             returns_df = calculations.calculate_returns(asset_df)
 
+            # makes assumption that signal column order matches that of returns
             temp_strategy_rets_df = calculations.calculate_signal_returns_as_matrix(signal_df, returns_df)
-            temp_strategy_rets_df.columns = signal_df.columns
 
             trade_rets_df = calculations.calculate_cum_rets_trades(signal_df, temp_strategy_rets_df)
 
@@ -638,6 +638,7 @@ class TradingModel(object):
         spot_df = market_data[1]
         spot_df2 = market_data[2]
         basket_dict = market_data[3]
+        # contract_value_df = market_data[4]
 
         # optional database output
         contract_value_df = None

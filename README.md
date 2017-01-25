@@ -34,21 +34,21 @@ Calculate the cumulative returns of a trading strategy historically (see finmark
 
 Plot the leverage of the strategy over time
 
-<img src="https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy_examples/gallery/fx-trend-leverage.png?raw=true" width="750"/>
+<img src="finmarketpy_examples/gallery/fx-trend-leverage.png?raw=true" width="750"/>
 
 Plot the individual trade returns
 
-<img src="https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy_examples/gallery/fx-trend-trade-returns.png?raw=true" width="750"/>
+<img src="finmarketpy_examples/gallery/fx-trend-trade-returns.png?raw=true" width="750"/>
 
 Calculate seasonality of any asset: here we show gold and FX volatility seasonality (see examples/seasonality_examples.py)
 
-<img src="https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy_examples/gallery/gold-seasonality.png?raw=true" width="750"/>
+<img src="finmarketpy_examples/gallery/gold-seasonality.png?raw=true" width="750"/>
 
-<img src="https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy_examples/gallery/fx-vol-seasonality.png?raw=true" width="750"/>
+<img src="finmarketpy_examples/gallery/fx-vol-seasonality.png?raw=true" width="750"/>
 
 Calculate event study around events for asset (see examples/events_examples.py)
 
-<img src="https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy_examples/gallery/usdjpy-nfp.png?raw=true" width="750"/>
+<img src="finmarketpy_examples/gallery/usdjpy-nfp.png?raw=true" width="750"/>
 
 
 # Requirements

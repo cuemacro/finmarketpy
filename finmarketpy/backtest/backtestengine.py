@@ -659,11 +659,13 @@ class TradingModel(object):
 
         # each portfolio key calculate returns - can put parts of the portfolio in the key
         for key in basket_dict.keys():
-            asset_cut_df = asset_df[[x +'.close' for x in basket_dict[key]]]
-            spot_cut_df = spot_df[[x +'.close' for x in basket_dict[key]]]
 
             self.logger.info("Calculating " + key)
 
+            asset_cut_df = asset_df[[x +'.close' for x in basket_dict[key]]]
+            spot_cut_df = spot_df[[x +'.close' for x in basket_dict[key]]]
+
+            # TODO add optional parallel computation here
             results, backtest = self.construct_individual_strategy(br, spot_cut_df, spot_df2, asset_cut_df, tech_params, key,
                                                                    contract_value_df = contract_value_df)
 

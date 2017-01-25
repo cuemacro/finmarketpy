@@ -94,7 +94,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
-* 25 Jan 2017 - Additional work on stops/take profit with multiple assets
+* 25 Jan 2017 - Additional work on stops/take profit with multiple assets & plotting bug fixes for TradeAnalysis
 * 24 Jan 2017 - Fixing issues around stops/take profits and adding fields in TechParams
 * 19 Jan 2017 - Change location of examples in project
 * 16 Jan 2017 - Added method in BacktestEngine for debugging of P&L (dumps table with signals/assets/returns)

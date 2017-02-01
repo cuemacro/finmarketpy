@@ -104,15 +104,26 @@ class Backtest(object):
         """
 
         calculations = Calculations()
+        risk_engine = RiskEngine()
 
-        # make sure the dates of both traded asset and signal are aligned properly
-        asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
+        # # do an outer join first, so can fill out signal and fill it down
+        # # this captures the case where the signal changes on an asset holiday
+        # # it will just get delayed till the next tradable day when we do this
+        # asset_df_2, signal_df_2 = asset_a_df.align(signal_df, join='outer', axis='index')
+        # signal_df = signal_df_2.fillna(method='ffill')
+        #
+        # # now make sure the dates of both traded asset and signal are aligned properly
+        # # and use as reference only those days where we have asset information
+        # asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
+
+        asset_df, signal_df = calculations.join_left_fill_right(asset_a_df, signal_df)
 
         if (contract_value_df is not None):
             asset_df, contract_value_df = asset_df.align(contract_value_df, join='left', axis='index')
             contract_value_df = contract_value_df.fillna(method='ffill')  # fill down asset holidays (we won't trade on these days)
 
-        # non-trading days
+        # non-trading days of the assets (this may of course vary between the assets we are trading
+        # if they are from different asset classes)
         non_trading_days = numpy.isnan(asset_df.values)
 
         # only allow signals to change on the days when we can trade assets
@@ -129,13 +140,12 @@ class Backtest(object):
         for i in range(0, len(asset_df_cols)):
             pnl_cols.append(asset_df_cols[i] + " / " + signal_cols[i])
 
-        asset_df_copy = asset_df.copy()
         asset_df = asset_df.fillna(method='ffill')        # fill down asset holidays (we won't trade on these days)
         returns_df = calculations.calculate_returns(asset_df)
 
         # apply a stop loss/take profit to every trade if this has been specified
         # do this before we start to do vol weighting etc.
-        if hasattr(br, 'take_profit') and hasattr(br, 'stop_loss'):
+        if br.take_profit is not None and br.stop_loss is not None:
             returns_df = calculations.calculate_returns(asset_df)
 
             # makes assumption that signal column order matches that of returns
@@ -151,10 +161,8 @@ class Backtest(object):
             signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
             signal_df = signal_df.fillna(method='ffill')  # fill these down (when asset is not trading
 
-            # signal_df.columns = [x + '_final_signal' for x in signal_df.columns]
-
             # for debugging purposes
-            # if False:
+            # if True:
             #     signal_df_copy = signal_df.copy()
             #     trade_rets_df_copy = trade_rets_df.copy()
             #
@@ -167,36 +175,25 @@ class Backtest(object):
             #     to_plot.to_csv('test.csv')
 
         # do we have a vol target for individual signals?
-        if hasattr(br, 'signal_vol_adjust'):
-            if br.signal_vol_adjust is True:
-                risk_engine = RiskEngine()
+        if br.signal_vol_adjust is True:
+            leverage_df = risk_engine.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
+                                                                    br.signal_vol_periods, br.signal_vol_obs_in_year,
+                                                                    br.signal_vol_rebalance_freq, br.signal_vol_resample_freq,
+                                                                    br.signal_vol_resample_type, period_shift=br.signal_vol_period_shift)
 
-                if not(hasattr(br, 'signal_vol_resample_type')):
-                    br.signal_vol_resample_type = 'mean'
-
-                if not(hasattr(br, 'signal_vol_resample_freq')):
-                    br.signal_vol_resample_freq = None
-
-                if not(hasattr(br, 'signal_vol_period_shift')):
-                    br.signal_vol_period_shift = 0
-
-                leverage_df = risk_engine.calculate_leverage_factor(returns_df, br.signal_vol_target, br.signal_vol_max_leverage,
-                                               br.signal_vol_periods, br.signal_vol_obs_in_year,
-                                               br.signal_vol_rebalance_freq, br.signal_vol_resample_freq,
-                                               br.signal_vol_resample_type, period_shift=br.signal_vol_period_shift)
-
-                signal_df = pandas.DataFrame(
+            signal_df = pandas.DataFrame(
                     signal_df.values * leverage_df.values, index = signal_df.index, columns = signal_df.columns)
 
-                self._individual_leverage = leverage_df     # contains leverage of individual signal (before portfolio vol target)
+            self._individual_leverage = leverage_df     # contains leverage of individual signal (before portfolio vol target)
 
         _pnl = calculations.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc = tc)
         _pnl.columns = pnl_cols
 
         adjusted_weights_matrix = None
 
-        # portfolio is average of the underlying signals: should we sum them or average them?
-        if hasattr(br, 'portfolio_combination'):
+        # portfolio is average of the underlying signals: should we sum them or average them or use another
+        # weighting scheme?
+        if br.portfolio_combination is not None:
             if br.portfolio_combination == 'sum':
                 portfolio = pandas.DataFrame(data = _pnl.sum(axis = 1), index = _pnl.index, columns = ['Portfolio'])
             elif br.portfolio_combination == 'mean':
@@ -221,50 +218,110 @@ class Backtest(object):
         portfolio_leverage_df = pandas.DataFrame(data = numpy.ones(len(_pnl.index)), index = _pnl.index, columns = ['Portfolio'])
 
         # should we apply vol target on a portfolio level basis?
-        if hasattr(br, 'portfolio_vol_adjust'):
-            if br.portfolio_vol_adjust is True:
-                risk_engine = RiskEngine()
+        if br.portfolio_vol_adjust is True:
 
-                portfolio, portfolio_leverage_df = risk_engine.calculate_vol_adjusted_returns(portfolio, br = br)
+            # calculate portfolio leverage
+            portfolio_leverage_df = risk_engine.calculate_leverage_factor(portfolio,
+                                                             br.portfolio_vol_target, br.portfolio_vol_max_leverage,
+                                                             br.portfolio_vol_periods, br.portfolio_vol_obs_in_year,
+                                                             br.portfolio_vol_rebalance_freq,
+                                                             br.portfolio_vol_resample_freq,
+                                                             br.portfolio_vol_resample_type,
+                                                             period_shift=br.portfolio_vol_period_shift)
 
-        self._portfolio = portfolio
-        self._signal = signal_df                            # individual signals (before portfolio leverage)
-        self._portfolio_leverage = portfolio_leverage_df    # leverage on portfolio
+            # portfolio, portfolio_leverage_df = risk_engine.calculate_vol_adjusted_returns(portfolio, br = br)
 
         # multiply portfolio leverage * individual signals to get final position signals
         length_cols = len(signal_df.columns)
-        leverage_matrix = numpy.repeat(portfolio_leverage_df.values.flatten()[numpy.newaxis,:], length_cols, 0)
+        leverage_matrix = numpy.transpose(
+            numpy.repeat(portfolio_leverage_df.values.flatten()[numpy.newaxis,:], length_cols, 0))
 
         # final portfolio signals (including signal & portfolio leverage)
-        self._portfolio_signal = pandas.DataFrame(
-            data = numpy.multiply(numpy.transpose(leverage_matrix), signal_df.values),
+        portfolio_signal = pandas.DataFrame(
+            data = numpy.multiply(leverage_matrix, signal_df.values),
             index = signal_df.index, columns = signal_df.columns)
 
-        if hasattr(br, 'portfolio_combination'):
+        # later when we plot the portfolio components, we do that without weighting the individual components
+        portfolio_signal_before_weighting = portfolio_signal.copy()
+
+        if br.portfolio_combination is not None:
             if br.portfolio_combination == 'sum':
                 pass
             elif br.portfolio_combination == 'mean' or isinstance(br.portfolio_combination, dict):
-                self._portfolio_signal = pandas.DataFrame(data=(self._portfolio_signal.values * adjusted_weights_matrix),
-                                             index=self._portfolio_signal.index,
-                                             columns=self._portfolio_signal.columns)
+                portfolio_signal = pandas.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
+                                             index=portfolio_signal.index,
+                                             columns=portfolio_signal.columns)
         else:
-            self._portfolio_signal = pandas.DataFrame(data=(self._portfolio_signal.values * adjusted_weights_matrix),
-                                                      index=self._portfolio_signal.index,
-                                                      columns=self._portfolio_signal.columns)
+            portfolio_signal = pandas.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
+                                                      index=portfolio_signal.index,
+                                                      columns=portfolio_signal.columns)
+
+        portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure \
+            = self.calculate_exposures(portfolio_signal)
+
+        # apply position limits?
+        position_clip_adjustment = risk_engine.calculate_position_clip_adjustment\
+            (portfolio_net_exposure, portfolio_total_exposure, br)
+
+        # if we have any position clip adjustment, for example related to max position sizes
+        if position_clip_adjustment is not None:
+            position_clip_adjustment_matrix = numpy.transpose(
+                numpy.repeat(position_clip_adjustment.values.flatten()[numpy.newaxis, :], length_cols, 0))
+
+            # recalculate portfolio signals after adjustment (for individual components - without
+            # weighting each signal separately)
+            portfolio_signal_before_weighting = pandas.DataFrame(
+                data=(portfolio_signal_before_weighting.values * position_clip_adjustment_matrix),
+                index=portfolio_signal_before_weighting.index,
+                columns=portfolio_signal_before_weighting.columns)
+
+            # recalculate portfolio signal after adjustment (for portfolio level positions)
+            portfolio_signal = pandas.DataFrame(
+                data=(portfolio_signal.values * position_clip_adjustment_matrix),
+                index=portfolio_signal.index,
+                columns=portfolio_signal.columns)
+
+            # recalculate portfolio leverage with position constraint (multiply vectors elementwise)
+            portfolio_leverage_df = pandas.DataFrame(
+                data=(portfolio_leverage_df.values * position_clip_adjustment.values),
+                index=portfolio_leverage_df.index,
+                columns=portfolio_leverage_df.columns)
+
+            # recalculate total long, short, net and absolute exposures of the whole portfolio after the position
+            # clip adjustment
+            portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure \
+                = self.calculate_exposures(portfolio_signal)
+
+        # calculate final portfolio returns with the amended portfolio leverage (by default just 1s)
+        portfolio = calculations.calculate_signal_returns_with_tc_matrix(portfolio_leverage_df, portfolio, tc=tc)
+
+        # assign all the property variables
+        self._signal = signal_df                            # individual signals (before portfolio leverage)
+        self._portfolio_signal = portfolio_signal           # individual signals (AFTER portfolio leverage/constraints)
+        self._portfolio_leverage = portfolio_leverage_df    # leverage on portfolio
+
+        self._portfolio = portfolio
 
         # calculate each period of trades
         self._portfolio_trade = self._portfolio_signal - self._portfolio_signal.shift(1)
 
+        # expressing trades/positions in terms of notionals
         self._portfolio_signal_notional = None
         self._portfolio_signal_trade_notional = None
 
+        # expressing trades/positions in terms of contracts (useful for futures)
         self._portfolio_signal_contracts = None
         self._portfolio_signal_trade_contracts = None
+
+        self._portfolio_total_longs = portfolio_total_longs
+        self._portfolio_total_shorts = portfolio_total_shorts
+        self._portfolio_net_exposure = portfolio_net_exposure
+        self._portfolio_total_exposure = portfolio_total_exposure
 
         # also create other measures of portfolio
         # portfolio & trades in terms of a predefined notional (in USD)
         # portfolio & trades in terms of contract sizes (particularly useful for futures)
-        if hasattr(br, 'portfolio_notional_size'):
+        if br.portfolio_notional_size is not None:
             # express positions in terms of the notional size specified
             self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
             self._portfolio_signal_trade_notional = self._portfolio_signal_notional - self._portfolio_signal_notional.shift(1)
@@ -284,25 +341,73 @@ class Backtest(object):
             self._portfolio_signal_contracts.columns = self._portfolio_signal_notional.columns
             self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts - self._portfolio_signal_contracts.shift(1)
 
-        self._pnl = _pnl                                                                    # individual signals P&L
+        self._pnl = _pnl # individual signals P&L (before portfolio volatility targeting, position limits etc)
+
+        # _pnl_components of individual assets after all the portfolio level risk signals and position limits
+        self._pnl_components =  calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting, returns_df, tc = tc)
+        self._pnl_components.columns = pnl_cols
 
         # TODO FIX very slow - hence only calculate on demand
         _pnl_trades = None
         # _pnl_trades = calculations.calculate_individual_trade_gains(signal_df, _pnl)
         self._pnl_trades = _pnl_trades
 
+        # calculate return statistics of the each asset/signal after signal leverage (but before portfolio level constraints)
         self._ret_stats_pnl = RetStats()
         self._ret_stats_pnl.calculate_ret_stats(self._pnl, br.ann_factor)
 
+        # calculate return statistics of the each asset/signal after signal leverage AND after portfolio level constraints
+        self._ret_stats_pnl_components = RetStats()
+        self._ret_stats_pnl_components.calculate_ret_stats(self._pnl_components, br.ann_factor)
+
+        # calculate return statistics of the final portfolio
         self._portfolio.columns = ['Port']
         self._ret_stats_portfolio = RetStats()
         self._ret_stats_portfolio.calculate_ret_stats(self._portfolio, br.ann_factor)
 
-        self._cumpnl = calculations.create_mult_index(self._pnl)                             # individual signals cumulative P&L
+        # calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
+        self._cumpnl = calculations.create_mult_index(self._pnl)
         self._cumpnl.columns = pnl_cols
 
+        # calculate individual signals cumulative P&L after signal leverage AND after portfolio level constraints
+        self._cumpnl_components = calculations.create_mult_index(self._pnl_components)  # individual signals cumulative P&L
+        self._cumpnl_components.columns = pnl_cols
+
+        # calculate final portfolio cumulative P&L
         self._cumportfolio = calculations.create_mult_index(self._portfolio)                 # portfolio cumulative P&L
         self._cumportfolio.columns = ['Port']
+
+
+    def calculate_exposures(self, portfolio_signal):
+        """Calculates time series for the total longs, short, net and absolute exposure on an aggregated portfolio basis.
+
+        Parameters
+        ----------
+        portfolio_signal : DataFrame
+            Signals for each asset in the portfolio after all weighting, portfolio & signal level volatility adjustments
+
+        Returns
+        -------
+        DataFrame (list)
+
+        """
+        # calculate total portfolio longs/total portfolio shorts/total portfolio exposure
+        portfolio_total_longs = pandas.DataFrame(portfolio_signal[portfolio_signal > 0].sum(axis=1))
+        portfolio_total_shorts = pandas.DataFrame(portfolio_signal[portfolio_signal < 0].sum(axis=1))
+
+        portfolio_total_longs.columns = ['Total Longs']
+        portfolio_total_shorts.columns = ['Total Shorts']
+
+        # NOTE: careful usage of signs (portfolio_total_shorts are NEGATIVE)
+        portfolio_net_exposure = pandas.DataFrame(
+            index=portfolio_signal.index, columns=['Net Exposure'],
+            data=portfolio_total_longs.values + portfolio_total_shorts.values)
+
+        portfolio_total_exposure = pandas.DataFrame(
+            index=portfolio_signal.index, columns=['Total Exposure'],
+            data=portfolio_total_longs.values - portfolio_total_shorts.values)
+
+        return portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure
 
     def create_portfolio_weights(self, br, _pnl, method='mean'):
         """Calculates P&L of a trading strategy and statistics to be retrieved later
@@ -355,8 +460,9 @@ class Backtest(object):
     def get_backtest_output(self):
         return
 
+    ### Get PnL of individual assets before portfolio constraints
     def get_pnl(self):
-        """Gets P&L returns
+        """Gets P&L returns of all the individual subcomponents of the model (before any portfolio level leverage is applied)
 
         Returns
         -------
@@ -407,6 +513,60 @@ class Backtest(object):
 
         return self._cumpnl
 
+    ### Get PnL of individual assets AFTER portfolio constraints
+    def get_pnl_components(self):
+        """Gets P&L returns of all the individual subcomponents of the model (after portfolio level leverage is applied)
+
+        Returns
+        -------
+        pandas.Dataframe
+        """
+        return self._pnl_components
+
+    def get_pnl_trades_components(self):
+        """Gets P&L of each individual trade per signal
+
+        Returns
+        -------
+        pandas.Dataframe
+        """
+
+        if self._pnl_trades_components is None:
+            calculations = Calculations()
+            self._pnl_trades = calculations.calculate_individual_trade_gains(self._signal, self._pnl_components)
+
+        return self._pnl_components_trades
+
+    def get_pnl_components_desc(self):
+        """Gets P&L of individual components as return statistics in a string format
+
+        Returns
+        -------
+        str
+        """
+        # return self._ret_stats_signals.summary()
+
+    def get_pnl_components_ret_stats(self):
+        """Gets P&L return statistics of individual strategies as class to be queried
+
+        Returns
+        -------
+        TimeSeriesDesc
+        """
+
+        return self._ret_stats_pnl_components
+
+    def get_cumpnl_components(self):
+        """Gets P&L as a cumulative time series of individual assets (after portfolio level leverage adjustments)
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
+
+        return self._cumpnl_components
+
+    ### Get PnL of the final portfolio
     def get_cumportfolio(self):
         """Gets P&L as a cumulative time series of portfolio
 
@@ -478,6 +638,46 @@ class Backtest(object):
 
         return self._portfolio_signal
 
+    def get_portfolio_total_longs(self):
+        """Gets the total long exposure in the portfolio
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_total_longs
+
+    def get_portfolio_total_shorts(self):
+        """Gets the total short exposure in the portfolio
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_total_shorts
+
+    def get_portfolio_net_exposure(self):
+        """Gets the total net exposure of the portfolio
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_net_exposure
+
+    def get_portfolio_total_exposure(self):
+        """Gets the total absolute exposure of the portfolio
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_total_exposure
+
     def get_portfolio_trade(self):
         """Gets the trades (with individual leverage & portfolio leverage) for each asset, which
         we'd need to execute
@@ -536,7 +736,7 @@ class Backtest(object):
         return self._portfolio_signal_trade_contracts
 
     def get_signal(self):
-        """(with individual leverage, but excluding portfolio leverage) for each asset
+        """Gets signal for each asset (with individual leverage, but excluding portfolio leverage constraints) for each asset
 
         Returns
         -------
@@ -675,7 +875,9 @@ class TradingModel(object):
 
             # for a key, designated as the final strategy save that as the "strategy"
             if key == self.FINAL_STRATEGY:
-                self._strategy_pnl = results
+                self._strategy_pnl = results                                # cumulative P&L for the strategy
+                self._strategy_pnl_components = backtest.get_cumpnl()       # P&L of the invididual components (before any portfolio level vol adjustments)
+                self._strategy_pnl_components_ret_stats = backtest.get_pnl_ret_stats()
                 self._strategy_pnl_ret_stats = backtest.get_portfolio_pnl_ret_stats()
                 self._strategy_leverage = backtest.get_portfolio_leverage()
 
@@ -693,6 +895,11 @@ class TradingModel(object):
 
                 self._strategy_pnl_trades = backtest.get_pnl_trades()
 
+                self._strategy_total_longs = backtest.get_portfolio_total_longs()
+                self._strategy_total_shorts = backtest.get_portfolio_total_shorts()
+                self._strategy_net_exposure = backtest.get_portfolio_net_exposure()
+                self._strategy_total_exposure = backtest.get_portfolio_total_exposure()
+
         # get benchmark for comparison
         benchmark = self.construct_strategy_benchmark()
 
@@ -708,7 +915,7 @@ class TradingModel(object):
         # calculate annualised returns
         years = calculations.average_by_annualised_year(calculations.calculate_returns(cumresults_benchmark))
 
-        self._strategy_group_pnl = cumresults
+        self._strategy_group_pnl = cumresults       # individual parts (all after individually applying portfolio level vol adjustment)
         self._strategy_group_pnl_ret_stats = ret_statsresults
         self._strategy_group_benchmark_pnl = cumresults_benchmark
         self._strategy_group_leverage = portleverage
@@ -824,6 +1031,12 @@ class TradingModel(object):
     def get_strategy_group_pnl_trades(self):
         return self._strategy_pnl_trades
 
+    def get_strategy_pnl_components(self):
+        return self._strategy_pnl_components
+
+    def get_strategy_pnl_components_ret_stats(self):
+        return self._strategy_pnl_components_ret_stats
+
     def get_strategy_pnl(self):
         return self._strategy_pnl
 
@@ -859,6 +1072,18 @@ class TradingModel(object):
 
     def get_strategy_trade_contracts(self):
         return self._strategy_trade_contracts
+
+    def get_strategy_total_longs(self):
+        return self._strategy_total_longs
+
+    def get_strategy_total_shorts(self):
+        return self._strategy_total_shorts
+
+    def get_strategy_net_exposure(self):
+        return self._strategy_net_exposure
+
+    def get_strategy_total_exposure(self):
+        return self._strategy_total_exposure
 
     def get_benchmark(self):
         return self._benchmark_pnl
@@ -918,6 +1143,18 @@ class TradingModel(object):
             if not(silent_plot): chart.plot()
             return chart
         except: pass
+
+    def plot_strategy_pnl_components(self, silent_plot=False):
+
+        style = self.create_style("Ind Components", "Strategy PnL Components")
+
+        try:
+            chart = Chart(self.reduce_plot(self._strategy_pnl_components), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                          style=style)
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
 
     def plot_strategy_pnl(self, silent_plot = False):
 
@@ -1092,9 +1329,36 @@ class TradingModel(object):
         self._plot_signal(self._strategy_signal_notional, label = "positions (contracts)", caption = "Positions",
                           date = date, strip = strip, silent_plot=silent_plot)
 
-    def plot_strategy_trades_notional(self, date = None, strip = None, silent_plot = False):
+    def plot_strategy_trades_contracts(self, date = None, strip = None, silent_plot = False):
         self._plot_signal(self._strategy_trade_notional, label = "trades (contracts)", caption = "Contracts",
                           date = date, strip = strip, silent_plot=silent_plot)
+
+    def plot_strategy_total_exposures(self, silent_plot=False):
+
+        style = self.create_style("", "Strategy Total Exposures")
+
+        df = pandas.concat([self._strategy_total_longs, self._strategy_total_shorts,
+            self._strategy_total_exposure], axis=1)
+
+        try:
+            chart = Chart(self.reduce_plot(df), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                          style=style)
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
+
+    def plot_strategy_net_exposures(self, silent_plot=False):
+
+        style = self.create_style("", "Strategy Net Exposures")
+
+        try:
+            chart = Chart(self.reduce_plot(self._strategy_net_exposure), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                          style=style)
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
 
     def grab_signals(self, strategy_signal, date = None, strip = None):
         if date is None:
@@ -1149,14 +1413,11 @@ class TradingModel(object):
 
 #######################################################################################################################
 
-"""
-RiskEngine
-
-Adjusts signal weighting according to risk constraints (volatility targeting)
-
-"""
-
 class RiskEngine(object):
+    """Adjusts signal weighting according to risk constraints (volatility targeting and position limit constraints)
+
+    """
+
     def calculate_vol_adjusted_index_from_prices(self, prices_df, br):
         """Adjusts an index of prices for a vol target
 
@@ -1164,7 +1425,6 @@ class RiskEngine(object):
         ----------
         br : BacktestRequest
             Parameters for the backtest specifying start date, finish data, transaction costs etc.
-
         asset_a_df : pandas.DataFrame
             Asset prices to be traded
 
@@ -1186,7 +1446,6 @@ class RiskEngine(object):
         ----------
         br : BacktestRequest
             Parameters for the backtest specifying start date, finish data, transaction costs etc.
-
         returns_a_df : pandas.DataFrame
             Asset returns to be traded
 
@@ -1198,15 +1457,6 @@ class RiskEngine(object):
         calculations = Calculations()
 
         if not returns: returns_df = calculations.calculate_returns(returns_df)
-
-        if not (hasattr(br, 'portfolio_vol_resample_type')):
-            br.portfolio_vol_resample_type = 'mean'
-
-        if not (hasattr(br, 'portfolio_vol_resample_freq')):
-            br.portfolio_vol_resample_freq = None
-
-        if not (hasattr(br, 'portfolio_vol_period_shift')):
-            br.portfolio_vol_period_shift = 0
 
         leverage_df = self.calculate_leverage_factor(returns_df,
                                                      br.portfolio_vol_target, br.portfolio_vol_max_leverage,
@@ -1229,28 +1479,20 @@ class RiskEngine(object):
         ----------
         returns_df : DataFrame
             Asset returns
-
         vol_target : float
             vol target for assets
-
         vol_max_leverage : float
             maximum leverage allowed
-
         vol_periods : int
             number of periods to calculate volatility
-
         vol_obs_in_year : int
             number of observations in the year
-
         vol_rebalance_freq : str
             how often to rebalance
-
         vol_resample_type : str
             do we need to resample the underlying data first? (eg. have we got intraday data?)
-
         returns : boolean
             is this returns time series or prices?
-
         period_shift : int
             should we delay the signal by a number of periods?
 
@@ -1269,8 +1511,7 @@ class RiskEngine(object):
         if not returns: returns_df = calculations.calculate_returns(returns_df)
 
         roll_vol_df = calculations.rolling_volatility(returns_df,
-                                                      periods=vol_periods, obs_in_year=vol_obs_in_year).shift(
-            period_shift)
+            periods=vol_periods, obs_in_year=vol_obs_in_year).shift(period_shift)
 
         # calculate the leverage as function of vol target (with max lev constraint)
         lev_df = vol_target / roll_vol_df
@@ -1278,9 +1519,45 @@ class RiskEngine(object):
 
         lev_df = filter.resample_time_series_frequency(lev_df, vol_rebalance_freq, data_resample_type)
 
-        returns_df, lev_df = returns_df.align(lev_df, join='left', axis=0)
+        returns_df, lev_df = calculations.join_left_fill_right(returns_df, lev_df)
 
-        lev_df = lev_df.fillna(method='ffill')
+        # # in case leverage changes on a weekend do outer join, and fill down
+        # # the leverage
+        # returns_df_1, lev_df = returns_df.align(lev_df, join='outer', axis=0)
+        # lev_df = lev_df.fillna(method='ffill')
+        #
+        # # now realign back to days when we trade
+        # returns_df, lev_df = returns_df.align(lev_df, join='left', axis=0)
+
         lev_df.ix[0:vol_periods] = numpy.nan  # ignore the first elements before the vol window kicks in
 
         return lev_df
+
+    def calculate_position_clip_adjustment(self, portfolio_net_exposure, portfolio_total_exposure, br):
+
+        position_clip_adjustment = None
+
+        if br.max_net_exposure is not None:
+            # add further constraints on portfolio (total net amount of longs and short)
+            position_clip_adjustment = pandas.DataFrame(data=numpy.ones(len(portfolio_net_exposure.index)),
+                                                        index=portfolio_net_exposure.index,
+                                                        columns=['Portfolio'])
+
+            portfolio_abs_exposure = portfolio_net_exposure.abs()
+
+            # for those periods when the absolute net positioning is greater than our limit cut down the leverage
+            position_clip_adjustment[(portfolio_abs_exposure > br.max_net_exposure).values] = \
+                br.max_net_exposure / portfolio_abs_exposure
+
+            # adjust leverage of portfolio based on max TOTAL position sizes
+        if br.max_abs_exposure is not None:
+            # add further constraints on portfolio (total net amount of longs and short)
+            position_clip_adjustment = pandas.DataFrame(data=numpy.ones(len(portfolio_abs_exposure.index)),
+                                                        index=portfolio_abs_exposure.index,
+                                                        columns=['Portfolio'])
+
+            # for those periods when the absolute TOTAL positioning is greater than our limit cut down the leverage
+            position_clip_adjustment[(portfolio_total_exposure > br.max_abs_exposure).values] = \
+                br.max_abs_exposure / portfolio_total_exposure
+
+        return position_clip_adjustment

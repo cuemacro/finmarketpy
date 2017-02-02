@@ -1012,7 +1012,9 @@ class TradingModel(object):
             strategy_benchmark_df = strategy_df.join(benchmark_df, how='inner')
             strategy_benchmark_df = strategy_benchmark_df.fillna(method='ffill')
 
-            strategy_benchmark_df = filter.filter_time_series_by_date(br.plot_start, br.finish_date, strategy_benchmark_df)
+            if br.plot_start is not None:
+                strategy_benchmark_df = filter.filter_time_series_by_date(br.plot_start, br.finish_date, strategy_benchmark_df)
+
             strategy_benchmark_df = calculations.create_mult_index_from_prices(strategy_benchmark_df)
 
             self._benchmark_pnl = benchmark_df
@@ -1471,7 +1473,7 @@ class RiskEngine(object):
         return vol_returns_df, leverage_df
 
     def calculate_leverage_factor(self, returns_df, vol_target, vol_max_leverage, vol_periods=60, vol_obs_in_year=252,
-                                  vol_rebalance_freq='BM', data_resample_freq=None, data_resample_type='mean',
+                                  vol_rebalance_freq='BM', resample_freq=None, resample_type='mean',
                                   returns=True, period_shift=0):
         """Calculates the time series of leverage for a specified vol target
 
@@ -1489,7 +1491,7 @@ class RiskEngine(object):
             number of observations in the year
         vol_rebalance_freq : str
             how often to rebalance
-        vol_resample_type : str
+        resample_type : str
             do we need to resample the underlying data first? (eg. have we got intraday data?)
         returns : boolean
             is this returns time series or prices?
@@ -1504,7 +1506,7 @@ class RiskEngine(object):
         calculations = Calculations()
         filter = Filter()
 
-        if data_resample_freq is not None:
+        if resample_freq is not None:
             return
             # TODO not implemented yet
 
@@ -1515,11 +1517,14 @@ class RiskEngine(object):
 
         # calculate the leverage as function of vol target (with max lev constraint)
         lev_df = vol_target / roll_vol_df
-        lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
-        lev_df = filter.resample_time_series_frequency(lev_df, vol_rebalance_freq, data_resample_type)
+        if vol_max_leverage is not None:
+            lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
-        returns_df, lev_df = calculations.join_left_fill_right(returns_df, lev_df)
+        if resample_type is not None:
+            lev_df = filter.resample_time_series_frequency(lev_df, vol_rebalance_freq, resample_type)
+
+            returns_df, lev_df = calculations.join_left_fill_right(returns_df, lev_df)
 
         # # in case leverage changes on a weekend do outer join, and fill down
         # # the leverage
@@ -1534,10 +1539,30 @@ class RiskEngine(object):
         return lev_df
 
     def calculate_position_clip_adjustment(self, portfolio_net_exposure, portfolio_total_exposure, br):
+        """Calculate the leverage adjustment that needs to be made in the portfolio such that either the net exposure or
+        the absolute exposure fits within predefined limits
+
+        Parameters
+        ----------
+        portfolio_net_exposure : DataFrame
+            Net exposure of the whole portfolio
+        portfolio_total_exposure : DataFrame
+            Absolute exposure of the whole portfolio
+        br : BacktestRequest
+            Includes parameters for setting position limits
+
+        Returns
+        -------
+        DataFrame
+        """
 
         position_clip_adjustment = None
 
+        # adjust leverage of portfolio based on max NET position sizes
         if br.max_net_exposure is not None:
+
+            portfolio_net_exposure = portfolio_net_exposure.shift(br.position_clip_period_shift)
+
             # add further constraints on portfolio (total net amount of longs and short)
             position_clip_adjustment = pandas.DataFrame(data=numpy.ones(len(portfolio_net_exposure.index)),
                                                         index=portfolio_net_exposure.index,
@@ -1549,8 +1574,10 @@ class RiskEngine(object):
             position_clip_adjustment[(portfolio_abs_exposure > br.max_net_exposure).values] = \
                 br.max_net_exposure / portfolio_abs_exposure
 
-            # adjust leverage of portfolio based on max TOTAL position sizes
+        # adjust leverage of portfolio based on max TOTAL position sizes
         if br.max_abs_exposure is not None:
+            portfolio_abs_exposure = portfolio_abs_exposure.shift(br.position_clip_period_shift)
+
             # add further constraints on portfolio (total net amount of longs and short)
             position_clip_adjustment = pandas.DataFrame(data=numpy.ones(len(portfolio_abs_exposure.index)),
                                                         index=portfolio_abs_exposure.index,
@@ -1559,5 +1586,16 @@ class RiskEngine(object):
             # for those periods when the absolute TOTAL positioning is greater than our limit cut down the leverage
             position_clip_adjustment[(portfolio_total_exposure > br.max_abs_exposure).values] = \
                 br.max_abs_exposure / portfolio_total_exposure
+
+        # only allow the position clip adjustment to change on certain days (eg. 'BM' = month end)
+        if br.position_clip_rebalance_freq is not None:
+            calculations = Calculations()
+            filter = Filter()
+
+            position_clip_adjustment = filter.resample_time_series_frequency(position_clip_adjustment,
+                                                           br.position_clip_rebalance_freq, br.position_clip_resample_type)
+
+            a, position_clip_adjustment = calculations.join_left_fill_right(portfolio_net_exposure, position_clip_adjustment)
+
 
         return position_clip_adjustment

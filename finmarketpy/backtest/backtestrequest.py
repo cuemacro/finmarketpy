@@ -17,20 +17,37 @@ class BacktestRequest(MarketDataRequest):
         self.logger = LoggerManager().getLogger(__name__)
 
         self.__signal_name = None
+
+        # output parameters for backtest (should we add returns statistics on legends, write CSVs with returns etc.)
+        self.__plot_start = None
+        self.__calc_stats = True
+        self.__write_csv = False
+        self.__plot_interim = False
+        self.__include_benchmark = False
+
         self.__tech_params = TechParams()
 
         # default parameters for portfolio level vol adjustment
-        # TODO add all parameters for vol adjustment
         self.__portfolio_vol_adjust = False
         self.__portfolio_vol_period_shift = 0
+        self.__portfolio_vol_rebalance_freq = None
         self.__portfolio_vol_resample_freq = None
         self.__portfolio_vol_resample_type = 'mean'
+        self.__portfolio_vol_target = 0.1           # 10% vol target
+        self.__portfolio_vol_max_leverage = None
+        self.__portfolio_vol_periods = 20
+        self.__portfolio_vol_obs_in_year = 252
 
         # default parameters for signal level vol adjustment
         self.__signal_vol_adjust = False
         self.__signal_vol_period_shift = 0
-        self.__signal_vol_resample_freq = None
+        self.__signal_vol_rebalance_freq = None
+        self.__signal_vol_resample_freq = None      
         self.__signal_vol_resample_type = 'mean'
+        self.__signal_vol_target = 0.1              # 10% vol target
+        self.__signal_vol_max_leverage = None
+        self.__signal_vol_periods = 20
+        self.__signal_vol_obs_in_year = 252
 
         # portfolio notional size
         self.__portfolio_notional_size = None
@@ -40,9 +57,45 @@ class BacktestRequest(MarketDataRequest):
         self.__max_net_exposure = None
         self.__max_abs_exposure = None
 
+        self.__position_clip_rebalance_freq = None
+        self.__position_clip_resample_freq = None  # by default apply max position criterion on last business day of month
+        self.__position_clip_resample_type = 'mean'
+        self.__position_clip_period_shift = 0
+
         # take profit and stop loss parameters
         self.__take_profit = None
         self.__stop_loss = None
+        
+    ##### properties for output of the backtest
+    @property
+    def plot_start(self): return self.__plot_start
+
+    @plot_start.setter
+    def plot_start(self, plot_start): self.__plot_start = plot_start
+    
+    @property
+    def calc_stats(self): return self.__calc_stats
+
+    @calc_stats.setter
+    def calc_stats(self, calc_stats): self.__calc_stats = calc_stats
+    
+    @property
+    def write_csv(self): return self.__write_csv
+
+    @write_csv.setter
+    def write_csv(self, write_csv): self.__write_csv = write_csv
+    
+    @property
+    def plot_interim(self): return self.__plot_interim
+
+    @plot_interim.setter
+    def plot_interim(self, plot_interim): self.__plot_interim = plot_interim
+    
+    @property
+    def include_benchmark(self): return self.__include_benchmark
+
+    @include_benchmark.setter
+    def include_benchmark(self, include_benchmark): self.__include_benchmark = include_benchmark
 
     ##### properties for portfolio level volatility adjustment
     @property
@@ -50,6 +103,12 @@ class BacktestRequest(MarketDataRequest):
 
     @portfolio_vol_adjust.setter
     def portfolio_vol_adjust(self, portfolio_vol_adjust): self.__portfolio_vol_adjust = portfolio_vol_adjust
+    
+    @property
+    def portfolio_vol_rebalance_freq(self): return self.__portfolio_vol_rebalance_freq
+
+    @portfolio_vol_rebalance_freq.setter
+    def portfolio_vol_rebalance_freq(self, portfolio_vol_rebalance_freq): self.__portfolio_vol_rebalance_freq = portfolio_vol_rebalance_freq
     
     @property
     def portfolio_vol_resample_type(self): return self.__portfolio_vol_resample_type
@@ -68,6 +127,30 @@ class BacktestRequest(MarketDataRequest):
 
     @portfolio_vol_period_shift.setter
     def portfolio_vol_period_shift(self, portfolio_vol_period_shift): self.__portfolio_vol_period_shift = portfolio_vol_period_shift
+    
+    @property
+    def portfolio_vol_target(self): return self.__portfolio_vol_target
+
+    @portfolio_vol_target.setter
+    def portfolio_vol_target(self, portfolio_vol_target): self.__portfolio_vol_target = portfolio_vol_target
+    
+    @property
+    def portfolio_vol_max_leverage(self): return self.__portfolio_vol_max_leverage
+
+    @portfolio_vol_max_leverage.setter
+    def portfolio_vol_max_leverage(self, portfolio_vol_max_leverage): self.__portfolio_vol_max_leverage = portfolio_vol_max_leverage
+    
+    @property
+    def portfolio_vol_periods(self): return self.__portfolio_vol_periods
+
+    @portfolio_vol_periods.setter
+    def portfolio_vol_periods(self, portfolio_vol_periods): self.__portfolio_vol_periods = portfolio_vol_periods
+    
+    @property
+    def portfolio_vol_obs_in_year(self): return self.__portfolio_vol_obs_in_year
+
+    @portfolio_vol_obs_in_year.setter
+    def portfolio_vol_obs_in_year(self, portfolio_vol_obs_in_year): self.__portfolio_vol_obs_in_year = portfolio_vol_obs_in_year
 
     ##### properties for signal level vol adjustment
     @property
@@ -75,6 +158,12 @@ class BacktestRequest(MarketDataRequest):
 
     @signal_vol_adjust.setter
     def signal_vol_adjust(self, signal_vol_adjust): self.__signal_vol_adjust = signal_vol_adjust
+    
+    @property
+    def signal_vol_rebalance_freq(self): return self.__signal_vol_rebalance_freq
+
+    @signal_vol_rebalance_freq.setter
+    def signal_vol_rebalance_freq(self, signal_vol_rebalance_freq): self.__signal_vol_rebalance_freq = signal_vol_rebalance_freq
     
     @property
     def signal_vol_resample_type(self): return self.__signal_vol_resample_type
@@ -93,6 +182,30 @@ class BacktestRequest(MarketDataRequest):
 
     @signal_vol_period_shift.setter
     def signal_vol_period_shift(self, signal_vol_period_shift): self.__signal_vol_period_shift = signal_vol_period_shift
+
+    @property
+    def signal_vol_target(self): return self.__signal_vol_target
+
+    @signal_vol_target.setter
+    def signal_vol_target(self, signal_vol_target): self.__signal_vol_target = signal_vol_target
+
+    @property
+    def signal_vol_max_leverage(self): return self.__signal_vol_max_leverage
+
+    @signal_vol_max_leverage.setter
+    def signal_vol_max_leverage(self, signal_vol_max_leverage): self.__signal_vol_max_leverage = signal_vol_max_leverage
+
+    @property
+    def signal_vol_periods(self): return self.__signal_vol_periods
+
+    @signal_vol_periods.setter
+    def signal_vol_periods(self, signal_vol_periods): self.__signal_vol_periods = signal_vol_periods
+
+    @property
+    def signal_vol_obs_in_year(self): return self.__signal_vol_obs_in_year
+
+    @signal_vol_obs_in_year.setter
+    def signal_vol_obs_in_year(self, signal_vol_obs_in_year): self.__signal_vol_obs_in_year = signal_vol_obs_in_year
     
     ##### portfolio notional size
     @property
@@ -121,6 +234,30 @@ class BacktestRequest(MarketDataRequest):
     @max_abs_exposure.setter
     def max_abs_exposure(self, max_abs_exposure): self.__max_abs_exposure = max_abs_exposure
     
+    @property
+    def position_clip_rebalance_freq(self): return self.__position_clip_rebalance_freq
+
+    @position_clip_rebalance_freq.setter
+    def position_clip_rebalance_freq(self, position_clip_rebalance_freq): self.__position_clip_rebalance_freq = position_clip_rebalance_freq
+
+    @property
+    def position_clip_resample_type(self): return self.__position_clip_resample_type
+
+    @position_clip_resample_type.setter
+    def position_clip_resample_type(self, position_clip_resample_type): self.__position_clip_resample_type = position_clip_resample_type
+
+    @property
+    def position_clip_resample_freq(self): return self.__position_clip_resample_freq
+
+    @position_clip_resample_freq.setter
+    def position_clip_resample_freq(self, position_clip_resample_freq): self.__position_clip_resample_freq = position_clip_resample_freq
+
+    @property
+    def position_clip_period_shift(self): return self.__position_clip_period_shift
+
+    @position_clip_period_shift.setter
+    def position_clip_period_shift(self, position_clip_period_shift): self.__position_clip_period_shift = position_clip_period_shift
+
     ##### stop loss and take profit
     @property
     def stop_loss(self): return self.__stop_loss

@@ -94,6 +94,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 02 Feb 2017 - Further changes to constraints on max long/shorts (with refactoring)
 * 01 Feb 2017 - Added constraints for max longs/shorts and plots in BacktestEngine
 * 25 Jan 2017 - Additional work on stops/take profit with multiple assets & plotting bug fixes for TradeAnalysis
 * 24 Jan 2017 - Fixing issues around stops/take profits and adding fields in TechParams

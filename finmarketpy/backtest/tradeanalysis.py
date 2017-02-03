@@ -43,7 +43,7 @@ class TradeAnalysis(object):
 
         return
 
-    def run_strategy_returns_stats(self, trading_model, index = None, engine = 'pyfolio'):
+    def run_strategy_returns_stats(self, trading_model, index = None, engine = 'finmarketpy'):
         """Plots useful statistics for the trading strategy using various backends
 
         Parameters
@@ -99,6 +99,11 @@ class TradeAnalysis(object):
             # assume we have TradingModel
             # to do to take in a time series
             from chartpy import Canvas, Chart
+
+            # temporarily make scale factor smaller so fits the window
+            old_scale_factor = trading_model.SCALE_FACTOR
+            trading_model.SCALE_FACTOR = 0.75
+
             pnl = trading_model.plot_strategy_pnl(silent_plot=True)                         # plot the final strategy
             individual = trading_model.plot_strategy_group_pnl_trades(silent_plot=True)     # plot the individual trade P&Ls
 
@@ -113,7 +118,11 @@ class TradeAnalysis(object):
                              [leverage, ind_lev]]
                              )
 
-            canvas.generate_canvas(silent_display=False, canvas_plotter='plain')
+            canvas.generate_canvas(page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
+                                   silent_display=False, canvas_plotter='keen',
+                                   output_filename=trading_model.FINAL_STRATEGY + ".html", render_pdf=False)
+
+            trading_model.SCALE_FACTOR = old_scale_factor
 
     def run_excel_trade_report(self, trading_model, excel_file = 'model.xlsx'):
         """

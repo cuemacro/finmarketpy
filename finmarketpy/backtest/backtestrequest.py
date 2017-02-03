@@ -212,7 +212,7 @@ class BacktestRequest(MarketDataRequest):
     def portfolio_notional_size(self): return self.__portfolio_notional_size
 
     @portfolio_notional_size.setter
-    def portfolio_notional_size(self, portfolio_notional_size): self.__portfolio_notional_size = portfolio_notional_size
+    def portfolio_notional_size(self, portfolio_notional_size): self.__portfolio_notional_size = float(portfolio_notional_size)
 
     ##### portfolio weights (sum, mean or dictionary of weights)
     @property

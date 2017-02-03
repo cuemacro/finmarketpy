@@ -318,6 +318,11 @@ class Backtest(object):
         self._portfolio_net_exposure = portfolio_net_exposure
         self._portfolio_total_exposure = portfolio_total_exposure
 
+        self._portfolio_total_longs_notional = None
+        self._portfolio_total_shorts_notional  = None
+        self._portfolio_net_exposure_notional  = None
+        self._portfolio_total_exposure_notional  = None
+
         # also create other measures of portfolio
         # portfolio & trades in terms of a predefined notional (in USD)
         # portfolio & trades in terms of contract sizes (particularly useful for futures)
@@ -325,6 +330,11 @@ class Backtest(object):
             # express positions in terms of the notional size specified
             self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
             self._portfolio_signal_trade_notional = self._portfolio_signal_notional - self._portfolio_signal_notional.shift(1)
+
+            self._portfolio_total_longs_notional = portfolio_total_longs * br.portfolio_notional_size
+            self._portfolio_total_shorts_notional = portfolio_total_shorts * br.portfolio_notional_size
+            self._portfolio_net_exposure_notional = portfolio_net_exposure * br.portfolio_notional_size
+            self._portfolio_total_exposure_notional = portfolio_total_exposure * br.portfolio_notional_size
 
             # get the positions in terms of the contract sizes
             notional_copy = self._portfolio_signal_notional.copy(deep=True)
@@ -678,6 +688,46 @@ class Backtest(object):
 
         return self._portfolio_total_exposure
 
+    def get_portfolio_total_longs_notional(self):
+        """Gets the total long exposure in the portfolio scaled by notional
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_total_longs_notional
+
+    def get_portfolio_total_shorts_notional(self):
+        """Gets the total short exposure in the portfolio scaled by notional
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_total_shorts_notional
+
+    def get_portfolio_net_exposure_notional(self):
+        """Gets the total net exposure of the portfolio scaled by notional
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_net_exposure_notional
+
+    def get_portfolio_total_exposure_notional(self):
+        """Gets the total absolute exposure of the portfolio scaled by notional
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_total_exposure_notional
+
     def get_portfolio_trade(self):
         """Gets the trades (with individual leverage & portfolio leverage) for each asset, which
         we'd need to execute
@@ -877,7 +927,7 @@ class TradingModel(object):
             if key == self.FINAL_STRATEGY:
                 self._strategy_pnl = results                                # cumulative P&L for the strategy
                 self._strategy_pnl_components = backtest.get_cumpnl()       # P&L of the invididual components (before any portfolio level vol adjustments)
-                self._strategy_pnl_components_ret_stats = backtest.get_pnl_ret_stats()
+                self._strategy_pnl_components_ret_stats = backtest.get_pnl_components_ret_stats()
                 self._strategy_pnl_ret_stats = backtest.get_portfolio_pnl_ret_stats()
                 self._strategy_leverage = backtest.get_portfolio_leverage()
 
@@ -899,6 +949,11 @@ class TradingModel(object):
                 self._strategy_total_shorts = backtest.get_portfolio_total_shorts()
                 self._strategy_net_exposure = backtest.get_portfolio_net_exposure()
                 self._strategy_total_exposure = backtest.get_portfolio_total_exposure()
+
+                self._strategy_total_longs_notional = backtest.get_portfolio_total_longs_notional()
+                self._strategy_total_shorts_notional = backtest.get_portfolio_total_shorts_notional()
+                self._strategy_net_exposure_notional = backtest.get_portfolio_net_exposure_notional()
+                self._strategy_total_exposure_notional = backtest.get_portfolio_total_exposure_notional()
 
         # get benchmark for comparison
         benchmark = self.construct_strategy_benchmark()
@@ -1087,6 +1142,18 @@ class TradingModel(object):
     def get_strategy_total_exposure(self):
         return self._strategy_total_exposure
 
+    def get_strategy_total_longs_notional(self):
+        return self._strategy_total_longs_notional
+
+    def get_strategy_total_shorts_notional(self):
+        return self._strategy_total_shorts_notional
+
+    def get_strategy_net_exposure_notional(self):
+        return self._strategy_net_exposure_notional
+
+    def get_strategy_total_exposure_notional(self):
+        return self._strategy_total_exposure_notional
+
     def get_benchmark(self):
         return self._benchmark_pnl
 
@@ -1145,18 +1212,6 @@ class TradingModel(object):
             if not(silent_plot): chart.plot()
             return chart
         except: pass
-
-    def plot_strategy_pnl_components(self, silent_plot=False):
-
-        style = self.create_style("Ind Components", "Strategy PnL Components")
-
-        try:
-            chart = Chart(self.reduce_plot(self._strategy_pnl_components), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=style)
-            if not (silent_plot): chart.plot()
-            return chart
-        except:
-            pass
 
     def plot_strategy_pnl(self, silent_plot = False):
 
@@ -1228,14 +1283,48 @@ class TradingModel(object):
             return chart
         except: pass
 
+    ##### plot the individual components cumulative returns and return statistics (including portfolio level constraints)
+    def plot_strategy_pnl_components(self, silent_plot=False):
+
+        style = self.create_style("Ind Components", "Strategy PnL Components")
+
+        try:
+            chart = Chart(self.reduce_plot(self._strategy_pnl_components), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                          style=style)
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
+
+    def plot_strategy_pnl_components_ir(self, strip=None, silent_plot=False):
+        return self.plot_ret_stats_helper(self._strategy_pnl_components_ret_stats, 'IR', '', 'Ind Component IR',
+                                              strip=strip,
+                                              silent_plot=silent_plot)
+
+    def plot_strategy_pnl_components_returns(self, strip=None, silent_plot=False):
+        return self.plot_ret_stats_helper(self._strategy_pnl_components_ret_stats, 'Returns', '(%)',
+                                              'Ind Component Returns', strip=strip,
+                                              silent_plot=silent_plot)
+
+    def plot_strategy_pnl_components_vol(self, strip=None, silent_plot=False):
+        return self.plot_ret_stats_helper(self._strategy_pnl_components_ret_stats, 'Vol', '(%)',
+                                              'Ind Component Vol', strip=strip,
+                                              silent_plot=silent_plot)
+
+    def plot_strategy_pnl_components_drawdowns(self, strip=None, silent_plot=False):
+        return self.plot_ret_stats_helper(self._strategy_pnl_components_ret_stats, 'Drawdowns', '(%)',
+                                              'Ind Component Drawdowns', strip=strip,
+                                              silent_plot=silent_plot)
+
+    ##### plot the cumulative returns and return statistics for the strategy group
+    ##### this will plot the final strategy, benchmark and all the individual baskets (as though they were run by themselves)
     def plot_strategy_group_benchmark_pnl(self, silent_plot = False):
 
         style = self.create_style("", "Group Benchmark PnL - cumulative")
 
         strat_list = self._strategy_group_benchmark_pnl.columns #.sort_values()
 
-        for line in strat_list:
-            self.logger.info(line)
+        for line in strat_list: self.logger.info(line)
 
         # plot cumulative line of returns
         chart = Chart(self.reduce_plot(self._strategy_group_benchmark_pnl), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
@@ -1244,34 +1333,66 @@ class TradingModel(object):
         return chart
 
     def plot_strategy_group_benchmark_pnl_ir(self, strip = None, silent_plot = False):
+        return self.plot_ret_stats_helper(self._strategy_group_benchmark_ret_stats, 'IR', '', 'Group Benchmark IR', strip=strip,
+                                          silent_plot=silent_plot)
 
-        style = self.create_style("", "Group Benchmark PnL IR - cumulative")
-        keys = self._strategy_group_benchmark_ret_stats.keys()
-        ir = []
+    def plot_strategy_group_benchmark_pnl_returns(self, strip = None, silent_plot = False):
+        return self.plot_ret_stats_helper(self._strategy_group_benchmark_ret_stats, 'Returns', '(%)', 'Group Benchmark Returns', strip=strip,
+                                          silent_plot=silent_plot)
+
+    def plot_strategy_group_benchmark_pnl_vol(self, strip = None, silent_plot = False):
+        return self.plot_ret_stats_helper(self._strategy_group_benchmark_ret_stats, 'Vol', '(%)', 'Group Benchmark Vol', strip=strip,
+                                          silent_plot=silent_plot)
+
+
+    def plot_strategy_group_benchmark_pnl_drawdowns(self, strip = None, silent_plot = False):
+        return self.plot_ret_stats_helper(self._strategy_group_benchmark_ret_stats, 'Drawdowns', '(%)', 'Group Benchmark Drawdowns', strip=strip,
+                                          silent_plot=silent_plot)
+
+    def plot_ret_stats_helper(self, ret_stats, metric, title, file_tag, strip=None, silent_plot=False):
+        style = self.create_style(title,file_tag)
+        keys = ret_stats.keys()
+        ret_metric = []
 
         for key in keys:
-            ir.append(self._strategy_group_benchmark_ret_stats[key].inforatio()[0])
+            if metric == 'IR':
+                ret_metric.append(ret_stats[key].inforatio()[0])
+            elif metric == 'Returns':
+                ret_metric.append(ret_stats[key].ann_returns()[0] * 100)
+            elif metric == 'Vol':
+                ret_metric.append(ret_stats[key].ann_vol()[0] * 100)
+            elif metric == 'Drawdowns':
+                ret_metric.append(ret_stats[key].drawdowns()[0] * 100)
+
 
         if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
-        ret_stats = pandas.DataFrame(index=keys, data=ir, columns=['IR'])
+        ret_stats = pandas.DataFrame(index=keys, data=ret_metric, columns=[metric])
         # ret_stats = ret_stats.sort_index()
-        style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.png'
-        style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - IR) ' + str(style.scale_factor) + '.html'
+        style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(
+            style.scale_factor) + '.png'
+        style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(
+            style.scale_factor) + '.html'
         style.display_brand_label = False
 
         chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
         if not (silent_plot): chart.plot()
+
         return chart
 
     def plot_strategy_group_benchmark_pnl_yoy(self, strip = None, silent_plot = False):
 
-        style = self.create_style("", "Group Benchmark PnL YoY - cumulative")
+        return self.plot_yoy_helper(self._strategy_group_benchmark_ret_stats, "", "Group Benchmark PnL YoY",
+                                    strip=strip, silent_plot=silent_plot)
+
+    def plot_yoy_helper(self, ret_stats, title, file_tag, strip = None, silent_plot = False):
+
+        style = self.create_style(title, title)
         keys = self._strategy_group_benchmark_ret_stats.keys()
         yoy = []
 
         for key in keys:
-            col = self._strategy_group_benchmark_ret_stats[key].yoy_rets()
+            col = ret_stats[key].yoy_rets()
             col.columns = [key]
             yoy.append(col)
 
@@ -1282,8 +1403,8 @@ class TradingModel(object):
         if strip is not None: ret_stats.columns = [k.replace(strip, '') for k in ret_stats.columns]
 
         # ret_stats = ret_stats.sort_index()
-        style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - YoY) ' + str(style.scale_factor) + '.png'
-        style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Group Benchmark PnL - YoY) ' + str(style.scale_factor) + '.html'
+        style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(style.scale_factor) + '.png'
+        style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(style.scale_factor) + '.html'
         style.display_brand_label = False
         style.date_formatter = "%Y"
 
@@ -1299,7 +1420,7 @@ class TradingModel(object):
         style = self.create_style("", "Group Benchmark Annualised PnL")
         style.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
 
-        chart = Chart(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+        chart = Chart(self.reduce_plot(self._strategy_group_benchmark_annualised_pnl[cols]), engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
         if not (silent_plot): chart.plot()
         return chart
 
@@ -1311,6 +1432,7 @@ class TradingModel(object):
         if not (silent_plot): chart.plot()
         return chart
 
+    ###### plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
     def plot_strategy_signals(self, date = None, strip = None, silent_plot = False):
         self._plot_signal(self._strategy_signal, label = "positions (% portfolio notional)", caption = "Positions",
                           date = date, strip = strip, silent_plot=silent_plot)
@@ -1335,16 +1457,14 @@ class TradingModel(object):
         self._plot_signal(self._strategy_trade_notional, label = "trades (contracts)", caption = "Contracts",
                           date = date, strip = strip, silent_plot=silent_plot)
 
+    ###### plot aggregated portfolio exposures
     def plot_strategy_total_exposures(self, silent_plot=False):
 
-        style = self.create_style("", "Strategy Total Exposures")
-
-        df = pandas.concat([self._strategy_total_longs, self._strategy_total_shorts,
-            self._strategy_total_exposure], axis=1)
+        df = pandas.concat([self._strategy_total_longs, self._strategy_total_shorts, self._strategy_total_exposure], axis=1)
 
         try:
             chart = Chart(self.reduce_plot(df), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=style)
+                          style=self.create_style("", "Strategy Total Exposures"))
             if not (silent_plot): chart.plot()
             return chart
         except:
@@ -1352,16 +1472,39 @@ class TradingModel(object):
 
     def plot_strategy_net_exposures(self, silent_plot=False):
 
-        style = self.create_style("", "Strategy Net Exposures")
-
         try:
             chart = Chart(self.reduce_plot(self._strategy_net_exposure), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=style)
+                          style=self.create_style("", "Strategy Net Exposures"))
             if not (silent_plot): chart.plot()
             return chart
         except:
             pass
 
+    def plot_strategy_total_exposures_notional(self, silent_plot=False):
+
+        df = pandas.concat([self._strategy_total_longs_notional,
+                            self._strategy_total_shorts_notional, self._strategy_total_exposure_notional], axis=1)
+
+        try:
+            chart = Chart(self.reduce_plot(df / 1000000.0), engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                          style=self.create_style("(mm)", "Strategy Total Exposures (mm)"))
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
+
+    def plot_strategy_net_exposures_notional(self, silent_plot=False):
+
+        try:
+            chart = Chart(self.reduce_plot(self._strategy_net_exposure_notional / 1000000.0),
+                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
+                          style=self.create_style("(mm)", "Strategy Net Exposures (mm)"))
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
+
+    #### grab signals for specific days
     def grab_signals(self, strategy_signal, date = None, strip = None):
         if date is None:
             last_day = strategy_signal.ix[-1].transpose().to_frame()

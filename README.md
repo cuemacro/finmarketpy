@@ -1,4 +1,4 @@
-![finmarketpy](finmarketpy_logo.png)
+<img src="finmarketpy.png?raw=true"/>
 
 # [finmarketpy (formerly pythalesians)](https://github.com/cuemacro/finmarketpy)
 

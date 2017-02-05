@@ -153,16 +153,24 @@ class TradeAnalysis(object):
                                        'pos', 'trades', writer)
 
             if hasattr(tm, '_strategy_signal_notional'):
-                # write position/trade sizes scaled by notional
-                self.save_positions_trades(tm,
-                                           tm.get_strategy_signal_notional(),
-                                           tm.get_strategy_trade_notional(), 'pos - Not', 'trades - Not', writer)
+                signal_notional = tm.get_strategy_signal_notional()
+                trading_notional = tm.get_strategy_signal_notional()
+
+                if signal_notional is not None and trading_notional is not None:
+                    # write position/trade sizes scaled by notional
+                    self.save_positions_trades(tm,
+                                               signal_notional,
+                                               trading_notional, 'pos - Not', 'trades - Not', writer)
 
             if hasattr(tm, '_strategy_signal_contracts'):
-                # write position/trade sizes in terms of contract sizes
-                self.save_positions_trades(tm,
-                                           tm.get_strategy_signal_contracts(),
-                                           tm.get_strategy_trade_contracts(), 'pos - Cont', 'trades - Cont', writer)
+                signal_contracts = tm.get_strategy_signal_contracts()
+                trade_contracts = tm.get_strategy_trade_contracts()
+
+                if signal_contracts is not None and trade_contracts is not None:
+                    # write position/trade sizes in terms of contract sizes
+                    self.save_positions_trades(tm,
+                                               signal_contracts,
+                                               trade_contracts, 'pos - Cont', 'trades - Cont', writer)
 
         # TODO Add summary sheet comparing return statistics for all the different models in the list
 
@@ -174,6 +182,8 @@ class TradeAnalysis(object):
 
         if hasattr(tm, 'STRIP'):
             strip = tm.STRIP
+        else:
+            strip = ''
 
         recent_signals = tm.grab_signals(signals, date=[-1, -2, -5, -10, -20], strip=strip)
         recent_trades = tm.grab_signals(trades, date=[-1, -2, -5, -10, -20], strip=strip)

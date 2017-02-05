@@ -1,4 +1,4 @@
-<img src="finmarketpy.png?raw=true"/>
+<img src="finmarketpy.png?raw=true" width="457"/>
 
 # [finmarketpy (formerly pythalesians)](https://github.com/cuemacro/finmarketpy)
 

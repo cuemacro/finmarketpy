@@ -76,6 +76,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
         * findatapy
             * pandas_datareader - accessing market data sources including Yahoo Finance
             * quandl - accessing market data sources
+            * openpyxl - writing Excel spreadsheets to disk
         * chartpy
             * bokeh - visualisation
             * cufflinks - wrapper on plotly

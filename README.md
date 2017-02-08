@@ -96,6 +96,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 08 Feb 2017 - Added SHOW_CHARTS parameter for TradingModel and made SMA work with old pandas
 * 05 Feb 2017 - Added more installation notes and fixed Excel output in TradeAnalysis if notional not specified
 * 02 Feb 2017 - Further changes to constraints on max long/shorts (with refactoring)
 * 01 Feb 2017 - Added constraints for max longs/shorts and plots in BacktestEngine

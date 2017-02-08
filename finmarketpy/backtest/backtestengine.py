@@ -816,6 +816,7 @@ class TradingModel(object):
 
     #### Default parameters for outputting of results from trading model
     SAVE_FIGURES = True
+    SHOW_CHARTS = True
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
     CHART_SOURCE = ChartConstants().chartfactory_source
@@ -1544,6 +1545,7 @@ class TradingModel(object):
         style.display_legend = True
         style.scale_factor = self.SCALE_FACTOR
         style.source = self.CHART_SOURCE
+        style.silent_display = not(self.SHOW_CHARTS)
 
         if self.DEFAULT_PLOT_ENGINE not in ['plotly', 'cufflinks'] and self.SAVE_FIGURES:
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_add + ') ' + str(style.scale_factor) + '.png'

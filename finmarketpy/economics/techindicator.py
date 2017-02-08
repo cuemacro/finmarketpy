@@ -59,7 +59,10 @@ class TechIndicator(object):
 
             if (data_frame_non_nan_early is not None):
                 # calculate the lagged sum of the n-1 point
-                rolling_sum = data_frame.shift(1).rolling(center=False, window=tech_params.sma_period - 1).sum()
+                if pandas.__version__ < '0.17':
+                    rolling_sum = pandas.rolling_sum(data_frame.shift(1).rolling, window=tech_params.sma_period - 1)
+                else:
+                    rolling_sum = data_frame.shift(1).rolling(center=False, window=tech_params.sma_period - 1).sum()
 
                 # add non-nan one for today
                 rolling_sum = rolling_sum + data_frame_early
@@ -69,8 +72,10 @@ class TechIndicator(object):
 
                 narray = numpy.where(data_frame_early > self._techind, 1, -1)
             else:
-                # self._techind = pandas.rolling_mean(data_frame, tech_params.sma_period)
-                self._techind = data_frame.rolling(window=tech_params.sma_period, center=False).mean()
+                if pandas.__version__ < '0.17':
+                    self._techind = pandas.rolling_sum(data_frame, window=tech_params.sma_period)
+                else:
+                    self._techind = data_frame.rolling(window=tech_params.sma_period, center=False).mean()
 
                 narray = numpy.where(data_frame > self._techind, 1, -1)
 

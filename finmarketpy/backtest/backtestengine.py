@@ -817,6 +817,7 @@ class TradingModel(object):
     #### Default parameters for outputting of results from trading model
     SAVE_FIGURES = True
     SHOW_CHARTS = True
+
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
     CHART_SOURCE = ChartConstants().chartfactory_source

@@ -11,11 +11,14 @@ Before installation of any specific Python libraries, we need to set up the core
 which will help you to write your own trading strategies and Python scripts for doing market analysis on top of the Cuemacro libraries.
 
 * Programming Tools
-    * Anaconda 4.20 64 bit Python - (download)[https://www.continuum.io/downloads] - Windows/Linux/Mac OS X
-      * This is the most used Python distribution for data science.
+    * Anaconda 4.30 64 bit Python - [download](https://www.continuum.io/downloads) - Windows/Linux/Mac OS X
+      * This is the most used Python distribution for data science
       * As well as installing the core Python libraries, it also installs many useful libraries like the SciPy stack, which
     contains NumPy, pandas etc. and many other useful libraries like matplotlib which are dependencies for the various Cuemacro libraries
-    * Microsoft Visual Studio 2015 Community Edition- (download)[https://www.visualstudio.com/downloads/] - Windows
+      * Recommend installing latest version of Python 3.5 (by running in command line `conda install python=3.5.3` rather than using Python 3.6 (which
+      is the default Python installation in Anaconda 4.30) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
+      * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda 4.30 (eg. version of pandas, numpy etc.)
+    * Microsoft Visual Studio 2015 Community Edition- [download](https://www.visualstudio.com/downloads/) - Windows
       * Makes sure to do a custom installation and tick Visual C++
       * Some Python libraries need a C++ compiler in order to build (such as blpapi and arctic)
       * Alternatively, if you don't want to compile the libraries yourself, you can sometimes find pre-compiled
@@ -23,7 +26,7 @@ which will help you to write your own trading strategies and Python scripts for 
     * Git - https://git-scm.com/downloads - Windows/Linux/Mac OS X
         * Version control software
         * Makes it easier to maintain your own Python code
-    * PyCharm Community Edition - (download)[https://www.jetbrains.com/pycharm/download/] - Windows/Linux/Mac OS X
+    * PyCharm Community Edition - [download](https://www.jetbrains.com/pycharm/download/) - Windows/Linux/Mac OS X
         * PyCharm is a relatively easy to use IDE for coding Python, with tools such as autocompletion
         and syntax highlighting
         * The Professional Edition also adds a few bells and whistles including a code profiler
@@ -31,15 +34,19 @@ which will help you to write your own trading strategies and Python scripts for 
         indices
         * There are many other alternative IDEs (and text editors) for Python, I recommend you also check out a few to see which you like most
         (or you just use a simple text editor like Notepad!)
-            * Atom - (hackable text editor, which also has addins for Python coding)[https://atom.io/]
-            * PyDev - (Python IDE written on top of Eclipse)[http://www.pydev.org/]
-            * Sublime - (text editor)[http://www.sublimetext.com/3]
+            * Atom - [hackable text editor, which also has addins for Python coding](https://atom.io/)
+            * PyDev - [Python IDE written on top of Eclipse](http://www.pydev.org/)
+            * Sublime - [text editor](http://www.sublimetext.com/3)
 
 * Data tools
-    * MongoDB - (download)[https://www.mongodb.com/download-center] - Windows/Linux/Mac OS X
+    * MongoDB - [download](https://www.mongodb.com/download-center) - Windows/Linux/Mac OS X
         * IOEngine class has a wrapper over arctic to use MongoDB (as well as HDF5 files if preferred)
         * Be sure to setup a database in MongoDB, if you wish to use it to store data later
-    * Bloomberg Terminal - (download)[https://www.bloomberg.com/professional/downloads/] - Windows
+    * Redis - [Download](https://redis.io/download) - Windows/Linux/Mac OS X
+        * IOEngine class has a wrapper to use Redis, as a high level cache
+        * Redis is an in-memory database designed for short term volatile storage
+        * findatapy uses it as a high level cache to speed up access to repeatedly used datasets
+    * Bloomberg Terminal - [download](https://www.bloomberg.com/professional/downloads/]) - Windows
         * Bloomberg provides a high quality data source
         * Note, you must be a subscriber for the software to function and to have a licence for the data
         * This also needs installation of your serial number
@@ -56,32 +63,38 @@ Open up the Anaconda Command Prompt (accessible via the Start Menu) to run the v
 various Python libraries. The Cuemacro libraries will install most Python dependencies, but some need to be installed separately.
 
 * Python libraries (open source)
-    * arctic - pip install git+https://github.com/manahl/arctic.git
-        * Wrapper for MongoDB
+    * arctic - `pip install git+https://github.com/manahl/arctic.git`
+        * Wrapper for MongoDB (also installs pymongo)
         * Allows us to easily save and load pandas DataFrames in MongoDB
         * Also compresses data contents
     * blpapi - https://www.bloomberglabs.com/api/libraries/ (both C++ and Python libraries)
         * Interact with Bloomberg programmatically via Python to download historical and live data
         * Note that this requires a C++ compiler to build the Python library (at present Bloomberg doesn't have binaries for Python 3.5,
         hence you need to build them yourself)
-        * Follow instructions at https://www.github.com/cuemacro/findatapy/BLOOMBERG.md for all the steps necessary to install blpapi
+        * Follow instructions at [https://www.github.com/cuemacro/findatapy/BLOOMBERG.md](https://www.github.com/cuemacro/findatapy/BLOOMBERG.md) for all the steps necessary to install blpapi
     * Whilst Anaconda has most of the dependencies below and pip will install all additional ones needed by the Cuemacro Python
     libraries it is possible to install them manually via pip, below is a list of the dependencies
         * all libraries
-            * numpy - matrix algebra
-            * pandas - time series
-            * pytz - timezone management
-            * requests - accessing URLs
+            * numpy - matrix algebra (Anaconda)
+            * pandas - time series (Anaconda) - older versions of pandas could have issues due to deprecated methods
+            * pytz - timezone management (Anaconda)
+            * requests - accessing URLs (Anaconda)
             * mulitprocessing_on_dill - multitasking
         * findatapy
-            * pandas_datareader - accessing market data sources including Yahoo Finance
-            * quandl - accessing market data sources
-            * openpyxl - writing Excel spreadsheets to disk
+            * pandas_datareader - accessing market data sources including Yahoo Finance (Anaconda)
+            * quandl - accessing market data sources (Anaconda)
+            * redis - Python wrapper to access Redis, in-memory database, like a hashtable (Anaconda Linux/Mac)
+            * openpyxl - writing Excel spreadsheets to disk (Anaconda)
+            * blosc - compression library
+            * arctic - wrapper on MongoDB (see below for installation)
+            * blpapi - Python API for Bloomberg (see below for installation)
+            * xlsxwriter - writing Excel files from Python (and reading) (Anaconda)
         * chartpy
-            * bokeh - visualisation
+            * bokeh - visualisation (Anaconda)
             * cufflinks - wrapper on plotly
-            * matplotlib - visualisation
-            * plotly - visualisation
+            * matplotlib - visualisation (Anaconda)
+            * plotly - visualisation (Anaconda)
+        * You can install all of these, and also chartpy, findatapy and finmarketpy by running the install_packages.bat file on Windows
 
 * Cuemacro Python libraries (open source)
     * Before we start, make sure we are familiar where your Anaconda site packages folder is (ie. where it will install your Python dependencies),
@@ -89,14 +102,14 @@ various Python libraries. The Cuemacro libraries will install most Python depend
         * Typically this is in folders like:
             * C:\Anaconda3-64\Lib\site-packages
             * C:\Program Files\Anaconda\Lib\site-packages
-    * chartpy - pip install git+https://github.com/cuemacro/chartpy.git
+    * chartpy - `pip install git+https://github.com/cuemacro/chartpy.git`
         * Check constants file configuration [chartpy/chartpy/util/chartconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/chartpy/util/chartconstants.py) for
             * Adding your own API keys for Plotly, Twitter etc
             * Changing the default size of plots
             * Changing the default chart engine (eg. Plotly, Bokeh or Matplotlib)
         * Alternatively you can create chartcred.py class in the same folder to put your own API keys
         * This has the benefit of not being overwritten each time you upgrade the project
-    * findatapy - pip install git+https://github.com/cuemacro/findatapy.git
+    * findatapy - `pip install git+https://github.com/cuemacro/findatapy.git`
         * Check constants file configuration [findatapy/findatapy/util/dataconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/findatatpy/util/dataconstants.py) for
             * adding your own API keys for Quandl etc.
             * changing path of your local data source (change `folder_time_series_data` attribute)
@@ -114,7 +127,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
                 * For customising how the project dumps logs to disk
         * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings.
         * This has the benefit of not being overwritten each time you upgrade the project.
-        * Below we have a sample:
+        * Below we have a sample datacred.py class file, to be placed in the "util" folder:
 
         ```python
 class DataCred(object):
@@ -122,7 +135,7 @@ class DataCred(object):
     folder_historic_CSV = "E:/tickdata/historicCSV"
     folder_time_series_data = "C:/timeseriesdata"
 
-    config_root_folder = "E:/Remote/canary/"
+    config_root_folder = "E:/Remote/yen/conf/"
 
     ###### FOR ALIAS TICKERS
     # config file for time series categories
@@ -155,8 +168,20 @@ class DataCred(object):
     # FRED API key
     fred_api_key = "XYZ"
 
+    # database settings need to be filled in even if you aren't going to use one
+    # main database settings
+    db_server = '127.0.0.1'
+
+    # cache database settings
+    db_cache_server = '127.0.0.1'
+    db_cache_port = '6379'
+    write_cache_engine = 'redis'
+
+    # Override multithreading for certain categories of downloads
+    override_multi_threading_for_categories = []
+
         ```
-    * finmarketpy - pip install git+https://github.com/cuemacro/finmarketpy.git
+    * finmarketpy - `pip install git+https://github.com/cuemacro/finmarketpy.git`
         * Check constants file configuration [finmarketpy/finmarketpy/util/marketconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy/util/marketconstants.py)
         * You can also create your own file marketcred.py (placed in the same folder)
 
@@ -178,4 +203,4 @@ a different Bloomberg server licence to run that
 on ways of solving issues when installing arctic on Mac OS X, in particular around the C compiler
 
 * Even if you cannot install blpapi and arctic, findatapy will still install and largely function, but you won't be able
-to make Bloomberg calls, or calls via arctic to MongoDB
+to make Bloomberg calls or calls via arctic to MongoDB

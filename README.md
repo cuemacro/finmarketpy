@@ -24,8 +24,8 @@ new features.
 * Using chartpy, you can choose to have results displayed in matplotlib, plotly or bokeh by changing single keyword!
 
 Points to note:
-* Please bear in mind at present finmarketpy is currently a highly experimental alpha project and isn't yet fully 
-documented
+* Please bear in mind at present finmarketpy is under continual development. The API is heavily documented, but we are
+looking to add more general documentation.
 * Uses Apache 2.0 licence
 
 # Gallery

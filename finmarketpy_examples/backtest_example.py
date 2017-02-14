@@ -103,7 +103,7 @@ if run_example == 1 or run_example == 0:
     backtest.calculate_trading_PnL(br, asset_df, signal_df)
     port = backtest.get_cumportfolio()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.get_portfolio_pnl_desc()[0])]
-    signals = backtest.get_porfolio_signal()
+    signals = backtest.get_portfolio_signal()
 
     # print the last positions (we could also save as CSV etc.)
     print(signals.tail(1))

@@ -83,6 +83,12 @@ pip install git+https://github.com/cuemacro/chartpy.git
 pip install git+https://github.com/cuemacro/findatapy.git
 ```
 
+# Contributors
+
+Contributors are always welcome for finmarketpy, findatapy and chartpy. If you'd like to contribute, have a look at
+[Planned Features](PLANNED_FEATURES.md] for areas we're looking for help on. Or if you have any ideas for improvements
+to the libriares please let us know too!
+
 # finmarketpy examples
 
 In finmarketpy/examples you will find several examples, including some simple trading models
@@ -96,6 +102,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 14 Feb 2017 - Added Planned Features page
 * 08 Feb 2017 - Added SHOW_CHARTS parameter for TradingModel and made SMA work with old pandas
 * 05 Feb 2017 - Added more installation notes and fixed Excel output in TradeAnalysis if notional not specified
 * 02 Feb 2017 - Further changes to constraints on max long/shorts (with refactoring)

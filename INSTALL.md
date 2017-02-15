@@ -15,7 +15,7 @@ which will help you to write your own trading strategies and Python scripts for 
       * This is the most used Python distribution for data science
       * As well as installing the core Python libraries, it also installs many useful libraries like the SciPy stack, which
     contains NumPy, pandas etc. and many other useful libraries like matplotlib which are dependencies for the various Cuemacro libraries
-      * Recommend installing latest version of Python 3.5 (by running in command line `conda install python=3.5.3` rather than using Python 3.6 (which
+      * Recommend installing latest version of Python 3.5 (by running in command line `conda install python=3.5.2` rather than using Python 3.6 (which
       is the default Python installation in Anaconda 4.30) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
       * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda 4.30 (eg. version of pandas, numpy etc.)
     * Microsoft Visual Studio 2015 Community Edition- [download](https://www.visualstudio.com/downloads/) - Windows

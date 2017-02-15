@@ -94,6 +94,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * cufflinks - wrapper on plotly
             * matplotlib - visualisation (Anaconda)
             * plotly - visualisation (Anaconda)
+            * Twython - Twitter library for Python
         * You can install all of these, and also chartpy, findatapy and finmarketpy by running the install_packages.bat file on Windows
 
 * Cuemacro Python libraries (open source)

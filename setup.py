@@ -15,5 +15,5 @@ setup(name='finmarketpy',
                           'pytz',
                           'requests',
                           'numpy',
-                          'multiprocessing_on_dill'],
+                          'multiprocess'],
 	  zip_safe=False)

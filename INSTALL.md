@@ -58,6 +58,8 @@ which will help you to write your own trading strategies and Python scripts for 
     * You can download these for free from [Font Squirrel](https://www.fontsquirrel.com/fonts/open-sans)
     * Once downloaded you need to install them on your operating system
     * On Windows this involves copying the fonts to your Windows font folder (eg. C:\Windows\Fonts)
+    * You need to delete matplotlib's font cache file, so it picks up the new font (eg. fontList.py3k.cache in
+    C:\Users\User name\.matplotlib
 
 Open up the Anaconda Command Prompt (accessible via the Start Menu) to run the various "pip" commands to install the
 various Python libraries. The Cuemacro libraries will install most Python dependencies, but some need to be installed separately.
@@ -79,7 +81,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * pandas - time series (Anaconda) - older versions of pandas could have issues due to deprecated methods
             * pytz - timezone management (Anaconda)
             * requests - accessing URLs (Anaconda)
-            * mulitprocessing_on_dill - multitasking
+            * mulitprocess - multitasking
         * findatapy
             * pandas_datareader - accessing market data sources including Yahoo Finance (Anaconda)
             * quandl - accessing market data sources (Anaconda)
@@ -94,7 +96,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * cufflinks - wrapper on plotly
             * matplotlib - visualisation (Anaconda)
             * plotly - visualisation (Anaconda)
-            * Twython - Twitter library for Python
+            * twython - Twitter library for Python
         * You can install all of these, and also chartpy, findatapy and finmarketpy by running the install_packages.bat file on Windows
 
 * Cuemacro Python libraries (open source)

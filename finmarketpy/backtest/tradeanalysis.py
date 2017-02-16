@@ -118,9 +118,8 @@ class TradeAnalysis(object):
                              [leverage, ind_lev]]
                              )
 
-            canvas.generate_canvas(page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
-                                   silent_display=False, canvas_plotter='plain',
-                                   output_filename=trading_model.FINAL_STRATEGY + ".html", render_pdf=False)
+            canvas.generate_canvas(silent_display=False, canvas_plotter='plain',
+                                   output_filename=trading_model.FINAL_STRATEGY + ".html")
 
             trading_model.SCALE_FACTOR = old_scale_factor
 

@@ -82,6 +82,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * pytz - timezone management (Anaconda)
             * requests - accessing URLs (Anaconda)
             * mulitprocess - multitasking
+            * multiprocessing_on_dill - multiprocessing on dill (similar to multiprocess, can select which library to use)
         * findatapy
             * pandas_datareader - accessing market data sources including Yahoo Finance (Anaconda)
             * quandl - accessing market data sources (Anaconda)
@@ -96,6 +97,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * cufflinks - wrapper on plotly
             * matplotlib - visualisation (Anaconda)
             * plotly - visualisation (Anaconda)
+            * vispy - visualisation with GPU acceleration
             * twython - Twitter library for Python
         * You can install all of these, and also chartpy, findatapy and finmarketpy by running the install_packages.bat file on Windows
 

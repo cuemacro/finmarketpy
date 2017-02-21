@@ -74,7 +74,7 @@ class Seasonality(object):
         filter = Filter()
 
         if price_index:
-            data_frame = data_frame.resample('B')           # resample into business days
+            data_frame = data_frame.resample('B').mean()           # resample into business days
             data_frame = calculations.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
@@ -109,7 +109,7 @@ class Seasonality(object):
         calculations = Calculations()
 
         if price_index:
-            data_frame = data_frame.resample('BM')          # resample into month end
+            data_frame = data_frame.resample('BM').mean()          # resample into month end
             data_frame = calculations.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
@@ -126,6 +126,44 @@ class Seasonality(object):
             monthly_seasonality = calculations.create_mult_index(monthly_seasonality)
 
         return monthly_seasonality
+    
+    def adjust_rolling_seasonality(self, data_frame, window = None, likely_period = None):
+        """Adjusted time series which exhibit strong seasonality. If time series do not exhibit any seasonality will return
+        NaN values.
+
+        Parameters
+        ----------
+        data_frame : DataFrame
+            Data to be seasonally adjusted
+        window : int
+            Number of points to use in our rolling window (eg. for monthly data 60 = 5 year * 12 months)
+        likely_period
+            What is the likely period of the data (eg. for monthly data, likely to be 12, for daily, likely to be 252)
+
+        Returns
+        -------
+        DataFrame
+            Time series seasonally adjusted
+        """
+        data_frame = data_frame.copy()
+
+        for c in data_frame.columns:
+            data_frame[c] = data_frame[c].rolling(center=False, window=window, min_periods=window).apply(
+                lambda x: self._remove_seasonality(x, likely_period=likely_period))
+
+        return data_frame
+
+    def _remove_seasonality(self, series, likely_period = None):
+        from seasonal import fit_seasons, adjust_seasons
+
+        # detrend and deseasonalize
+        seasons, trend = fit_seasons(series, period=likely_period)
+        adjusted = adjust_seasons(series, seasons=seasons, period=likely_period)
+
+        if adjusted is None:
+            return numpy.nan
+
+        return adjusted[-1]
 
 if __name__ == '__main__':
     # see seasonality_examples

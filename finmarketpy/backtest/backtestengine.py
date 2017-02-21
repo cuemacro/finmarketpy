@@ -353,7 +353,7 @@ class Backtest(object):
 
         self._pnl = _pnl # individual signals P&L (before portfolio volatility targeting, position limits etc)
 
-        # _pnl_components of individual assets after all the portfolio level risk signals and position limits
+        # _pnl_components of individual assets after all the portfolio level risk signals and position limits have been applied
         self._pnl_components =  calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting, returns_df, tc = tc)
         self._pnl_components.columns = pnl_cols
 
@@ -362,31 +362,58 @@ class Backtest(object):
         # _pnl_trades = calculations.calculate_individual_trade_gains(signal_df, _pnl)
         self._pnl_trades = _pnl_trades
 
-        # calculate return statistics of the each asset/signal after signal leverage (but before portfolio level constraints)
-        self._ret_stats_pnl = RetStats()
-        self._ret_stats_pnl.calculate_ret_stats(self._pnl, br.ann_factor)
+        from findatapy.util import SwimPool
 
-        # calculate return statistics of the each asset/signal after signal leverage AND after portfolio level constraints
-        self._ret_stats_pnl_components = RetStats()
-        self._ret_stats_pnl_components.calculate_ret_stats(self._pnl_components, br.ann_factor)
-
-        # calculate return statistics of the final portfolio
         self._portfolio.columns = ['Port']
-        self._ret_stats_portfolio = RetStats()
-        self._ret_stats_portfolio.calculate_ret_stats(self._portfolio, br.ann_factor)
 
-        # calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
-        self._cumpnl = calculations.create_mult_index(self._pnl)
+        self._ret_stats_pnl = RetStats(self._pnl, br.ann_factor)
+        self._ret_stats_pnl_components = RetStats(self._pnl_components, br.ann_factor)
+        self._ret_stats_portfolio = RetStats(self._portfolio, br.ann_factor)
+
+        # TODO parallel version still work in progress!
+        apply_parallel = False
+
+        if apply_parallel:
+            pool = SwimPool().create_pool(thread_technique="multiprocessor", thread_no=8)
+
+            r1 = pool.apply_async(self._ret_stats_pnl.calculate_ret_stats)
+            r2 = pool.apply_async(self._ret_stats_pnl_components.calculate_ret_stats)
+            r3 = pool.apply_async(self._ret_stats_portfolio.calculate_ret_stats)
+
+            resultsA = pool.apply_async(calculations.create_mult_index, args=(self._pnl,))
+            resultsB = pool.apply_async(calculations.create_mult_index, args=(self._pnl_components,))
+            resultsC = pool.apply_async(calculations.create_mult_index, args=(self._portfolio,))
+
+            self._ret_stats_pnl = r1.get()
+            self._ret_stats_pnl_components = r2.get()
+            self._ret_stats_portfolio = r3.get()
+
+            self._cumpnl = resultsA.get()
+            self._cumpnl_components = resultsB.get()
+            self._cumportfolio = resultsC.get()
+
+        else:
+            # calculate return statistics of the each asset/signal after signal leverage (but before portfolio level constraints)
+            #self._ret_stats_pnl.calculate_ret_stats()
+
+            # calculate return statistics of the each asset/signal after signal leverage AND after portfolio level constraints
+            #self._ret_stats_pnl_components.calculate_ret_stats()
+
+            # calculate return statistics of the final portfolio
+            #self._ret_stats_portfolio.calculate_ret_stats()
+
+            # calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
+            self._cumpnl = calculations.create_mult_index(self._pnl)
+
+            # calculate individual signals cumulative P&L after signal leverage AND after portfolio level constraints
+            self._cumpnl_components = calculations.create_mult_index(self._pnl_components)
+
+            # calculate final portfolio cumulative P&L
+            self._cumportfolio = calculations.create_mult_index(self._portfolio)  # portfolio cumulative P&L
+
         self._cumpnl.columns = pnl_cols
-
-        # calculate individual signals cumulative P&L after signal leverage AND after portfolio level constraints
-        self._cumpnl_components = calculations.create_mult_index(self._pnl_components)  # individual signals cumulative P&L
         self._cumpnl_components.columns = pnl_cols
-
-        # calculate final portfolio cumulative P&L
-        self._cumportfolio = calculations.create_mult_index(self._portfolio)                 # portfolio cumulative P&L
         self._cumportfolio.columns = ['Port']
-
 
     def calculate_exposures(self, portfolio_signal):
         """Calculates time series for the total longs, short, net and absolute exposure on an aggregated portfolio basis.
@@ -985,16 +1012,12 @@ class TradingModel(object):
         ----------
         br : BacktestRequest
             Parameters for backtest such as start and finish dates
-
         spot_df : pandas.DataFrame
             Market time series for generating signals
-
         spot_df2 : pandas.DataFrame
             Secondary Market time series for generated signals (can be of different frequency)
-
         tech_params : TechParams
             Parameters for generating signals
-
         contract_value_df : pandas.DataFrame
             Dataframe with the contract sizes for each asset
 
@@ -1028,10 +1051,8 @@ class TradingModel(object):
         ----------
         br : BacktestRequest
             Parameters for backtest such as start and finish dates
-
         strategy_df : pandas.DataFrame
             Strategy time series
-
         benchmark_df : pandas.DataFrame
             Benchmark time series
         """
@@ -1080,6 +1101,25 @@ class TradingModel(object):
             return strategy_benchmark_df
 
         return strategy_df
+
+    def flatten_list(self, seq):
+        """Flattens list, particularly useful for combining baskets
+
+        Parameters
+        ----------
+        seq : str (list)
+            List to be flattened
+
+        Returns
+        -------
+
+        """
+        if not seq:
+            return []
+        elif isinstance(seq[0], list):
+            return (self.flatten_list(seq[0]) + self.flatten_list(seq[1:]))
+        else:
+            return [seq[0]] + self.flatten_list(seq[1:])
 
     def get_strategy_name(self):
         return self.FINAL_STRATEGY

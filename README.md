@@ -102,6 +102,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 21 Feb 2017 - Refactored BacktestEngine to use SwimPool
 * 20 Feb 2017 - Extra install instructions
 * 14 Feb 2017 - Added Planned Features page
 * 08 Feb 2017 - Added SHOW_CHARTS parameter for TradingModel and made SMA work with old pandas

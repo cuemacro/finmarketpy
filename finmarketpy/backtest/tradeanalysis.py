@@ -61,7 +61,7 @@ class TradeAnalysis(object):
         """
 
         if index is None:
-            pnl = trading_model.get_strategy_pnl()
+            pnl = trading_model.strategy_pnl()
         else:
             pnl = index
 
@@ -144,17 +144,17 @@ class TradeAnalysis(object):
 
         for tm in trading_model_list:
             strategy_name = tm.FINAL_STRATEGY
-            returns = tm.get_strategy_group_benchmark_pnl()
+            returns = tm.strategy_group_benchmark_pnl()
 
             returns.to_excel(writer, sheet_name=strategy_name + ' rets', engine='xlsxwriter')
 
             # write raw position/trade sizes
-            self.save_positions_trades(tm, tm.get_strategy_signal(),tm.get_strategy_trade(),
+            self.save_positions_trades(tm, tm.strategy_signal(), tm.strategy_trade(),
                                        'pos', 'trades', writer)
 
             if hasattr(tm, '_strategy_signal_notional'):
-                signal_notional = tm.get_strategy_signal_notional()
-                trading_notional = tm.get_strategy_signal_notional()
+                signal_notional = tm.strategy_signal_notional()
+                trading_notional = tm.strategy_signal_notional()
 
                 if signal_notional is not None and trading_notional is not None:
                     # write position/trade sizes scaled by notional
@@ -163,8 +163,8 @@ class TradeAnalysis(object):
                                                trading_notional, 'pos - Not', 'trades - Not', writer)
 
             if hasattr(tm, '_strategy_signal_contracts'):
-                signal_contracts = tm.get_strategy_signal_contracts()
-                trade_contracts = tm.get_strategy_trade_contracts()
+                signal_contracts = tm.strategy_signal_contracts()
+                trade_contracts = tm.strategy_trade_contracts()
 
                 if signal_contracts is not None and trade_contracts is not None:
                     # write position/trade sizes in terms of contract sizes
@@ -185,8 +185,8 @@ class TradeAnalysis(object):
         else:
             strip = ''
 
-        recent_signals = tm.grab_signals(signals, date=[-1, -2, -5, -10, -20], strip=strip)
-        recent_trades = tm.grab_signals(trades, date=[-1, -2, -5, -10, -20], strip=strip)
+        recent_signals = tm._grab_signals(signals, date=[-1, -2, -5, -10, -20], strip=strip)
+        recent_trades = tm._grab_signals(trades, date=[-1, -2, -5, -10, -20], strip=strip)
 
         recent_signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + signal_caption, engine='xlsxwriter')
         recent_trades.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + trade_caption, engine='xlsxwriter')
@@ -239,10 +239,10 @@ class TradeAnalysis(object):
             self.logger.info("Calculating... " + str(pretty_portfolio_names[i]))
 
             backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=contract_value_df)
-            ret_stats_list.append(backtest.get_portfolio_pnl_ret_stats())
-            stats = str(backtest.get_portfolio_pnl_desc()[0])
+            ret_stats_list.append(backtest.portfolio_pnl_ret_stats())
+            stats = str(backtest.portfolio_pnl_desc()[0])
 
-            port = backtest.get_cumportfolio().resample('B').mean()
+            port = backtest.portfolio_cum().resample('B').mean()
             port.columns = [str(pretty_portfolio_names[i]) + ' ' + stats]
 
             if port_list is None:
@@ -320,7 +320,7 @@ class TradeAnalysis(object):
         calculations = Calculations()
         seas = Seasonality()
         trading_model.construct_strategy()
-        pnl = trading_model.get_strategy_pnl()
+        pnl = trading_model.strategy_pnl()
 
         # get seasonality by day of the month
         pnl = pnl.resample('B').mean()

@@ -116,6 +116,7 @@ class Backtest(object):
         # # and use as reference only those days where we have asset information
         # asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
 
+        signal_df = signal_df.shift(br.signal_delay)
         asset_df, signal_df = calculations.join_left_fill_right(asset_a_df, signal_df)
 
         if (contract_value_df is not None):
@@ -343,13 +344,15 @@ class Backtest(object):
 
             notional_copy.columns = notional_copy_cols
 
-            contract_value_df = contract_value_df[notional_copy_cols]
-            notional_df, contract_value_df = notional_copy.align(contract_value_df, join='left', axis='index')
+            # can only give contract sizes if these are defined
+            if contract_value_df is not None:
+                contract_value_df = contract_value_df[notional_copy_cols]
+                notional_df, contract_value_df = notional_copy.align(contract_value_df, join='left', axis='index')
 
-            # careful make sure orders of magnitude are same for the notional and the contract value
-            self._portfolio_signal_contracts = notional_df / contract_value_df
-            self._portfolio_signal_contracts.columns = self._portfolio_signal_notional.columns
-            self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts - self._portfolio_signal_contracts.shift(1)
+                # careful make sure orders of magnitude are same for the notional and the contract value
+                self._portfolio_signal_contracts = notional_df / contract_value_df
+                self._portfolio_signal_contracts.columns = self._portfolio_signal_notional.columns
+                self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts - self._portfolio_signal_contracts.shift(1)
 
         self._pnl = _pnl # individual signals P&L (before portfolio volatility targeting, position limits etc)
 
@@ -1096,6 +1099,7 @@ class TradingModel(object):
             calculations = Calculations()
 
             # align strategy time series with that of benchmark
+            benchmark_df.columns = [x + ' be' for x in benchmark_df.columns]
             strategy_df, benchmark_df = strategy_df.align(benchmark_df, join='left', axis = 0)
 
             # if necessary apply vol target to benchmark (to make it comparable with strategy)
@@ -1653,6 +1657,11 @@ class TradingModel(object):
         except: pass
 
         return style
+
+#######################################################################################################################
+
+class PortfolioModel(object):
+    pass
 
 #######################################################################################################################
 

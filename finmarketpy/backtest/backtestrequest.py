@@ -65,6 +65,9 @@ class BacktestRequest(MarketDataRequest):
         # take profit and stop loss parameters
         self.__take_profit = None
         self.__stop_loss = None
+
+        # should we delay the signal?
+        self.__signal_delay = 0
         
     ##### properties for output of the backtest
     @property
@@ -313,4 +316,12 @@ class BacktestRequest(MarketDataRequest):
         if not instrument in valid_instrument: self.logger.warning(instrument & " is not a defined trading instrument.")
 
         self.__instrument = instrument
+
+    @property
+    def signal_delay(self):
+        return self.__signal_delay
+
+    @signal_delay.setter
+    def signal_delay(self, signal_delay):
+        self.__signal_delay = signal_delay
 

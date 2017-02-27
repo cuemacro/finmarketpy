@@ -102,6 +102,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 25 Feb 2017 - Added signal delay parameter
+* 24 Feb 2017 - Refactored backtesting classes so have consistent naming
 * 21 Feb 2017 - Refactored BacktestEngine to use SwimPool
 * 20 Feb 2017 - Extra install instructions
 * 14 Feb 2017 - Added Planned Features page

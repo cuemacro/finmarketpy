@@ -102,6 +102,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 13 Apr 2017 - Changed finish date on FX trend following model
 * 12 Mar 2017 - Added FX vol surface animation example
 * 25 Feb 2017 - Added signal delay parameter
 * 24 Feb 2017 - Refactored backtesting classes so have consistent naming

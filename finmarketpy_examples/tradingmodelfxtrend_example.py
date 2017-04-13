@@ -15,7 +15,7 @@ __author__ = 'saeedamen'
 """
 TradingModelFXCTA
 
-Shows how to create a simple FX CTA style strategy, using the StrategyTemplate abstract class (cashbacktest_examples.py
+Shows how to create a simple FX CTA style strategy, using the StrategyTemplate abstract class (backtest_examples.py
 is a lower level way of doing this).
 
 """
@@ -50,7 +50,7 @@ class TradingModelFXTrend_Example(TradingModel):
 
         # get all asset data
         br.start_date = "04 Jan 1989"
-        br.finish_date = datetime.datetime.utcnow()
+        br.finish_date = datetime.datetime.utcnow().date()
         br.spot_tc_bp = 0.5
         br.ann_factor = 252
 

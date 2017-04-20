@@ -29,7 +29,7 @@ def plot_animated_vol_market():
 
     md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
                                    data_source='bloomberg', cut='LDN', category='fx-implied-vol',
-                                   tickers=cross, cache_algo='cache_algo_return')
+                                   tickers=cross, cache_algo='internet_load_return')
 
     df = market.fetch_market(md_request)
     if sampling != 'no': df = df.resample(sampling).mean()

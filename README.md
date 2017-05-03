@@ -12,6 +12,8 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 * In built calculator for risk weighting using volatility targeting
 * Written in object oriented way to make code more reusable
 
+*Contributors for the project are very much welcome, sell below!*
+
 # Merging with pythalesians
 I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
 one set of libraries). This new finmarketpy library has 
@@ -102,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 03 May 2017 - Added more planned features.
 * 13 Apr 2017 - Changed finish date on FX trend following model
 * 12 Mar 2017 - Added FX vol surface animation example
 * 25 Feb 2017 - Added signal delay parameter

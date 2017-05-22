@@ -22,6 +22,7 @@ class BacktestRequest(MarketDataRequest):
         self.__plot_start = None
         self.__calc_stats = True
         self.__write_csv = False
+        self.__write_csv_pnl = False
         self.__plot_interim = False
         self.__include_benchmark = False
 
@@ -87,6 +88,14 @@ class BacktestRequest(MarketDataRequest):
 
     @write_csv.setter
     def write_csv(self, write_csv): self.__write_csv = write_csv
+
+    @property
+    def write_csv_pnl(self):
+        return self.__write_csv_pnl
+
+    @write_csv_pnl.setter
+    def write_csv_pnl(self, write_csv_pnl):
+        self.__write_csv_pnl = write_csv_pnl
     
     @property
     def plot_interim(self): return self.__plot_interim

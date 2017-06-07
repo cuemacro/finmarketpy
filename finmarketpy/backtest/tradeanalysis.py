@@ -256,11 +256,12 @@ class TradeAnalysis(object):
         style = Style()
 
         ir = [t.inforatio()[0] for t in ret_stats_list]
+        rets = [t.ann_returns()[0] for t in ret_stats_list]
 
         # if we have too many combinations remove legend and use scaled shaded colour
         # if len(port_list) > 10:
-            # style.color = 'Blues'
-            # style.display_legend = False
+        # style.color = 'Blues'
+        # style.display_legend = False
 
         # plot all the variations
         style.resample = 'B'
@@ -277,11 +278,19 @@ class TradeAnalysis(object):
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' IR.html'
         style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
-        summary = pandas.DataFrame(index = pretty_portfolio_names, data = ir, columns = ['IR'])
+        summary_ir = pandas.DataFrame(index = pretty_portfolio_names, data = ir, columns = ['IR'])
 
-        self.chart.plot(summary, chart_type='bar', style=style)
+        self.chart.plot(summary_ir, chart_type='bar', style=style)
 
-        return port_list
+        # plot all the rets
+        style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.png'
+        style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.html'
+
+        summary_rets = pandas.DataFrame(index = pretty_portfolio_names, data = rets, columns = ['Rets (%)']) * 100
+
+        self.chart.plot(summary_rets, chart_type='bar', style=style)
+
+        return port_list, summary_ir, summary_rets
 
     ###### Parameters and signal generations (need to be customised for every model)
     ###### Plot all the output seperately
@@ -314,7 +323,7 @@ class TradeAnalysis(object):
         trading_model.br = trading_model.fill_backtest_request()
         trading_model.FINAL_STRATEGY = final_strategy
 
-    def run_day_of_month_analysis(self, trading_model):
+    def run_day_of_month_analysis(self, trading_model, resample_freq = 'B'):
         from finmarketpy.economics.seasonality import Seasonality
 
         calculations = Calculations()
@@ -325,7 +334,8 @@ class TradeAnalysis(object):
         # get seasonality by day of the month
         pnl = pnl.resample('B').mean()
         rets = calculations.calculate_returns(pnl)
-        bus_day = seas.bus_day_of_month_seasonality(rets, add_average = True)
+
+        bus_day = seas.bus_day_of_month_seasonality(rets, add_average = True, resample_freq = resample_freq)
 
         # get seasonality by month
         pnl = pnl.resample('BM').mean()

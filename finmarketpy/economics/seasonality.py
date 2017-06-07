@@ -59,28 +59,32 @@ class Seasonality(object):
 
     def bus_day_of_month_seasonality_from_prices(self, data_frame,
                                  month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum = True,
-                                 cal = "FX", partition_by_month = True, add_average = False):
+                                 cal = "FX", partition_by_month = True, add_average = False, resample_freq = 'B'):
 
         return self.bus_day_of_month_seasonality(self, data_frame,
                                  month_list = month_list, cum = cum,
                                  cal = cal, partition_by_month = partition_by_month,
-                                 add_average = add_average, price_index = True)
+                                 add_average = add_average, price_index = True, resample_freq=resample_freq)
 
     def bus_day_of_month_seasonality(self, data_frame,
                                  month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum = True,
-                                 cal = "FX", partition_by_month = True, add_average = False, price_index = False):
+                                 cal = "FX", partition_by_month = True, add_average = False, price_index = False, resample_freq = 'B'):
 
         calculations = Calculations()
         filter = Filter()
 
         if price_index:
-            data_frame = data_frame.resample('B').mean()           # resample into business days
+            data_frame = data_frame.resample(resample_freq).mean()           # resample into business days
             data_frame = calculations.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
         data_frame = filter.filter_time_series_by_holidays(data_frame, cal)
 
-        monthly_seasonality = calculations.average_by_month_day_by_bus_day(data_frame, cal)
+        if resample_freq == 'B':    # business days
+            monthly_seasonality = calculations.average_by_month_day_by_bus_day(data_frame, cal)
+        elif resample_freq == 'D':  # calendar days
+            monthly_seasonality = calculations.average_by_month_day_by_day(data_frame)
+
         monthly_seasonality = monthly_seasonality.loc[month_list]
 
         if partition_by_month:

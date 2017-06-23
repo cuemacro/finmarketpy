@@ -221,9 +221,9 @@ class EventsFactory(EventStudy):
     # where your HDF5 file is stored with economic data
     # TODO integrate with on the fly downloading!
     _hdf5_file_econ_file = MarketConstants().hdf5_file_econ_file
-    _arctic_database = MarketConstants().arctic_database_econ_file
+    _db_database_econ_file = MarketConstants().db_database_econ_file
 
-    ### manual offset for certain events where Bloomberg displays the wrong date (usually because of time differences)
+    ### manual offset for certain events where Bloomberg/data vendor displays the wrong date (usually because of time differences)
     _offset_events = {'AUD-Australia Labor Force Employment Change SA.release-dt' : 1}
 
     def __init__(self, df = None):
@@ -232,7 +232,7 @@ class EventsFactory(EventStudy):
         self.config = ConfigManager()
         self.logger = LoggerManager().getLogger(__name__)
         self.filter = Filter()
-        self.io_engine =IOEngine()
+        self.io_engine = IOEngine()
 
         if df is not None:
             self._econ_data_frame = df
@@ -243,8 +243,8 @@ class EventsFactory(EventStudy):
 
     def load_economic_events(self):
         # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
-        self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._arctic_database, engine='arctic',
-                                                                                db_server=MarketConstants().arctic_server)
+        self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._db_database_econ_file, engine=MarketConstants().write_engine,
+                                                                                db_server=MarketConstants().db_server)
 
     def harvest_category(self, category_name):
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)
@@ -291,6 +291,7 @@ class EventsFactory(EventStudy):
 
     def get_economic_event_date_time_fields(self, fields, name, event = None):
         ### acceptible fields
+        # observation-date <- observation time for the index
         # actual-release
         # survey-median
         # survey-average
@@ -327,7 +328,9 @@ class EventsFactory(EventStudy):
         event_date_time_frame.index = date_time_dt
 
         ######## grab event date/fields
+        self._econ_data_frame[name + ".observation-date"] = self._econ_data_frame.index
         data_frame = self._econ_data_frame[ticker]
+
         data_frame.index = self._econ_data_frame[ticker_index]
 
         data_frame = data_frame[data_frame.index != 0]              # eliminate any 0 dates (artifact of Excel)

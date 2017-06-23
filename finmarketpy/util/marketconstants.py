@@ -22,8 +22,9 @@ Has various constants required for the finmarketpy project. These have been defi
 class MarketConstants(object):
 
     hdf5_file_econ_file = "x"
-    arctic_database_econ_file = ''
-    arctic_server = '127.0.0.1'
+    db_database_econ_file = ''
+    db_server = '127.0.0.1'
+    write_engine = 'arctic'
 
     # or we can store credentials in a file "marketcred.py" in the same folder, which will overwrite the above
     try:
@@ -32,7 +33,9 @@ class MarketConstants(object):
         cred = MarketCred()
 
         hdf5_file_econ_file = cred.hdf5_file_econ_file
-        arctic_database_econ_file = cred.arctic_database_econ_file
+        db_database_econ_file = cred.db_database_econ_file
+
+        db_server = cred.db_server
 
     except:
         pass

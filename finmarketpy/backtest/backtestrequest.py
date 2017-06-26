@@ -53,6 +53,7 @@ class BacktestRequest(MarketDataRequest):
         # portfolio notional size
         self.__portfolio_notional_size = None
         self.__portfolio_combination = None
+        self.__portfolio_combination_weights = None
         
         # parameters for maximum position limits (expressed as whole portfolio)
         self.__max_net_exposure = None
@@ -226,12 +227,19 @@ class BacktestRequest(MarketDataRequest):
     @portfolio_notional_size.setter
     def portfolio_notional_size(self, portfolio_notional_size): self.__portfolio_notional_size = float(portfolio_notional_size)
 
-    ##### portfolio weights (sum, mean or dictionary of weights)
+    ##### portfolio combination style (sum, mean, weighted, weighted-sum)
     @property
     def portfolio_combination(self): return self.__portfolio_combination
 
     @portfolio_combination.setter
     def portfolio_combination(self, portfolio_combination): self.__portfolio_combination = portfolio_combination
+    
+    ##### portfolio weights (sum, mean)
+    @property
+    def portfolio_combination_weights(self): return self.__portfolio_combination_weights
+
+    @portfolio_combination_weights.setter
+    def portfolio_combination_weights(self, portfolio_combination_weights): self.__portfolio_combination_weights = portfolio_combination_weights
     
     ##### properties for maximum position constraints
     @property

@@ -195,15 +195,16 @@ class Backtest(object):
         # portfolio is average of the underlying signals: should we sum them or average them or use another
         # weighting scheme?
         if br.portfolio_combination is not None:
-            if br.portfolio_combination == 'sum':
+            if br.portfolio_combination == 'sum' and br.portfolio_combination_weights is not None:
                 portfolio = pandas.DataFrame(data = _pnl.sum(axis = 1), index = _pnl.index, columns = ['Portfolio'])
-            elif br.portfolio_combination == 'mean':
+            elif br.portfolio_combination == 'mean' and br.portfolio_combination_weights is not None:
                 portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
 
                 adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
-            elif isinstance(br.portfolio_combination, dict):
+            elif 'weighted' in br.portfolio_combination and isinstance(br.portfolio_combination_weights, dict):
+
                 # get the weights for each asset
-                adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='weighted')
+                adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method=br.portfolio_combination)
 
                 portfolio = pandas.DataFrame(data=(_pnl.values * adjusted_weights_matrix), index=_pnl.index)
                 is_all_na = pandas.isnull(portfolio).all(axis=1)
@@ -246,9 +247,10 @@ class Backtest(object):
         portfolio_signal_before_weighting = portfolio_signal.copy()
 
         if br.portfolio_combination is not None:
-            if br.portfolio_combination == 'sum':
+            if 'sum' in br.portfolio_combination:
                 pass
-            elif br.portfolio_combination == 'mean' or isinstance(br.portfolio_combination, dict):
+            elif br.portfolio_combination == 'mean' \
+                    or (br.portfolio_combination == 'weighted' and isinstance(br.portfolio_combination_weights, dict)):
                 portfolio_signal = pandas.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
                                              index=portfolio_signal.index,
                                              columns=portfolio_signal.columns)
@@ -467,6 +469,9 @@ class Backtest(object):
             'mean' - assumes equal weighting for each signal
             'weighted' - can use predefined user weights (eg. if we assign weighting of 1, 1, 0.5, for three signals
             the third signal will have a weighting of half versus the others)
+        
+        weights : dict
+            Portfolio weights
 
         Returns
         -------
@@ -475,30 +480,35 @@ class Backtest(object):
         """
         if method == 'mean':
             weights_vector = numpy.ones(len(_pnl.columns))
-        elif method == 'weighted':
+        elif method == 'weighted' or 'weighted-sum':
             # get the weights for each asset
-            weights_vector = numpy.array([float(br.portfolio_combination[col]) for col in _pnl.columns])
+            weights_vector = numpy.array([float(br.portfolio_combination_weights[col]) for col in _pnl.columns])
 
         # repeat this down for every day
         weights_matrix = numpy.repeat(weights_vector[numpy.newaxis, :], len(_pnl.index), 0)
+
 
         # where we don't have old price data, make the weights 0 there
         ind = numpy.isnan(_pnl.values)
         weights_matrix[ind] = 0
 
-        # the total weights will vary, as historically might not have all the assets trading
-        total_weights = numpy.sum(weights_matrix, axis=1)
+        if method != 'weighted-sum':
+            # the total weights will vary, as historically might not have all the assets trading
+            total_weights = numpy.sum(weights_matrix, axis=1)
 
-        # replicate across columns
-        total_weights = numpy.transpose(numpy.repeat(total_weights[numpy.newaxis, :], len(_pnl.columns), 0))
+            # replicate across columns
+            total_weights = numpy.transpose(numpy.repeat(total_weights[numpy.newaxis, :], len(_pnl.columns), 0))
 
-        # to avoid divide by zero
-        total_weights[total_weights == 0.0] = 1.0
+            # to avoid divide by zero
+            total_weights[total_weights == 0.0] = 1.0
 
-        adjusted_weights_matrix = weights_matrix / total_weights
-        adjusted_weights_matrix[ind] = numpy.nan
 
-        return adjusted_weights_matrix
+            adjusted_weights_matrix = weights_matrix / total_weights
+            adjusted_weights_matrix[ind] = numpy.nan
+
+            return adjusted_weights_matrix
+
+        return weights_matrix
 
     def backtest_output(self):
         return

@@ -15,5 +15,6 @@ setup(name='finmarketpy',
                           'pytz',
                           'requests',
                           'numpy',
-                          'multiprocess'],
+                          'multiprocess',
+                          'seasonal'],
 	  zip_safe=False)

@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 03 Jul 2016 - Fixed dependency on seasonal library
 * 26 Jun 2017 - BacktestEngine can now handle weighted sum style portfolios
 * 23 Jun 2017 - Downloads observation date for economic data (EventStudy)
 * 21 Jun 2017 - Added trend following example using Bloomberg total return data

@@ -209,3 +209,33 @@ on ways of solving issues when installing arctic on Mac OS X, in particular arou
 
 * Even if you cannot install blpapi and arctic, findatapy will still install and largely function, but you won't be able
 to make Bloomberg calls or calls via arctic to MongoDB
+
+# Installation additional notes - conda environments (courtesy of Tahsin Alam)
+
+*   To install findatapy into a conda environment separate from root, you will need to create that environment with pip (rather than create the environment and then install pip into it). So, do:
+    ```
+    conda create -n cuemacro python=3.5.2 pip
+    INSTEAD OF
+    conda create -n cuemacro python=3.5.2
+    ```
+
+    This will ensure that pip installs any packages in this environment's site-packages folder rather than in the global site-packages folder. (This currently appears to be a known issue with conda - see https://github.com/ContinuumIO/anaconda-issues/issues/1429).
+
+*   You can now activate the new conda environment and run pip install on findatapy:
+
+    ```
+    activate cuemacro
+    pip install git+https://github.com/cuemacro/findatapy.git
+    ```
+
+    This will install findatapy into the conda environment's site-packages folder.
+
+*   Above works fine for environments where I am planning to use findatapy. But for an environment where I plan to work on findatapy code itself, I prefer to set it up a bit differently. I prefer to keep code I am working on separate from the site-packages directory. So, instead of running pip install on findatapy, I ran conda install (or pip install since some of the packages don't appear to be available on conda) on each of the packages listed in findatapy's setup.py:
+
+    ```
+    conda create -n devcuemacro python=3.5.2 pip
+    activate devcuemacro
+    pip install pandas twython pytz requests numpy pandas_datareader quandl statsmodels multiprocess ...
+    ```
+
+    I then separately clone the findatapy repository and add its location to my PYTHONPATH

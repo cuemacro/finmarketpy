@@ -230,7 +230,8 @@ to make Bloomberg calls or calls via arctic to MongoDB
 
     This will install findatapy into the conda environment's site-packages folder.
 
-*   Above works fine for environments where I am planning to use findatapy. But for an environment where I plan to work on findatapy code itself, I prefer to set it up a bit differently. I prefer to keep code I am working on separate from the site-packages directory. So, instead of running pip install on findatapy, I ran conda install (or pip install since some of the packages don't appear to be available on conda) on each of the packages listed in findatapy's setup.py:
+*   Above works fine for environments where you are planning to use findatapy. But for an environment if you plan to work on findatapy code itself, you might prefer to set it up a bit differently.
+This will keep code you are working on separate from the site-packages directory. So, instead of running pip install on findatapy, run conda install (or pip install since some of the packages don't appear to be available on conda) on each of the packages listed in findatapy's setup.py:
 
     ```
     conda create -n devcuemacro python=3.5.2 pip

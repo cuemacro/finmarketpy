@@ -66,7 +66,7 @@ Major requirements
 # Installation
 
 For detailed installation instructions for finmarketpy and its associated Python libraries go to
-https://github.com/cuemacro/finmarketpy/INSTALL.md (which includes details on how to setup your entire Python environment).
+https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md (which includes details on how to setup your entire Python environment).
 
 You can install the library using the below (better to get the newest version from repo, as opposed to releases).
 

@@ -21,6 +21,7 @@ return statistics, for example through using GPU accelerated code for cases when
 
 * Add data wrappers for other data providers:
     * Thomson Reuters
+    * Alpha Vantage
     * Macrobond
     * And any others we can think of!
 * Add subscription style data listening to data from:
@@ -36,7 +37,7 @@ return statistics, for example through using GPU accelerated code for cases when
 
 * Add a wrapper for bqplot (Bloomberg's open source plotting library designed for Jupyter notebook)
 * Add a wrapper for vispy, high performance GPU accelerated (partially done)
-* Add more chart types across the various engines, in particular for matplotlib including FOMC style dotplot (aka beeswarm plot)
+* Add more chart types across the various engines, in particular for plotly and matplotlib including FOMC style dotplot (aka beeswarm plot)
 * Add more animated chart types (surface currently implemented for matplotlib, want to add for plotly)
 * Adding tests based on pytest (although guess this is tricky, given output is graphical)
 * Add more examples

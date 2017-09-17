@@ -18,9 +18,9 @@ which will help you to write your own trading strategies and Python scripts for 
       * Recommend installing latest version of Python 3.5 (by running in command line `conda install python=3.5.2` rather than using Python 3.6 (which
       is the default Python installation in Anaconda 4.30) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
       * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda 4.30 (eg. version of pandas, numpy etc.)
-    * Microsoft Visual Studio 2015 Community Edition- [download](https://www.visualstudio.com/downloads/) or Visual C++ 2015 build tools - Windows
-      * Makes sure to do a custom installation and tick Visual C++
-      * Alternatively, if we can simply install [Visual C++ 2015 build tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+    * Microsoft Visual Studio 2015 Community Edition - [download](https://www.visualstudio.com/downloads/) or Visual C++ 2015 build tools - Windows
+      * Makes sure to do a custom installation and tick Visual C++ in the Visual Studio 2015 installation
+      * Alternatively, it is quicker to install [Visual C++ 2015 build tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
          * You may need to add the following (or similar) to your Windows path `C:\Program Files (x86)\Windows Kits\8.1\bin\x64`
          * This should prevent the following compilation error where 'rl.exe' is not found
       * Some Python libraries need a C++ compiler in order to build (such as blpapi and arctic)
@@ -135,7 +135,8 @@ various Python libraries. The Cuemacro libraries will install most Python depend
                 * For customising how the project dumps logs to disk
         * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings.
         * This has the benefit of not being overwritten each time you upgrade the project.
-        * Below we have a sample datacred.py class file, to be placed in the "util" folder:
+        * Below we have a sample datacred.py class file, to be placed in the "util" folder, any parameters set here, will overwrite
+        those of dataconstants.py:
 
         ```python
 class DataCred(object):
@@ -188,7 +189,7 @@ class DataCred(object):
     # Override multithreading for certain categories of downloads
     override_multi_threading_for_categories = []
 
-        ```
+    ```
     * finmarketpy - `pip install git+https://github.com/cuemacro/finmarketpy.git`
         * Check constants file configuration [finmarketpy/finmarketpy/util/marketconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/finmarketpy/util/marketconstants.py)
         * You can also create your own file marketcred.py (placed in the same folder)

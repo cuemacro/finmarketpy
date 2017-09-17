@@ -18,8 +18,11 @@ which will help you to write your own trading strategies and Python scripts for 
       * Recommend installing latest version of Python 3.5 (by running in command line `conda install python=3.5.2` rather than using Python 3.6 (which
       is the default Python installation in Anaconda 4.30) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
       * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda 4.30 (eg. version of pandas, numpy etc.)
-    * Microsoft Visual Studio 2015 Community Edition- [download](https://www.visualstudio.com/downloads/) - Windows
+    * Microsoft Visual Studio 2015 Community Edition- [download](https://www.visualstudio.com/downloads/) or Visual C++ 2015 build tools - Windows
       * Makes sure to do a custom installation and tick Visual C++
+      * Alternatively, if we can simply install [Visual C++ 2015 build tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+         * You may need to add the following (or similar) to your Windows path `C:\Program Files (x86)\Windows Kits\8.1\bin\x64`
+         * This should prevent the following compilation error where 'rl.exe' is not found
       * Some Python libraries need a C++ compiler in order to build (such as blpapi and arctic)
       * Alternatively, if you don't want to compile the libraries yourself, you can sometimes find pre-compiled
       Python wheels for your platform

@@ -244,7 +244,9 @@ class EventsFactory(EventStudy):
     def load_economic_events(self):
         # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
         self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._db_database_econ_file, engine=MarketConstants().write_engine,
-                                                                                db_server=MarketConstants().db_server)
+                                                                                db_server=MarketConstants().db_server,
+                                                                                username=MarketConstants().db_username,
+                                                                                password=MarketConstants().db_password)
 
     def harvest_category(self, category_name):
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)
@@ -390,7 +392,6 @@ class EventsFactory(EventStudy):
 
     def get_economic_event_ret_over_custom_event_day(self, data_frame_in, name, event, start, end, lagged = False,
                                               NYC_cutoff = 10):
-
 
         # get the times of events
         event_dates = self.get_economic_event_date_time(name, event)

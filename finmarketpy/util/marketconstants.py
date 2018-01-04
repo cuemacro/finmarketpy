@@ -24,6 +24,9 @@ class MarketConstants(object):
     hdf5_file_econ_file = "x"
     db_database_econ_file = ''
     db_server = '127.0.0.1'
+    db_username = 'admin_root'
+    db_password = 'TOFILL'
+
     write_engine = 'arctic'
 
     # overwrite field variables with those listed in MarketCred

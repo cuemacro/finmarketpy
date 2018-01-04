@@ -26,16 +26,14 @@ class MarketConstants(object):
     db_server = '127.0.0.1'
     write_engine = 'arctic'
 
-    # or we can store credentials in a file "marketcred.py" in the same folder, which will overwrite the above
-    try:
-        from finmarketpy.util.marketcred import MarketCred
+    # overwrite field variables with those listed in MarketCred
+    def __init__(self):
+        try:
+            from finmarketpy.util.marketcred import MarketCred
+            cred_keys = MarketCred.__dict__.keys()
 
-        cred = MarketCred()
-
-        hdf5_file_econ_file = cred.hdf5_file_econ_file
-        db_database_econ_file = cred.db_database_econ_file
-
-        db_server = cred.db_server
-
-    except:
-        pass
+            for k in MarketConstants.__dict__.keys():
+                if k in cred_keys and '__' not in k:
+                    setattr(MarketConstants, k, getattr(MarketCred, k))
+        except:
+            pass

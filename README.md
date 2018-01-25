@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 25 Jan 2018 - Fix bug on class
 * 04 Jan 2018 - Bug fix for Cred override of constants
 * 16 Sep 2017 - Adding to planned features list
 * 10 Jul 2017 - Added install instructions for conda

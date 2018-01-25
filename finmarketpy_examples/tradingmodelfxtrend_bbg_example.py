@@ -192,7 +192,7 @@ if __name__ == '__main__':
     # create a FX CTA strategy, then examine how P&L changes with different vol targeting
     # and later transaction costs
     if True:
-        strategy = TradingModelFXTrend_Example()
+        strategy = TradingModelFXTrend_BBG_Example()
 
         from finmarketpy.backtest import TradeAnalysis
 
@@ -227,7 +227,7 @@ if __name__ == '__main__':
     # create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
     if False:
         from finmarketpy.backtest import TradeAnalysis
-        model = TradingModelFXTrend_Example()
+        model = TradingModelFXTrend_BBG_Example()
         model.construct_strategy()
 
         tradeanalysis = TradeAnalysis()

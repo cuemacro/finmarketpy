@@ -101,9 +101,9 @@ if run_example == 1 or run_example == 0:
 
     # use the same data for generating signals
     backtest.calculate_trading_PnL(br, asset_df, signal_df)
-    port = backtest.get_cumportfolio()
-    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.get_portfolio_pnl_desc()[0])]
-    signals = backtest.get_portfolio_signal()
+    port = backtest.portfolio_cum()
+    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
+    signals = backtest.portfolio_signal()
 
     # print the last positions (we could also save as CSV etc.)
     print(signals.tail(1))
@@ -181,10 +181,10 @@ if run_example == 2 or run_example == 0:
 
     # use the same data for generating signals
     backtest.calculate_trading_PnL(br, asset_df, signal_df)
-    port = backtest.get_cumportfolio()
-    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.get_portfolio_pnl_desc()[0])]
-    signals = backtest.get_porfolio_signal()   # get final signals for each series
-    returns = backtest.get_pnl()               # get P&L for each series
+    port = backtest.portfolio_cum()
+    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
+    signals = backtest.portfolio_signal()   # get final signals for each series
+    returns = backtest.pnl()               # get P&L for each series
 
     calculations = Calculations()
     trade_returns = calculations.calculate_individual_trade_gains(signals, returns)

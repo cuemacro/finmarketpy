@@ -20,8 +20,8 @@ except: pass
 
 import datetime
 
-import matplotlib
-import matplotlib.pyplot as plt
+# import matplotlib
+# import matplotlib.pyplot as plt
 import pandas
 
 from chartpy import Chart, Style, ChartConstants
@@ -77,6 +77,8 @@ class TradeAnalysis(object):
             # set the matplotlib style sheet & defaults
             # at present this only works in Matplotlib engine
             try:
+                import matplotlib
+                import matplotlib.pyplot as plt
                 matplotlib.rcdefaults()
                 plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
             except: pass

@@ -195,9 +195,9 @@ class Backtest(object):
         # portfolio is average of the underlying signals: should we sum them or average them or use another
         # weighting scheme?
         if br.portfolio_combination is not None:
-            if br.portfolio_combination == 'sum' and br.portfolio_combination_weights is not None:
+            if br.portfolio_combination == 'sum' and br.portfolio_combination_weights is None:
                 portfolio = pandas.DataFrame(data = _pnl.sum(axis = 1), index = _pnl.index, columns = ['Portfolio'])
-            elif br.portfolio_combination == 'mean' and br.portfolio_combination_weights is not None:
+            elif br.portfolio_combination == 'mean' and br.portfolio_combination_weights is None:
                 portfolio = pandas.DataFrame(data = _pnl.mean(axis = 1), index = _pnl.index, columns = ['Portfolio'])
 
                 adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
@@ -1260,7 +1260,7 @@ class TradingModel(object):
 
     #### Plotting
 
-    def _reduce_plot(self, data_frame):
+    def _reduce_plot(self, data_frame, reduce_plot = True, resample = 'B'):
         """Reduces the frequency of a time series to every business day so it can be plotted more easily
 
         Parameters
@@ -1273,29 +1273,31 @@ class TradingModel(object):
         pandas.DataFrame
         """
         try:
-            # make plots on every business day (will downsample intraday data)
-            data_frame = data_frame.resample('B')
-            data_frame = data_frame.fillna(method='pad')
+            if reduce_plot:
+                # make plots on every business day (will downsample intraday data)
+                data_frame = data_frame.resample(resample)
+                data_frame = data_frame.fillna(method='pad')
 
             return data_frame
         except:
             return data_frame
 
     ##### Quick helper functions to plot aspects of the strategy such as P&L, leverage etc.
-    def plot_individual_leverage(self, strip, silent_plot=False):
+    def plot_individual_leverage(self, strip, silent_plot=False, reduce_plot = True, resample = 'B'):
 
-        style = self._create_style("Leverage", "Individual Leverage")
+        style = self._create_style("Leverage", "Individual Leverage", reduce_plot = reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._individual_leverage), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(self._individual_leverage,
+                                                                  reduce_plot = reduce_plot, resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
             if not(silent_plot): chart.plot()
             return chart
         except: pass
 
-    def plot_strategy_group_pnl_trades(self, strip = None, silent_plot = False):
+    def plot_strategy_group_pnl_trades(self, strip = None, silent_plot = False, reduce_plot = True, resample = 'B'):
 
-        style = self._create_style("(bp)", "Individual Trade PnL")
+        style = self._create_style("(bp)", "Individual Trade PnL", reduce_plot = reduce_plot)
 
         # zero when there isn't a trade exit
         # strategy_pnl_trades = self._strategy_pnl_trades * 100 * 100
@@ -1304,18 +1306,20 @@ class TradingModel(object):
         # note only works with single large basket trade
         try:
             strategy_pnl_trades = self._strategy_group_pnl_trades.fillna(0) * 100 * 100
-            chart = Chart(self._strip_dataframe(self._reduce_plot(strategy_pnl_trades), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(strategy_pnl_trades, reduce_plot = reduce_plot,
+                                                                  resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
             if not(silent_plot): chart.plot()
             return chart
         except: pass
 
-    def plot_strategy_pnl(self, strip=None, silent_plot = False):
+    def plot_strategy_pnl(self, strip=None, silent_plot = False, reduce_plot = True, resample = 'B'):
 
-        style = self._create_style("", "Strategy PnL")
+        style = self._create_style("", "Strategy PnL", reduce_plot = reduce_plot)
 
         try:
-            df = self._strip_dataframe(self._reduce_plot(self._strategy_pnl), strip)
+            df = self._strip_dataframe(self._reduce_plot(self._strategy_pnl, reduce_plot = reduce_plot,
+                                                                  resample = resample), strip)
             chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
             if not(silent_plot): chart.plot()
 
@@ -1324,25 +1328,26 @@ class TradingModel(object):
             return chart
         except: pass
 
-    def plot_strategy_trade_no(self, strip = None, silent_plot = False):
+    def plot_strategy_trade_no(self, strip = None, silent_plot = False, reduce_plot = True, resample = 'B'):
         df_trades = self._strategy_trade_no
 
         if strip is not None: df_trades.index = [k.replace(strip, '') for k in df_trades.index]
 
-        style = self._create_style("", "")
+        style = self._create_style("", "", reduce_plot = reduce_plot)
 
         try:
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).html'
 
-            chart = Chart(self._strip_dataframe(self._reduce_plot(df_trades), strip), engine=self.DEFAULT_PLOT_ENGINE,
+            chart = Chart(self._strip_dataframe(self._reduce_plot(df_trades, reduce_plot = reduce_plot,
+                                                                  resample = resample), strip), engine=self.DEFAULT_PLOT_ENGINE,
                           chart_type='bar', style=style)
             if not(silent_plot): chart.plot()
             return chart
         except:
             pass
 
-    def plot_strategy_signal_proportion(self, strip = None, silent_plot = False):
+    def plot_strategy_signal_proportion(self, strip = None, silent_plot = False, reduce_plot = True, resample = 'B'):
 
         signal = self._strategy_signal
 
@@ -1365,29 +1370,32 @@ class TradingModel(object):
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).html'
 
-            chart = Chart(self._strip_dataframe(self._reduce_plot(df), strip), engine=self.DEFAULT_PLOT_ENGINE,
+            chart = Chart(self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot = reduce_plot,
+                                                resample = resample), engine=self.DEFAULT_PLOT_ENGINE,
                           chart_type='bar', style=style)
             if not(silent_plot): chart.plot()
             return chart
         except: pass
 
-    def plot_strategy_leverage(self, strip = None, silent_plot = False):
-        style = self._create_style("Leverage", "Strategy Leverage")
+    def plot_strategy_leverage(self, strip = None, silent_plot = False, reduce_plot = True, resample = 'B'):
+        style = self._create_style("Leverage", "Strategy Leverage", reduce_plot = reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_leverage), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_leverage,
+                                                                  reduce_plot = reduce_plot, resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
             if not(silent_plot): chart.plot()
             return chart
         except: pass
 
     ##### plot the individual components cumulative returns and return statistics (including portfolio level constraints)
-    def plot_strategy_components_pnl(self, strip=None, silent_plot=False):
+    def plot_strategy_components_pnl(self, strip=None, silent_plot=False, reduce_plot = True, resample = 'B'):
 
-        style = self._create_style("Ind Components", "Strategy PnL Components")
+        style = self._create_style("Ind Components", "Strategy PnL Components", reduce_plot = reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_components_pnl), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_components_pnl,
+                                                                  reduce_plot = reduce_plot, resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
             if not (silent_plot): chart.plot()
             return chart
@@ -1421,7 +1429,7 @@ class TradingModel(object):
 
     ##### plot the cumulative returns and return statistics for the strategy group
     ##### this will plot the final strategy, benchmark and all the individual baskets (as though they were run by themselves)
-    def plot_strategy_group_benchmark_pnl(self, strip = None, silent_plot = False):
+    def plot_strategy_group_benchmark_pnl(self, strip = None, silent_plot = False, reduce_plot = True, resample = 'B'):
 
         style = self._create_style("", "Group Benchmark PnL - cumulative")
 
@@ -1431,7 +1439,8 @@ class TradingModel(object):
 
         # plot cumulative line of returns
         chart = Chart(
-            self._strip_dataframe(self._reduce_plot(self._strategy_group_benchmark_pnl), strip),
+            self._strip_dataframe(self._reduce_plot(self._strategy_group_benchmark_pnl,
+                                                    reduce_plot = reduce_plot, resample = resample), strip),
                                   engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
 
         if not (silent_plot): chart.plot()
@@ -1523,11 +1532,12 @@ class TradingModel(object):
         if not (silent_plot): chart.plot()
         return chart
 
-    def plot_strategy_group_leverage(self, silent_plot = False):
+    def plot_strategy_group_leverage(self, silent_plot = False, reduce_plot = True, resample = 'B'):
 
-        style = self._create_style("Leverage", "Group Leverage")
+        style = self._create_style("Leverage", "Group Leverage", reduce_plot = reduce_plot)
 
-        chart = Chart(self._reduce_plot(self._strategy_group_leverage), engine=self.DEFAULT_PLOT_ENGINE,
+        chart = Chart(self._reduce_plot(self._strategy_group_leverage,
+                                        reduce_plot = reduce_plot, resample = resample), engine=self.DEFAULT_PLOT_ENGINE,
                       chart_type='line', style=style)
         if not (silent_plot): chart.plot()
         return chart
@@ -1558,12 +1568,12 @@ class TradingModel(object):
                           date = date, strip = strip, silent_plot=silent_plot)
 
     ###### plot aggregated portfolio exposures
-    def plot_strategy_total_exposures(self, strip = None, silent_plot=False):
+    def plot_strategy_total_exposures(self, strip = None, silent_plot=False, reduce_plot = True, resample = 'B'):
 
         df = pandas.concat([self._strategy_total_longs, self._strategy_total_shorts, self._strategy_total_exposure], axis=1)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(df), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(df, reduce_plot = reduce_plot, resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
                           style=self._create_style("", "Strategy Total Exposures"))
             if not (silent_plot): chart.plot()
@@ -1571,38 +1581,40 @@ class TradingModel(object):
         except:
             pass
 
-    def plot_strategy_net_exposures(self, strip = None, silent_plot=False):
+    def plot_strategy_net_exposures(self, strip = None, silent_plot=False, reduce_plot = True, resample = 'B'):
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure,
+                                                                  reduce_plot = reduce_plot, resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=self._create_style("", "Strategy Net Exposures"))
+                          style=self._create_style("", "Strategy Net Exposures", reduce_plot = reduce_plot))
             if not (silent_plot): chart.plot()
             return chart
         except:
             pass
 
-    def plot_strategy_total_exposures_notional(self, strip = None, silent_plot=False):
+    def plot_strategy_total_exposures_notional(self, strip = None, silent_plot=False, reduce_plot = True, resample = 'B'):
 
         df = pandas.concat([self._strategy_total_longs_notional,
                             self._strategy_total_shorts_notional, self._strategy_total_exposure_notional], axis=1)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(df / 1000000.0), strip),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(df / 1000000.0, reduce_plot = reduce_plot, resample = resample), strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=self._create_style("(mm)", "Strategy Total Exposures (mm)"))
+                          style=self._create_style("(mm)", "Strategy Total Exposures (mm)", reduce_plot = reduce_plot))
             if not (silent_plot): chart.plot()
             return chart
         except:
             pass
 
-    def plot_strategy_net_exposures_notional(self, strip = None, silent_plot=False):
+    def plot_strategy_net_exposures_notional(self, strip = None, silent_plot=False, reduce_plot = True, resample = 'B'):
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure_notional / 1000000.0),
+            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure_notional / 1000000.0,
+                                                                  reduce_plot=reduce_plot, resample=resample),
                                                 strip),
                           engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=self._create_style("(mm)", "Strategy Net Exposures (mm)"))
+                          style=self._create_style("(mm)", "Strategy Net Exposures (mm)", reduce_plot = reduce_plot))
             if not (silent_plot): chart.plot()
             return chart
         except:
@@ -1649,7 +1661,7 @@ class TradingModel(object):
 
         return data_frame
 
-    def _create_style(self, title, file_add):
+    def _create_style(self, title, file_add, reduce_plot = True):
         style = Style()
 
         style.title = self.FINAL_STRATEGY + " " + title
@@ -1657,6 +1669,10 @@ class TradingModel(object):
         style.scale_factor = self.SCALE_FACTOR
         style.source = self.CHART_SOURCE
         style.silent_display = not(self.SHOW_CHARTS)
+
+        # when plotting many points use WebGl version of plotly if specified
+        if not(reduce_plot):
+            style.plotly_webgl = True
 
         if self.DEFAULT_PLOT_ENGINE not in ['plotly', 'cufflinks'] and self.SAVE_FIGURES:
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_add + ') ' \

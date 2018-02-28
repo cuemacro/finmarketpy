@@ -230,6 +230,7 @@ class TradeAnalysis(object):
             # for calculating P&L
             for k in current_parameter.keys():
                 setattr(br, k, current_parameter[k])
+                setattr(br.tech_params, k, current_parameter[k])
 
             trading_model.br = br   # for calculating signals
 

@@ -190,10 +190,13 @@ import numpy
 from finmarketpy.util.marketconstants import MarketConstants
 from findatapy.market import IOEngine
 from findatapy.util import ConfigManager
+from findatapy.market import SpeedCache
 
 try:
     from numbapro import autojit
 except: pass
+
+marketconstants = MarketConstants()
 
 class EventsFactory(EventStudy):
     """Provides methods to fetch data on economic data events and to perform basic event studies for market data around
@@ -233,6 +236,7 @@ class EventsFactory(EventStudy):
         self.logger = LoggerManager().getLogger(__name__)
         self.filter = Filter()
         self.io_engine = IOEngine()
+        self.speed_cache = SpeedCache()
 
         if df is not None:
             self._econ_data_frame = df
@@ -242,11 +246,16 @@ class EventsFactory(EventStudy):
         return
 
     def load_economic_events(self):
-        # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
-        self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._db_database_econ_file, engine=MarketConstants().write_engine,
-                                                                                db_server=MarketConstants().db_server,
-                                                                                username=MarketConstants().db_username,
-                                                                                password=MarketConstants().db_password)
+        self._econ_data_frame = self.speed_cache.get_dataframe(self._db_database_econ_file)
+
+        if self._econ_data_frame is None:
+            # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
+            self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._db_database_econ_file, engine=marketconstants.write_engine,
+                                                                                    db_server=marketconstants.db_server,
+                                                                                    username=marketconstants.db_username,
+                                                                                    password=marketconstants.db_password)
+
+            self.speed_cache.put_dataframe(self._db_database_econ_file, self._econ_data_frame)
 
     def harvest_category(self, category_name):
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)

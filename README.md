@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 29 Mar 2018 - Fix bug when dumping CSV of P&L
 * 15 Mar 2018 - Added caching for event data
 * 26 Feb 2018 - Added solution for replacing parameters under tech_params (in tradeanalysis.py).
 * 30 Jan 2018 - Fix bug on backtest.example.py

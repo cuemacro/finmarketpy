@@ -1323,7 +1323,8 @@ class TradingModel(object):
             chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
             if not(silent_plot): chart.plot()
 
-            if self.br.write_csv_pnl: df.to_csv(self.DUMP_CSV + self.FINAL_STRATEGY + "_pnl.csv")
+            if self.br.write_csv_pnl:
+                df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
 
             return chart
         except: pass

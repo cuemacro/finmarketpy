@@ -334,6 +334,15 @@ class Backtest(object):
             self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
             self._portfolio_signal_trade_notional = self._portfolio_signal_notional - self._portfolio_signal_notional.shift(1)
 
+            df_trades_sizes = pandas.DataFrame()
+
+            for k in self._portfolio_signal_trade_notional.columns:
+                df_trades_sizes[k] = pandas.value_counts(self._portfolio_signal_trade_notional[k], sort=True)
+
+            df_trades_sizes = df_trades_sizes[df_trades_sizes.index != 0]
+
+            self._portfolio_signal_trade_notional_sizes = df_trades_sizes
+
             self._portfolio_total_longs_notional = portfolio_total_longs * br.portfolio_notional_size
             self._portfolio_total_shorts_notional = portfolio_total_shorts * br.portfolio_notional_size
             self._portfolio_net_exposure_notional = portfolio_net_exposure * br.portfolio_notional_size
@@ -833,6 +842,17 @@ class Backtest(object):
 
         return self._portfolio_signal_trade_notional
 
+    def portfolio_trade_notional_sizes(self):
+        """Gets the number of trades (with individual leverage & portfolio leverage) for each asset, which
+        we'd need to execute, scaled by a notional amount we have already specified
+
+        Returns
+        -------
+        DataFrame
+        """
+
+        return self._portfolio_signal_trade_notional_sizes
+
     def portfolio_signal_contracts(self):
         """Gets the signals (with individual leverage & portfolio leverage) for each asset, which
         equates to what we would have a positions in practice, scaled by a notional amount and into contract sizes (eg. for futures)
@@ -1014,6 +1034,7 @@ class TradingModel(object):
                 # scaled by notional
                 self._strategy_signal_notional = backtest.portfolio_signal_notional()
                 self._strategy_trade_notional = backtest.portfolio_trade_notional()
+                self._strategy_trade_notional_sizes = backtest.portfolio_trade_notional_sizes()
 
                 # scaled by notional and adjusted into contract sizes
                 self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
@@ -1227,6 +1248,9 @@ class TradingModel(object):
 
     def strategy_trade_notional(self):
         return self._strategy_trade_notional
+
+    def strategy_trade_notional_sizes(self):
+        return self._strategy_trade_notional_sizes
 
     def strategy_signal_contracts(self):
         return self._strategy_signal_contracts
@@ -1560,12 +1584,31 @@ class TradingModel(object):
         self._plot_signal(self._strategy_trade_notional, label = "trades (scaled by notional)", caption = "Trades",
                           date = date, strip = strip, silent_plot=silent_plot)
 
+    def plot_strategy_trades_notional_sizes(self, strip = None, silent_plot = False):
+
+        if strip is not None: self._strategy_trade_notional_sizes.index = [k.replace(strip, '')
+                                                                           for k in self._strategy_trade_notional_sizes.index]
+
+        style = self._create_style("", "", reduce_plot=False)
+
+        try:
+            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade notional size).png'
+            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade notional size).html'
+
+            chart = Chart(self._strip_dataframe(self._strategy_trade_notional_sizes, strip),
+                          engine=self.DEFAULT_PLOT_ENGINE,
+                          chart_type='bar', style=style)
+            if not (silent_plot): chart.plot()
+            return chart
+        except:
+            pass
+
     def plot_strategy_signals_contracts(self, date = None, strip = None, silent_plot = False):
-        self._plot_signal(self._strategy_signal_notional, label = "positions (contracts)", caption = "Positions",
+        self._plot_signal(self._strategy_signal_contracts, label = "positions (contracts)", caption = "Positions",
                           date = date, strip = strip, silent_plot=silent_plot)
 
     def plot_strategy_trades_contracts(self, date = None, strip = None, silent_plot = False):
-        self._plot_signal(self._strategy_trade_notional, label = "trades (contracts)", caption = "Contracts",
+        self._plot_signal(self._strategy_trade_contracts, label = "trades (contracts)", caption = "Contracts",
                           date = date, strip = strip, silent_plot=silent_plot)
 
     ###### plot aggregated portfolio exposures

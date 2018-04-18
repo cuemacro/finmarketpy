@@ -325,6 +325,7 @@ class Backtest(object):
         self._portfolio_total_shorts_notional  = None
         self._portfolio_net_exposure_notional  = None
         self._portfolio_total_exposure_notional  = None
+        self._portfolio_signal_trade_notional_sizes = None
 
         # also create other measures of portfolio
         # portfolio & trades in terms of a predefined notional (in USD)

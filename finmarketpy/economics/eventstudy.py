@@ -250,10 +250,11 @@ class EventsFactory(EventStudy):
 
         if self._econ_data_frame is None:
             # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
-            self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._db_database_econ_file, engine=marketconstants.write_engine,
-                                                                                    db_server=marketconstants.db_server,
-                                                                                    username=marketconstants.db_username,
-                                                                                    password=marketconstants.db_password)
+            self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(
+                self._db_database_econ_file, engine = marketconstants.write_engine,
+                db_server = marketconstants.db_server,
+                username = marketconstants.db_username,
+                password = marketconstants.db_password)
 
             self.speed_cache.put_dataframe(self._db_database_econ_file, self._econ_data_frame)
 

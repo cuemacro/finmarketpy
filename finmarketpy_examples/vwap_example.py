@@ -11,7 +11,7 @@ from findatapy.util.loggermanager import LoggerManager
 
 logger = LoggerManager().getLogger(__name__)
 
-chart = Chart(engine='matplotlib')
+chart = Chart(engine='bokeh')
 
 tech_ind = TechIndicator()
 
@@ -26,3 +26,11 @@ tech_ind.create_tech_ind(df, 'VWAP', tech_params)
 df = tech_ind.get_techind()
 
 print(df)
+
+style = Style()
+style.title = 'S&P500 VWAP'
+style.scale_factor = 2
+
+df = tech_ind.get_techind()
+
+chart.plot(df, style=style)

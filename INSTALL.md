@@ -244,3 +244,9 @@ This will keep code you are working on separate from the site-packages directory
     ```
 
     I then separately clone the findatapy repository and add its location to my PYTHONPATH
+
+*   If we wish to install an anaconda instance in our environment (which will install lots of libraries like pandas) we can instead run
+
+    ```
+    conda create -n devcuemacro python=3.5.2 anaconda
+    ```

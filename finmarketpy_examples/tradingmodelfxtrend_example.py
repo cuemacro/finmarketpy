@@ -22,7 +22,6 @@ is a lower level way of doing this).
 
 import datetime
 
-from chartpy import Chart
 from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
 from finmarketpy.backtest import TradingModel, BacktestRequest
 from finmarketpy.economics import TechIndicator
@@ -85,6 +84,8 @@ class TradingModelFXTrend_Example(TradingModel):
 
     def load_assets(self):
         ##### FILL IN WITH YOUR ASSET DATA
+        from findatapy.util.loggermanager import  LoggerManager
+        logger = LoggerManager().getLogger(__name__)
 
         # for FX basket
         full_bkt    = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
@@ -99,7 +100,7 @@ class TradingModelFXTrend_Example(TradingModel):
 
         br = self.load_parameters()
 
-        self.logger.info("Loading asset data...")
+        logger.info("Loading asset data...")
 
         vendor_tickers = ['FRED/DEXUSEU', 'FRED/DEXJPUS', 'FRED/DEXUSUK', 'FRED/DEXUSAL', 'FRED/DEXCAUS',
                           'FRED/DEXUSNZ', 'FRED/DEXSZUS', 'FRED/DEXNOUS', 'FRED/DEXSDUS']
@@ -113,7 +114,7 @@ class TradingModelFXTrend_Example(TradingModel):
                     fields = ['close'],                                 # which fields to download
                     vendor_tickers = vendor_tickers,                    # ticker (Quandl)
                     vendor_fields = ['close'],                          # which Bloomberg fields to download
-                    cache_algo = 'internet_load_return')                # how to return data
+                    cache_algo = 'cache_algo_return')                # how to return data
 
         asset_df = self.market.fetch_market(market_data_request)
 
@@ -132,7 +133,7 @@ class TradingModelFXTrend_Example(TradingModel):
 
         return asset_df, spot_df, spot_df2, basket_dict
 
-    def construct_signal(self, spot_df, spot_df2, tech_params, br):
+    def construct_signal(self, spot_df, spot_df2, tech_params, br, run_in_parallel=False):
 
         ##### FILL IN WITH YOUR OWN SIGNALS
 

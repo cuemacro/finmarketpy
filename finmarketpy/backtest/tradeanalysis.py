@@ -16,18 +16,26 @@ pf = None
 
 try:
     import pyfolio as pf
-except: pass
+except:
+    pass
 
 import datetime
 
 # import matplotlib
 # import matplotlib.pyplot as plt
 import pandas
+import copy
 
 from chartpy import Chart, Style, ChartConstants
 from findatapy.timeseries import Calculations, Timezone
 from findatapy.util.loggermanager import LoggerManager
 from finmarketpy.backtest import Backtest
+
+from finmarketpy.util.marketconstants import MarketConstants
+from findatapy.util.swimpool import SwimPool
+
+market_constants = MarketConstants()
+
 
 class TradeAnalysis(object):
     """Applies some basic trade analysis for a trading strategy (as defined by TradingModel). Use PyFolio to create some
@@ -35,15 +43,15 @@ class TradeAnalysis(object):
 
     """
 
-    def __init__(self, engine = ChartConstants().chartfactory_default_engine):
-        self.logger = LoggerManager().getLogger(__name__)
+    def __init__(self, engine=ChartConstants().chartfactory_default_engine):
+        # self.logger = LoggerManager().getLogger(__name__)
         self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime("%Y%m%d") + ' '
         self.DEFAULT_PLOT_ENGINE = engine
         self.chart = Chart(engine=self.DEFAULT_PLOT_ENGINE)
 
         return
 
-    def run_strategy_returns_stats(self, trading_model, index = None, engine = 'finmarketpy'):
+    def run_strategy_returns_stats(self, trading_model, index=None, engine='finmarketpy'):
         """Plots useful statistics for the trading strategy using various backends
 
         Parameters
@@ -72,7 +80,8 @@ class TradeAnalysis(object):
             # PyFolio assumes UTC time based DataFrames (so force this localisation)
             try:
                 pnl = tz.localise_index_as_UTC(pnl)
-            except: pass
+            except:
+                pass
 
             # set the matplotlib style sheet & defaults
             # at present this only works in Matplotlib engine
@@ -81,7 +90,8 @@ class TradeAnalysis(object):
                 import matplotlib.pyplot as plt
                 matplotlib.rcdefaults()
                 plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
-            except: pass
+            except:
+                pass
 
             # TODO for intraday strategies, make daily
 
@@ -92,8 +102,9 @@ class TradeAnalysis(object):
             fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
 
             try:
-                plt.savefig (trading_model.DUMP_PATH + "stats.png")
-            except: pass
+                plt.savefig(trading_model.DUMP_PATH + "stats.png")
+            except:
+                pass
 
             plt.show()
         elif engine == 'finmarketpy':
@@ -106,19 +117,22 @@ class TradeAnalysis(object):
             old_scale_factor = trading_model.SCALE_FACTOR
             trading_model.SCALE_FACTOR = 0.75
 
-            pnl = trading_model.plot_strategy_pnl(silent_plot=True)                         # plot the final strategy
-            individual = trading_model.plot_strategy_group_pnl_trades(silent_plot=True)     # plot the individual trade P&Ls
+            pnl = trading_model.plot_strategy_pnl(silent_plot=True)  # plot the final strategy
+            individual = trading_model.plot_strategy_group_pnl_trades(
+                silent_plot=True)  # plot the individual trade P&Ls
 
-            pnl_comp = trading_model.plot_strategy_group_benchmark_pnl(silent_plot=True)    # plot all the cumulative P&Ls of each component
-            ir_comp = trading_model.plot_strategy_group_benchmark_pnl_ir(silent_plot=True)  # plot all the IR of each component
+            pnl_comp = trading_model.plot_strategy_group_benchmark_pnl(
+                silent_plot=True)  # plot all the cumulative P&Ls of each component
+            ir_comp = trading_model.plot_strategy_group_benchmark_pnl_ir(
+                silent_plot=True)  # plot all the IR of each component
 
-            leverage = trading_model.plot_strategy_leverage(silent_plot=True)               # plot the leverage of the portfolio
-            ind_lev = trading_model.plot_strategy_group_leverage(silent_plot=True)          # plot all the individual leverages
+            leverage = trading_model.plot_strategy_leverage(silent_plot=True)  # plot the leverage of the portfolio
+            ind_lev = trading_model.plot_strategy_group_leverage(silent_plot=True)  # plot all the individual leverages
 
             canvas = Canvas([[pnl, individual],
                              [pnl_comp, ir_comp],
                              [leverage, ind_lev]]
-                             )
+                            )
 
             canvas.generate_canvas(page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
                                    silent_display=False, canvas_plotter='plain',
@@ -126,7 +140,7 @@ class TradeAnalysis(object):
 
             trading_model.SCALE_FACTOR = old_scale_factor
 
-    def run_excel_trade_report(self, trading_model, excel_file = 'model.xlsx'):
+    def run_excel_trade_report(self, trading_model, excel_file='model.xlsx'):
         """
         run_excel_trade_report - Creates an Excel spreadsheet with model returns and latest trades
 
@@ -139,7 +153,7 @@ class TradeAnalysis(object):
 
         trading_model_list = trading_model
 
-        if not(isinstance(trading_model_list, list)):
+        if not (isinstance(trading_model_list, list)):
             trading_model_list = [trading_model]
 
         writer = pandas.ExcelWriter(excel_file, engine='xlsxwriter')
@@ -193,65 +207,90 @@ class TradeAnalysis(object):
         recent_signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + signal_caption, engine='xlsxwriter')
         recent_trades.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + trade_caption, engine='xlsxwriter')
 
-    def run_tc_shock(self, strategy, tc = None):
-        if tc is None: tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]
+    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False):
+        if tc is None: tc = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
 
-        parameter_list = [{'spot_tc_bp' : x } for x in tc]
-        pretty_portfolio_names = [str(x) + 'bp' for x in tc]    # names of the portfolio
-        parameter_type = 'TC analysis'                          # broad type of parameter name
+        parameter_list = [{'spot_tc_bp': x} for x in tc]
+        pretty_portfolio_names = [str(x) + 'bp' for x in tc]  # names of the portfolio
+        parameter_type = 'TC analysis'  # broad type of parameter name
 
         return self.run_arbitrary_sensitivity(strategy,
-                                 parameter_list=parameter_list,
-                                 pretty_portfolio_names=pretty_portfolio_names,
-                                 parameter_type=parameter_type)
+                                              parameter_list=parameter_list,
+                                              pretty_portfolio_names=pretty_portfolio_names,
+                                              parameter_type=parameter_type,
+                                              run_in_parallel=run_in_parallel)
 
     ###### Parameters and signal generations (need to be customised for every model)
-    def run_arbitrary_sensitivity(self, trading_model, parameter_list = None, parameter_names = None,
-                                  pretty_portfolio_names = None, parameter_type = None):
+    def run_arbitrary_sensitivity(self, trading_model, parameter_list=None,
+                                  pretty_portfolio_names=None, parameter_type=None, run_in_parallel=False):
 
         assets = trading_model.load_assets()
 
         asset_df = assets[0]
-        spot_df  = assets[1]
+        spot_df = assets[1]
         spot_df2 = assets[2]
         basket_dict = assets[3]
 
         contract_value_df = None
 
-        if len(assets) == 5:# for future use
+        if len(assets) == 5:  # for future use
             contract_value_df = assets[4]
 
-        port_list = None
+        port_list = []
         ret_stats_list = []
 
-        for i in range(0, len(parameter_list)):
-            br = trading_model.load_parameters()
+        if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
+            swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
 
-            current_parameter = parameter_list[i]
+            pool = swim_pool.create_pool(thread_technique=market_constants.backtest_thread_technique,
+                                         thread_no=market_constants.backtest_thread_no[market_constants.generic_plat])
 
-            # for calculating P&L
-            for k in current_parameter.keys():
-                setattr(br, k, current_parameter[k])
-                setattr(br.tech_params, k, current_parameter[k])
+            mult_results = []
 
-            trading_model.br = br   # for calculating signals
+            for i in range(0, len(parameter_list)):
+                br = copy.copy(trading_model.load_parameters())
 
-            signal_df = trading_model.construct_signal(spot_df, spot_df2, br.tech_params, br)
+                current_parameter = parameter_list[i]
 
-            backtest = Backtest()
-            self.logger.info("Calculating... " + str(pretty_portfolio_names[i]))
+                # for calculating P&L
+                for k in current_parameter.keys():
+                    setattr(br, k, current_parameter[k])
+                    setattr(br.tech_params, k, current_parameter[k])
 
-            backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=contract_value_df)
-            ret_stats_list.append(backtest.portfolio_pnl_ret_stats())
-            stats = str(backtest.portfolio_pnl_desc()[0])
+                mult_results.append(
+                    pool.apply_async(self._run_strategy, args=(trading_model, asset_df, spot_df, spot_df2, br,
+                                                               contract_value_df,
+                                                               pretty_portfolio_names[i],)))
 
-            port = backtest.portfolio_cum().resample('B').mean()
-            port.columns = [str(pretty_portfolio_names[i]) + ' ' + stats]
+            for p in mult_results:
+                port, ret_stats = p.get()
 
-            if port_list is None:
-                port_list = port
-            else:
-                port_list = port_list.join(port)
+                port_list.append(port)
+                ret_stats_list.append(ret_stats)
+
+            try:
+                swim_pool.close_pool(pool)
+            except:
+                pass
+
+        else:
+            for i in range(0, len(parameter_list)):
+                br = copy.copy(trading_model.load_parameters())
+
+                current_parameter = parameter_list[i]
+
+                # for calculating P&L
+                for k in current_parameter.keys():
+                    setattr(br, k, current_parameter[k])
+                    setattr(br.tech_params, k, current_parameter[k])
+
+                port, ret_stats = self._run_strategy(trading_model, asset_df, spot_df, spot_df2, br, contract_value_df,
+                                                     pretty_portfolio_names[i])
+
+                port_list.append(port)
+                ret_stats_list.append(ret_stats)
+
+        port_list = Calculations().pandas_outer_join(port_list)
 
         # reset the parameters of the strategy
         trading_model.br = trading_model.load_parameters()
@@ -281,7 +320,7 @@ class TradeAnalysis(object):
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' IR.html'
         style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
-        summary_ir = pandas.DataFrame(index = pretty_portfolio_names, data = ir, columns = ['IR'])
+        summary_ir = pandas.DataFrame(index=pretty_portfolio_names, data=ir, columns=['IR'])
 
         self.chart.plot(summary_ir, chart_type='bar', style=style)
 
@@ -289,16 +328,35 @@ class TradeAnalysis(object):
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.png'
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.html'
 
-        summary_rets = pandas.DataFrame(index = pretty_portfolio_names, data = rets, columns = ['Rets (%)']) * 100
+        summary_rets = pandas.DataFrame(index=pretty_portfolio_names, data=rets, columns=['Rets (%)']) * 100
 
         self.chart.plot(summary_rets, chart_type='bar', style=style)
 
         return port_list, summary_ir, summary_rets
 
+    def _run_strategy(self, trading_model, asset_df, spot_df, spot_df2, br, contract_value_df, pretty_portfolio_name):
+
+        logger = LoggerManager().getLogger(__name__)
+
+        logger.info("Calculating... " + str(pretty_portfolio_name))
+
+        signal_df = trading_model.construct_signal(spot_df, spot_df2, br.tech_params, br, run_in_parallel=False)
+
+        backtest = Backtest()
+
+        backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, False)
+        ret_stats = backtest.portfolio_pnl_ret_stats()
+        stats = str(backtest.portfolio_pnl_desc()[0])
+
+        port = backtest.portfolio_cum().resample('B').mean()
+        port.columns = [str(pretty_portfolio_name) + ' ' + stats]
+
+        return port, ret_stats
+
     ###### Parameters and signal generations (need to be customised for every model)
     ###### Plot all the output seperately
-    def run_arbitrary_sensitivity_separately(self, trading_model, parameter_list = None,
-                                             pretty_portfolio_names = None, strip = None):
+    def run_arbitrary_sensitivity_separately(self, trading_model, parameter_list=None,
+                                             pretty_portfolio_names=None, strip=None):
 
         # asset_df, spot_df, spot_df2, basket_dict = strat.fill_assets()
         final_strategy = trading_model.FINAL_STRATEGY
@@ -316,17 +374,17 @@ class TradeAnalysis(object):
 
             self.logger.info("Calculating... " + pretty_portfolio_names[i])
             trading_model.br = br
-            trading_model.construct_strategy(br = br)
+            trading_model.construct_strategy(br=br)
 
             trading_model.plot_strategy_pnl()
             trading_model.plot_strategy_leverage()
-            trading_model.plot_strategy_group_benchmark_pnl(strip = strip)
+            trading_model.plot_strategy_group_benchmark_pnl(strip=strip)
 
         # reset the parameters of the strategy
         trading_model.br = trading_model.fill_backtest_request()
         trading_model.FINAL_STRATEGY = final_strategy
 
-    def run_day_of_month_analysis(self, trading_model, resample_freq = 'B'):
+    def run_day_of_month_analysis(self, trading_model, resample_freq='B'):
         from finmarketpy.economics.seasonality import Seasonality
 
         calculations = Calculations()
@@ -338,7 +396,7 @@ class TradeAnalysis(object):
         pnl = pnl.resample('B').mean()
         rets = calculations.calculate_returns(pnl)
 
-        bus_day = seas.bus_day_of_month_seasonality(rets, add_average = True, resample_freq = resample_freq)
+        bus_day = seas.bus_day_of_month_seasonality(rets, add_average=True, resample_freq=resample_freq)
 
         # get seasonality by month
         pnl = pnl.resample('BM').mean()
@@ -356,7 +414,7 @@ class TradeAnalysis(object):
         style.title = trading_model.FINAL_STRATEGY + ' day of month seasonality'
         style.display_legend = False
         style.color_2_series = [bus_day.columns[-1]]
-        style.color_2 = ['red'] # red, pink
+        style.color_2 = ['red']  # red, pink
         style.linewidth_2 = 4
         style.linewidth_2_series = [bus_day.columns[-1]]
         style.y_axis_2_series = [bus_day.columns[-1]]
@@ -373,7 +431,3 @@ class TradeAnalysis(object):
         self.chart.plot(month, chart_type='line', style=style)
 
         return month
-
-
-
-

@@ -406,7 +406,7 @@ class TechIndicator(object):
             if tech_params.strip_signal_name:
                 self._signal.columns = data_frame.columns
 
-        return self._techind
+        return self._techind, self._signal
 
     def create_custom_tech_ind(
             self,

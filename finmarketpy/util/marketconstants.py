@@ -19,7 +19,27 @@ Has various constants required for the finmarketpy project. These have been defi
 
 """
 
+
+
 class MarketConstants(object):
+    import platform
+
+    ###### SETUP ENVIRONMENT VARIABLES ######
+    plat = str(platform.platform()).lower()
+
+    if 'linux' in plat: generic_plat = 'linux'
+    elif 'windows' in plat: generic_plat = 'windows'
+
+    # "thread" or "multiprocessing" (experimental!) library to use when backtesting
+    backtest_thread_technique = "multiprocessing"
+
+    multiprocessing_library = 'multiprocess'  # 'multiprocessing_on_dill' or 'multiprocess' or 'multiprocessing' or 'pathos'
+
+    # how many threads to use for backtesting (don't do too many on slow machines!)
+    # also some data sources will complain if you start too many parallel threads to call data!
+    # for some data providers might get better performance from 1 thread only!
+    backtest_thread_no = {'linux': 14,
+                          'windows' : 1}
 
     hdf5_file_econ_file = "x"
     db_database_econ_file = ''

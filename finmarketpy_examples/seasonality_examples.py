@@ -4,6 +4,8 @@ __author__ = 'saeedamen'
 # loading data
 import datetime
 
+import pandas
+
 from chartpy import Chart, Style
 from finmarketpy.economics import Seasonality
 from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
@@ -25,6 +27,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 2 - seasonality of FX vol
 # run_example = 3 - seasonality of gasoline
 # run_example = 4 - seasonality in NFP
+# run_example = 5 - seasonal adjustment in NFP
 
 run_example = 0
 
@@ -117,7 +120,7 @@ if run_example == 4 or run_example == 0:
         data_source='alfred',           # use ALFRED/FRED as data source
         tickers=['US NFP'],             # ticker
         fields=['actual-release'],      # which fields to download
-        vendor_tickers=['PAYNSA'],         # ticker (FRED)  PAYEMS (SA)
+        vendor_tickers=['PAYNSA'],         # ticker (FRED)  PAYEMS (NSA)
         vendor_fields=['actual-release'])  # which FRED fields to download
 
     df = market.fetch_market(md_request)
@@ -133,3 +136,36 @@ if run_example == 4 or run_example == 0:
     style.file_output = "nfp-seasonality.png"
 
     chart.plot(month_seasonality, style=style)
+
+###### apply seasonal adjustment to NFP data and compare the seasonal adjustment by finmarketpy with that of BLS
+if run_example == 5 or run_example == 0:
+    # get the NFP NSA from ALFRED/FRED
+    md_request = MarketDataRequest(
+        start_date="01 Jun 1980",       # start date (download data over past decade)
+        data_source='alfred',           # use ALFRED/FRED as data source
+        tickers=['US NFP (NSA)', 'US NFP (SA)'],             # ticker
+        fields=['actual-release'],      # which fields to download
+        vendor_tickers=['PAYNSA', 'PAYEMS'],         # ticker (FRED) PAYEMS (SA) PAYNSA (NSA)
+        vendor_fields=['actual-release'])  # which FRED fields to download
+
+    df = market.fetch_market(md_request)
+
+    # calculate changes in NFP
+    df = df - df.shift(1)
+
+    df_seasonal_adjusted = seasonality.adjust_rolling_seasonality(pandas.DataFrame(df['US NFP (NSA).actual-release']),
+                                                                  window=12*20, likely_period=12)
+
+    df_seasonal_adjusted.columns = [x + ' SA finmarketpy' for x in df_seasonal_adjusted.columns]
+
+    # compare not seasonally adjusted vs seasonally adjusted
+    df = df.join(df_seasonal_adjusted)
+    df = df[df.index > '01 Jan 2000']
+
+    style = Style()
+
+    style.title = 'NFP (seasonally adjusted)'
+    style.scale_factor = 3
+    style.file_output = "nfp-seasonally-adjusted.png"
+
+    chart.plot(df, style=style)

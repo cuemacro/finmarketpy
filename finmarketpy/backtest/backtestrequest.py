@@ -14,7 +14,6 @@ class BacktestRequest(MarketDataRequest):
 
     def __init__(self):
         super(MarketDataRequest, self).__init__()
-        self.logger = LoggerManager().getLogger(__name__)
 
         self.__signal_name = None
 
@@ -302,7 +301,17 @@ class BacktestRequest(MarketDataRequest):
     def spot_tc_bp(self): return self.__spot_tc_bp
 
     @spot_tc_bp.setter
-    def spot_tc_bp(self, spot_tc_bp): self.__spot_tc_bp = spot_tc_bp / (2.0 * 100.0 * 100.0)
+    def spot_tc_bp(self, spot_tc_bp):
+        if isinstance(spot_tc_bp, dict):
+            spot_tc_bp = spot_tc_bp.copy()
+
+            for k in spot_tc_bp.keys():
+                spot_tc_bp[k] = float(spot_tc_bp[k]) / (2.0 * 100.0 * 100.0)
+
+            self.__spot_tc_bp = spot_tc_bp
+
+        else:
+            self.__spot_tc_bp = float(spot_tc_bp) / (2.0 * 100.0 * 100.0)
 
     #### FOR FUTURE USE ###
 
@@ -319,7 +328,8 @@ class BacktestRequest(MarketDataRequest):
     def asset(self, asset):
         valid_asset = ['fx', 'multi-asset']
 
-        if not asset in valid_asset: self.logger.warning(asset & " is not a defined asset.")
+        if not asset in valid_asset:
+            LoggerManager().getLogger(__name__).warning(asset & " is not a defined asset.")
 
         self.__asset = asset
 
@@ -330,7 +340,8 @@ class BacktestRequest(MarketDataRequest):
     def instrument(self, instrument):
         valid_instrument = ['spot', 'futures', 'options']
 
-        if not instrument in valid_instrument: self.logger.warning(instrument & " is not a defined trading instrument.")
+        if not instrument in valid_instrument:
+            LoggerManager().getLogger(__name__).warning(instrument & " is not a defined trading instrument.")
 
         self.__instrument = instrument
 

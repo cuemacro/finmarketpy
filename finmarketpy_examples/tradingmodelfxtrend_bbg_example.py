@@ -84,6 +84,8 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
     def load_assets(self):
         ##### FILL IN WITH YOUR ASSET DATA
+        from findatapy.util.loggermanager import  LoggerManager
+        logger = LoggerManager().getLogger(__name__)
 
         # for FX basket
         full_bkt    = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
@@ -98,7 +100,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         br = self.load_parameters()
 
-        self.logger.info("Loading asset data...")
+        logger.info("Loading asset data...")
 
         vendor_tickers = [x + 'CR CMPN Curncy' for x in full_bkt]
 
@@ -130,7 +132,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         return asset_df, spot_df, spot_df2, basket_dict
 
-    def construct_signal(self, spot_df, spot_df2, tech_params, br):
+    def construct_signal(self, spot_df, spot_df2, tech_params, br, run_in_parallel=False):
 
         ##### FILL IN WITH YOUR OWN SIGNALS
 

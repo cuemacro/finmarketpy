@@ -107,7 +107,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 * 25 Apr 2018
     * Added (some) parallel features for backtesting and sensitivity analysis (works better in Linux)
     * Added different transaction costs by assets
-    * Fixed backtesting examples so work with "run_in_parallel" keyword
+    * Fixed backtesting examples so work with "run_in_parallel" keyword and can customise BacktestRequest more
 * 18 Apr 2018 - Fix bug with trade notional sizes
 * 06 Apr 2018 - Added function to measure freq of trade notional sizes
 * 29 Mar 2018 - Fix bug when dumping CSV of P&L

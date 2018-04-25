@@ -207,7 +207,7 @@ class TradeAnalysis(object):
         recent_signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + signal_caption, engine='xlsxwriter')
         recent_trades.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + trade_caption, engine='xlsxwriter')
 
-    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False):
+    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False, reload_market_data=True):
         if tc is None: tc = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
 
         parameter_list = [{'spot_tc_bp': x} for x in tc]
@@ -218,23 +218,16 @@ class TradeAnalysis(object):
                                               parameter_list=parameter_list,
                                               pretty_portfolio_names=pretty_portfolio_names,
                                               parameter_type=parameter_type,
-                                              run_in_parallel=run_in_parallel)
+                                              run_in_parallel=run_in_parallel,
+                                              reload_market_data=reload_market_data)
 
     ###### Parameters and signal generations (need to be customised for every model)
     def run_arbitrary_sensitivity(self, trading_model, parameter_list=None,
-                                  pretty_portfolio_names=None, parameter_type=None, run_in_parallel=False):
+                                  pretty_portfolio_names=None, parameter_type=None, run_in_parallel=False,
+                                  reload_market_data=True):
 
-        assets = trading_model.load_assets()
-
-        asset_df = assets[0]
-        spot_df = assets[1]
-        spot_df2 = assets[2]
-        basket_dict = assets[3]
-
-        contract_value_df = None
-
-        if len(assets) == 5:  # for future use
-            contract_value_df = assets[4]
+        if not(reload_market_data):
+            asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model)
 
         port_list = []
         ret_stats_list = []
@@ -248,14 +241,20 @@ class TradeAnalysis(object):
             mult_results = []
 
             for i in range(0, len(parameter_list)):
+                # br = copy.copy(trading_model.load_parameters())
+                # reset all parameters
                 br = copy.copy(trading_model.load_parameters())
 
                 current_parameter = parameter_list[i]
 
-                # for calculating P&L
+                # for calculating P&L, change the assets
                 for k in current_parameter.keys():
                     setattr(br, k, current_parameter[k])
                     setattr(br.tech_params, k, current_parameter[k])
+
+                # should specify reloading the data, if our parameters impact which assets we are fetching
+                if reload_market_data:
+                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model, br = br)
 
                 mult_results.append(
                     pool.apply_async(self._run_strategy, args=(trading_model, asset_df, spot_df, spot_df2, br,
@@ -275,6 +274,7 @@ class TradeAnalysis(object):
 
         else:
             for i in range(0, len(parameter_list)):
+                # reset all parameters
                 br = copy.copy(trading_model.load_parameters())
 
                 current_parameter = parameter_list[i]
@@ -283,6 +283,12 @@ class TradeAnalysis(object):
                 for k in current_parameter.keys():
                     setattr(br, k, current_parameter[k])
                     setattr(br.tech_params, k, current_parameter[k])
+
+                # should specify reloading the data, if our parameters impact which assets we are fetching
+                if reload_market_data:
+                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model, br = br)
+
+                br = copy.copy(trading_model.br)
 
                 port, ret_stats = self._run_strategy(trading_model, asset_df, spot_df, spot_df2, br, contract_value_df,
                                                      pretty_portfolio_names[i])
@@ -333,6 +339,21 @@ class TradeAnalysis(object):
         self.chart.plot(summary_rets, chart_type='bar', style=style)
 
         return port_list, summary_ir, summary_rets
+
+    def _load_assets(self, trading_model, br):
+        assets = trading_model.load_assets(br = br)
+
+        asset_df = assets[0]
+        spot_df = assets[1]
+        spot_df2 = assets[2]
+        basket_dict = assets[3]
+
+        if len(assets) == 5:  # for future use
+            contract_value_df = assets[4]
+
+        contract_value_df = None
+
+        return asset_df, spot_df, spot_df2, basket_dict, contract_value_df
 
     def _run_strategy(self, trading_model, asset_df, spot_df, spot_df2, br, contract_value_df, pretty_portfolio_name):
 

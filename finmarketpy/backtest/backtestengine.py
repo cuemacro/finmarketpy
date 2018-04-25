@@ -116,8 +116,6 @@ class Backtest(object):
         calculations = Calculations()
         risk_engine = RiskEngine()
 
-
-
         # # do an outer join first, so can fill out signal and fill it down
         # # this captures the case where the signal changes on an asset holiday
         # # it will just get delayed till the next tradable day when we do this
@@ -956,15 +954,16 @@ class TradingModel(object):
 
     # to be implemented by every trading strategy
     @abc.abstractmethod
-    def load_parameters(self):
+    def load_parameters(self, br=None):
         """Fills parameters for the backtest, such as start-end dates, transaction costs etc. To
-        be implemented by subclass.
+        be implemented by subclass. Can overwrite it with our own BacktestRequest.
         """
         return
 
     @abc.abstractmethod
-    def load_assets(self):
-        """Loads time series for the assets to be traded and also for data for generating signals.
+    def load_assets(self, br=None):
+        """Loads time series for the assets to be traded and also for data for generating signals. Can overwrite it
+        with our own BacktestRequest.
         """
         return
 
@@ -1092,13 +1091,9 @@ class TradingModel(object):
 
             self._assign_final_strategy_results(results, backtest)
 
-                 #   self._assign_final_strategy_results(results, backtest)
             for p in mult_results:
 
                 desc, results, leverage, stats, key, backtest = p.get()
-
-                #if key == self.FINAL_STRATEGY:
-                #    backtest = blosc.decompress(pickle.loads(backtest))
 
                 results.columns = desc
 

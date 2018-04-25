@@ -42,7 +42,8 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
         return
 
     ###### Parameters and signal generations (need to be customised for every model)
-    def load_parameters(self):
+    def load_parameters(self, br = None):
+        if br is not None: return br
 
         ##### FILL IN WITH YOUR OWN BACKTESTING PARAMETERS
         br = BacktestRequest()
@@ -82,7 +83,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         return br
 
-    def load_assets(self):
+    def load_assets(self, br = None):
         ##### FILL IN WITH YOUR ASSET DATA
         from findatapy.util.loggermanager import  LoggerManager
         logger = LoggerManager().getLogger(__name__)
@@ -98,7 +99,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         basket_dict['FX trend'] = full_bkt
 
-        br = self.load_parameters()
+        br = self.load_parameters(br = br)
 
         logger.info("Loading asset data...")
 

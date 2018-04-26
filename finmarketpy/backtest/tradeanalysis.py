@@ -311,6 +311,9 @@ class TradeAnalysis(object):
         # style.color = 'Blues'
         # style.display_legend = False
 
+        # careful with plotting labels, may need to convert to strings
+        pretty_portfolio_names = [str(p) for p in pretty_portfolio_names]
+
         # plot all the variations
         style.resample = 'B'
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + '.png'
@@ -408,6 +411,8 @@ class TradeAnalysis(object):
     def run_day_of_month_analysis(self, trading_model, resample_freq='B'):
         from finmarketpy.economics.seasonality import Seasonality
 
+        logger = LoggerManager().getLogger(__name__)
+
         calculations = Calculations()
         seas = Seasonality()
         trading_model.construct_strategy()
@@ -424,7 +429,7 @@ class TradeAnalysis(object):
         rets = calculations.calculate_returns(pnl)
         month = seas.monthly_seasonality(rets)
 
-        self.logger.info("About to plot seasonality...")
+        logger.info("About to plot seasonality...")
         style = Style()
 
         # Plotting spot over day of month/month of year

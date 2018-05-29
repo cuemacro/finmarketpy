@@ -42,8 +42,11 @@ class MarketConstants(object):
                           'windows' : 1}
 
     hdf5_file_econ_file = "x"
+
     db_database_econ_file = ''
     db_server = '127.0.0.1'
+    db_port = '27017'
+
     db_username = 'admin_root'
     db_password = 'TOFILL'
 

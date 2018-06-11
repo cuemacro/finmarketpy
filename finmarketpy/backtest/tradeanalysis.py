@@ -288,7 +288,7 @@ class TradeAnalysis(object):
                 if reload_market_data:
                     asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model, br = br)
 
-                br = copy.copy(trading_model.br)
+                # br = copy.copy(trading_model.br)
 
                 port, ret_stats = self._run_strategy(trading_model, asset_df, spot_df, spot_df2, br, contract_value_df,
                                                      pretty_portfolio_names[i])

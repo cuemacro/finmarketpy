@@ -142,7 +142,8 @@ class TradingModelFXTrend_Example(TradingModel):
         # use technical indicator to create signals
         # (we could obviously create whatever function we wanted for generating the signal dataframe)
         tech_ind = TechIndicator()
-        tech_ind.create_tech_ind(spot_df, 'SMA', tech_params); signal_df = tech_ind.get_signal()
+        tech_ind.create_tech_ind(spot_df, 'SMA', tech_params);
+        signal_df = tech_ind.get_signal()
 
         return signal_df
 

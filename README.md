@@ -104,7 +104,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
-* 29 May 2017 - Added port
+* 11 Jun 2018 - Fixed bug with single threaded TradeAnalysis
+* 29 May 2018 - Added port
 * 25 Apr 2018
     * Added (some) parallel features for backtesting and sensitivity analysis (works better in Linux)
     * Added different transaction costs by assets

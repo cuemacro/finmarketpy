@@ -358,8 +358,10 @@ class Backtest(object):
 
             df_trades_sizes = pandas.DataFrame()
 
-            for k in self._portfolio_signal_trade_notional.columns:
-                df_trades_sizes[k] = pandas.value_counts(self._portfolio_signal_trade_notional[k], sort=True)
+            rounded_portfolio_signal_trade_notional = self._portfolio_signal_trade_notional.round(2)
+
+            for k in rounded_portfolio_signal_trade_notional.columns:
+                df_trades_sizes[k] = pandas.value_counts(rounded_portfolio_signal_trade_notional[k], sort=True)
 
             df_trades_sizes = df_trades_sizes[df_trades_sizes.index != 0]
 
@@ -1487,17 +1489,19 @@ class TradingModel(object):
         style = self._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
         try:
-            df = self._strip_dataframe(self._reduce_plot(self._strategy_pnl, reduce_plot=reduce_plot,
-                                                         resample=resample), strip)
+            df = self._strip_dataframe(self._reduce_plot(self._strategy_pnl,
+                                                        reduce_plot=reduce_plot, resample=resample), strip)
+
             chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+
             if not (silent_plot): chart.plot()
 
             if self.br.write_csv_pnl:
                 df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
 
             return chart
-        except:
-            pass
+        except Exception as e:
+            print(str(e))
 
     def plot_strategy_trade_no(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
         df_trades = self._strategy_trade_no

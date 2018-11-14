@@ -941,6 +941,7 @@ class TradingModel(object):
     #### Default parameters for outputting of results from trading model
     SAVE_FIGURES = True
     SHOW_CHARTS = True
+    SHOW_TITLES = True
 
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
@@ -1866,7 +1867,9 @@ class TradingModel(object):
     def _create_style(self, title, file_add, reduce_plot=True):
         style = Style()
 
-        style.title = self.FINAL_STRATEGY + " " + title
+        if self.SHOW_TITLES:
+            style.title = self.FINAL_STRATEGY + " " + title
+            
         style.display_legend = True
         style.scale_factor = self.SCALE_FACTOR
         style.source = self.CHART_SOURCE

@@ -1,4 +1,4 @@
-__author__ = 'saeedamen' # Saeed Amen
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
 # Copyright 2016 Cuemacro
@@ -51,7 +51,7 @@ if run_example == 1 or run_example == 0:
     # get all asset data
     br.start_date = "02 Jan 1990"
     br.finish_date = datetime.datetime.utcnow()
-    br.spot_tc_bp = 2.5                             # 2.5 bps bid/ask spread
+    br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
     br.ann_factor = 252
 
     # have vol target for each signal
@@ -63,7 +63,9 @@ if run_example == 1 or run_example == 0:
     br.signal_vol_rebalance_freq = 'BM'
     br.signal_vol_resample_freq = None
 
-    tech_params = TechParams(); tech_params.sma_period = 200; indicator = 'SMA'
+    tech_params = TechParams();
+    tech_params.sma_period = 200;
+    indicator = 'SMA'
 
     # pick USD crosses in G10 FX
     # note: we are calculating returns from spot (it is much better to use to total return
@@ -77,15 +79,15 @@ if run_example == 1 or run_example == 0:
                       'FRED/DEXUSNZ', 'FRED/DEXSZUS', 'FRED/DEXNOUS', 'FRED/DEXSDUS']
 
     md_request = MarketDataRequest(
-                start_date = "01 Jan 1989",                     # start date
-                finish_date = datetime.date.today(),            # finish date
-                freq = 'daily',                                 # daily data
-                data_source = 'quandl',                         # use Quandl as data source
-                tickers = tickers,                              # ticker (findatapy)
-                fields = ['close'],                                 # which fields to download
-                vendor_tickers = vendor_tickers,                    # ticker (Quandl)
-                vendor_fields = ['close'],                          # which Bloomberg fields to download
-                cache_algo = 'internet_load_return')                # how to return data
+        start_date="01 Jan 1989",  # start date
+        finish_date=datetime.date.today(),  # finish date
+        freq='daily',  # daily data
+        data_source='quandl',  # use Quandl as data source
+        tickers=tickers,  # ticker (findatapy)
+        fields=['close'],  # which fields to download
+        vendor_tickers=vendor_tickers,  # ticker (Quandl)
+        vendor_fields=['close'],  # which Bloomberg fields to download
+        cache_algo='internet_load_return')  # how to return data
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -97,10 +99,13 @@ if run_example == 1 or run_example == 0:
     # use technical indicator to create signals
     # (we could obviously create whatever function we wanted for generating the signal dataframe)
     tech_ind = TechIndicator()
-    tech_ind.create_tech_ind(spot_df, indicator, tech_params); signal_df = tech_ind.get_signal()
+    tech_ind.create_tech_ind(spot_df, indicator, tech_params);
+    signal_df = tech_ind.get_signal()
+
+    contract_value_df = None
 
     # use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df)
+    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()
@@ -114,7 +119,7 @@ if run_example == 1 or run_example == 0:
     style.scale_factor = 1
     style.file_output = 'fx-trend-example.png'
 
-    Chart().plot(port, style = style)
+    Chart().plot(port, style=style)
 
 ###### backtest simple trend following strategy for FX spot basket
 if run_example == 2 or run_example == 0:
@@ -144,10 +149,12 @@ if run_example == 2 or run_example == 0:
     # get all asset data
     br.start_date = "02 Jan 1990"
     br.finish_date = datetime.datetime.utcnow()
-    br.spot_tc_bp = 2.5                             # 2.5 bps bid/ask spread
+    br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
     br.ann_factor = 252
 
-    tech_params = TechParams(); tech_params.sma_period = 200; indicator = 'SMA'
+    tech_params = TechParams();
+    tech_params.sma_period = 200;
+    indicator = 'SMA'
     tech_params.only_allow_longs = True
     # tech_params.only_allow_shorts = True
 
@@ -157,15 +164,15 @@ if run_example == 2 or run_example == 0:
     logger.info("Loading asset data...")
 
     md_request = MarketDataRequest(
-                start_date = "01 Jan 1989",                     # start date
-                finish_date = datetime.date.today(),            # finish date
-                freq = 'daily',                                 # daily data
-                data_source = 'quandl',                         # use Quandl as data source
-                tickers = ['EURUSD'],                               # ticker (findatapy)
-                fields = ['close'],                                 # which fields to download
-                vendor_tickers = ['FRED/DEXUSEU'],                  # ticker (Quandl)
-                vendor_fields = ['close'],                          # which Bloomberg fields to download
-                cache_algo = 'internet_load_return')                # how to return data
+        start_date="01 Jan 1989",  # start date
+        finish_date=datetime.date.today(),  # finish date
+        freq='daily',  # daily data
+        data_source='quandl',  # use Quandl as data source
+        tickers=['EURUSD'],  # ticker (findatapy)
+        fields=['close'],  # which fields to download
+        vendor_tickers=['FRED/DEXUSEU'],  # ticker (Quandl)
+        vendor_fields=['close'],  # which Bloomberg fields to download
+        cache_algo='internet_load_return')  # how to return data
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -177,14 +184,15 @@ if run_example == 2 or run_example == 0:
     # use technical indicator to create signals
     # (we could obviously create whatever function we wanted for generating the signal dataframe)
     tech_ind = TechIndicator()
-    tech_ind.create_tech_ind(spot_df, indicator, tech_params); signal_df = tech_ind.get_signal()
+    tech_ind.create_tech_ind(spot_df, indicator, tech_params);
+    signal_df = tech_ind.get_signal()
 
     # use the same data for generating signals
     backtest.calculate_trading_PnL(br, asset_df, signal_df)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
-    signals = backtest.portfolio_signal()   # get final signals for each series
-    returns = backtest.pnl()               # get P&L for each series
+    signals = backtest.portfolio_signal()  # get final signals for each series
+    returns = backtest.pnl()  # get P&L for each series
 
     calculations = Calculations()
     trade_returns = calculations.calculate_individual_trade_gains(signals, returns)
@@ -200,4 +208,4 @@ if run_example == 2 or run_example == 0:
     style.scale_factor = 1
     style.file_output = 'eurusd-trend-example.png'
 
-    Chart(port, style = style).plot()
+    Chart(port, style=style).plot()

@@ -344,7 +344,7 @@ class TradeAnalysis(object):
         return port_list, summary_ir, summary_rets
 
     def _load_assets(self, trading_model, br):
-        assets = trading_model.load_assets(br = br)
+        assets = trading_model.load_assets(br=br)
 
         asset_df = assets[0]
         spot_df = assets[1]

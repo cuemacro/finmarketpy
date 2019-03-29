@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 29 Mar 2019 - Added variable transaction costs
 * 14 Nov 2018 - Fixed contract bug in backtest_example
 * 18 Sep 2018 - Fixed bug on writing PnL CSV
 * 17 Sep 2018 - Added rounding for trade size display (otherwise trades can be ungrounded because of rounding errors)

@@ -5,6 +5,8 @@ from findatapy.market import MarketDataRequest
 from finmarketpy.economics import TechParams
 from findatapy.util.loggermanager import LoggerManager
 
+from pandas import DataFrame
+
 class BacktestRequest(MarketDataRequest):
     """Contains parameters necessary to define a backtest, including start date, finish date, transaction cost, etc
 
@@ -310,6 +312,8 @@ class BacktestRequest(MarketDataRequest):
 
             self.__spot_tc_bp = spot_tc_bp
 
+        elif isinstance(spot_tc_bp, DataFrame):
+            self.__spot_tc_bp = spot_tc_bp # assume that DataFrame is in the percentage form (bid to mid)
         else:
             self.__spot_tc_bp = float(spot_tc_bp) / (2.0 * 100.0 * 100.0)
 

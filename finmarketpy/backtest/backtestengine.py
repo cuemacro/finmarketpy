@@ -924,6 +924,7 @@ class Backtest(object):
 import abc
 import pandas
 import datetime
+import copy
 
 from chartpy import Chart, Style, ChartConstants
 
@@ -946,6 +947,7 @@ class TradingModel(object):
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
     CHART_SOURCE = ChartConstants().chartfactory_source
+    CHART_STYLE = Style()
 
     DUMP_CSV = ''
     DUMP_PATH = datetime.date.today().strftime("%Y%m%d") + ' '
@@ -1865,7 +1867,7 @@ class TradingModel(object):
         return data_frame
 
     def _create_style(self, title, file_add, reduce_plot=True):
-        style = Style()
+        style = copy.deepcopy(self.CHART_STYLE)
 
         if self.SHOW_TITLES:
             style.title = self.FINAL_STRATEGY + " " + title

@@ -26,6 +26,8 @@ from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
 from finmarketpy.backtest import TradingModel, BacktestRequest
 from finmarketpy.economics import TechIndicator
 
+from chartpy import Style
+
 class TradingModelFXTrend_Example(TradingModel):
 
     def __init__(self):
@@ -37,6 +39,7 @@ class TradingModelFXTrend_Example(TradingModel):
         self.FINAL_STRATEGY = 'FX trend'
         self.SCALE_FACTOR = 1
         self.DEFAULT_PLOT_ENGINE = 'matplotlib'
+        # self.CHART_STYLE = Style(plotly_plot_mode='offline_jupyter')
 
         self.br = self.load_parameters()
         return
@@ -225,7 +228,7 @@ if __name__ == '__main__':
 
         # now examine sensitivity to different transaction costs
         tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]
-        ta.run_tc_shock(strategy, tc = tc)
+        ta.run_tc_shock(strategy, tc=tc)
 
         # how does P&L change on day of month
         ta.run_day_of_month_analysis(strategy)

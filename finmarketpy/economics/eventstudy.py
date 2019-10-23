@@ -64,7 +64,7 @@ class EventStudy(object):
 
     def get_intraday_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
                                              minute_start = 5, mins = 3 * 60, min_offset = 0 , create_index = False,
-                                             resample = False, freq = 'minutes'):
+                                             resample = False, freq = 'minutes', cumsum = True):
 
         filter = Filter()
 
@@ -126,7 +126,7 @@ class EventStudy(object):
             if vol is True:
                 # annualise (if vol)
                 data_frame = data_frame.rolling(center=False,window=5).std() * math.sqrt(ann_factor)
-            else:
+            elif cumsum:
                 data_frame = data_frame.cumsum()
 
         return data_frame

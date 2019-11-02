@@ -480,7 +480,26 @@ class TechParams:
     @property
     def red_count(self): return self.__red_count
 
+    @property
+    def only_allow_shorts(self): return self.__only_allow_shorts    \
+
+    @property
+    def only_allow_longs(self): return self.__only_allow_longs
+
     @red_count.setter
     def red_count(self, red_count): self.__red_count = red_count
 
+    @only_allow_longs.setter
+    def only_allow_longs(self, only_allow_longs):
+        if hasattr(self, 'only_allow_shorts'):
+            raise Exception('Attribute only_allow_shorts is already defined and it is not compatible with attribute '
+                            'only_allow_longs')
+        self.__only_allow_longs = only_allow_longs
+
+    @only_allow_shorts.setter
+    def only_allow_shorts(self, only_allow_shorts):
+        if hasattr(self, 'only_allow_longs'):
+            raise Exception('Attribute only_allow_longs is already defined and it is not compatible with attribute '
+                            'only_allow_shorts')
+        self.__only_allow_shorts = only_allow_shorts
     # TODO add specific fields so can error check fields

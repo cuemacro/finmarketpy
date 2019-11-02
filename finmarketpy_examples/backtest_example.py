@@ -19,6 +19,8 @@ Gives several examples of backtesting simple trading strategies, using Backtest 
 
 """
 
+from findatapy.timeseries import Calculations
+
 # choose run_example = 0 for everything
 # run_example = 1 - do a backtest of a FX basket with trend following
 # run_example = 2 - do a backtest of EURUSD traded with trend following
@@ -188,7 +190,7 @@ if run_example == 2 or run_example == 0:
     signal_df = tech_ind.get_signal()
 
     # use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df)
+    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=None, run_in_parallel=False)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()  # get final signals for each series

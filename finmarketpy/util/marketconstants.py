@@ -27,10 +27,12 @@ class MarketConstants(object):
     ###### SETUP ENVIRONMENT VARIABLES ######
     plat = str(platform.platform()).lower()
 
-    if 'windows' in plat:
-        generic_plat = 'windows'
-    else:
+    if 'linux' in plat: 
         generic_plat = 'linux'
+    elif 'windows' in plat: 
+        generic_plat = 'windows'
+    elif 'darwin' in plat: 
+        generic_plat = 'mac'
 
     # "thread" or "multiprocessing" (experimental!) library to use when backtesting
     backtest_thread_technique = "multiprocessing"
@@ -40,8 +42,9 @@ class MarketConstants(object):
     # how many threads to use for backtesting (don't do too many on slow machines!)
     # also some data sources will complain if you start too many parallel threads to call data!
     # for some data providers might get better performance from 1 thread only!
-    backtest_thread_no = {'linux': 14,
-                          'windows' : 1}
+    backtest_thread_no = {'linux': 8,
+                          'windows' : 1,
+                          'mac' : 8}
 
     hdf5_file_econ_file = "x"
 

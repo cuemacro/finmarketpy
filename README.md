@@ -104,6 +104,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 02 Nov 2019 
+    * Fixed bug running on Mac
+    * Updated installation instructions
 * 29 Mar 2019 - Added variable transaction costs
 * 14 Nov 2018 - Fixed contract bug in backtest_example
 * 18 Sep 2018 - Fixed bug on writing PnL CSV

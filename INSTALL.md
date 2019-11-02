@@ -11,19 +11,19 @@ Before installation of any specific Python libraries, we need to set up the core
 which will help you to write your own trading strategies and Python scripts for doing market analysis on top of the Cuemacro libraries.
 
 * Programming Tools
-    * Anaconda 4.30 64 bit Python - [download](https://www.continuum.io/downloads) - Windows/Linux/Mac OS X
+    * Anaconda 64 bit Python - [download](https://www.continuum.io/downloads) - Windows/Linux/Mac OS X
       * This is the most used Python distribution for data science
       * As well as installing the core Python libraries, it also installs many useful libraries like the SciPy stack, which
     contains NumPy, pandas etc. and many other useful libraries like matplotlib which are dependencies for the various Cuemacro libraries
-      * Recommend installing latest version of Python 3.5 (by running in command line `conda install python=3.5.2` rather than using Python 3.6 (which
-      is the default Python installation in Anaconda 4.30) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
-      * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda 4.30 (eg. version of pandas, numpy etc.)
-    * Microsoft Visual Studio 2015 Community Edition - [download](https://www.visualstudio.com/downloads/) or Visual C++ 2015 build tools - Windows
-      * Makes sure to do a custom installation and tick Visual C++ in the Visual Studio 2015 installation
-      * Alternatively, it is quicker to install [Visual C++ 2015 build tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+      * Recommend installing latest version of Python 3.6 (by running in command line `conda install python=3.6`) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
+      * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda (eg. version of pandas, numpy etc.)
+    * Microsoft Visual Studio 2017 Community Edition - [download](https://www.visualstudio.com/downloads/) or Visual C++ 2015 build tools - Windows
+      * Makes sure to do a custom installation and tick Visual C++ in the Visual Studio 2017 installation
+      * Alternatively, it is quicker to install [Visual C++ 2017 build tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
          * You may need to add the following (or similar) to your Windows path `C:\Program Files (x86)\Windows Kits\8.1\bin\x64`
          * This should prevent the following compilation error where 'rl.exe' is not found
       * Some Python libraries need a C++ compiler in order to build (such as blpapi and arctic)
+      * Often it is easier to install Python libraries using conda
       * Alternatively, if you don't want to compile the libraries yourself, you can sometimes find pre-compiled
       Python wheels for your platform
     * Git - https://git-scm.com/downloads - Windows/Linux/Mac OS X
@@ -64,7 +64,7 @@ which will help you to write your own trading strategies and Python scripts for 
     * You need to delete matplotlib's font cache file, so it picks up the new font (eg. fontList.py3k.cache in
     C:\Users\User name\.matplotlib
 
-Open up the Anaconda Command Prompt (accessible via the Start Menu) to run the various "pip" commands to install the
+Open up the Anaconda Command Prompt (accessible via the Start Menu) to run the various "conda" and "pip" commands to install the
 various Python libraries. The Cuemacro libraries will install most Python dependencies, but some need to be installed separately.
 
 * Python libraries (open source)
@@ -81,7 +81,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
     libraries it is possible to install them manually via pip, below is a list of the dependencies
         * all libraries
             * numpy - matrix algebra (Anaconda)
-            * pandas - time series (Anaconda) - older versions of pandas could have issues due to deprecated methods
+            * pandas - time series (Anaconda) - older versions of pandas could have issues due to deprecated methods - recommend 0.24.2
             * pytz - timezone management (Anaconda)
             * requests - accessing URLs (Anaconda)
             * mulitprocess - multitasking
@@ -91,7 +91,8 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * quandl - accessing market data sources (Anaconda)
             * redis - Python wrapper to access Redis, in-memory database, like a hashtable (Anaconda Linux/Mac)
             * openpyxl - writing Excel spreadsheets to disk (Anaconda)
-            * blosc - compression library
+            * pyarrow - for caching 
+            * keyring - for storing passwords
             * arctic - wrapper on MongoDB (see below for installation)
             * blpapi - Python API for Bloomberg (see below for installation)
             * xlsxwriter - writing Excel files from Python (and reading) (Anaconda)
@@ -108,7 +109,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
     * Before we start, make sure we are familiar where your Anaconda site packages folder is (ie. where it will install your Python dependencies),
     as this will be where we need to edit the various configuation files described in this section.
         * Typically this is in folders like:
-            * C:\Anaconda3-64\Lib\site-packages
+            * C:\Anaconda3\Lib\site-packages
             * C:\Program Files\Anaconda\Lib\site-packages
     * chartpy - `pip install git+https://github.com/cuemacro/chartpy.git`
         * Check constants file configuration [chartpy/chartpy/util/chartconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/chartpy/util/chartconstants.py) for
@@ -136,7 +137,8 @@ various Python libraries. The Cuemacro libraries will install most Python depend
         * Alternatively you can create datacred.py class in the same folder to put your own API keys and file folder settings.
         * This has the benefit of not being overwritten each time you upgrade the project.
         * Below we have a sample datacred.py class file, to be placed in the "util" folder, any parameters set here, will overwrite
-        those of dataconstants.py:
+        those of dataconstants.py (note: for passwords if a datacred.py file is not created, it will use
+        passwords stored in your keyring and will prompt you the very first time it is run):
 
         ```python
 class DataCred(object):
@@ -218,9 +220,9 @@ to make Bloomberg calls or calls via arctic to MongoDB
 
 *   To install findatapy into a conda environment separate from root, you will need to create that environment with pip (rather than create the environment and then install pip into it). So, do:
     ```
-    conda create -n cuemacro python=3.5.2 pip
+    conda create -n cuemacro python=3.6 pip
     INSTEAD OF
-    conda create -n cuemacro python=3.5.2
+    conda create -n cuemacro python=3.6
     ```
 
     This will ensure that pip installs any packages in this environment's site-packages folder rather than in the global site-packages folder. (This currently appears to be a known issue with conda - see https://github.com/ContinuumIO/anaconda-issues/issues/1429).
@@ -238,15 +240,15 @@ to make Bloomberg calls or calls via arctic to MongoDB
 This will keep code you are working on separate from the site-packages directory. So, instead of running pip install on findatapy, run conda install (or pip install since some of the packages don't appear to be available on conda) on each of the packages listed in findatapy's setup.py:
 
     ```
-    conda create -n devcuemacro python=3.5.2 pip
+    conda create -n devcuemacro python=3.6 pip
     activate devcuemacro
     pip install pandas twython pytz requests numpy pandas_datareader quandl statsmodels multiprocess ...
     ```
 
     I then separately clone the findatapy repository and add its location to my PYTHONPATH
 
-*   If we wish to install an anaconda instance in our environment (which will install lots of libraries like pandas) we can instead run
+*   If we wish to install an conda instance in our environment (which will install lots of libraries like pandas) we can instead run
 
     ```
-    conda create -n devcuemacro python=3.5.2 anaconda
+    conda create -n devcuemacro python=3.6 anaconda
     ```

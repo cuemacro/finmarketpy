@@ -90,8 +90,10 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * pandas_datareader - accessing market data sources including Yahoo Finance (Anaconda)
             * quandl - accessing market data sources (Anaconda)
             * redis - Python wrapper to access Redis, in-memory database, like a hashtable (Anaconda Linux/Mac)
+                * `brew reinstall redis` (Unix)
             * openpyxl - writing Excel spreadsheets to disk (Anaconda)
             * blosc - compression library
+                * `conda install -c conda-forge python-blosc`
             * arctic - wrapper on MongoDB (see below for installation)
             * blpapi - Python API for Bloomberg (see below for installation)
             * xlsxwriter - writing Excel files from Python (and reading) (Anaconda)

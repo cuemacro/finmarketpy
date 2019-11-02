@@ -992,6 +992,25 @@ class TradingModel(object):
         """
         return
 
+    def save_model(self, path):
+        """
+        Save the model instance as as pickle.
+
+        :param path: path to pickle.
+        :return:
+        """
+        pickle.dump(self, path)
+
+    @staticmethod
+    def load_model(path):
+        """
+        Load the pickle of the saved model.
+        :param path: path to pickle.
+        :return: TradingModel instance.
+        """
+        pkl = pickle.load(path)
+        return pkl
+
     ####### Generic functions for every backtest
     def construct_strategy(self, br=None, run_in_parallel=False):
         """Constructs the returns for all the strategies which have been specified.

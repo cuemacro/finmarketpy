@@ -51,7 +51,41 @@ class BacktestComparison(object):
 
         return chart
 
+    def plot_sharpe(self, silent_plot=False, reduce_plot=True):
+        style = self.models[self.ref_index]._create_style("", "Sharpe Curve", reduce_plot=reduce_plot)
 
+        models = self.models
+        ref = self.ref_index
 
+        returns = [model._strategy_pnl.pct_change() for model in models]
+        stdev_of_returns = np.std(returns)
 
+        annualized_sharpe = returns / stdev_of_returns * np.sqrt(250)
 
+        df = pd.concat(annualized_sharpe, axis=1)
+
+        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+        if not silent_plot:
+            chart.plot()
+        return chart
+
+    def plot_strategy_trade_notional(self, diff=True, silent_plot=False, reduce_plot=True):
+        style = self.models[self.ref_index]._create_style("", "Trades (Scaled by Notional)", reduce_plot=reduce_plot)
+
+        models = self.models
+        ref = self.ref_index
+
+        strategy_trade_notional = [model._strategy_trade_notional for model in models]
+
+        df = pd.concat(strategy_trade_notional, axis=1)
+
+        if diff:
+            df = df.subtract(strategy_trade_notional[ref], axis='index')
+        if self.labels is not None:
+            df.columns = self.labels
+
+        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
+        if not silent_plot:
+            chart.plot()
+
+        return chart

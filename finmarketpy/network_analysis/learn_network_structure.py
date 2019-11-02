@@ -7,11 +7,6 @@
 
 # importing packages
 import numpy as np
-# import pandas as pd
-
-# import matplotlib.pyplot as plt
-# from matplotlib.collections import LineCollection
-
 from sklearn import cluster, covariance, manifold
 
 
@@ -27,36 +22,36 @@ def learn_network_structure(ts_returns_data, names, alphas=4, cv=5, mode='cd',
 	Parameters
 	----------
 	ts_returns_data : array-like of shape [n_samples, n_instruments]
-	                  return time series matrix
+	                  time series matrix of returns
 
 	names : array-like of shape [n_samples, 1]
-	        individual names of the financial instrument
+	        Individual names of the financial instrument
 
 	alphas : int or positive float, optional
-	         number of points on the grids to be used
+	         Number of points on the grids to be used
 
 	cv : int, optional
-	     number of folds for cross-validation splitting strategy
+	     Number of folds for cross-validation splitting strategy
 
 	mode : str, optional
-	       solver to use to compute the graph
+	       Solver to use to compute the graph
 
 	assume_centered : bool, optional
-                      centre the data if False.
+                      Centre the data if False.
 
 	n_components : int
-	               number of components for the manifold
+	               Number of components for the manifold
 
 	n_neighbors: int
-                 number of neighbours to consider for each point
+                 Number of neighbours to consider for each point
 
 	eigen_solver : str
-	               algorithm to compute eigenvalues
+	               Algorithm to compute eigenvalues
 
 	method : str
-             algorithm to use for local linear embedding
+             Algorithm to use for local linear embedding
 	neighbors_algorithm : str
-	                      algorithm to use for nearest neighbours search
+	                      Algorithm to use for nearest neighbours search
 
 	random_state : int, RandomState instance or None, optional
 	               If int, random_state is the seed used by the random number generator.
@@ -75,6 +70,12 @@ def learn_network_structure(ts_returns_data, names, alphas=4, cv=5, mode='cd',
               sklearn.manifold.locally_linear.LocallyLinearEmbedding
 
               array-like of shape [n_components, n_instruments]
+              Transformed embedding vectors
+
+              array-like of shape [n_instruments, 1]
+              numeric identifier of each cluster
+
+
 
 	-------
 	"""
@@ -123,4 +124,4 @@ def learn_network_structure(ts_returns_data, names, alphas=4, cv=5, mode='cd',
 				random_state=random_state, n_jobs=n_jobs)
 		embedding = node_position_model.fit_transform(ts_returns_data.T).T
 
-	return edge_model, node_position_model, embedding
+	return edge_model, node_position_model, embedding, labels

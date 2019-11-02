@@ -51,7 +51,6 @@ class BacktestComparison(object):
 
         return chart
 
-
     def plot_sharpe(self, silent_plot=False, reduce_plot=True):
         style = self.models[self.ref_index]._create_style("", "Sharpe Curve", reduce_plot=reduce_plot)
 
@@ -90,4 +89,3 @@ class BacktestComparison(object):
             chart.plot()
 
         return chart
-

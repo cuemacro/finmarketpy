@@ -12,7 +12,7 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 * In built calculator for risk weighting using volatility targeting
 * Written in object oriented way to make code more reusable
 
-*Contributors for the project are very much welcome, sell below!*
+*Contributors for the project are very much welcome, see below!*
 
 # Merging with pythalesians
 I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
@@ -58,8 +58,8 @@ Calculate event study around events for asset (see examples/events_examples.py)
 # Requirements
 
 Major requirements
-* Required: Python 3.4, 3.5
-* Required: pandas 0.18, numpy etc.
+* Required: Python 3.6
+* Required: pandas 0.24.2, numpy etc.
 * Required: findatapy for downloading market data (https://github.com/cuemacro/findatapy)
 * Required: chartpy for funky interactive plots (https://github.com/cuemacro/chartpy)
 
@@ -77,8 +77,11 @@ After installation:
 pip install git+https://github.com/cuemacro/finmarketpy.git
 ```
 
-But beforehand please make sure you have already installed both chartpy, findatapy and any other dependencies. In chartpy you will need to change the ChartConstants file (to add Plotly API key) and 
-for findatapy, you will also need to change the DataConstants file to add the Quandl API (and possibly change other configuration settings there).
+But beforehand please make sure you have already installed both chartpy, findatapy and any other dependencies. 
+In chartpy you will need to change the chartconstants.py file (to add Plotly API key) and 
+for findatapy, you will also need to change the dataconstants.py file to add the Quandl API 
+(and possibly change other configuration settings there or add a datacred.py file in the util folder, 
+alternatively you will be prompted on your first run to input the API key which will be installed).
 
 ```
 pip install git+https://github.com/cuemacro/chartpy.git
@@ -97,6 +100,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.1 - finmarketpy (23 Oct 2019)
 * 0.11 - finmarketpy
 * First prerelease version 
 
@@ -107,6 +111,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 * 02 Nov 2019 
     * Fixed bug running on Mac
     * Updated installation instructions
+    * Added tests for technical indicators
 * 29 Mar 2019 - Added variable transaction costs
 * 14 Nov 2018 - Fixed contract bug in backtest_example
 * 18 Sep 2018 - Fixed bug on writing PnL CSV

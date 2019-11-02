@@ -20,5 +20,6 @@ setup(name='finmarketpy',
                         'requests',
                         'numpy',
                         'multiprocess',
-                        'seasonal'],
+                        'seasonal',
+                        'sklearn'],
       zip_safe=False)

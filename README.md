@@ -71,7 +71,7 @@ https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md (which includes d
 You can install the library using the below (better to get the newest version from repo, as opposed to releases).
 
 After installation:
-* Make sure you edit the MarketConstants file
+* Make sure you edit the marketconstants.py file (or you can create a marketcred.py file to overwrite the settings)
 
 ```
 pip install git+https://github.com/cuemacro/finmarketpy.git
@@ -91,7 +91,7 @@ pip install git+https://github.com/cuemacro/findatapy.git
 # Contributors
 
 Contributors are always welcome for finmarketpy, findatapy and chartpy. If you'd like to contribute, have a look at
-[Planned Features](PLANNED_FEATURES.md] for areas we're looking for help on. Or if you have any ideas for improvements
+[Planned Features](PLANNED_FEATURES.md) for areas we're looking for help on. Or if you have any ideas for improvements
 to the libriares please let us know too!
 
 # finmarketpy examples
@@ -112,6 +112,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
     * Fixed bug running on Mac
     * Updated installation instructions
     * Added tests for technical indicators
+    * Added backtestcomparison.py
 * 29 Mar 2019 - Added variable transaction costs
 * 14 Nov 2018 - Fixed contract bug in backtest_example
 * 18 Sep 2018 - Fixed bug on writing PnL CSV

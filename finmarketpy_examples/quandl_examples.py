@@ -31,7 +31,8 @@ if run_example == 1 or run_example == 0:
         fields=['close'],  # which fields to download
         vendor_tickers=['BOE/CFMBJ84'],  # ticker (Bloomberg)
         vendor_fields=['close'],  # which Bloomberg fields to download
-        cache_algo='internet_load_return')  # how to return data
+        cache_algo='internet_load_return',
+        quandl_api_key='mchs47VHfnWzxv6mGhxA')  # how to return data
 
     df = market.fetch_market(md_request)
 

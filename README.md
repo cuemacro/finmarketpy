@@ -108,6 +108,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 14 Nov 2019
+    * Added network plot
 * 02 Nov 2019 
     * Fixed bug running on Mac
     * Updated installation instructions

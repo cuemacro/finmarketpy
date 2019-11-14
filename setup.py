@@ -21,5 +21,6 @@ setup(name='finmarketpy',
                         'numpy',
                         'multiprocess',
                         'seasonal',
-                        'sklearn'],
+                        'sklearn',
+                        'matplotlib'],
       zip_safe=False)

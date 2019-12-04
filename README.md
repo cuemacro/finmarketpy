@@ -100,6 +100,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.3 - finmarketpy (04 Dec 2019)
 * 0.11.1 - finmarketpy (23 Oct 2019)
 * 0.11 - finmarketpy
 * First prerelease version 

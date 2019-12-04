@@ -22,7 +22,13 @@ from findatapy.util import LoggerManager
 import pickle
 #import zlib
 #import lz4framed    # conda install -c conda-forge py-lz4framed
-import blosc
+
+# make blosc optional (only when trying to run backtests in parallel)
+try:
+    import blosc
+except:
+    pass
+
 import pickle
 
 market_constants = MarketConstants()

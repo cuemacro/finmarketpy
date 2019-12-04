@@ -108,6 +108,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 04 Dec 2019
+    * Making blosc optional in BacktestEngine
 * 14 Nov 2019
     * Added network plot
 * 02 Nov 2019 

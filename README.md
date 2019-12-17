@@ -68,6 +68,10 @@ Major requirements
 For detailed installation instructions for finmarketpy and its associated Python libraries go to
 https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md (which includes details on how to setup your entire Python environment).
 
+Also take a look at https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb
+from my Python for finance workshop course, where I keep notes specifically about setting up your Anaconda environment 
+for data science (including for findatapy/chartpy/finmarketpy), including YAML files etc.
+
 You can install the library using the below (better to get the newest version from repo, as opposed to releases).
 
 After installation:
@@ -109,6 +113,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 17 Dec 2019
+    * Added link for Python for finance workshop installation notes for Anaconda
 * 04 Dec 2019
     * Making blosc optional in BacktestEngine
 * 14 Nov 2019

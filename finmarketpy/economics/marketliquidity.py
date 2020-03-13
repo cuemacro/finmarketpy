@@ -19,6 +19,8 @@ from findatapy.util.loggermanager import LoggerManager
 
 class MarketLiquidity(object):
     """Calculates spread between bid/ask and also tick count.
+    Spread is defined as ask - bid
+    Tick is defined as each sample in a determined frequency
 
     """
 

@@ -13,7 +13,9 @@ logger = LoggerManager().getLogger(__name__)
 chart = Chart(engine='matplotlib')
 
 market = Market(market_data_generator=MarketDataGenerator())
-
+"""Only to test if market fetcher is working
+Add other data sources to try API akeys and libraries
+"""
 md_request = MarketDataRequest(
     start_date="20 Nov 2016",  # start date
     freq='daily',

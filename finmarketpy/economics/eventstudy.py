@@ -32,6 +32,8 @@ class EventStudy(object):
                                               NYC_cutoff = 10):
 
         filter = Filter()
+        #returns event_dates dataframe that is between those dates, returns correct
+        # filtered dataframe them even if index is not a timestamp
         event_dates = filter.filter_time_series_by_date(start, end, event_dates)
 
         data_frame = data_frame_in.copy(deep=True) # because we change the dates!
@@ -74,6 +76,7 @@ class EventStudy(object):
         if freq == 'minutes':
             ef_time_start = ef_time - timedelta(minutes = minute_start)
             ef_time_end = ef_time + timedelta(minutes = mins)
+            #annualization factor
             ann_factor = 252 * 1440
         elif freq == 'days':
             ef_time = ef_time_frame.index.normalize()
@@ -90,7 +93,7 @@ class EventStudy(object):
             data_frame_rets = data_frame_rets.resample('1min')
             data_frame_rets = data_frame_rets.fillna(value = 0)
             data_frame_rets = filter.remove_out_FX_out_of_hours(data_frame_rets)
-
+        #clear our indicator signals
         data_frame_rets['Ind'] = numpy.nan
 
         start_index = data_frame_rets.index.searchsorted(ef_time_start)
@@ -249,7 +252,6 @@ class EventsFactory(EventStudy):
         self._econ_data_frame = self.speed_cache.get_dataframe(self._db_database_econ_file)
 
         if self._econ_data_frame is None:
-            # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
             self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(
                 self._db_database_econ_file, engine=marketconstants.write_engine,
                 db_server=marketconstants.db_server,
@@ -288,7 +290,7 @@ class EventsFactory(EventStudy):
             data_frame = pandas.read_csv(csv, index_col=0, parse_dates = True, date_parser=dateparse)
 
         data_frame = data_frame[pandas.notnull(data_frame.index)]
-
+        #start at a really early date
         start_date = datetime.datetime.strptime("01-Jan-1971", "%d-%b-%Y")
         self.filter.filter_time_series_by_date(start_date, None, data_frame)
 
@@ -415,8 +417,6 @@ class EventsFactory(EventStudy):
         return self.get_economic_event_ret_over_custom_event_day(vol_in, name, event, start, end,
             lagged = realised)
 
-        # return super(EventsFactory, self).get_economic_event_ret_over_event_day(vol_in, name, event, start, end, lagged = realised)
-
     def get_daily_moves_over_event(self):
         # TODO
         pass
@@ -483,9 +483,6 @@ class HistEconDataFactory(object):
 
     def get_economic_data_history(self, start_date, finish_date, country_group, data_type,
         source = 'fred', cache_algo = "internet_load_return"):
-
-        #vendor_country_codes = self.fred_country_codes[country_group]
-        #vendor_pretty_country = self.fred_nice_country_codes[country_group]
 
         if isinstance(country_group, list):
             pretty_country_names = country_group

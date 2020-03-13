@@ -48,13 +48,14 @@ if run_example == 1 or run_example == 0:
 
     backtest = Backtest()
     br = BacktestRequest()
+    #unused
     fxconv = FXConv()
 
     # get all asset data
     br.start_date = "02 Jan 1990"
     br.finish_date = datetime.datetime.utcnow()
     br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
-    br.ann_factor = 252
+    br.ann_factor = 252 #252 trading days in a year
 
     # have vol target for each signal
     br.signal_vol_adjust = True
@@ -62,9 +63,9 @@ if run_example == 1 or run_example == 0:
     br.signal_vol_max_leverage = 3
     br.signal_vol_periods = 60
     br.signal_vol_obs_in_year = 252
-    br.signal_vol_rebalance_freq = 'BM'
+    br.signal_vol_rebalance_freq = 'BM' #business months
     br.signal_vol_resample_freq = None
-
+    #buy when 200 day sma crosses price, sell (or go short) if it is below
     tech_params = TechParams();
     tech_params.sma_period = 200;
     indicator = 'SMA'
@@ -76,7 +77,7 @@ if run_example == 1 or run_example == 0:
 
     tickers = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
                'NZDUSD', 'USDCHF', 'USDNOK', 'USDSEK']
-
+    #quandl specific. FRED is the data set
     vendor_tickers = ['FRED/DEXUSEU', 'FRED/DEXJPUS', 'FRED/DEXUSUK', 'FRED/DEXUSAL', 'FRED/DEXCAUS',
                       'FRED/DEXUSNZ', 'FRED/DEXSZUS', 'FRED/DEXNOUS', 'FRED/DEXSDUS']
 
@@ -108,6 +109,7 @@ if run_example == 1 or run_example == 0:
 
     # use the same data for generating signals
     backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
+    #final cumulative returns
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()
@@ -146,13 +148,14 @@ if run_example == 2 or run_example == 0:
 
     backtest = Backtest()
     br = BacktestRequest()
+    #unused
     fxconv = FXConv()
 
     # get all asset data
     br.start_date = "02 Jan 1990"
     br.finish_date = datetime.datetime.utcnow()
     br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
-    br.ann_factor = 252
+    br.ann_factor = 252 # 252 trading days in a year
 
     tech_params = TechParams();
     tech_params.sma_period = 200;

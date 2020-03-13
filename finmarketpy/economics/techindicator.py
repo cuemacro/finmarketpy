@@ -36,7 +36,8 @@ class TechIndicator(object):
         SMA2 - double simple moving average - buy if faster SMA above slower SMA, sell if below
         RSI - relative strength indicator - buy if RSI exits overbought, sell if RSI exits oversold
         BB - Bollinger bands - buy if spot above upper Bollinger band, sell if below lower Bollinger Band
-        ATR - Average True Range - useful for creating stop/take profit levels
+        ATR - Average True Range - useful for creating stop/take profit levels. Does no create a signal
+        VWAP - Volume Weighted Average Price - determine the general direction of intraday prices. Does not create a signal
         long_only - long only signal
 
     """
@@ -54,7 +55,7 @@ class TechIndicator(object):
             data_frame_non_nan_early=None):
         self._signal = None
         self._techind = None
-
+        #na fill is needed for continuous calculation in the moving window
         if tech_params.fillna:
             data_frame = data_frame_non_nan.fillna(method="ffill")
         else:
@@ -62,7 +63,7 @@ class TechIndicator(object):
 
         if data_frame_non_nan_early is not None:
             data_frame_early = data_frame_non_nan_early.fillna(method="ffill")
-
+        #set the early moving window value for nan for all signals
         if name == "SMA":
 
             if (data_frame_non_nan_early is not None):
@@ -102,7 +103,6 @@ class TechIndicator(object):
 
         elif name == "EMA":
 
-            # self._techind = pd.ewma(data_frame, span = tech_params.ema_period)
             self._techind = data_frame.ewm(
                 ignore_na=False,
                 span=tech_params.ema_period,
@@ -171,17 +171,6 @@ class TechIndicator(object):
             self._techind = pd.concat([sma, sma2], axis=1)
 
         elif name in ['RSI']:
-            # delta = data_frame.diff()
-            #
-            # dUp, dDown = delta.copy(), delta.copy()
-            # dUp[dUp < 0] = 0
-            # dDown[dDown > 0] = 0
-            #
-            # rolUp = pd.rolling_mean(dUp, tech_params.rsi_period)
-            # rolDown = pd.rolling_mean(dDown, tech_params.rsi_period).abs()
-            #
-            # rsi = rolUp / rolDown
-
             # Get the difference in price from previous step
             delta = data_frame.diff()
             # Get rid of the first row, which is NaN since it did not have a previous
@@ -223,8 +212,6 @@ class TechIndicator(object):
                      tech_params.rsi_lower) & (signal > tech_params.rsi_lower)
             buys = (signal.shift(-1) >
                     tech_params.rsi_upper) & (signal < tech_params.rsi_upper)
-
-            # print (buys[buys == True])
 
             # buys
             signal[buys] = 1
@@ -294,6 +281,7 @@ class TechIndicator(object):
                 x + " Long Only" for x in data_frame.columns.values]
 
         elif name == "ATR":
+            #ATR sets the techind dataframe. Does not create buy or sell signals
             # get all the asset names (assume we have names 'close', 'low', 'high' in the Data)
             # keep ordering of assets
             asset_name = list(OrderedDict.fromkeys(
@@ -345,6 +333,7 @@ class TechIndicator(object):
             self._techind.columns = [x + ".close ATR" for x in asset_name]
 
         elif name in ["VWAP"]:
+            # VWAP sets the techind dataframe. Does not create buy or sell signals
             asset_name = list(OrderedDict.fromkeys(
                 [x.split('.')[0] for x in data_frame.columns]))
 
@@ -408,6 +397,7 @@ class TechIndicator(object):
 
         return self._techind, self._signal
 
+    #reserved space for other indicators
     def create_custom_tech_ind(
             self,
             data_frame_non_nan,
@@ -427,7 +417,13 @@ class TechIndicator(object):
 
 class TechParams:
     """Holds parameters for calculation of technical indicators.
-
+    fillna -- uses forward fill for filling nas
+    atr_period -- Used for ATR indicator only
+    sma_period -- Used for SMA and SMA2 indicators only
+    green_n -- unused
+    green_count -- unused
+    red_n -- unused
+    red_count -- unused
     """
 
     def __init__(self, fillna=True, atr_period=14, sma_period=20,

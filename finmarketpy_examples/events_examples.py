@@ -36,7 +36,7 @@ if run_example == 1 or run_example == 0:
     md_request = MarketDataRequest(
         start_date=start_date,      # start date
         finish_date=finish_date,    # finish date
-        category='fx',
+        category='fx',              #forex
         freq='intraday',                # intraday
         data_source='bloomberg',        # use Bloomberg as data source
         tickers=['USDJPY'],             # ticker (finmarketpy)
@@ -52,6 +52,7 @@ if run_example == 1 or run_example == 0:
     df = calc.calculate_returns(df)
 
     # fetch NFP times from Bloomberg
+    # non-farm payroll release dates (jobs report)
     md_request = MarketDataRequest(
         start_date=start_date,              # start date
         finish_date=finish_date,            # finish date

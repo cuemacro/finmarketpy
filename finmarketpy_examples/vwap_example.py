@@ -14,7 +14,7 @@ logger = LoggerManager().getLogger(__name__)
 chart = Chart(engine='bokeh')
 
 tech_ind = TechIndicator()
-
+###### Simple example loading local data and using finmarketpy engine
 # Load data from local file
 df = pd.read_csv("/Volumes/Data/s&p500.csv", index_col=0, parse_dates=['Date'],
                  date_parser=lambda x: pd.datetime.strptime(x, '%Y-%m-%d'))

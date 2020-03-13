@@ -73,9 +73,9 @@ class Backtest(object):
         calculations = Calculations()
         asset_rets_df = calculations.calculate_returns(asset_a_df)
         strategy_rets = calculations.calculate_signal_returns(signal_df, asset_rets_df)
-
+        #reset points measure difference in signals to avoid doing an action twice
         reset_points = ((signal_df - signal_df.shift(1)).abs())
-
+        #need copy since asset prices will be modified for entry points
         asset_a_df_entry = asset_a_df.copy(deep=True)
         asset_a_df_entry[reset_points == 0] = numpy.nan
         asset_a_df_entry = asset_a_df_entry.ffill()
@@ -122,21 +122,12 @@ class Backtest(object):
         calculations = Calculations()
         risk_engine = RiskEngine()
 
-        # # do an outer join first, so can fill out signal and fill it down
-        # # this captures the case where the signal changes on an asset holiday
-        # # it will just get delayed till the next tradable day when we do this
-        # asset_df_2, signal_df_2 = asset_a_df.align(signal_df, join='outer', axis='index')
-        # signal_df = signal_df_2.fillna(method='ffill')
-        #
-        # # now make sure the dates of both traded asset and signal are aligned properly
-        # # and use as reference only those days where we have asset information
-        # asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
-
         logger = LoggerManager().getLogger(__name__)
 
         logger.info("Calculating trading P&L...")
-
+        #adjust delays
         signal_df = signal_df.shift(br.signal_delay)
+        # make sure the dates of both traded asset and signal are aligned properly
         asset_df, signal_df = calculations.join_left_fill_right(asset_a_df, signal_df)
 
         if (contract_value_df is not None):
@@ -151,14 +142,14 @@ class Backtest(object):
         # only allow signals to change on the days when we can trade assets
         signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
         signal_df = signal_df.fillna(method='ffill')  # fill these down
-
+        #trade cost
         tc = br.spot_tc_bp
 
         signal_cols = signal_df.columns.values
         asset_df_cols = asset_df.columns.values
 
         pnl_cols = []
-
+        #calculate portfolio weighting
         for i in range(0, len(asset_df_cols)):
             pnl_cols.append(asset_df_cols[i] + " / " + signal_cols[i])
 
@@ -175,26 +166,11 @@ class Backtest(object):
 
             trade_rets_df = calculations.calculate_cum_rets_trades(signal_df, temp_strategy_rets_df)
 
-            # pre_signal_df = signal_df.copy()
-
             signal_df = calculations.calculate_risk_stop_signals(signal_df, trade_rets_df, br.stop_loss, br.take_profit)
 
             # make sure we can't trade where asset price is undefined and carry over signal
             signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
             signal_df = signal_df.fillna(method='ffill')  # fill these down (when asset is not trading
-
-            # for debugging purposes
-            # if True:
-            #     signal_df_copy = signal_df.copy()
-            #     trade_rets_df_copy = trade_rets_df.copy()
-            #
-            #     asset_df_copy.columns = [x + '_asset' for x in temp_strategy_rets_df.columns]
-            #     temp_strategy_rets_df.columns = [x + '_strategy_rets' for x in temp_strategy_rets_df.columns]
-            #     signal_df_copy.columns = [x + '_final_signal' for x in signal_df_copy.columns]
-            #     trade_rets_df_copy.columns = [x + '_cum_trade' for x in trade_rets_df_copy.columns]
-            #
-            #     to_plot = calculations.pandas_outer_join([asset_df_copy, pre_signal_df, signal_df_copy, trade_rets_df_copy, temp_strategy_rets_df])
-            #     to_plot.to_csv('test.csv')
 
         # do we have a vol target for individual signals?
         if br.signal_vol_adjust is True:
@@ -223,7 +199,6 @@ class Backtest(object):
                 portfolio = pandas.DataFrame(data=_pnl.sum(axis=1), index=_pnl.index, columns=['Portfolio'])
             elif br.portfolio_combination == 'mean' and br.portfolio_combination_weights is None:
                 portfolio = pandas.DataFrame(data=_pnl.mean(axis=1), index=_pnl.index, columns=['Portfolio'])
-
                 adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
             elif 'weighted' in br.portfolio_combination and isinstance(br.portfolio_combination_weights, dict):
 
@@ -257,7 +232,6 @@ class Backtest(object):
                                                                           br.portfolio_vol_resample_type,
                                                                           period_shift=br.portfolio_vol_period_shift)
 
-            # portfolio, portfolio_leverage_df = risk_engine.calculate_vol_adjusted_returns(portfolio, br = br)
 
         # multiply portfolio leverage * individual signals to get final position signals
         length_cols = len(signal_df.columns)
@@ -446,15 +420,6 @@ class Backtest(object):
             self._portfolio_cum = resultsC.get()
 
         else:
-            # calculate return statistics of the each asset/signal after signal leverage (but before portfolio level constraints)
-            # self._ret_stats_pnl.calculate_ret_stats()
-
-            # calculate return statistics of the each asset/signal after signal leverage AND after portfolio level constraints
-            # self._ret_stats_pnl_components.calculate_ret_stats()
-
-            # calculate return statistics of the final portfolio
-            # self._ret_stats_portfolio.calculate_ret_stats()
-
             # calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
             self._pnl_cum = calculations.create_mult_index(self._pnl)
 
@@ -529,6 +494,7 @@ class Backtest(object):
             weights_vector = numpy.ones(len(_pnl.columns))
         elif method == 'weighted' or 'weighted-sum':
             # get the weights for each asset
+            # weights are contained in br, so both can be done with the same function
             weights_vector = numpy.array([float(br.portfolio_combination_weights[col]) for col in _pnl.columns])
 
         # repeat this down for every day
@@ -958,8 +924,6 @@ class TradingModel(object):
     DUMP_CSV = ''
     DUMP_PATH = datetime.date.today().strftime("%Y%m%d") + ' '
 
-    # logger = LoggerManager().getLogger(__name__)
-
     def __init__(self):
         pass
 
@@ -1078,9 +1042,6 @@ class TradingModel(object):
 
             mult_results = []
 
-            #start = asset_df.index[0]
-            #finish = asset_df.index[-1]
-
             # calculate sub substrategies in sub-processes
             # TODO cut up in time chunks
             for key in bask_keys:
@@ -1151,7 +1112,6 @@ class TradingModel(object):
                                                                        tech_params, key,
                                                                        contract_value_df, False, False)
 
-                #results = backtest.portfolio_cum()
                 results.columns = desc
 
                 cum_results[results.columns[0]] = results
@@ -1278,10 +1238,6 @@ class TradingModel(object):
 
         return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.pnl_ret_stats(), key, backtest
 
-        # have lightweight output for subcomponents of portfolio
-        # return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.portfolio_pnl_ret_stats(), \
-        #       key, _
-
     def compare_strategy_vs_benchmark(self, br, strategy_df, benchmark_df):
         """Compares the trading strategy we are backtesting against a benchmark
 
@@ -1311,7 +1267,6 @@ class TradingModel(object):
 
             # only calculate return statistics if this has been specified (note when different frequencies of data
             # might underrepresent vol
-            # if calc_stats:
             benchmark_df = benchmark_df.fillna(method='ffill')
             ret_stats.calculate_ret_stats_from_prices(benchmark_df, br.ann_factor)
 
@@ -1459,7 +1414,7 @@ class TradingModel(object):
 
     def _reduce_plot(self, data_frame, reduce_plot=True, resample='B'):
         """Reduces the frequency of a time series to every business day so it can be plotted more easily
-
+        fillna method: pad
         Parameters
         ----------
         data_frame: pandas.DataFrame
@@ -1496,10 +1451,6 @@ class TradingModel(object):
     def plot_strategy_group_pnl_trades(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
 
         style = self._create_style("(bp)", "Individual Trade PnL", reduce_plot=reduce_plot)
-
-        # zero when there isn't a trade exit
-        # strategy_pnl_trades = self._strategy_pnl_trades * 100 * 100
-        # strategy_pnl_trades = strategy_pnl_trades.dropna()
 
         # note only works with single large basket trade
         try:
@@ -1681,10 +1632,12 @@ class TradingModel(object):
 
         for key in keys:
             if metric == 'IR':
+                # measurement of portfolio returns beyond the returns of a benchmark
                 ret_metric.append(ret_stats[key].inforatio()[0])
             elif metric == 'Returns':
                 ret_metric.append(ret_stats[key].ann_returns()[0] * 100)
             elif metric == 'Vol':
+                #volatility
                 ret_metric.append(ret_stats[key].ann_vol()[0] * 100)
             elif metric == 'Drawdowns':
                 ret_metric.append(ret_stats[key].drawdowns()[0] * 100)
@@ -1692,7 +1645,6 @@ class TradingModel(object):
         if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
         ret_stats = pandas.DataFrame(index=keys, data=ret_metric, columns=[metric])
-        # ret_stats = ret_stats.sort_index()
         style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(
             style.scale_factor) + '.png'
         style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(
@@ -1710,9 +1662,8 @@ class TradingModel(object):
                                     strip=strip, silent_plot=silent_plot)
 
     def plot_yoy_helper(self, ret_stats, title, file_tag, strip=None, silent_plot=False):
-
+        #yoy: year over year
         style = self._create_style(title, title)
-        # keys = self._strategy_group_benchmark_ret_stats.keys()
         yoy = []
 
         for key in ret_stats.keys():
@@ -1726,7 +1677,6 @@ class TradingModel(object):
 
         ret_stats = self._strip_dataframe(ret_stats, strip)
 
-        # ret_stats = ret_stats.sort_index()
         style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' \
                             + str(style.scale_factor) + '.png'
         style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' \
@@ -1884,6 +1834,8 @@ class TradingModel(object):
         return chart
 
     def _strip_dataframe(self, data_frame, strip):
+        """Removes 'strip' substring from column names in data_frame
+        """
         if strip is None:
             return data_frame
 
@@ -1892,6 +1844,8 @@ class TradingModel(object):
         return data_frame
 
     def _create_style(self, title, file_add, reduce_plot=True):
+        """Style of the plot
+        """
         style = copy.deepcopy(self.CHART_STYLE)
 
         if self.SHOW_TITLES:
@@ -1952,7 +1906,7 @@ class RiskEngine(object):
         calculations = Calculations()
 
         returns_df, leverage_df = self.calculate_vol_adjusted_returns(prices_df, br, returns=False)
-
+        #create multiplicative index
         return calculations.create_mult_index(returns_df)
 
     def calculate_vol_adjusted_returns(self, returns_df, br, returns=True):
@@ -2031,8 +1985,9 @@ class RiskEngine(object):
             period_shift)
 
         # calculate the leverage as function of vol target (with max lev constraint)
+        # important to measure exposure and risk
         lev_df = vol_target / roll_vol_df
-
+        #clip max values
         if vol_max_leverage is not None:
             lev_df[lev_df > vol_max_leverage] = vol_max_leverage
 
@@ -2041,15 +1996,7 @@ class RiskEngine(object):
 
             returns_df, lev_df = calculations.join_left_fill_right(returns_df, lev_df)
 
-        # # in case leverage changes on a weekend do outer join, and fill down
-        # # the leverage
-        # returns_df_1, lev_df = returns_df.align(lev_df, join='outer', axis=0)
-        # lev_df = lev_df.fillna(method='ffill')
-        #
-        # # now realign back to days when we trade
-        # returns_df, lev_df = returns_df.align(lev_df, join='left', axis=0)
-
-        lev_df.ix[0:vol_periods] = numpy.nan  # ignore the first elements before the vol window kicks in
+        lev_df.iloc[0:vol_periods] = numpy.nan  # ignore the first elements before the vol window kicks in
 
         return lev_df
 

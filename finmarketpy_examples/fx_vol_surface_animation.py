@@ -25,11 +25,18 @@ from chartpy import Chart, Style
 def plot_animated_vol_market():
     market = Market(market_data_generator=MarketDataGenerator())
 
-    cross = ['EURUSD']; start_date = '01 Mar 2017'; finish_date = '21 Apr 2017'; sampling = 'no'
+    cross = ['EURUSD']; 
+    start_date = '01 Mar 2017'; 
+    finish_date = '21 Apr 2017'; 
+    sampling = 'no'
 
-    md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
-                                   data_source='bloomberg', cut='LDN', category='fx-implied-vol',
-                                   tickers=cross, cache_algo='cache_algo_return')
+    md_request = MarketDataRequest(start_date=start_date, 
+                finish_date=finish_date,
+                data_source='bloomberg', 
+                cut='LDN',  #exchange?
+                category='fx-implied-vol',
+                tickers=cross, 
+                cache_algo='cache_algo_return')
 
     df = market.fetch_market(md_request)
     if sampling != 'no': df = df.resample(sampling).mean()

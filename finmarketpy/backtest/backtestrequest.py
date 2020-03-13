@@ -302,8 +302,10 @@ class BacktestRequest(MarketDataRequest):
     @property
     def spot_tc_bp(self): return self.__spot_tc_bp
 
+
     @spot_tc_bp.setter
     def spot_tc_bp(self, spot_tc_bp):
+        #defines bps slippage (bid ask spread)
         if isinstance(spot_tc_bp, dict):
             spot_tc_bp = spot_tc_bp.copy()
 

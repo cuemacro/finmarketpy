@@ -21,8 +21,6 @@ except:
 
 import datetime
 
-# import matplotlib
-# import matplotlib.pyplot as plt
 import pandas
 import copy
 
@@ -44,7 +42,6 @@ class TradeAnalysis(object):
     """
 
     def __init__(self, engine=ChartConstants().chartfactory_default_engine):
-        # self.logger = LoggerManager().getLogger(__name__)
         self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime("%Y%m%d") + ' '
         self.DEFAULT_PLOT_ENGINE = engine
         self.chart = Chart(engine=self.DEFAULT_PLOT_ENGINE)
@@ -241,7 +238,6 @@ class TradeAnalysis(object):
             mult_results = []
 
             for i in range(0, len(parameter_list)):
-                # br = copy.copy(trading_model.load_parameters())
                 # reset all parameters
                 br = copy.copy(trading_model.load_parameters())
 
@@ -288,8 +284,6 @@ class TradeAnalysis(object):
                 if reload_market_data:
                     asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model, br = br)
 
-                # br = copy.copy(trading_model.br)
-
                 port, ret_stats = self._run_strategy(trading_model, asset_df, spot_df, spot_df2, br, contract_value_df,
                                                      pretty_portfolio_names[i])
 
@@ -305,11 +299,6 @@ class TradeAnalysis(object):
 
         ir = [t.inforatio()[0] for t in ret_stats_list]
         rets = [t.ann_returns()[0] for t in ret_stats_list]
-
-        # if we have too many combinations remove legend and use scaled shaded colour
-        # if len(port_list) > 10:
-        # style.color = 'Blues'
-        # style.display_legend = False
 
         # careful with plotting labels, may need to convert to strings
         pretty_portfolio_names = [str(p) for p in pretty_portfolio_names]

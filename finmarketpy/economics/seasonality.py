@@ -42,7 +42,7 @@ class Seasonality(object):
         year = sorted(list(set_year))
 
         intraday_seasonality = None
-
+        #common library
         commonman = CommonMan()
 
         for i in year:
@@ -96,7 +96,6 @@ class Seasonality(object):
         if cum is True:
             if partition_by_month:
                 monthly_seasonality.loc[0] = numpy.zeros(len(monthly_seasonality.columns))
-                # monthly_seasonality.index = monthly_seasonality.index + 1       # shifting index
                 monthly_seasonality = monthly_seasonality.sort_index()
 
             monthly_seasonality = calculations.create_mult_index(monthly_seasonality)

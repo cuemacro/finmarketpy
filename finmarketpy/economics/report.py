@@ -38,7 +38,6 @@ class Report(object):
 
         # strip out the field(s) from the regression output which we want
         stats_df = Calculations.strip_linear_regression_output(pretty_index, stats, statistic)
-        # stats_df = stats_df.sort_index()
 
         return stats_df
 
@@ -81,7 +80,6 @@ class Report(object):
             style.title = title
             style.display_legend = True
             style.scale_factor = scale_factor
-            # style.color = ['red', 'blue', 'purple', 'gray', 'yellow', 'green', 'pink']
 
             if output_path is not None:
                 style.file_output = output_path + ' (' + tag + ' ' + st + ').png'

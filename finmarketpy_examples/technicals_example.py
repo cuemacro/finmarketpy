@@ -36,9 +36,9 @@ if run_example == 1 or run_example == 0:
                 cache_algo = 'internet_load_return')                # how to return data
 
     df = market.fetch_market(md_request)
-
+    #see the raw data
     print(df)
-
+    #use ATR and plot it
     tech_params = TechParams()
     tech_params.atr_period = 14
     tech_ind.create_tech_ind(df, 'ATR', tech_params)

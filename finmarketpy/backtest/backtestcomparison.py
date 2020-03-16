@@ -9,6 +9,10 @@ from chartpy import Chart, Style, ChartConstants
 
 
 class BacktestComparison(object):
+    """
+    Compares different backtest TradingModels
+    Each model must have already been run
+    """
 
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
@@ -17,12 +21,7 @@ class BacktestComparison(object):
 
     def __init__(self, models, ref_index=0,
                  labels=None):
-        """Compares different backtest TradingModels
-        Each model must have already been run
 
-        :param models: iterable of TradingModel instances.
-        :param ref_index: index of the reference model in the list (for difference).
-        """
         if hasattr(models, "__iter__") and all([isinstance(x, TradingModel) for x in models]):
             self.models = models
             self.ref_index = ref_index
@@ -32,6 +31,19 @@ class BacktestComparison(object):
         self.labels = labels
 
     def plot_pnl(self, diff=True, silent_plot=False, reduce_plot=True):
+        """
+        Plots the profit and loss graph of the model.
+        Returns the created Chart
+
+        Parameters
+        ---------
+        diff
+            if you want to get the profit differences instead of raw values
+        silent_plot
+            if you want to only return the chart created
+        reduce_plot
+            when plotting many points use WebGl version of plotly if specified
+        """
         style = self.models[self.ref_index]._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
         models = self.models
@@ -40,7 +52,6 @@ class BacktestComparison(object):
         pnls = [model._strategy_pnl for model in models]
 
         df = pd.concat(pnls, axis=1)
-        #if you want to get the profit differences instead of raw values
         if diff:
             df = df.subtract(pnls[ref], axis='index')
         if self.labels is not None:
@@ -53,6 +64,17 @@ class BacktestComparison(object):
         return chart
 
     def plot_sharpe(self, silent_plot=False, reduce_plot=True):
+        """
+        Plots the sharpe ratio of the model
+        Returns the created Chart
+
+        Parameters
+        ---------
+        silent_plot
+            if you want to only return the chart created
+        reduce_plot:
+            when plotting many points use WebGl version of plotly if specified
+        """
         #sharpe does not take into account risk free rate for simplicity
         style = self.models[self.ref_index]._create_style("", "Sharpe Curve", reduce_plot=reduce_plot)
 
@@ -72,6 +94,19 @@ class BacktestComparison(object):
         return chart
 
     def plot_strategy_trade_notional(self, diff=True, silent_plot=False, reduce_plot=True):
+        """
+        Plots the notional trades of the model
+        Returns the created Chart
+
+        Parameters
+        ---------
+        diff
+            if you want to get the profit differences instead of raw values
+        silent_plot
+            if you want to only return the chart created
+        reduce_plot:
+            when plotting many points use WebGl version of plotly if specified
+        """
         style = self.models[self.ref_index]._create_style("", "Trades (Scaled by Notional)", reduce_plot=reduce_plot)
 
         models = self.models

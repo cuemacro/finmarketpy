@@ -35,9 +35,9 @@ market_constants = MarketConstants()
 
 
 class Backtest(object):
-    """Conducts backtest for strategies trading assets. Assumes we have an input of total returns. Reports historical return statistics
+    """
+    Conducts backtest for strategies trading assets. Assumes we have an input of total returns. Reports historical return statistics
     and returns time series.
-
     """
 
     def __init__(self):
@@ -50,25 +50,21 @@ class Backtest(object):
 
         The table is populated with asset, signal and further dataframes provided by the user, can be used to check signalling methodology.
         It does not apply parameters such as transaction costs, vol adjusment and so on.
+        Returns DataFrame with asset, trading signals and returns of the trading strategy for diagnostic purposes
 
         Parameters
         ----------
-        asset_a_df : DataFrame
+        asset_a_df: DataFrame
             Asset prices
 
-        signal_df : DataFrame
+        signal_df: DataFrame
             Trade signals (typically +1, -1, 0 etc)
 
-        further_df : DataFrame
+        further_df: DataFrame
             Further dataframes user wishes to output in the diagnostic output (typically inputs for the signals)
 
         further_df_labels
             Labels to append to the further dataframes
-
-        Returns
-        -------
-        DataFrame with asset, trading signals and returns of the trading strategy for diagnostic purposes
-
         """
         calculations = Calculations()
         asset_rets_df = calculations.calculate_returns(asset_a_df)
@@ -106,16 +102,16 @@ class Backtest(object):
 
         Parameters
         ----------
-        br : BacktestRequest
+        br: BacktestRequest
             Parameters for the backtest specifying start date, finish data, transaction costs etc.
 
-        asset_a_df : pandas.DataFrame
+        asset_a_df: pandas.DataFrame
             Asset prices to be traded
 
-        signal_df : pandas.DataFrame
+        signal_df: pandas.DataFrame
             Signals for the trading strategy
 
-        contract_value_df : pandas.DataFrame
+        contract_value_df: pandas.DataFrame
             Daily size of contracts
         """
 
@@ -436,16 +432,14 @@ class Backtest(object):
         self._portfolio_cum.columns = ['Port']
 
     def calculate_exposures(self, portfolio_signal):
-        """Calculates time series for the total longs, short, net and absolute exposure on an aggregated portfolio basis.
+        """
+        Calculates time series for the total longs, short, net and absolute exposure on an aggregated portfolio basis.
+        Returns DataFrame (list)
 
         Parameters
         ----------
-        portfolio_signal : DataFrame
+        portfolio_signal: DataFrame
             Signals for each asset in the portfolio after all weighting, portfolio & signal level volatility adjustments
-
-        Returns
-        -------
-        DataFrame (list)
 
         """
         # calculate total portfolio longs/total portfolio shorts/total portfolio exposure

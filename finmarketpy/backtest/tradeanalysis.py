@@ -53,10 +53,10 @@ class TradeAnalysis(object):
 
         Parameters
         ----------
-        trading_model : TradingModel
+        trading_model: TradingModel
             defining trading strategy
 
-        engine : str
+        engine: str
             'pyfolio' - use PyFolio as a backend
             'finmarketpy' - use finmarketpy as a backend
 
@@ -143,7 +143,7 @@ class TradeAnalysis(object):
 
         Parameters
         ----------
-        trading_model : TradingModel
+        trading_model: TradingModel
             defining trading strategy (can be a list)
 
         """

@@ -413,9 +413,9 @@ class Backtest(object):
 
         self._portfolio.columns = ['Port']
 
-        self._pnl_ret_stats = RetStats(self._pnl, br.ann_factor)
-        self._components_pnl_ret_stats = RetStats(self._components_pnl, br.ann_factor)
-        self._portfolio_ret_stats = RetStats(self._portfolio, br.ann_factor)
+        self._pnl_ret_stats = RetStats(self._pnl, br.ann_factor, br.resample_ann_factor)
+        self._components_pnl_ret_stats = RetStats(self._components_pnl, br.ann_factor, br.resample_ann_factor)
+        self._portfolio_ret_stats = RetStats(self._portfolio, br.ann_factor, br.resample_ann_factor)
 
         # TODO parallel version still work in progress!
 
@@ -1033,14 +1033,17 @@ class TradingModel(object):
 
         logger = LoggerManager().getLogger(__name__)
 
-        # get the parameters for backtesting
+        # Get the parameters for backtesting
         if hasattr(self, 'br'):
             br = self.br
         elif br is None:
             br = self.load_parameters()
 
-        # get market data for backtest
-        market_data = self.load_assets()
+        # Get market data for backtest (not every load_assets model will take br)
+        try:
+            market_data = self.load_assets(br=br)
+        except:
+            market_data = self.load_assets()
 
         asset_df = market_data[0]
         spot_df = market_data[1]
@@ -1296,7 +1299,7 @@ class TradingModel(object):
         """
 
         if br.include_benchmark:
-            ret_stats = RetStats()
+            ret_stats = RetStats(br.resample_ann_factor)
             risk_engine = RiskEngine()
             filter = Filter()
             calculations = Calculations()
@@ -1524,8 +1527,9 @@ class TradingModel(object):
 
             if not (silent_plot): chart.plot()
 
-            if self.br.write_csv_pnl:
-                df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
+            if hasattr(self, 'br'):
+                if self.br.write_csv_pnl:
+                    df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
 
             return chart
         except Exception as e:

@@ -12,14 +12,6 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-"""
-TradingModelFXCTA
-
-Shows how to create a simple FX CTA style strategy, using the StrategyTemplate abstract class (backtest_examples.py
-is a lower level way of doing this).
-
-"""
-
 import datetime
 
 from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
@@ -29,6 +21,9 @@ from finmarketpy.economics import TechIndicator
 from chartpy import Style
 
 class TradingModelFXTrend_Example(TradingModel):
+    """Shows how to create a simple FX CTA style strategy, using the TradingModel abstract class (backtest_examples.py
+    is a lower level way of doing this).
+    """
 
     def __init__(self):
         super(TradingModel, self).__init__()
@@ -64,7 +59,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.plot_interim = True
         br.include_benchmark = True
 
-        # have vol target for each signal
+        # Have vol target for each signal
         br.signal_vol_adjust = True
         br.signal_vol_target = 0.1
         br.signal_vol_max_leverage = 5
@@ -73,7 +68,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.signal_vol_rebalance_freq = 'BM'
         br.signal_vol_resample_freq = None
 
-        # have vol target for portfolio
+        # Have vol target for portfolio
         br.portfolio_vol_adjust = True
         br.portfolio_vol_target = 0.1
         br.portfolio_vol_max_leverage = 5
@@ -82,7 +77,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.portfolio_vol_rebalance_freq = 'BM'
         br.portfolio_vol_resample_freq = None
 
-        # tech params
+        # Tech params
         br.tech_params.sma_period = 200
 
         return br
@@ -92,7 +87,7 @@ class TradingModelFXTrend_Example(TradingModel):
         from findatapy.util.loggermanager import  LoggerManager
         logger = LoggerManager().getLogger(__name__)
 
-        # for FX basket
+        # For FX basket
         full_bkt    = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
                        'NZDUSD', 'USDCHF', 'USDNOK', 'USDSEK']
 
@@ -123,14 +118,14 @@ class TradingModelFXTrend_Example(TradingModel):
 
         asset_df = self.market.fetch_market(market_data_request)
 
-        # if web connection fails read from CSV
+        # If web connection fails read from CSV
         if asset_df is None:
             import pandas
 
             asset_df = pandas.read_csv("d:/fxcta.csv", index_col=0, parse_dates=['Date'],
                                        date_parser = lambda x: pandas.datetime.strptime(x, '%Y-%m-%d'))
 
-        # signalling variables
+        # Signalling variables
         spot_df = asset_df
         spot_df2 = None
 
@@ -142,7 +137,7 @@ class TradingModelFXTrend_Example(TradingModel):
 
         ##### FILL IN WITH YOUR OWN SIGNALS
 
-        # use technical indicator to create signals
+        # Use technical indicator to create signals
         # (we could obviously create whatever function we wanted for generating the signal dataframe)
         tech_ind = TechIndicator()
         tech_ind.create_tech_ind(spot_df, 'SMA', tech_params);
@@ -173,9 +168,9 @@ class TradingModelFXTrend_Example(TradingModel):
 
 if __name__ == '__main__':
 
-# just change "False" to "True" to run any of the below examples
+# Just change "False" to "True" to run any of the below examples
 
-    # create a FX trend strategy then chart the returns, leverage over time
+    # Create a FX trend strategy then chart the returns, leverage over time
     if True:
         model = TradingModelFXTrend_Example()
 
@@ -192,13 +187,13 @@ if __name__ == '__main__':
 
         ta = TradeAnalysis()
 
-        # create statistics for the model returns using both finmarketpy and pyfolio
+        # Create statistics for the model returns using both finmarketpy and pyfolio
         ta.run_strategy_returns_stats(model, engine='finmarketpy')
         # ta.run_strategy_returns_stats(model, engine='pyfolio')
 
         # model.plot_strategy_group_benchmark_annualised_pnl()
 
-    # create a FX CTA strategy, then examine how P&L changes with different vol targeting
+    # Create a FX CTA strategy, then examine how P&L changes with different vol targeting
     # and later transaction costs
     if True:
         strategy = TradingModelFXTrend_Example()
@@ -208,7 +203,7 @@ if __name__ == '__main__':
         ta = TradeAnalysis()
         ta.run_strategy_returns_stats(model, engine='finmarketpy')
 
-        # which backtesting parameters to change
+        # Which backtesting parameters to change
         # names of the portfolio
         # broad type of parameter name
         parameter_list = [
@@ -226,14 +221,14 @@ if __name__ == '__main__':
                                      pretty_portfolio_names=pretty_portfolio_names,
                                      parameter_type=parameter_type)
 
-        # now examine sensitivity to different transaction costs
+        # Now examine sensitivity to different transaction costs
         tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]
         ta.run_tc_shock(strategy, tc=tc)
 
-        # how does P&L change on day of month
+        # How does P&L change on day of month
         ta.run_day_of_month_analysis(strategy)
 
-    # create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
+    # Create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
     if False:
         from finmarketpy.backtest import TradeAnalysis
         model = TradingModelFXTrend_Example()

@@ -224,7 +224,7 @@ class TradeAnalysis(object):
     ###### Parameters and signal generations (need to be customised for every model)
     def run_arbitrary_sensitivity(self, trading_model, parameter_list=None,
                                   pretty_portfolio_names=None, parameter_type=None, run_in_parallel=False,
-                                  reload_market_data=True):
+                                  reload_market_data=True, plot=True):
 
         if not(reload_market_data):
             asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model)
@@ -321,7 +321,8 @@ class TradeAnalysis(object):
         style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
 
-        self.chart.plot(port_list, chart_type='line', style=style)
+        if plot:
+            self.chart.plot(port_list, chart_type='line', style=style)
 
         # plot all the IR in a bar chart form (can be easier to read!)
         style = Style()
@@ -331,7 +332,8 @@ class TradeAnalysis(object):
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
         summary_ir = pandas.DataFrame(index=pretty_portfolio_names, data=ir, columns=['IR'])
 
-        self.chart.plot(summary_ir, chart_type='bar', style=style)
+        if plot:
+            self.chart.plot(summary_ir, chart_type='bar', style=style)
 
         # plot all the rets
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.png'
@@ -339,7 +341,8 @@ class TradeAnalysis(object):
 
         summary_rets = pandas.DataFrame(index=pretty_portfolio_names, data=rets, columns=['Rets (%)']) * 100
 
-        self.chart.plot(summary_rets, chart_type='bar', style=style)
+        if plot:
+            self.chart.plot(summary_rets, chart_type='bar', style=style)
 
         return port_list, summary_ir, summary_rets
 

@@ -1,7 +1,22 @@
 __author__ = 'saeedamen'
 
+#
+# Copyright 2020 Cuemacro
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#
+# See the License for the specific language governing permissions and limitations under the License.
+#
 
-# loading data
+"""
+Shows how to calculate seasonality
+"""
+
+# Loading data
 import datetime
 
 import pandas
@@ -31,7 +46,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 
 run_example = 0
 
-###### calculate seasonal moves in Gold (using Bloomberg data)
+###### Calculate seasonal moves in Gold (using Bloomberg data)
 if run_example == 1 or run_example == 0:
     md_request = MarketDataRequest(
                 start_date = "01 Jan 1996",                         # start date
@@ -57,7 +72,7 @@ if run_example == 1 or run_example == 0:
 
     chart.plot(day_of_month_seasonality, style=style)
 
-###### calculate seasonal moves in FX vol (using Bloomberg data)
+###### Calculate seasonal moves in FX vol (using Bloomberg data)
 if run_example == 2 or run_example == 0:
     tickers = ['EURUSDV1M', 'USDJPYV1M', 'GBPUSDV1M', 'AUDUSDV1M']
 
@@ -86,7 +101,7 @@ if run_example == 2 or run_example == 0:
 
     chart.plot(day_of_month_seasonality, style=style)
 
-###### calculate seasonal moves in Gasoline (using Bloomberg data)
+###### Calculate seasonal moves in Gasoline (using Bloomberg data)
 if run_example == 3 or run_example == 0:
     md_request = MarketDataRequest(
                 start_date = "01 Jan 1996",                         # start date
@@ -112,7 +127,7 @@ if run_example == 3 or run_example == 0:
 
     chart.plot(day_of_month_seasonality, style=style)
 
-###### calculate seasonal moves in US non-farm payrolls (using Bloomberg data)
+###### Calculate seasonal moves in US non-farm payrolls (using Bloomberg data)
 if run_example == 4 or run_example == 0:
     # get the NFP NSA from ALFRED/FRED
     md_request = MarketDataRequest(
@@ -137,7 +152,7 @@ if run_example == 4 or run_example == 0:
 
     chart.plot(month_seasonality, style=style)
 
-###### apply seasonal adjustment to NFP data and compare the seasonal adjustment by finmarketpy with that of BLS
+###### Apply seasonal adjustment to NFP data and compare the seasonal adjustment by finmarketpy with that of BLS
 if run_example == 5 or run_example == 0:
     # get the NFP NSA from ALFRED/FRED
     md_request = MarketDataRequest(
@@ -150,7 +165,7 @@ if run_example == 5 or run_example == 0:
 
     df = market.fetch_market(md_request)
 
-    # calculate changes in NFP
+    # Calculate changes in NFP
     df = df - df.shift(1)
 
     df_seasonal_adjusted = seasonality.adjust_rolling_seasonality(pandas.DataFrame(df['US NFP (NSA).actual-release']),
@@ -158,7 +173,7 @@ if run_example == 5 or run_example == 0:
 
     df_seasonal_adjusted.columns = [x + ' SA finmarketpy' for x in df_seasonal_adjusted.columns]
 
-    # compare not seasonally adjusted vs seasonally adjusted
+    # Compare not seasonally adjusted vs seasonally adjusted
     df = df.join(df_seasonal_adjusted)
     df = df[df.index > '01 Jan 2000']
 

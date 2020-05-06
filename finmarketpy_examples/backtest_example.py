@@ -13,10 +13,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-backtest
-
 Gives several examples of backtesting simple trading strategies, using Backtest (a lower level class)
-
 """
 
 from findatapy.timeseries import Calculations
@@ -28,18 +25,18 @@ run_example = 0
 
 ###### backtest simple trend following strategy for FX spot basket
 if run_example == 1 or run_example == 0:
-    # for backtest and loading data
+    # For backtest and loading data
     from finmarketpy.backtest import BacktestRequest, Backtest
     from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
     from findatapy.util.fxconv import FXConv
 
-    # for logging
+    # For logging
     from findatapy.util.loggermanager import LoggerManager
 
-    # for signal generation
+    # For signal generation
     from finmarketpy.economics import TechIndicator, TechParams
 
-    # for plotting
+    # For plotting
     from chartpy import Chart, Style
 
     logger = LoggerManager().getLogger(__name__)
@@ -50,13 +47,13 @@ if run_example == 1 or run_example == 0:
     br = BacktestRequest()
     fxconv = FXConv()
 
-    # get all asset data
+    # Get all asset data
     br.start_date = "02 Jan 1990"
     br.finish_date = datetime.datetime.utcnow()
     br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
     br.ann_factor = 252
 
-    # have vol target for each signal
+    # Have vol target for each signal
     br.signal_vol_adjust = True
     br.signal_vol_target = 0.05
     br.signal_vol_max_leverage = 3
@@ -69,8 +66,8 @@ if run_example == 1 or run_example == 0:
     tech_params.sma_period = 200;
     indicator = 'SMA'
 
-    # pick USD crosses in G10 FX
-    # note: we are calculating returns from spot (it is much better to use to total return
+    # Pick USD crosses in G10 FX
+    # Note: we are calculating returns from spot (it is much better to use to total return
     # indices for FX, which include carry)
     logger.info("Loading asset data...")
 
@@ -98,7 +95,7 @@ if run_example == 1 or run_example == 0:
 
     logger.info("Running backtest...")
 
-    # use technical indicator to create signals
+    # Use technical indicator to create signals
     # (we could obviously create whatever function we wanted for generating the signal dataframe)
     tech_ind = TechIndicator()
     tech_ind.create_tech_ind(spot_df, indicator, tech_params);
@@ -106,13 +103,13 @@ if run_example == 1 or run_example == 0:
 
     contract_value_df = None
 
-    # use the same data for generating signals
+    # Use the same data for generating signals
     backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()
 
-    # print the last positions (we could also save as CSV etc.)
+    # Print the last positions (we could also save as CSV etc.)
     print(signals.tail(1))
 
     style = Style()
@@ -125,19 +122,19 @@ if run_example == 1 or run_example == 0:
 
 ###### backtest simple trend following strategy for FX spot basket
 if run_example == 2 or run_example == 0:
-    # for backtest and loading data
+    # For backtest and loading data
     from finmarketpy.backtest import Backtest, BacktestRequest
     from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
     from findatapy.util.fxconv import FXConv
     from findatapy.timeseries import Calculations
 
-    # for logging
+    # For logging
     from findatapy.util import LoggerManager
 
-    # for signal generation
+    # For signal generation
     from finmarketpy.economics import TechIndicator, TechParams
 
-    # for plotting
+    # For plotting
     from chartpy import Chart, Style
 
     logger = LoggerManager().getLogger(__name__)
@@ -148,7 +145,7 @@ if run_example == 2 or run_example == 0:
     br = BacktestRequest()
     fxconv = FXConv()
 
-    # get all asset data
+    # Get all asset data
     br.start_date = "02 Jan 1990"
     br.finish_date = datetime.datetime.utcnow()
     br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
@@ -160,8 +157,8 @@ if run_example == 2 or run_example == 0:
     tech_params.only_allow_longs = True
     # tech_params.only_allow_shorts = True
 
-    # pick EUR/USD
-    # note: we are calculating returns from spot (it is much better to use to total return
+    # Pick EUR/USD
+    # Note: we are calculating returns from spot (it is much better to use to total return
     # indices for FX, which include carry)
     logger.info("Loading asset data...")
 
@@ -183,13 +180,13 @@ if run_example == 2 or run_example == 0:
 
     logger.info("Running backtest...")
 
-    # use technical indicator to create signals
+    # Use technical indicator to create signals
     # (we could obviously create whatever function we wanted for generating the signal dataframe)
     tech_ind = TechIndicator()
     tech_ind.create_tech_ind(spot_df, indicator, tech_params);
     signal_df = tech_ind.get_signal()
 
-    # use the same data for generating signals
+    # Use the same data for generating signals
     backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=None, run_in_parallel=False)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
@@ -201,7 +198,7 @@ if run_example == 2 or run_example == 0:
 
     print(trade_returns)
 
-    # print the last positions (we could also save as CSV etc.)
+    # Print the last positions (we could also save as CSV etc.)
     print(signals.tail(1))
 
     style = Style()

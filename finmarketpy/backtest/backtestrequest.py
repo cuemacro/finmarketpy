@@ -71,6 +71,10 @@ class BacktestRequest(MarketDataRequest):
 
         # should we delay the signal?
         self.__signal_delay = 0
+
+        # annualization factor for return stats (and should we resample data first before calculating it?)
+        self.__ann_factor = 252
+        self.__resample_ann_factor = None
         
     ##### properties for output of the backtest
     @property
@@ -356,4 +360,19 @@ class BacktestRequest(MarketDataRequest):
     @signal_delay.setter
     def signal_delay(self, signal_delay):
         self.__signal_delay = signal_delay
+        
+    @property
+    def ann_factor(self):
+        return self.__ann_factor
 
+    @ann_factor.setter
+    def ann_factor(self, ann_factor):
+        self.__ann_factor = ann_factor
+
+    @property
+    def resample_ann_factor(self):
+        return self.__resample_ann_factor
+
+    @resample_ann_factor.setter
+    def resample_ann_factor(self, resample_ann_factor):
+        self.__resample_ann_factor = resample_ann_factor

@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.4 - finmarketpy (06 May 2020)
 * 0.11.3 - finmarketpy (04 Dec 2019)
 * 0.11.1 - finmarketpy (23 Oct 2019)
 * 0.11 - finmarketpy
@@ -113,6 +114,10 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 06 May 2020
+    * Added QuickChart for one line download of market data and plotting
+    * Added feature to resample returns 
+    * Allow more custom parameters in backtest
 * 17 Dec 2019
     * Added link for Python for finance workshop installation notes for Anaconda
 * 04 Dec 2019

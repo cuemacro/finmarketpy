@@ -1,6 +1,5 @@
 __author__ = 'saeedamen'
 
-
 # loading data
 import datetime
 
@@ -17,15 +16,15 @@ chart = Chart(engine='matplotlib')
 market = Market(market_data_generator=MarketDataGenerator())
 tech_ind = TechIndicator()
 
-# choose run_example = 0 for everything
+# Choose run_example = 0 for everything
 # run_example = 1 - download S&P500 from Quandl, calculate ATR and plot
 
 run_example = 0
 
-###### fetch data from Quandl for BoE rate (using Bloomberg data)
+###### Fetch data from Quandl for BoE rate (using Bloomberg data)
 if run_example == 1 or run_example == 0:
 
-    # downloaded S&P500
+    # Downloaded S&P500
     md_request = MarketDataRequest(
                 start_date = "01 Jan 2000",                         # start date
                 data_source = 'quandl',                             # use Quandl as data source

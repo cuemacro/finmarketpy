@@ -13,10 +13,7 @@ __author__ = 'saeedamen'
 #
 
 """
-fx_vol_surface_animation
-
 Shows how to load up FX vol surfaces from Bloomberg and then plot an animation of them
-
 """
 
 from findatapy.market import Market, MarketDataRequest, MarketDataGenerator, FXVolFactory
@@ -36,7 +33,7 @@ def plot_animated_vol_market():
     fxvf = FXVolFactory()
     df_vs = []
 
-    # grab the vol surface for each date and create a dataframe for each date (could have used a panel)
+    # Grab the vol surface for each date and create a dataframe for each date (could have used a panel)
     for i in range(0, len(df.index)): df_vs.append(fxvf.extract_vol_surface_for_date(df, cross[0], i))
 
     style = Style(title="FX vol surface of " + cross[0], source="chartpy", color='Blues',

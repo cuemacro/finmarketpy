@@ -15,13 +15,17 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@thalesians.com
 from chartpy import Chart, Style, ChartConstants
 from findatapy.util.dataconstants import DataConstants
 from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
+from findatapy.timeseries import Calculations
 
 import datetime
 
 from datetime import timedelta
 
+dataconstants = DataConstants()
+
 class QuickChart(object):
-    """Displays charts from downloaded data, in a single line code call. Ideal for quickly generating charts
+    """Displays charts from downloaded data, in a single line code call. Ideal for quickly generating charts from sources
+    including Bloomberg, Quandl, ALFRED/FRED etc.
 
     """
 
@@ -30,8 +34,13 @@ class QuickChart(object):
         self._market = Market(market_data_generator=market_data_generator)
         self._data_source = data_source
 
-    def plot_chart(self, tickers=None, tickers_rhs=None, start_date=None, finish_date=None, chart_file=None, chart_type='line', title='',
-                   fields={'close' : 'PX_LAST'}, freq='daily'):
+    def plot_chart(self, tickers=None, tickers_rhs=None, start_date=None, finish_date=None,
+                   chart_file=None, chart_type='line', title='',
+                   fields={'close' : 'PX_LAST'}, freq='daily', source='Web', brand_label='Cuemacro', display_brand_label=True,
+                   reindex=False, yoy=False, plotly_plot_mode='offline_png',
+                   quandl_api_key=dataconstants.quandl_api_key,
+                   fred_api_key=dataconstants.fred_api_key,
+                   alpha_vantage_api_key=dataconstants.alpha_vantage_api_key):
 
         if start_date is None:
             start_date = datetime.datetime.utcnow().date() - timedelta(days=60)
@@ -66,9 +75,12 @@ class QuickChart(object):
         md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
                                        freq=freq,
                                        data_source=self._data_source,
-                                       tickers=list(tickers.keys()), vendor_tickers=list(tickers.keys()),
+                                       tickers=list(tickers.keys()), vendor_tickers=list(tickers.values()),
                                        fields=list(fields.keys()),
-                                       vendor_fields=list(fields.values()))
+                                       vendor_fields=list(fields.values()),
+                                       quandl_api_key=quandl_api_key,
+                                       fred_api_key=fred_api_key,
+                                       alpha_vantage_api_key=alpha_vantage_api_key)
 
         df = self._market.fetch_market(md_request=md_request)
         df = df.fillna(method='ffill')
@@ -76,11 +88,28 @@ class QuickChart(object):
 
         style = Style(title=title, chart_type=chart_type, html_file_output=chart_file, scale_factor=-1,
                       height=400, width=600, file_output=datetime.date.today().strftime("%Y%m%d") + " " + title + ".png",
-                      plotly_plot_mode='offline_png')
+                      plotly_plot_mode=plotly_plot_mode, source=source, brand_label=brand_label,
+                      display_brand_label=display_brand_label)
+
+        if reindex:
+            df = Calculations().create_mult_index_from_prices(df)
+
+            style.y_title = 'Reindexed from 100'
+
+        if yoy:
+            if freq == 'daily':
+                obs_in_year = 252
+            elif freq == 'intraday':
+                obs_in_year = 1440
+
+            df_rets = Calculations().calculate_returns(df)
+            df = Calculations().average_by_annualised_year(df_rets, obs_in_year=obs_in_year) * 100
+
+            style.y_title = 'Annualized % YoY'
 
         if list(tickers_rhs.keys()) != []:
             style.y_axis_2_series=list(tickers_rhs.keys())
             style.y_axis_2_showgrid = False
             style.y_axis_showgrid = False
 
-        return self._chart.plot(df, style=style)
+        return self._chart.plot(df, style=style), df

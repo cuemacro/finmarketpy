@@ -32,7 +32,7 @@ chart = Chart(engine='matplotlib')
 market = Market(market_data_generator=MarketDataGenerator())
 
 # Choose run_example = 0 for everything
-# run_example = 1 - download BoE data from quandl
+# run_example = 1 - download
 
 run_example = 0
 

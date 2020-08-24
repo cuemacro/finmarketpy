@@ -59,7 +59,7 @@ class EventStudy(object):
             data_frame.index = data_frame.index + bday
 
         # set as New York time and select only those ON vols at the 10am NY cut just before the event
-        data_frame_events = data_frame.ix[event_dates.index]
+        data_frame_events = data_frame[event_dates.index]
         data_frame_events.columns = data_frame.columns.values + '-' + name + ' ' + event
 
         return data_frame_events
@@ -104,13 +104,15 @@ class EventStudy(object):
         # TODO vectorise this!
         for i in range(0, len(ef_time_frame.index)):
             try:
-                data_frame_rets.ix[start_index[i]:finish_index[i], 'Ind'] = ords
+                data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords
             except:
-                data_frame_rets.ix[start_index[i]:finish_index[i], 'Ind'] = ords[0:(finish_index[i] - start_index[i])]
+                data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords[0:(finish_index[i] - start_index[i])]
 
-        # set the release dates
-        data_frame_rets.ix[start_index, 'Rel'] = ef_time  # set entry points
-        data_frame_rets.ix[finish_index + 1, 'Rel'] = numpy.zeros(len(start_index))  # set exit points
+        data_frame_rets['Rel'] = numpy.nan
+
+        # Set the release dates
+        data_frame_rets['Rel'][start_index] = ef_time  # set entry points
+        data_frame_rets['Rel'][finish_index + 1] = numpy.zeros(len(start_index))  # set exit points
         data_frame_rets['Rel'] = data_frame_rets['Rel'].fillna(method='pad')  # fill down signals
 
         data_frame_rets = data_frame_rets[pandas.notnull(data_frame_rets['Ind'])]  # get rid of other
@@ -122,7 +124,7 @@ class EventStudy(object):
 
         if create_index:
             calculations = Calculations()
-            data_frame.ix[-minute_start + min_offset, :] = numpy.nan
+            data_frame.iloc[-minute_start + min_offset] = numpy.nan
             data_frame = calculations.create_mult_index(data_frame)
         else:
             if vol is True:
@@ -548,7 +550,7 @@ class HistEconDataFactory(object):
         return self.market_data_generator.fetch_market_data(md_request)
 
     def grasp_coded_entry(self, df, index):
-        df = df.ix[index:].stack()
+        df = df[index:].stack()
         df = df.reset_index()
         df.columns = ['Date', 'Name', 'Val']
 

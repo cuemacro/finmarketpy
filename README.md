@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.5 - finmarketpy (24 Aug 2020)
 * 0.11.4 - finmarketpy (06 May 2020)
 * 0.11.3 - finmarketpy (04 Dec 2019)
 * 0.11.1 - finmarketpy (23 Oct 2019)
@@ -114,6 +115,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 24 Aug 2020
+    * Replaced .ix to work with later versions of pandas
 * 07 May 2020
     * Improved QuickChart, adding additional labels, fixing example
 * 06 May 2020

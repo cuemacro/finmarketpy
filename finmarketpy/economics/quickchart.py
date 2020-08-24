@@ -1,7 +1,7 @@
 __author__ = 'saeedamen'  # Saeed Amen / saeed@thalesians.com
 
 #
-# Copyright 2016 Cuemacro
+# Copyright 2020 Cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -40,7 +40,7 @@ class QuickChart(object):
                    reindex=False, yoy=False, plotly_plot_mode='offline_png',
                    quandl_api_key=dataconstants.quandl_api_key,
                    fred_api_key=dataconstants.fred_api_key,
-                   alpha_vantage_api_key=dataconstants.alpha_vantage_api_key):
+                   alpha_vantage_api_key=dataconstants.alpha_vantage_api_key, df=None):
 
         if start_date is None:
             start_date = datetime.datetime.utcnow().date() - timedelta(days=60)
@@ -72,17 +72,19 @@ class QuickChart(object):
         else:
             tickers_rhs = {}
 
-        md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
-                                       freq=freq,
-                                       data_source=self._data_source,
-                                       tickers=list(tickers.keys()), vendor_tickers=list(tickers.values()),
-                                       fields=list(fields.keys()),
-                                       vendor_fields=list(fields.values()),
-                                       quandl_api_key=quandl_api_key,
-                                       fred_api_key=fred_api_key,
-                                       alpha_vantage_api_key=alpha_vantage_api_key)
+        if df is None:
+            md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
+                                           freq=freq,
+                                           data_source=self._data_source,
+                                           tickers=list(tickers.keys()), vendor_tickers=list(tickers.values()),
+                                           fields=list(fields.keys()),
+                                           vendor_fields=list(fields.values()),
+                                           quandl_api_key=quandl_api_key,
+                                           fred_api_key=fred_api_key,
+                                           alpha_vantage_api_key=alpha_vantage_api_key)
 
-        df = self._market.fetch_market(md_request=md_request)
+            df = self._market.fetch_market(md_request=md_request)
+
         df = df.fillna(method='ffill')
         df.columns = [x.split('.')[0] for x in df.columns]
 

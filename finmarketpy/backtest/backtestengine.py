@@ -1857,7 +1857,7 @@ class TradingModel(object):
     #### grab signals for specific days
     def _grab_signals(self, strategy_signal, date=None, strip=None):
         if date is None:
-            last_day = strategy_signal.ix[-1].transpose().to_frame()
+            last_day = strategy_signal.loc[-1].transpose().to_frame()
         else:
             if not (isinstance(date, list)):
                 date = [date]
@@ -1865,7 +1865,7 @@ class TradingModel(object):
             last_day = []
 
             for d in date:
-                last_day.append(strategy_signal.ix[d].transpose().to_frame())
+                last_day.append(strategy_signal[d].transpose().to_frame())
 
             last_day = pandas.concat(last_day, axis=1)
             last_day = last_day.sort_index(axis=1)
@@ -2053,7 +2053,7 @@ class RiskEngine(object):
         # # now realign back to days when we trade
         # returns_df, lev_df = returns_df.align(lev_df, join='left', axis=0)
 
-        lev_df.ix[0:vol_periods] = numpy.nan  # ignore the first elements before the vol window kicks in
+        lev_df[0:vol_periods] = numpy.nan  # ignore the first elements before the vol window kicks in
 
         return lev_df
 

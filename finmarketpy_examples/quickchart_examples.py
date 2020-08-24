@@ -42,11 +42,13 @@ if run_example == 2 or run_example == 0:
     from finmarketpy.economics import QuickChart
 
     # Plot with matplotlib - Major USD crosses reindexed from 100 in 2020
-    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(tickers=['EURUSD Curncy', 'GBPUSD Curncy', 'AUDUSD Curncy'],
-    title='USD crosses in 2020',
-            start_date='01 Jan 2020', reindex=True, source='Bloomberg')
+    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(
+        tickers=['EURUSD Curncy', 'GBPUSD Curncy', 'AUDUSD Curncy'],
+        title='USD crosses in 2020',
+        start_date='01 Jan 2020', reindex=True, source='Bloomberg')
 
     # Plot with Plotly - Major USD crosses reindexed from 100 in 2020
-    QuickChart(engine='plotly', data_source='bloomberg').plot_chart(tickers=['EURUSD Curncy', 'GBPUSD Curncy', 'AUDUSD Curncy'],
-    title='USD crosses in 2020 (Plotly)',
-            start_date='01 Jan 2020', reindex=True, source='Bloomberg')
+    QuickChart(engine='plotly', data_source='bloomberg').plot_chart(
+        tickers=['EURUSD Curncy', 'GBPUSD Curncy', 'AUDUSD Curncy'],
+        title='USD crosses in 2020 (Plotly)',
+        start_date='01 Jan 2020', reindex=True, source='Bloomberg')

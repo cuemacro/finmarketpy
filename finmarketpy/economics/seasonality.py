@@ -31,7 +31,7 @@ class Seasonality(object):
         self.logger = LoggerManager().getLogger(__name__)
         return
 
-    def time_of_day_seasonality(self, data_frame, years = False):
+    def time_of_day_seasonality(self, data_frame, years=False):
 
         calculations = Calculations()
 
@@ -46,7 +46,8 @@ class Seasonality(object):
         commonman = CommonMan()
 
         for i in year:
-            temp_seasonality = calculations.average_by_hour_min_of_day_pretty_output(data_frame[data_frame.index.year == i])
+            temp_seasonality = calculations.average_by_hour_min_of_day_pretty_output(
+                data_frame[data_frame.index.year == i])
 
             temp_seasonality.columns = commonman.postfix_list(temp_seasonality.columns.values, " " + str(i))
 
@@ -58,29 +59,31 @@ class Seasonality(object):
         return intraday_seasonality
 
     def bus_day_of_month_seasonality_from_prices(self, data_frame,
-                                 month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum = True,
-                                 cal = "FX", partition_by_month = True, add_average = False, resample_freq = 'B'):
+                                                 month_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum=True,
+                                                 cal="FX", partition_by_month=True, add_average=False,
+                                                 resample_freq='B'):
 
         return self.bus_day_of_month_seasonality(self, data_frame,
-                                 month_list = month_list, cum = cum,
-                                 cal = cal, partition_by_month = partition_by_month,
-                                 add_average = add_average, price_index = True, resample_freq=resample_freq)
+                                                 month_list=month_list, cum=cum,
+                                                 cal=cal, partition_by_month=partition_by_month,
+                                                 add_average=add_average, price_index=True, resample_freq=resample_freq)
 
     def bus_day_of_month_seasonality(self, data_frame,
-                                 month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum = True,
-                                 cal = "FX", partition_by_month = True, add_average = False, price_index = False, resample_freq = 'B'):
+                                     month_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], cum=True,
+                                     cal="FX", partition_by_month=True, add_average=False, price_index=False,
+                                     resample_freq='B'):
 
         calculations = Calculations()
         filter = Filter()
 
         if price_index:
-            data_frame = data_frame.resample(resample_freq).mean()           # resample into business days
+            data_frame = data_frame.resample(resample_freq).mean()  # resample into business days
             data_frame = calculations.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
         data_frame = filter.filter_time_series_by_holidays(data_frame, cal)
 
-        if resample_freq == 'B':    # business days
+        if resample_freq == 'B':  # business days
             monthly_seasonality = calculations.average_by_month_day_by_bus_day(data_frame, cal)
         elif resample_freq == 'D':  # calendar days
             monthly_seasonality = calculations.average_by_month_day_by_day(data_frame)
@@ -91,7 +94,7 @@ class Seasonality(object):
             monthly_seasonality = monthly_seasonality.unstack(level=0)
 
             if add_average:
-               monthly_seasonality['Avg'] = monthly_seasonality.mean(axis=1)
+                monthly_seasonality['Avg'] = monthly_seasonality.mean(axis=1)
 
         if cum is True:
             if partition_by_month:
@@ -103,17 +106,17 @@ class Seasonality(object):
 
         return monthly_seasonality
 
-    def monthly_seasonality_from_prices(self, data_frame, cum = True, add_average = False):
+    def monthly_seasonality_from_prices(self, data_frame, cum=True, add_average=False):
         return self.monthly_seasonality(data_frame, cum, add_average, price_index=True)
 
     def monthly_seasonality(self, data_frame,
-                                  cum = True,
-                                  add_average = False, price_index = False):
+                            cum=True,
+                            add_average=False, price_index=False):
 
         calculations = Calculations()
 
         if price_index:
-            data_frame = data_frame.resample('BM').mean()          # resample into month end
+            data_frame = data_frame.resample('BM').mean()  # resample into month end
             data_frame = calculations.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
@@ -130,8 +133,8 @@ class Seasonality(object):
             monthly_seasonality = calculations.create_mult_index(monthly_seasonality)
 
         return monthly_seasonality
-    
-    def adjust_rolling_seasonality(self, data_frame, window = None, likely_period = None):
+
+    def adjust_rolling_seasonality(self, data_frame, window=None, likely_period=None):
         """Adjusted time series which exhibit strong seasonality. If time series do not exhibit any seasonality will return
         NaN values.
 
@@ -157,7 +160,7 @@ class Seasonality(object):
 
         return data_frame
 
-    def _remove_seasonality(self, series, likely_period = None):
+    def _remove_seasonality(self, series, likely_period=None):
         from seasonal import fit_seasons, adjust_seasons
 
         # detrend and deseasonalize
@@ -168,6 +171,7 @@ class Seasonality(object):
             return numpy.nan
 
         return adjusted[-1]
+
 
 if __name__ == '__main__':
     # see seasonality_examples

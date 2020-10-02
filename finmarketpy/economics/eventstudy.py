@@ -200,13 +200,7 @@ from findatapy.market import IOEngine
 from findatapy.util import ConfigManager
 from findatapy.market import SpeedCache
 
-try:
-    from numbapro import autojit
-except:
-    pass
-
 marketconstants = MarketConstants()
-
 
 class EventsFactory(EventStudy):
     """Provides methods to fetch data on economic data events and to perform basic event studies for market data around
@@ -231,12 +225,13 @@ class EventsFactory(EventStudy):
 
     # _econ_data_frame = None
 
-    # where your HDF5 file is stored with economic data
+    # Where your HDF5 file is stored with economic data
     # TODO integrate with on the fly downloading!
     _hdf5_file_econ_file = MarketConstants().hdf5_file_econ_file
     _db_database_econ_file = MarketConstants().db_database_econ_file
 
-    ### manual offset for certain events where Bloomberg/data vendor displays the wrong date (usually because of time differences)
+    ### Manual offset for certain events where Bloomberg/data vendor displays the wrong date (usually because of time differences)
+    # You may need to add to this list
     _offset_events = {'AUD-Australia Labor Force Employment Change SA.release-dt': 1}
 
     def __init__(self, df=None):
@@ -360,7 +355,7 @@ class EventsFactory(EventStudy):
         data_frame = data_frame[pandas.notnull(data_frame.index)]  # eliminate any NaN dates (artifact of Excel)
         ind_dt = data_frame.index
 
-        # convert yyyymmdd format to datetime
+        # Convert yyyymmdd format to datetime
         data_frame.index = [datetime.datetime(
             int((ind_dt[x] - (ind_dt[x] % 10000)) / 10000),
             int(((ind_dt[x] % 10000) - (ind_dt[x] % 100)) / 100),
@@ -414,7 +409,7 @@ class EventsFactory(EventStudy):
     def get_economic_event_ret_over_custom_event_day(self, data_frame_in, name, event, start, end, lagged=False,
                                                      NYC_cutoff=10):
 
-        # get the times of events
+        # Get the times of events
         event_dates = self.get_economic_event_date_time(name, event)
 
         return super(EventsFactory, self).get_economic_event_ret_over_custom_event_day(data_frame_in, event_dates, name,
@@ -468,7 +463,7 @@ class EventsFactory(EventStudy):
 HistEconDataFactory
 
 Provides functions for getting historical economic data. Uses aliases for tickers, to make it relatively easy to use,
-rather than having to remember all the underlying vendor tickers. Can use Fred, Quandl or Bloomberg.
+rather than having to remember all the underlying vendor tickers. Can use alfred, quandl or bloomberg.
 
 The files below, contain default tickers and country groups. However, you can add whichever tickers you'd like.
 - conf/all_econ_tickers.csv
@@ -500,7 +495,7 @@ class HistEconDataFactory(object):
             self.market_data_generator = market_data_generator
 
     def get_economic_data_history(self, start_date, finish_date, country_group, data_type,
-                                  source='fred', cache_algo="internet_load_return"):
+                                  source='alfred', cache_algo="internet_load_return"):
 
         # vendor_country_codes = self.fred_country_codes[country_group]
         # vendor_pretty_country = self.fred_nice_country_codes[country_group]
@@ -508,14 +503,14 @@ class HistEconDataFactory(object):
         if isinstance(country_group, list):
             pretty_country_names = country_group
         else:
-            # get all the country names in the country_group
+            # Get all the country names in the country_group
             pretty_country_names = list(self._econ_country_groups[
                                             self._econ_country_groups["Country Group"] == country_group]['Country'])
 
-        # construct the pretty tickers
+        # Construct the pretty tickers
         pretty_tickers = [x + '-' + data_type for x in pretty_country_names]
 
-        # get vendor tickers
+        # Get vendor tickers
         vendor_tickers = []
 
         for pretty_ticker in pretty_tickers:
@@ -535,17 +530,17 @@ class HistEconDataFactory(object):
         if source == 'bloomberg': vendor_fields = ['PX_LAST']
 
         md_request = MarketDataRequest(
-            start_date=start_date,  # start date
-            finish_date=finish_date,  # finish date
+            start_date=start_date,      # start date
+            finish_date=finish_date,    # finish date
             category='economic',
-            freq='daily',  # intraday data
-            data_source=source,  # use Bloomberg as data source
+            freq='daily',               # daily data
+            data_source=source,         # use Bloomberg as data source
             cut='LOC',
             tickers=pretty_tickers,
-            fields=['close'],  # which fields to download
+            fields=['close'],           # which fields to download
             vendor_tickers=vendor_tickers,
-            vendor_fields=vendor_fields,  # which Bloomberg fields to download
-            cache_algo=cache_algo)  # how to return data
+            vendor_fields=vendor_fields,  # which Bloomberg/data vendor fields to download
+            cache_algo=cache_algo)      # how to return data
 
         return self.market_data_generator.fetch_market_data(md_request)
 

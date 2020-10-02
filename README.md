@@ -58,7 +58,7 @@ Calculate event study around events for asset (see examples/events_examples.py)
 # Requirements
 
 Major requirements
-* Required: Python 3.6
+* Required: Python 3.7
 * Required: pandas 0.24.2, numpy etc.
 * Required: findatapy for downloading market data (https://github.com/cuemacro/findatapy)
 * Required: chartpy for funky interactive plots (https://github.com/cuemacro/chartpy)
@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.6 - finmarketpy (02 Oct 2020)
 * 0.11.5 - finmarketpy (24 Aug 2020)
 * 0.11.4 - finmarketpy (06 May 2020)
 * 0.11.3 - finmarketpy (04 Dec 2019)
@@ -115,6 +116,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 02 Oct 2020
+    * Fixed vol surface calculation
 * 24 Aug 2020
     * Replaced .ix to work with later versions of pandas
 * 07 May 2020

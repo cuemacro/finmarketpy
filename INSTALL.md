@@ -15,7 +15,7 @@ which will help you to write your own trading strategies and Python scripts for 
       * This is the most used Python distribution for data science
       * As well as installing the core Python libraries, it also installs many useful libraries like the SciPy stack, which
     contains NumPy, pandas etc. and many other useful libraries like matplotlib which are dependencies for the various Cuemacro libraries
-      * Recommend installing latest version of Python 3.6 (by running in command line `conda install python=3.6`) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
+      * Recommend installing latest version of Python 3.7 (by running in command line `conda install python=3.7`) as some of the multiprocessing libraries have issues with Python 3.6 at present when I've tried it
       * findatapy, chartpy and finmarketpy should be compatible with the dependencies in Anaconda (eg. version of pandas, numpy etc.)
     * Microsoft Visual Studio 2017 Community Edition - [download](https://www.visualstudio.com/downloads/) or Visual C++ 2015 build tools - Windows
       * Makes sure to do a custom installation and tick Visual C++ in the Visual Studio 2017 installation
@@ -67,21 +67,26 @@ which will help you to write your own trading strategies and Python scripts for 
 Open up the Anaconda Command Prompt (accessible via the Start Menu) to run the various "conda" and "pip" commands to install the
 various Python libraries. The Cuemacro libraries will install most Python dependencies, but some need to be installed separately.
 
+* Install finmarketpy, findatapy and chartpy the easy way...
+    * You can install some Python data science conda environments that I use for teaching
+    which include finmarketpy, findatapy and chartpy
+    * Instructions on how to install Anaconda and the py37class conda environment at 
+    [https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb](https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb)
+
 * Python libraries (open source)
-    * arctic - `pip install git+https://github.com/manahl/arctic.git`
+    * arctic - `pip install arctic`
         * Wrapper for MongoDB (also installs pymongo)
         * Allows us to easily save and load pandas DataFrames in MongoDB
         * Also compresses data contents
     * blpapi - https://www.bloomberglabs.com/api/libraries/ (both C++ and Python libraries)
         * Interact with Bloomberg programmatically via Python to download historical and live data
-        * Note that this requires a C++ compiler to build the Python library (at present Bloomberg doesn't have binaries for Python 3.5,
-        hence you need to build them yourself)
+        * Note that may need requires a C++ compiler to build the Python library 
         * Follow instructions at [https://github.com/cuemacro/findatapy/blob/master/BLOOMBERG.md](https://github.com/cuemacro/findatapy/blob/master/BLOOMBERG.md) for all the steps necessary to install blpapi
     * Whilst Anaconda has most of the dependencies below and pip will install all additional ones needed by the Cuemacro Python
     libraries it is possible to install them manually via pip, below is a list of the dependencies
         * all libraries
             * numpy - matrix algebra (Anaconda)
-            * pandas - time series (Anaconda) - older versions of pandas could have issues due to deprecated methods - recommend 0.24.2
+            * pandas - time series (Anaconda) - older versions of pandas could have issues due to deprecated methods - recommend 1.0.5
             * pytz - timezone management (Anaconda)
             * requests - accessing URLs (Anaconda)
             * mulitprocess - multitasking
@@ -112,14 +117,14 @@ various Python libraries. The Cuemacro libraries will install most Python depend
         * Typically this is in folders like:
             * C:\Anaconda3\Lib\site-packages
             * C:\Program Files\Anaconda\Lib\site-packages
-    * chartpy - `pip install git+https://github.com/cuemacro/chartpy.git`
+    * chartpy - `pip install chartpy`
         * Check constants file configuration [chartpy/chartpy/util/chartconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/chartpy/util/chartconstants.py) for
             * Adding your own API keys for Plotly, Twitter etc
             * Changing the default size of plots
             * Changing the default chart engine (eg. Plotly, Bokeh or Matplotlib)
         * Alternatively you can create chartcred.py class in the same folder to put your own API keys
         * This has the benefit of not being overwritten each time you upgrade the project
-    * findatapy - `pip install git+https://github.com/cuemacro/findatapy.git`
+    * findatapy - `pip install findatapy`
         * Check constants file configuration [findatapy/findatapy/util/dataconstants.py](https://github.com/cuemacro/finmarketpy/blob/master/findatatpy/util/dataconstants.py) for
             * adding your own API keys for Quandl etc.
             * changing path of your local data source (change `folder_time_series_data` attribute)

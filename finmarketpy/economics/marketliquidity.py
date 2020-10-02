@@ -26,7 +26,7 @@ class MarketLiquidity(object):
         self.logger = LoggerManager().getLogger(__name__)
         return
 
-    def calculate_spreads(self, data_frame, asset, bid_field = 'bid', ask_field = 'ask'):
+    def calculate_spreads(self, data_frame, asset, bid_field='bid', ask_field='ask'):
         if isinstance(asset, str): asset = [asset]
 
         cols = [x + '.spread' for x in asset]
@@ -38,7 +38,7 @@ class MarketLiquidity(object):
 
         return data_frame_spreads
 
-    def calculate_tick_count(self, data_frame, asset, freq = '1h'):
+    def calculate_tick_count(self, data_frame, asset, freq='1h'):
         if isinstance(asset, str): asset = [asset]
 
         data_frame_tick_count = data_frame.resample(freq, how='count').dropna()
@@ -47,6 +47,7 @@ class MarketLiquidity(object):
         data_frame_tick_count.columns = [x + '.event' for x in asset]
 
         return data_frame_tick_count
+
 
 if __name__ == '__main__':
     # see examples

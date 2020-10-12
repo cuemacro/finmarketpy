@@ -248,7 +248,7 @@ class TradeAnalysis(object):
                 current_parameter = parameter_list[i]
 
                 # for calculating P&L, change the assets
-                for k in list(current_parameter.keys()):
+                for k in current_parameter.keys():
                     setattr(br, k, current_parameter[k])
                     setattr(br.tech_params, k, current_parameter[k])
 
@@ -280,7 +280,7 @@ class TradeAnalysis(object):
                 current_parameter = parameter_list[i]
 
                 # for calculating P&L
-                for k in list(current_parameter.keys()):
+                for k in current_parameter.keys():
                     setattr(br, k, current_parameter[k])
                     setattr(br.tech_params, k, current_parameter[k])
 
@@ -394,7 +394,7 @@ class TradeAnalysis(object):
             current_parameter = parameter_list[i]
 
             # for calculating P&L
-            for k in list(current_parameter.keys()):
+            for k in current_parameter.keys():
                 setattr(br, k, current_parameter[k])
 
             trading_model.FINAL_STRATEGY = final_strategy + " " + pretty_portfolio_names[i]

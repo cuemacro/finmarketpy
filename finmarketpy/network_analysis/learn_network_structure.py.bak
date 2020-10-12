@@ -92,7 +92,7 @@ def learn_network_structure(ts_returns_data, names, alphas=4, cv=5, mode='cd',
 	_, labels = cluster.affinity_propagation(edge_model.covariance_)
 	n_labels = labels.max()
 	for i in range(n_labels + 1):
-		print(('Cluster %i: %s' % ((i + 1), ', '.join(names[labels == i]))))
+		print('Cluster %i: %s' % ((i + 1), ', '.join(names[labels == i])))
 
 	# find low-dimension embedding - useful for 2D plane visualisation
 	node_position_model = manifold.LocallyLinearEmbedding(
@@ -114,7 +114,7 @@ def learn_network_structure(ts_returns_data, names, alphas=4, cv=5, mode='cd',
 		_, labels = cluster.affinity_propagation(edge_model.covariance_)
 		n_labels = labels.max()
 		for i in range(n_labels + 1):
-			print(('Cluster %i: %s' % ((i + 1), ', '.join(names[labels == i]))))
+			print('Cluster %i: %s' % ((i + 1), ', '.join(names[labels == i])))
 
 		# find low-dimension embedding - useful for 2D plane visualisation
 		node_position_model = manifold.LocallyLinearEmbedding(

@@ -370,7 +370,7 @@ class TechIndicator(object):
                 vwap = np.cumsum(((h + l + c) / 3) * v) / np.cumsum(v)
                 vwap = pd.DataFrame(index=df_mod.index, data=vwap,
                                     columns=[close[0] + ' VWAP'])
-                print((vwap.columns))
+                print(vwap.columns)
 
                 if not tech_params.fillna:
                     vwap = vwap.reindex(data_frame.index, fill_value=np.nan)

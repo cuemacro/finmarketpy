@@ -1070,7 +1070,7 @@ class TradingModel(object):
 
         bask_results = {}
 
-        bask_keys = list(basket_dict.keys())
+        bask_keys = basket_dict.keys()
 
         # each portfolio key calculate returns - can put parts of the portfolio in the key
         if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
@@ -1533,7 +1533,7 @@ class TradingModel(object):
 
             return chart
         except Exception as e:
-            print((str(e)))
+            print(str(e))
 
     def plot_strategy_trade_no(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
         df_trades = self._strategy_trade_no
@@ -1564,9 +1564,9 @@ class TradingModel(object):
         short = signal[signal < 0].count()
         flat = signal[signal == 0].count()
 
-        df = pandas.DataFrame(index=int.index, columns=['Long', 'Short', 'Flat'])
+        df = pandas.DataFrame(index=long.index, columns=['Long', 'Short', 'Flat'])
 
-        df['Long'] = int
+        df['Long'] = long
         df['Short'] = short
         df['Flat'] = flat
 
@@ -1680,7 +1680,7 @@ class TradingModel(object):
 
     def _plot_ret_stats_helper(self, ret_stats, metric, title, file_tag, strip=None, silent_plot=False):
         style = self._create_style(title, file_tag)
-        keys = list(ret_stats.keys())
+        keys = ret_stats.keys()
         ret_metric = []
 
         for key in keys:
@@ -1719,7 +1719,7 @@ class TradingModel(object):
         # keys = self._strategy_group_benchmark_ret_stats.keys()
         yoy = []
 
-        for key in list(ret_stats.keys()):
+        for key in ret_stats.keys():
             col = ret_stats[key].yoy_rets()
             col.columns = [key]
             yoy.append(col)

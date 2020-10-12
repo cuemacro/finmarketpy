@@ -110,7 +110,7 @@ if run_example == 1 or run_example == 0:
     signals = backtest.portfolio_signal()
 
     # Print the last positions (we could also save as CSV etc.)
-    print((signals.tail(1)))
+    print(signals.tail(1))
 
     style = Style()
     style.title = "FX trend strategy"
@@ -199,7 +199,7 @@ if run_example == 2 or run_example == 0:
     print(trade_returns)
 
     # Print the last positions (we could also save as CSV etc.)
-    print((signals.tail(1)))
+    print(signals.tail(1))
 
     style = Style()
     style.title = "EUR/USD trend model"

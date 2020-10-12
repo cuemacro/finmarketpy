@@ -50,7 +50,7 @@ def test_sma():
 
     # Test Case 3: Normal case with multiple securities
     cols = get_cols_name(10)
-    col_prices = np.array(list(range(1, 9)))
+    col_prices = np.array(range(1, 9))
     data_df = pd.DataFrame(index=dates, columns=cols, data=np.tile(col_prices, (len(cols), 1)).T)
     tech_ind.create_tech_ind(data_df, indicator_name, tech_params)
     expected_signal_df = pd.DataFrame(index=dates, columns=[' '.join([col, indicator_name, 'Signal'])
@@ -68,7 +68,7 @@ def test_sma():
 
     # Test Case 4: Decreasing price with multiple securities
     cols = get_cols_name(10)
-    col_prices = np.array(list(range(8, 0, -1)))
+    col_prices = np.array(range(8, 0, -1))
     data_df = pd.DataFrame(index=dates, columns=cols, data=np.tile(col_prices, (len(cols), 1)).T)
     tech_ind.create_tech_ind(data_df, indicator_name, tech_params)
     expected_signal_df = pd.DataFrame(index=dates, columns=[' '.join([col, indicator_name, 'Signal'])

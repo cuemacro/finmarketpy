@@ -61,9 +61,9 @@ class MarketConstants(object):
     def __init__(self):
         try:
             from finmarketpy.util.marketcred import MarketCred
-            cred_keys = list(MarketCred.__dict__.keys())
+            cred_keys = MarketCred.__dict__.keys()
 
-            for k in list(MarketConstants.__dict__.keys()):
+            for k in MarketConstants.__dict__.keys():
                 if k in cred_keys and '__' not in k:
                     setattr(MarketConstants, k, getattr(MarketCred, k))
         except:

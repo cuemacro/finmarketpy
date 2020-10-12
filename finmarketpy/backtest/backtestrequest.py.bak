@@ -311,7 +311,7 @@ class BacktestRequest(MarketDataRequest):
         if isinstance(spot_tc_bp, dict):
             spot_tc_bp = spot_tc_bp.copy()
 
-            for k in list(spot_tc_bp.keys()):
+            for k in spot_tc_bp.keys():
                 spot_tc_bp[k] = float(spot_tc_bp[k]) / (2.0 * 100.0 * 100.0)
 
             self.__spot_tc_bp = spot_tc_bp

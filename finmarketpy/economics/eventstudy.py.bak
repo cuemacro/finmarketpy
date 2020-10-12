@@ -84,7 +84,7 @@ class EventStudy(object):
             ef_time_end = ef_time + timedelta(days=mins)
             ann_factor = 252
 
-        ords = list(range(-minute_start + min_offset, mins + min_offset))
+        ords = range(-minute_start + min_offset, mins + min_offset)
 
         # all data needs to be equally spaced
         if resample:

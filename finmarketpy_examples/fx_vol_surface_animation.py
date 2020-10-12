@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'
+__author__ = "saeedamen"
 
 #
 # Copyright 2016 Cuemacro
@@ -11,45 +11,71 @@ __author__ = 'saeedamen'
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
-
 """
 Shows how to load up FX vol surfaces from Bloomberg and then plot an animation of them
 """
 
-from findatapy.market import Market, MarketDataRequest, MarketDataGenerator, FXVolFactory
+from findatapy.market import (
+    Market,
+    MarketDataRequest,
+    MarketDataGenerator,
+    FXVolFactory,
+)
 from chartpy import Chart, Style
+
 
 def plot_animated_vol_market():
     market = Market(market_data_generator=MarketDataGenerator())
 
-    cross = ['EURUSD']; start_date = '01 Mar 2017'; finish_date = '21 Apr 2017'; sampling = 'no'
+    cross = ["EURUSD"]
+    start_date = "01 Mar 2017"
+    finish_date = "21 Apr 2017"
+    sampling = "no"
 
-    md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
-                                   data_source='bloomberg', cut='NYC', category='fx-implied-vol',
-                                   tickers=cross, cache_algo='cache_algo_return')
+    md_request = MarketDataRequest(
+        start_date=start_date,
+        finish_date=finish_date,
+        data_source="bloomberg",
+        cut="NYC",
+        category="fx-implied-vol",
+        tickers=cross,
+        cache_algo="cache_algo_return",
+    )
 
     df = market.fetch_market(md_request)
-    if sampling != 'no': df = df.resample(sampling).mean()
+    if sampling != "no":
+        df = df.resample(sampling).mean()
     fxvf = FXVolFactory()
     df_vs = []
 
-    # Grab the vol surface for each date and create a dataframe for each date (could have used a panel)
-    for i in range(0, len(df.index)): df_vs.append(fxvf.extract_vol_surface_for_date(df, cross[0], i))
+    # Grab the vol surface for each date and create a dataframe for each date
+    # (could have used a panel)
+    for i in range(0, len(df.index)):
+        df_vs.append(fxvf.extract_vol_surface_for_date(df, cross[0], i))
 
     # Do static plot for first day using Plotly
-    style = Style(title="FX vol surface of " + cross[0], source="chartpy", color='Blues')
+    style = Style(title="FX vol surface of " + cross[0],
+                  source="chartpy",
+                  color="Blues")
 
-    Chart(df=df_vs[0], chart_type='surface', style=style).plot(engine='plotly')
+    Chart(df=df_vs[0], chart_type="surface", style=style).plot(engine="plotly")
 
     # Now do animation (TODO: need to fix animation in chartpy for matplotlib)
-    style = Style(title="FX vol surface of " + cross[0], source="chartpy", color='Blues',
-                    animate_figure=True, animate_titles=df.index,
-                    animate_frame_ms=500, normalize_colormap=False)
+    style = Style(
+        title="FX vol surface of " + cross[0],
+        source="chartpy",
+        color="Blues",
+        animate_figure=True,
+        animate_titles=df.index,
+        animate_frame_ms=500,
+        normalize_colormap=False,
+    )
 
-    Chart(df=df_vs, chart_type='surface', style=style).plot(engine='matplotlib')
+    Chart(df=df_vs, chart_type="surface", style=style).plot(engine="matplotlib")
 
     # Chart object is initialised with the dataframe and our chart style
-    Chart(df=df_vs, chart_type='surface', style=style).plot(engine='matplotlib')
+    Chart(df=df_vs, chart_type="surface", style=style).plot(engine="matplotlib")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     plot_animated_vol_market()

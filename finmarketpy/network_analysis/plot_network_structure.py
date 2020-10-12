@@ -78,11 +78,9 @@ def plot_network_structure(
 
     """
     if not isinstance(edge_model, covariance.graph_lasso_.GraphicalLassoCV):
-        raise TypeError(
-            "edge_model must be of class "
-            "covariance.graph_lasso_"
-            ".GraphicalLassoCV "
-        )
+        raise TypeError("edge_model must be of class "
+                        "covariance.graph_lasso_"
+                        ".GraphicalLassoCV ")
 
     if not isinstance(embedding, (np.ndarray, np.generic)):
         raise TypeError("embedding must be of class ndarray.")
@@ -100,14 +98,16 @@ def plot_network_structure(
     non_zero = np.abs(np.triu(partial_correlations, k=1)) > corr_threshold
 
     # plot the nodes using the coordinates in embedding
-    plt.scatter(embedding[0], embedding[1], s=100 * d ** 2, c=labels, cmap=cmap_scatter)
+    plt.scatter(embedding[0],
+                embedding[1],
+                s=100 * d**2,
+                c=labels,
+                cmap=cmap_scatter)
 
     # plot the edges
     start_idx, end_idx = np.where(non_zero)
-    segments = [
-        [embedding[:, start], embedding[:, stop]]
-        for start, stop in zip(start_idx, end_idx)
-    ]
+    segments = [[embedding[:, start], embedding[:, stop]]
+                for start, stop in zip(start_idx, end_idx)]
     corr_values = np.abs(partial_correlations[non_zero])
     lc = LineCollection(
         segments,
@@ -121,7 +121,8 @@ def plot_network_structure(
 
     # add a label to each node
     n_labels = labels.max()
-    for index, (name, label, (x, y)) in enumerate(zip(names, labels, embedding.T)):
+    for index, (name, label, (x,
+                              y)) in enumerate(zip(names, labels, embedding.T)):
 
         dx = x - embedding[0]
         dx[index] = 1
@@ -148,9 +149,9 @@ def plot_network_structure(
             size=10,
             horizontalalignment=horizontalalignment,
             verticalalignment=verticalalignment,
-            bbox=dict(
-                facecolor="w", edgecolor=edgecolor(label / float(n_labels)), alpha=alpha
-            ),
+            bbox=dict(facecolor="w",
+                      edgecolor=edgecolor(label / float(n_labels)),
+                      alpha=alpha),
         )
 
         plt.xlim(

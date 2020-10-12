@@ -1,6 +1,10 @@
-__author__ = 'saeedamen'
+__author__ = "saeedamen"
 
-from finmarketpy.economics.eventstudy import EventsFactory, EventStudy, HistEconDataFactory
+from finmarketpy.economics.eventstudy import (
+    EventsFactory,
+    EventStudy,
+    HistEconDataFactory,
+)
 from finmarketpy.economics.quickchart import QuickChart
 from finmarketpy.economics.marketliquidity import MarketLiquidity
 from finmarketpy.economics.seasonality import Seasonality

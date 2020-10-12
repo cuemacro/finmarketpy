@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'
+__author__ = "saeedamen"
 
 from finmarketpy.backtest.backtestengine import Backtest
 from finmarketpy.backtest.backtestrequest import BacktestRequest

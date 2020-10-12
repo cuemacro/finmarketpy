@@ -1,4 +1,4 @@
-__author__ = 'saeedamen & mhockenberger'  # Saeed Amen & Marcel Hockenberger
+__author__ = "saeedamen & mhockenberger"  # Saeed Amen & Marcel Hockenberger
 
 #
 # Copyright 2016 Cuemacro
@@ -46,12 +46,11 @@ class TechIndicator(object):
         self._techind = None
         self._signal = None
 
-    def create_tech_ind(
-            self,
-            data_frame_non_nan,
-            name,
-            tech_params,
-            data_frame_non_nan_early=None):
+    def create_tech_ind(self,
+                        data_frame_non_nan,
+                        name,
+                        tech_params,
+                        data_frame_non_nan_early=None):
         self._signal = None
         self._techind = None
 
@@ -65,15 +64,15 @@ class TechIndicator(object):
 
         if name == "SMA":
 
-            if (data_frame_non_nan_early is not None):
+            if data_frame_non_nan_early is not None:
                 # calculate the lagged sum of the n-1 point
-                if pd.__version__ < '0.17':
-                    rolling_sum = pd.rolling_sum(
-                        data_frame.shift(1).rolling,
-                        window=tech_params.sma_period - 1)
+                if pd.__version__ < "0.17":
+                    rolling_sum = pd.rolling_sum(data_frame.shift(1).rolling,
+                                                 window=tech_params.sma_period -
+                                                 1)
                 else:
-                    rolling_sum = data_frame.shift(1).rolling(
-                        center=False, window=tech_params.sma_period - 1).sum()
+                    rolling_sum = (data_frame.shift(1).rolling(
+                        center=False, window=tech_params.sma_period - 1).sum())
 
                 # add non-nan one for today
                 rolling_sum = rolling_sum + data_frame_early
@@ -83,7 +82,7 @@ class TechIndicator(object):
 
                 narray = np.where(data_frame_early > self._techind, 1, -1)
             else:
-                if pd.__version__ < '0.17':
+                if pd.__version__ < "0.17":
                     self._techind = pd.rolling_sum(
                         data_frame, window=tech_params.sma_period)
                 else:
@@ -95,48 +94,53 @@ class TechIndicator(object):
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
             self._signal.loc[0:tech_params.sma_period] = np.nan
             self._signal.columns = [
-                x + " SMA Signal" for x in data_frame.columns.values]
+                x + " SMA Signal" for x in data_frame.columns.values
+            ]
 
             self._techind.columns = [
-                x + " SMA" for x in data_frame.columns.values]
+                x + " SMA" for x in data_frame.columns.values
+            ]
 
         elif name == "EMA":
 
             # self._techind = pd.ewma(data_frame, span = tech_params.ema_period)
-            self._techind = data_frame.ewm(
-                ignore_na=False,
-                span=tech_params.ema_period,
-                min_periods=0,
-                adjust=True).mean()
+            self._techind = data_frame.ewm(ignore_na=False,
+                                           span=tech_params.ema_period,
+                                           min_periods=0,
+                                           adjust=True).mean()
 
             narray = np.where(data_frame > self._techind, 1, -1)
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
             self._signal.loc[0:tech_params.ema_period] = np.nan
             self._signal.columns = [
-                x + " EMA Signal" for x in data_frame.columns.values]
+                x + " EMA Signal" for x in data_frame.columns.values
+            ]
 
             self._techind.columns = [
-                x + " EMA" for x in data_frame.columns.values]
+                x + " EMA" for x in data_frame.columns.values
+            ]
 
         elif name == "ROC":
 
-            if (data_frame_non_nan_early is not None):
-                self._techind = data_frame_early / \
-                    data_frame.shift(tech_params.roc_period) - 1
+            if data_frame_non_nan_early is not None:
+                self._techind = (data_frame_early /
+                                 data_frame.shift(tech_params.roc_period) - 1)
             else:
-                self._techind = data_frame / \
-                    data_frame.shift(tech_params.roc_period) - 1
+                self._techind = (
+                    data_frame / data_frame.shift(tech_params.roc_period) - 1)
 
             narray = np.where(self._techind > 0, 1, -1)
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
             self._signal.loc[0:tech_params.roc_period] = np.nan
             self._signal.columns = [
-                x + " ROC Signal" for x in data_frame.columns.values]
+                x + " ROC Signal" for x in data_frame.columns.values
+            ]
 
             self._techind.columns = [
-                x + " ROC" for x in data_frame.columns.values]
+                x + " ROC" for x in data_frame.columns.values
+            ]
 
         elif name == "polarity":
             self._techind = data_frame
@@ -145,24 +149,25 @@ class TechIndicator(object):
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
             self._signal.columns = [
-                x + " Polarity Signal" for x in data_frame.columns.values]
+                x + " Polarity Signal" for x in data_frame.columns.values
+            ]
 
             self._techind.columns = [
-                x + " Polarity" for x in data_frame.columns.values]
+                x + " Polarity" for x in data_frame.columns.values
+            ]
 
         elif name == "SMA2":
-            sma = data_frame.rolling(
-                window=tech_params.sma_period,
-                center=False).mean()
-            sma2 = data_frame.rolling(
-                window=tech_params.sma2_period,
-                center=False).mean()
+            sma = data_frame.rolling(window=tech_params.sma_period,
+                                     center=False).mean()
+            sma2 = data_frame.rolling(window=tech_params.sma2_period,
+                                      center=False).mean()
 
             narray = np.where(sma > sma2, 1, -1)
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
             self._signal.columns = [
-                x + " SMA2 Signal" for x in data_frame.columns.values]
+                x + " SMA2 Signal" for x in data_frame.columns.values
+            ]
 
             sma.columns = [x + " SMA" for x in data_frame.columns.values]
             sma2.columns = [x + " SMA2" for x in data_frame.columns.values]
@@ -170,7 +175,7 @@ class TechIndicator(object):
             self._signal.loc[0:most] = np.nan
             self._techind = pd.concat([sma, sma2], axis=1)
 
-        elif name in ['RSI']:
+        elif name in ["RSI"]:
             # delta = data_frame.diff()
             #
             # dUp, dDown = delta.copy(), delta.copy()
@@ -195,19 +200,18 @@ class TechIndicator(object):
 
             # Calculate the EWMA
             roll_up1 = pd.stats.moments.ewma(up, tech_params.rsi_period)
-            roll_down1 = pd.stats.moments.ewma(
-                down.abs(), tech_params.rsi_period)
+            roll_down1 = pd.stats.moments.ewma(down.abs(),
+                                               tech_params.rsi_period)
 
             # Calculate the RSI based on EWMA
             RS1 = roll_up1 / roll_down1
             RSI1 = 100.0 - (100.0 / (1.0 + RS1))
 
             # Calculate the SMA
-            roll_up2 = up.rolling(
-                window=tech_params.rsi_period,
-                center=False).mean()
-            roll_down2 = down.abs().rolling(
-                window=tech_params.rsi_period, center=False).mean()
+            roll_up2 = up.rolling(window=tech_params.rsi_period,
+                                  center=False).mean()
+            roll_down2 = (down.abs().rolling(window=tech_params.rsi_period,
+                                             center=False).mean())
 
             # Calculate the RSI based on SMA
             RS2 = roll_up2 / roll_down2
@@ -215,7 +219,8 @@ class TechIndicator(object):
 
             self._techind = RSI2
             self._techind.columns = [
-                x + " RSI" for x in data_frame.columns.values]
+                x + " RSI" for x in data_frame.columns.values
+            ]
 
             signal = data_frame.copy()
 
@@ -230,32 +235,35 @@ class TechIndicator(object):
             signal[buys] = 1
             signal[sells] = -1
             signal[~(buys | sells)] = np.nan
-            signal = signal.fillna(method='ffill')
+            signal = signal.fillna(method="ffill")
 
             self._signal = signal
 
             self._signal.loc[0:tech_params.rsi_period] = np.nan
             self._signal.columns = [
-                x + " RSI Signal" for x in data_frame.columns.values]
+                x + " RSI Signal" for x in data_frame.columns.values
+            ]
 
         elif name in ["BB"]:
             # calcuate Bollinger bands
-            mid = data_frame.rolling(
-                center=False, window=tech_params.bb_period).mean()
+            mid = data_frame.rolling(center=False,
+                                     window=tech_params.bb_period).mean()
             mid.columns = [x + " BB Mid" for x in data_frame.columns.values]
-            std_dev = data_frame.rolling(
-                center=False, window=tech_params.bb_period).std()
+            std_dev = data_frame.rolling(center=False,
+                                         window=tech_params.bb_period).std()
             BB_std = tech_params.bb_mult * std_dev
 
             lower = pd.DataFrame(
                 data=mid.values - BB_std.values,
                 index=mid.index,
-                columns=data_frame.columns)
+                columns=data_frame.columns,
+            )
 
             upper = pd.DataFrame(
                 data=mid.values + BB_std.values,
                 index=mid.index,
-                columns=data_frame.columns)
+                columns=data_frame.columns,
+            )
 
             # calculate signals
             signal = data_frame.copy()
@@ -266,18 +274,17 @@ class TechIndicator(object):
             signal[buys] = 1
             signal[sells] = -1
             signal[~(buys | sells)] = np.nan
-            signal = signal.fillna(method='ffill')
+            signal = signal.fillna(method="ffill")
 
             self._signal = signal
             self._signal.loc[0:tech_params.bb_period] = np.nan
             self._signal.columns = [
-                x + " " + name + " Signal" for x in data_frame.columns.values]
+                x + " " + name + " Signal" for x in data_frame.columns.values
+            ]
 
-            lower.columns = [
-                x + " BB Lower" for x in data_frame.columns.values]
+            lower.columns = [x + " BB Lower" for x in data_frame.columns.values]
             upper.columns = [x + " BB Mid" for x in data_frame.columns.values]
-            upper.columns = [
-                x + " BB Lower" for x in data_frame.columns.values]
+            upper.columns = [x + " BB Lower" for x in data_frame.columns.values]
 
             self._techind = pd.concat([lower, mid, upper], axis=1)
         elif name == "long-only":
@@ -288,29 +295,32 @@ class TechIndicator(object):
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
             self._signal.columns = [
-                x + " Long Only Signal" for x in data_frame.columns.values]
+                x + " Long Only Signal" for x in data_frame.columns.values
+            ]
 
             self._techind.columns = [
-                x + " Long Only" for x in data_frame.columns.values]
+                x + " Long Only" for x in data_frame.columns.values
+            ]
 
         elif name == "ATR":
             # get all the asset names (assume we have names 'close', 'low', 'high' in the Data)
             # keep ordering of assets
-            asset_name = list(OrderedDict.fromkeys(
-                [x.split('.')[0] for x in data_frame.columns]))
+            asset_name = list(
+                OrderedDict.fromkeys(
+                    [x.split(".")[0] for x in data_frame.columns]))
 
             df = []
 
             # can improve the performance of this if vectorise more!
             for a in asset_name:
 
-                close = [a + '.close']
-                low = [a + '.low']
-                high = [a + '.high']
+                close = [a + ".close"]
+                low = [a + ".low"]
+                high = [a + ".high"]
 
                 # if we don't fill NaNs, we need to remove those rows and then
                 # calculate the ATR
-                if not(tech_params.fillna):
+                if not (tech_params.fillna):
                     data_frame_short = data_frame[[close[0], low[0], high[0]]]
                     data_frame_short = data_frame_short.dropna()
                 else:
@@ -318,43 +328,45 @@ class TechIndicator(object):
 
                 prev_close = data_frame_short[close].shift(1)
 
-                c1 = data_frame_short[high].values - \
-                    data_frame_short[low].values
+                c1 = data_frame_short[high].values - data_frame_short[low].values
                 c2 = np.abs(data_frame_short[high].values - prev_close.values)
                 c3 = np.abs(data_frame_short[low].values - prev_close.values)
 
                 true_range = np.max((c1, c2, c3), axis=0)
                 true_range = pd.DataFrame(
-                    index=data_frame_short.index, data=true_range, columns=[
-                        close[0] + ' True Range'])
+                    index=data_frame_short.index,
+                    data=true_range,
+                    columns=[close[0] + " True Range"],
+                )
 
                 # put back NaNs into ATR if necessary
-                if (not(tech_params.fillna)):
-                    true_range = true_range.reindex(
-                        data_frame.index, fill_value=np.nan)
+                if not (tech_params.fillna):
+                    true_range = true_range.reindex(data_frame.index,
+                                                    fill_value=np.nan)
 
                 df.append(true_range)
 
             calc = Calculations()
             true_range = calc.pandas_outer_join(df)
 
-            self._techind = true_range.rolling(
-                window=tech_params.atr_period, center=False).mean()
+            self._techind = true_range.rolling(window=tech_params.atr_period,
+                                               center=False).mean()
             # self._techind = true_range.ewm(ignore_na=False, span=tech_params.atr_period, min_periods=0, adjust=True).mean()
 
             self._techind.columns = [x + ".close ATR" for x in asset_name]
 
         elif name in ["VWAP"]:
-            asset_name = list(OrderedDict.fromkeys(
-                [x.split('.')[0] for x in data_frame.columns]))
+            asset_name = list(
+                OrderedDict.fromkeys(
+                    [x.split(".")[0] for x in data_frame.columns]))
 
             df = []
 
             for a in asset_name:
-                high = [a + '.high']
-                low = [a + '.low']
-                close = [a + '.close']
-                volume = [a + '.volume']
+                high = [a + ".high"]
+                low = [a + ".low"]
+                close = [a + ".close"]
+                volume = [a + ".volume"]
 
                 if not tech_params.fillna:
                     df_mod = data_frame[[high[0], low[0], close[0], volume[0]]]
@@ -368,8 +380,9 @@ class TechIndicator(object):
                 v = df_mod[volume].values
 
                 vwap = np.cumsum(((h + l + c) / 3) * v) / np.cumsum(v)
-                vwap = pd.DataFrame(index=df_mod.index, data=vwap,
-                                    columns=[close[0] + ' VWAP'])
+                vwap = pd.DataFrame(index=df_mod.index,
+                                    data=vwap,
+                                    columns=[close[0] + " VWAP"])
                 print((vwap.columns))
 
                 if not tech_params.fillna:
@@ -384,36 +397,29 @@ class TechIndicator(object):
 
             self._techind.columns = [x + ".close VWAP" for x in asset_name]
 
-        self.create_custom_tech_ind(
-            data_frame_non_nan,
-            name,
-            tech_params,
-            data_frame_non_nan_early)
+        self.create_custom_tech_ind(data_frame_non_nan, name, tech_params,
+                                    data_frame_non_nan_early)
 
         # TODO create other indicators
-        if hasattr(tech_params, 'only_allow_longs'):
+        if hasattr(tech_params, "only_allow_longs"):
             self._signal[self._signal < 0] = 0
 
         # TODO create other indicators
-        if hasattr(tech_params, 'only_allow_shorts'):
+        if hasattr(tech_params, "only_allow_shorts"):
             self._signal[self._signal > 0] = 0
 
         # apply signal multiplier (typically to flip signals)
-        if hasattr(tech_params, 'signal_mult'):
+        if hasattr(tech_params, "signal_mult"):
             self._signal = self._signal * tech_params.signal_mult
 
-        if hasattr(tech_params, 'strip_signal_name'):
+        if hasattr(tech_params, "strip_signal_name"):
             if tech_params.strip_signal_name:
                 self._signal.columns = data_frame.columns
 
         return self._techind, self._signal
 
-    def create_custom_tech_ind(
-            self,
-            data_frame_non_nan,
-            name,
-            tech_params,
-            data_frame_non_nan_early):
+    def create_custom_tech_ind(self, data_frame_non_nan, name, tech_params,
+                               data_frame_non_nan_early):
         return
 
     def get_techind(self):
@@ -422,16 +428,23 @@ class TechIndicator(object):
     def get_signal(self):
         return self._signal
 
+
 ##########################################################################
 
 
 class TechParams:
-    """Holds parameters for calculation of technical indicators.
+    """Holds parameters for calculation of technical indicators."""
 
-    """
-
-    def __init__(self, fillna=True, atr_period=14, sma_period=20,
-                 green_n=4, green_count=9, red_n=2, red_count=13):
+    def __init__(
+        self,
+        fillna=True,
+        atr_period=14,
+        sma_period=20,
+        green_n=4,
+        green_count=9,
+        red_n=2,
+        red_count=13,
+    ):
         self.fillna = fillna
         self.atr_period = atr_period
         self.sma_period = sma_period
@@ -442,64 +455,83 @@ class TechParams:
         self.red_count = red_count
 
     @property
-    def fillna(self): return self.__fillna
+    def fillna(self):
+        return self.__fillna
 
     @fillna.setter
-    def fillna(self, fillna): self.__fillna = fillna
+    def fillna(self, fillna):
+        self.__fillna = fillna
 
     @property
-    def atr_period(self): return self.__atr_period
+    def atr_period(self):
+        return self.__atr_period
 
     @atr_period.setter
-    def atr_period(self, atr_period): self.__atr_period = atr_period
+    def atr_period(self, atr_period):
+        self.__atr_period = atr_period
 
     @property
-    def sma_period(self): return self.__sma_period
+    def sma_period(self):
+        return self.__sma_period
 
     @sma_period.setter
-    def sma_period(self, sma_period): self.__sma_period = sma_period
+    def sma_period(self, sma_period):
+        self.__sma_period = sma_period
 
     @property
-    def green_n(self): return self.__green_n
+    def green_n(self):
+        return self.__green_n
 
     @green_n.setter
-    def green_n(self, green_n): self.__green_n = green_n
+    def green_n(self, green_n):
+        self.__green_n = green_n
 
     @property
-    def green_count(self): return self.__green_count
+    def green_count(self):
+        return self.__green_count
 
     @green_count.setter
-    def green_count(self, green_count): self.__green_count = green_count
+    def green_count(self, green_count):
+        self.__green_count = green_count
 
     @property
-    def red_n(self): return self.__red_n
+    def red_n(self):
+        return self.__red_n
 
     @red_n.setter
-    def red_n(self, red_n): self.__red_n = red_n
+    def red_n(self, red_n):
+        self.__red_n = red_n
 
     @property
-    def red_count(self): return self.__red_count
+    def red_count(self):
+        return self.__red_count
 
     @property
-    def only_allow_shorts(self): return self.__only_allow_shorts    \
+    def only_allow_shorts(self):
+        return self.__only_allow_shorts
 
     @property
-    def only_allow_longs(self): return self.__only_allow_longs
+    def only_allow_longs(self):
+        return self.__only_allow_longs
 
     @red_count.setter
-    def red_count(self, red_count): self.__red_count = red_count
+    def red_count(self, red_count):
+        self.__red_count = red_count
 
     @only_allow_longs.setter
     def only_allow_longs(self, only_allow_longs):
-        if hasattr(self, 'only_allow_shorts'):
-            raise Exception('Attribute only_allow_shorts is already defined and it is not compatible with attribute '
-                            'only_allow_longs')
+        if hasattr(self, "only_allow_shorts"):
+            raise Exception(
+                "Attribute only_allow_shorts is already defined and it is not compatible with attribute "
+                "only_allow_longs")
         self.__only_allow_longs = only_allow_longs
 
     @only_allow_shorts.setter
     def only_allow_shorts(self, only_allow_shorts):
-        if hasattr(self, 'only_allow_longs'):
-            raise Exception('Attribute only_allow_longs is already defined and it is not compatible with attribute '
-                            'only_allow_shorts')
+        if hasattr(self, "only_allow_longs"):
+            raise Exception(
+                "Attribute only_allow_longs is already defined and it is not compatible with attribute "
+                "only_allow_shorts")
         self.__only_allow_shorts = only_allow_shorts
+
     # TODO add specific fields so can error check fields

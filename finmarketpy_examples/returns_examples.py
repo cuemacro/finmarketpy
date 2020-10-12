@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'
+__author__ = "saeedamen"
 
 #
 # Copyright 2020 Cuemacro
@@ -11,7 +11,6 @@ __author__ = 'saeedamen'
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
-
 """
 Shows how to calculate returns of an asset
 """
@@ -31,7 +30,7 @@ ta = TradeAnalysis()
 calc = Calculations()
 logger = LoggerManager().getLogger(__name__)
 
-chart = Chart(engine='matplotlib')
+chart = Chart(engine="matplotlib")
 
 market = Market(market_data_generator=MarketDataGenerator())
 
@@ -40,17 +39,20 @@ market = Market(market_data_generator=MarketDataGenerator())
 
 run_example = 0
 
-###### Use PyFolio to analyse gold's return properties
+# Use PyFolio to analyse gold's return properties
 if run_example == 1 or run_example == 0:
     md_request = MarketDataRequest(
-                start_date = "01 Jan 1996",                         # start date
-                data_source = 'bloomberg',                          # use Bloomberg as data source
-                tickers = ['Gold'],
-                fields = ['close'],                                 # which fields to download
-                vendor_tickers = ['XAUUSD Curncy'],                 # ticker (Bloomberg)
-                vendor_fields = ['PX_LAST'],                        # which Bloomberg fields to download
-                cache_algo = 'internet_load_return')                # how to return data
+        start_date="01 Jan 1996",  # start date
+        data_source="bloomberg",  # use Bloomberg as data source
+        tickers=["Gold"],
+        # which fields to download
+        fields=["close"],
+        vendor_tickers=["XAUUSD Curncy"],  # ticker (Bloomberg)
+        # which Bloomberg fields to download
+        vendor_fields=["PX_LAST"],
+        cache_algo="internet_load_return",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 
-    ta.run_strategy_returns_stats(None, index=df, engine='pyfolio')
+    ta.run_strategy_returns_stats(None, index=df, engine="pyfolio")

@@ -31,7 +31,7 @@ class MarketConstants(object):
         generic_plat = 'linux'
     elif 'windows' in plat: 
         generic_plat = 'windows'
-    elif 'darwin' in plat: 
+    elif ('darwin' in plat or 'macos' in plat): 
         generic_plat = 'mac'
 
     # "thread" or "multiprocessing" (experimental!) library to use when backtesting

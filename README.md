@@ -104,6 +104,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.7 - finmarketpy (20 Oct 2020)
 * 0.11.6 - finmarketpy (02 Oct 2020)
 * 0.11.5 - finmarketpy (24 Aug 2020)
 * 0.11.4 - finmarketpy (06 May 2020)
@@ -116,6 +117,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 20 Oct 2020
+    * Fixed missing GBP depo tickers
+    * Fixed startup on newer MacOS
 * 02 Oct 2020
     * Fixed vol surface calculation
 * 24 Aug 2020

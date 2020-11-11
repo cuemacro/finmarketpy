@@ -37,7 +37,7 @@ class QuickChart(object):
     def plot_chart(self, tickers=None, tickers_rhs=None, start_date=None, finish_date=None,
                    chart_file=None, chart_type='line', title='',
                    fields={'close' : 'PX_LAST'}, freq='daily', source='Web', brand_label='Cuemacro', display_brand_label=True,
-                   reindex=False, yoy=False, plotly_plot_mode='offline_png',
+                   reindex=False, additive_index=False, yoy=False, plotly_plot_mode='offline_png',
                    quandl_api_key=dataconstants.quandl_api_key,
                    fred_api_key=dataconstants.fred_api_key,
                    alpha_vantage_api_key=dataconstants.alpha_vantage_api_key, df=None):
@@ -97,6 +97,11 @@ class QuickChart(object):
             df = Calculations().create_mult_index_from_prices(df)
 
             style.y_title = 'Reindexed from 100'
+
+        if additive_index:
+            df = (df - df.shift(1)).cumsum()
+
+            style.y_title = 'Additive changes from 0'
 
         if yoy:
             if freq == 'daily':

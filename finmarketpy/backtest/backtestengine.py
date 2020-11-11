@@ -446,23 +446,33 @@ class Backtest(object):
             self._portfolio_cum = resultsC.get()
 
         else:
-            # calculate return statistics of the each asset/signal after signal leverage (but before portfolio level constraints)
+            # Calculate return statistics of the each asset/signal after signal leverage (but before portfolio level constraints)
             # self._ret_stats_pnl.calculate_ret_stats()
 
-            # calculate return statistics of the each asset/signal after signal leverage AND after portfolio level constraints
+            # Calculate return statistics of the each asset/signal after signal leverage AND after portfolio level constraints
             # self._ret_stats_pnl_components.calculate_ret_stats()
 
-            # calculate return statistics of the final portfolio
+            # Calculate return statistics of the final portfolio
             # self._ret_stats_portfolio.calculate_ret_stats()
 
-            # calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
-            self._pnl_cum = calculations.create_mult_index(self._pnl)
+            # Calculate final portfolio cumulative P&L
+            if br.cum_index == 'mult':
+                # Calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
+                self._pnl_cum = calculations.create_mult_index(self._pnl)
 
-            # calculate individual signals cumulative P&L after signal leverage AND after portfolio level constraints
-            self._components_pnl_cum = calculations.create_mult_index(self._components_pnl)
+                # Calculate individual signals cumulative P&L after signal leverage AND after portfolio level constraints
+                self._components_pnl_cum = calculations.create_mult_index(self._components_pnl)
 
-            # calculate final portfolio cumulative P&L
-            self._portfolio_cum = calculations.create_mult_index(self._portfolio)  # portfolio cumulative P&L
+                self._portfolio_cum = calculations.create_mult_index(self._portfolio)  # portfolio cumulative P&L
+
+            elif br.cum_index == 'add':
+                # Calculate individual signals cumulative P&L after signal leverage but before portfolio level constraints
+                self._pnl_cum = calculations.create_add_index(self._pnl)
+
+                # Calculate individual signals cumulative P&L after signal leverage AND after portfolio level constraints
+                self._components_pnl_cum = calculations.create_add_index(self._components_pnl)
+
+                self._portfolio_cum = calculations.create_add_index(self._portfolio)  # portfolio cumulative P&L
 
         logger.info("Completed cumulative index calculations")
 
@@ -1329,7 +1339,10 @@ class TradingModel(object):
                 strategy_benchmark_df = filter.filter_time_series_by_date(br.plot_start, br.finish_date,
                                                                           strategy_benchmark_df)
 
-            strategy_benchmark_df = calculations.create_mult_index_from_prices(strategy_benchmark_df)
+            if br.cum_index == 'mult':
+                strategy_benchmark_df = calculations.create_mult_index_from_prices(strategy_benchmark_df)
+            elif br.cum_index == 'add':
+                strategy_benchmark_df = calculations.create_add_index_from_prices(strategy_benchmark_df)
 
             self._strategy_benchmark_pnl = benchmark_df
             self._strategy_benchmark_pnl_ret_stats = ret_stats
@@ -1957,7 +1970,10 @@ class RiskEngine(object):
 
         returns_df, leverage_df = self.calculate_vol_adjusted_returns(prices_df, br, returns=False)
 
-        return calculations.create_mult_index(returns_df)
+        if br.cum_index == 'mult':
+            return calculations.create_mult_index(returns_df)
+        elif br.cum_index == 'add':
+            return calculations.create_add_index(returns_df)
 
     def calculate_vol_adjusted_returns(self, returns_df, br, returns=True):
         """Adjusts returns for a vol target

@@ -80,6 +80,9 @@ class TradingModelFXTrend_Example(TradingModel):
         # Tech params
         br.tech_params.sma_period = 200
 
+        # To make additive indices
+        # br.cum_index = 'add'
+
         return br
 
     def load_assets(self, br = None):

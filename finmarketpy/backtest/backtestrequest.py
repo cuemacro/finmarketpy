@@ -75,6 +75,11 @@ class BacktestRequest(MarketDataRequest):
         # annualization factor for return stats (and should we resample data first before calculating it?)
         self.__ann_factor = 252
         self.__resample_ann_factor = None
+
+        # how do we create a cumulative index of strategy returns
+        # either multiplicative starting a 100
+        # or additive starting at 0
+        self.__cum_index = 'mult' # 'mult' or 'add'
         
     ##### properties for output of the backtest
     @property
@@ -376,3 +381,11 @@ class BacktestRequest(MarketDataRequest):
     @resample_ann_factor.setter
     def resample_ann_factor(self, resample_ann_factor):
         self.__resample_ann_factor = resample_ann_factor
+        
+    @property
+    def cum_index(self):
+        return self.__cum_index
+
+    @cum_index.setter
+    def cum_index(self, cum_index):
+        self.__cum_index = cum_index

@@ -117,6 +117,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 11 Nov 2020
+    * Added cumulative additive index flag for backtests
 * 20 Oct 2020
     * Fixed missing GBP depo tickers
     * Fixed startup on newer MacOS

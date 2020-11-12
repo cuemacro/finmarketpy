@@ -100,7 +100,7 @@ Binder instance to start.
 Note that you will need to get a Quandl
 API key to download market data for some of these, and you can sign up for a free account at https://www.quandl.com.
 
-* [backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_notebooks/backtest_example.ipynb)
+* [backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/backtest_example.ipynb)
 
 # Contributors
 

@@ -33,4 +33,4 @@ RUN pip install --no-cache-dir -r /tmp/finmarketpy/requirements.txt && \
 
 RUN ln -s /home/${NB_USER}/finmarketpy/home/${NB_USER}/work/tcapy
 RUN ln -s /home/${NB_USER}/finmarketpy_examples /home/${NB_USER}/work/finmarketpy_examples
-RUN ln -s /home/${NB_USER}/finmarketpy_examples/finmarketpy_notebooks /home/${NB_USER}/work/finmarketpy_notebooks
+RUN ln -s /home/${NB_USER}/finmarketpy_examples/finmarketpy_notebooks /home/${NB_USER}/work/finmarketpy_examples/finmarketpy_notebooks

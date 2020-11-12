@@ -15,9 +15,9 @@ RUN chown -R ${NB_UID} ${HOME}
 USER root
 
 # Minimal dependencies
-#RUN apt-get update && \
-#    apt-get install -y --no-install-recommends \
-#    libsnappy-dev gcc g++ unixodbc-dev
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libsnappy-dev gcc g++ unixodbc-dev
 
 # Dependencies for pystore and weasyprint in buildDeps
 # If we don't want to use weasyprint we
@@ -28,7 +28,7 @@ USER root
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
 
-RUN pip install --no-cache-dir /tmp/finmarketpy && \
+RUN pip install --no-cache-dir /tmp/finmarketpy/requirements.txt && \
     rm -rf /tmp/finmarketpy
 
 RUN ln -s /home/${NB_USER}/finmarketpy/home/${NB_USER}/work/tcapy

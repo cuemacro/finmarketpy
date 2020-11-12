@@ -92,15 +92,15 @@ pip install git+https://github.com/cuemacro/chartpy.git
 pip install git+https://github.com/cuemacro/findatapy.git
 ```
 
-# Binder and Jupyter
+# Binder and Jupyter - Run finmarketpy in your browser
 
-You can run some of the Jupyter notebooks in Binder interactively in your browser. It might take a few minutes for the 
-Binder instance to start.
+You can run some of the Jupyter notebooks in Binder interactively in your browser to play around with finmarketpy. It might take a few minutes for the 
+Binder instance to start. We are currently working on having more notebooks in Binder, so stay tuned!
 
 Note that you will need to get a Quandl
-API key to download market data for some of these, and you can sign up for a free account at https://www.quandl.com.
+API key to download market data to use some of these, and you can sign up for a free account at https://www.quandl.com.
 
-* [backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/backtest_example.ipynb)
+* [Backtesting an FX trend following strategy - backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/backtest_example.ipynb)
 
 # Contributors
 

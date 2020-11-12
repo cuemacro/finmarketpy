@@ -28,7 +28,7 @@ RUN apt-get update && \
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
 
-RUN pip install --no-cache-dir /tmp/finmarketpy/requirements.txt && \
+RUN pip install --no-cache-dir -r /tmp/finmarketpy/requirements.txt && \
     rm -rf /tmp/finmarketpy
 
 RUN ln -s /home/${NB_USER}/finmarketpy/home/${NB_USER}/work/tcapy

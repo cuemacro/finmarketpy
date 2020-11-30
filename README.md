@@ -113,7 +113,7 @@ to the libriares please let us know too!
 We have spent many years writing finmarketpy and other open source libraries at Cuemacro, and we are keen to do so
 for many years into the future.
  
-If you are interested in sponsoring Cuemacro's library, you can do so through the
+If you using our libraries and are interested in sponsoring Cuemacro's open source libraries, you can do so through the
 GitHub sponsorship page at https://github.com/sponsors/cuemacro
 
 We also offer commercial services for our Cuemacro libraries, which include:

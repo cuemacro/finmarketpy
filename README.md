@@ -110,15 +110,21 @@ to the libriares please let us know too!
 
 # Sponsorship, workshops and support for Cuemacro libraries
 
-We have spent many years writing finmarketpy and other open source libraries at Cuemacro.
+We have spent many years writing finmarketpy and other open source libraries at Cuemacro, and we are keen to do so
+for many years into the future.
  
 If you are interested in sponsoring Cuemacro's library, you can do so through the
 GitHub sponsorship page at https://github.com/sponsors/cuemacro
 
-We also offer commercial support and workshops to teach how to use Cuemacro's libraries. If you are interested in our commercial services
-please contact saeed@cuemacro.com
+We also offer commercial services for our Cuemacro libraries, which include:
 
-All these sources of funding help us to maintain Cuemacro's libraries, so we can improve our open source libraries for the community.
+* a 2 day Python for finance workshop, which can be taught at your firm, to teach you how to use Cuemacro's libraries 
+* extensive commercial technical support for our libraries
+
+If you are interested in our commercial services please contact saeed@cuemacro.com
+
+All these sources of funding, whether it is sponsorship or our commercial services, help us to maintain Cuemacro's libraries, 
+so we can improve our open source libraries for the community.
 
 # finmarketpy examples
 

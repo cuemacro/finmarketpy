@@ -108,6 +108,18 @@ Contributors are always welcome for finmarketpy, findatapy and chartpy. If you'd
 [Planned Features](PLANNED_FEATURES.md) for areas we're looking for help on. Or if you have any ideas for improvements
 to the libriares please let us know too!
 
+# Sponsorship, workshops and support for Cuemacro libraries
+
+We have spent many years writing finmarketpy and other open source libraries at Cuemacro.
+ 
+If you are interested in sponsoring Cuemacro's library, you can do so through the
+GitHub sponsorship page at https://github.com/sponsors/cuemacro
+
+We also offer commercial support and workshops to teach how to use Cuemacro's libraries. If you are interested in our commercial services
+please contact saeed@cuemacro.com
+
+All these sources of funding help us to maintain Cuemacro's libraries, so we can improve our open source libraries for the community.
+
 # finmarketpy examples
 
 In finmarketpy/examples you will find several examples, including some simple trading models

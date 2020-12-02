@@ -19,8 +19,6 @@ Has various constants required for the finmarketpy project. These have been defi
 
 """
 
-
-
 class MarketConstants(object):
     import platform
 

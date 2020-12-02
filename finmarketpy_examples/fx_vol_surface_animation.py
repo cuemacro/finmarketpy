@@ -13,7 +13,8 @@ __author__ = 'saeedamen'
 #
 
 """
-Shows how to load up FX vol surfaces from Bloomberg and then plot an animation of them
+Shows how to load up FX vol surfaces from Bloomberg and then plot an animation of them. Note, this does not do
+any interpolation.
 """
 
 from findatapy.market import Market, MarketDataRequest, MarketDataGenerator, FXVolFactory
@@ -46,10 +47,10 @@ def plot_animated_vol_market():
                     animate_figure=True, animate_titles=df.index,
                     animate_frame_ms=500, normalize_colormap=False)
 
-    Chart(df=df_vs, chart_type='surface', style=style).plot(engine='matplotlib')
+    Chart(df=df_vs, chart_type='surface', style=style).plot(engine='plotly')
 
     # Chart object is initialised with the dataframe and our chart style
-    Chart(df=df_vs, chart_type='surface', style=style).plot(engine='matplotlib')
+    Chart(df=df_vs, chart_type='surface', style=style).plot(engine='plotly')
 
 if __name__ == '__main__':
     plot_animated_vol_market()

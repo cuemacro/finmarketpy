@@ -145,6 +145,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 02 Dec 2020
+    * Added FX vol surface interpolation (using FinancePy library underneath) + animated example
 * 12 Nov 2020
     * Added Binder, so can run notebooks interactively
     * Edited backtest_example Jupyter notebook with more description

@@ -19,7 +19,6 @@ from pandas.tseries.offsets import CustomBusinessDay
 
 from findatapy.timeseries import Calculations, Timezone, Filter, Calendar
 
-
 class EventStudy(object):
     """Provides functions for doing event studies on price action on an intraday basis and daily basis.
 

@@ -348,25 +348,3 @@ class FXVolSurface(AbstractVolSurface):
     def plot_vol_curves(self):
         if self._fin_fx_vol_surface is not None:
             self._fin_fx_vol_surface.plotVolCurves()
-
-if __name__ == '__main__':
-    from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
-
-    ticker = 'EURUSD'
-    start_date = '06 Oct 2020'
-    md_request = MarketDataRequest(start_date=start_date, finish_date=start_date, data_source='bloomberg', cut='LDN', category='fx-vol-market',
-                                   tickers=ticker)
-
-    import os
-    import pandas as pd
-
-    if os.path.exists(ticker + '.parquet'):
-        market_df = pd.read_parquet(ticker + '.parquet')
-    else:
-        market_df = Market(market_data_generator=MarketDataGenerator()).fetch_market(md_request)
-
-        market_df.to_parquet(ticker + '.parquet')
-
-    fx_vol_surface = FXVolSurface(market_df=market_df)
-
-    fx_vol_surface.build_vol_surface(start_date, asset='EURUSD')

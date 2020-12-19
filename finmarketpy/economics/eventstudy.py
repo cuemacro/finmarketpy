@@ -7,7 +7,7 @@ __author__ = 'saeedamen'  # Saeed Amen / saeed@thalesians.com
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_vol.
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -49,12 +49,12 @@ class EventStudy(object):
 
         # realised is traditionally on later day eg. 3rd Jan realised ON is 2nd-3rd Jan realised
         # so if Fed meeting is on 2nd Jan later, then we need realised labelled on 3rd (so minus a day)
-        # implied expires on next day eg. 3rd Jan implied ON is 3rd-4th Jan implied
+        # implied_vol expires on next day eg. 3rd Jan implied_vol ON is 3rd-4th Jan implied_vol
 
         # TODO smarter way of adjusting dates, as sometimes events can be before/after 10am NY cut
         if (lagged and average_hour_nyc >= NYC_cutoff):
             data_frame.index = data_frame.index - bday
-        elif (not lagged and average_hour_nyc < NYC_cutoff):  # ie. implied
+        elif (not lagged and average_hour_nyc < NYC_cutoff):  # ie. implied_vol
             data_frame.index = data_frame.index + bday
 
         # set as New York time and select only those ON vols at the 10am NY cut just before the event

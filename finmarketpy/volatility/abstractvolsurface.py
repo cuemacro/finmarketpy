@@ -7,7 +7,7 @@ __author__ = 'saeedamen' # Saeed Amen
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_vol.
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -80,7 +80,7 @@ class AbstractVolSurface(ABC):
 
             # x_axis = strike - index
             # y_axis = tenor - columns
-            # z_axis = implied vol - values
+            # z_axis = implied_vol vol - values
             min_x, max_x = self._extremes(min_x, max_x, df_vol_surface.index.values)
             min_z, max_z = self._extremes(min_z, max_z, df_vol_surface.values)
 

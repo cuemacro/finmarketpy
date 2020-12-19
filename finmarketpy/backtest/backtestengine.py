@@ -7,7 +7,7 @@ __author__ = 'saeedamen'
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_vol.
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -193,7 +193,7 @@ class Backtest(object):
             #     signal_df_copy.columns = [x + '_final_signal' for x in signal_df_copy.columns]
             #     trade_rets_df_copy.columns = [x + '_cum_trade' for x in trade_rets_df_copy.columns]
             #
-            #     to_plot = calculations.pandas_outer_join([asset_df_copy, pre_signal_df, signal_df_copy, trade_rets_df_copy, temp_strategy_rets_df])
+            #     to_plot = _calculations.pandas_outer_join([asset_df_copy, pre_signal_df, signal_df_copy, trade_rets_df_copy, temp_strategy_rets_df])
             #     to_plot.to_csv('test.csv')
 
         # do we have a vol target for individual signals?
@@ -404,7 +404,7 @@ class Backtest(object):
         self._components_pnl.columns = pnl_cols
 
         # TODO FIX very slow - hence only calculate on demand
-        # _pnl_trades = calculations.calculate_individual_trade_gains(signal_df, _pnl)
+        # _pnl_trades = _calculations.calculate_individual_trade_gains(signal_df, _pnl)
         self._pnl_trades = None
         self._components_pnl_trades = None
 
@@ -419,7 +419,7 @@ class Backtest(object):
 
         # TODO parallel version still work in progress!
 
-        logger.info("Cumulative index calculations")
+        logger.info("Cumulative index _calculations")
 
         if False: # market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
             swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
@@ -474,7 +474,7 @@ class Backtest(object):
 
                 self._portfolio_cum = calculations.create_add_index(self._portfolio)  # portfolio cumulative P&L
 
-        logger.info("Completed cumulative index calculations")
+        logger.info("Completed cumulative index _calculations")
 
         self._pnl_cum.columns = pnl_cols
         self._components_pnl_cum.columns = pnl_cols

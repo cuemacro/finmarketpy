@@ -7,7 +7,7 @@ __author__ = 'saeedamen'
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_vol.
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -16,7 +16,7 @@ __author__ = 'saeedamen'
 Shows how to use finmarketpy to process FX vol surfaces which have been interpolated (uses FinancePy underneath).
 
 Note, you will need to have a Bloomberg terminal (with blpapi Python library) to download the FX market data in order
-to plot these vol surface (FX spot, FX forwards, FX implied volatility quotes and deposits)
+to plot these vol surface (FX spot, FX forwards, FX implied_vol volatility quotes and deposits)
 """
 
 # For plotting
@@ -36,14 +36,14 @@ market = Market(market_data_generator=MarketDataGenerator())
 
 # Choose run_example = 0 for everything
 # run_example = 1 - plot GBPUSD 1W implied vol
-# run_example = 2 - get GBPUSD vol surface for a specific point
+# run_example = 2 - get GBPUSD vol surface for a date and plot interpolated vol surface and implied PDF
 # run_example = 3 - do an animation of GBPUSD vol surface over this period
-# run_example = 4 - get implied vol for a particular strike, interpolating the surface
+# run_example = 4 - get implied_vol vol for a particular strike, interpolating the surface
 
-run_example = 3
+run_example = 2
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
-###### Show how to plot ATM 1M implied vol time series
+###### Show how to plot ATM 1M implied_vol vol time series
 if run_example == 1 or run_example == 0:
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
     md_request = MarketDataRequest(start_date='01 May 2016', finish_date='01 Aug 2016',
@@ -64,8 +64,10 @@ if run_example == 1 or run_example == 0:
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Construct volatility surface using FinancePy library underneath, using polynomial interpolation
 if run_example == 2 or run_example == 0:
+
+    horizon_date = '23 Jun 2016'
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
-    md_request = MarketDataRequest(start_date='20 Jun 2016', finish_date='20 Jun 2016',
+    md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
                                    data_source='bloomberg', cut='LDN', category='fx-vol-market',
                                    tickers=['GBPUSD'],
                                    cache_algo='cache_algo_return')
@@ -74,29 +76,42 @@ if run_example == 2 or run_example == 0:
 
     fx_vol_surface = FXVolSurface(market_df=df)
 
-    fx_vol_surface.build_vol_surface('20 Jun 2016', 'GBPUSD')
+    fx_vol_surface.build_vol_surface(horizon_date, 'GBPUSD')
 
     # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance in FinancePy
     # FinFXVolSurface.buildVolSurface method to get it to fill
     df_vol_dict = fx_vol_surface.extract_vol_surface()
 
     # Print out the various vol surface and data produced
+    print(df_vol_dict['vol_surface_implied_pdf'])
     print(df_vol_dict['vol_surface_strike_space'])
     print(df_vol_dict['vol_surface_delta_space'])
     print(df_vol_dict['deltas_vs_strikes'])
+    print(df_vol_dict['deltas_vs_strikes'])
     print(df_vol_dict['vol_surface_quoted_points'])
 
-    # Plot vol surface animation in strike space (all interpolated)
+    # Plot vol surface in strike space (all interpolated)
     # x_axis = strike - index
     # y_axis = tenor - columns
     # z_axis = implied vol - values
-    style = Style(title='Plotting in strike space')
-
-    chart.plot(df_vol_dict['vol_surface_strike_space'].iloc[:, ::-1], chart_type='surface', style=style)
+    chart.plot(df_vol_dict['vol_surface_strike_space'].iloc[:, ::-1], chart_type='surface',
+               style=Style(title='Plotting volatility in strike space'))
 
     # Plot vol surface in delta space
     chart.plot(df_vol_dict['vol_surface_delta_space'].iloc[:, ::-1],
                chart_type='surface', style=Style(title='Plotting in delta space'))
+
+    # Plot implied PDF in strike space (all interpolated)
+    # x_axis = strike - index
+    # y_axis = tenor - columns
+    # z_axis = implied PDF - values
+    chart.plot(df_vol_dict['vol_surface_implied_pdf'], chart_type='surface',
+               style=Style(title='Plotting implied PDF in strike space'))
+
+    # Plot the implied PDF for ON only versus strikes
+    chart.plot(df_vol_dict['vol_surface_implied_pdf']['ON'], chart_type='line',
+               style=Style(title='Plotting implied PDF in strike space ON before Brexit', x_axis_range=[1.0,1.8]))
+
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Do animation for vol surface
@@ -108,7 +123,7 @@ if run_example == 3 or run_example == 0:
                                    tickers=['GBPUSD'],
                                    cache_algo='cache_algo_return')
     # 01 Jun 2016, 30 Jun 2016
-    # 20 Jun 2016, 25 Jun 2016
+    # 20 Jun 2016, 24 Jun 2016
 
     df = market.fetch_market(md_request)
 
@@ -131,13 +146,13 @@ if run_example == 3 or run_example == 0:
     # Plot vol surface animation in strike space (all interpolated)
     # x_axis = strike - index
     # y_axis = tenor - columns
-    # z_axis = implied vol - values
+    # z_axis = implied_vol vol - values
     style = Style(title='Plotting in strike space', animate_figure=True, animate_titles=animate_titles)
 
     chart.plot(list(vol_surface_dict.values()), chart_type='surface', style=style)
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
-###### Get implied vol for specific strikes interpolating across surface
+###### Get implied_vol vol for specific strikes interpolating across surface
 if run_example == 4 or run_example == 0:
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
     md_request = MarketDataRequest(start_date='20 Jun 2016', finish_date='25 Jun 2016',
@@ -154,10 +169,10 @@ if run_example == 4 or run_example == 0:
 
     fx_vol_surface.build_vol_surface('20 Jun 2016', 'GBPUSD')
 
-    # Get the implied volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 20 Jun 2016
+    # Get the implied_vol volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 20 Jun 2016
     vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000, tenor='1W')
 
     fx_vol_surface.build_vol_surface('23 Jun 2016', 'GBPUSD')
 
-    # Get the implied volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 23 Jun 2016
+    # Get the implied_vol volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 23 Jun 2016
     vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000, tenor='1W')

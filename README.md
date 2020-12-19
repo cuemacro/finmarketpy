@@ -145,6 +145,14 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 19 Dec 2020
+  * Added VolStats and examples to calculate realized vol, vol risk premium and implied vol addons
+  * Added FX total return calculations for FX spot positions
+  * Begun to add FX total return calculations for FX forwards (incomplete)
+  * Adapted FX vol code to latest version of FinancePy (note, may need to download via GitHub instead of PyPI)
+  * Also calculated implied PDF for FX vol surface using FinancePy underneath
+* 04 Dec 2020
+    * Fix imports in FX vol interpolation
 * 02 Dec 2020
     * Added FX vol surface interpolation (using FinancePy library underneath) + animated example
 * 12 Nov 2020

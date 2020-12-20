@@ -1,3 +1,17 @@
+__author__ = 'saeedamen'  # Saeed Amen
+
+#
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#
+# See the License for the specific language governing permissions and limitations under the License.
+#
+
 import pytest
 import pandas as pd
 import numpy as np
@@ -118,7 +132,6 @@ def test_sma():
     assert_frame_equal(df, expected_df)
     assert_frame_equal(signal_df, expected_signal_df)
 
-
 def test_roc():
     indicator_name = 'ROC'
     # Test Case 1: constant prices
@@ -203,11 +216,11 @@ def test_roc():
     assert_frame_equal(df, expected_df)
     assert_frame_equal(signal_df, expected_signal_df)
 
-
 def test_sma2():
     indicator_name = 'SMA2'
     tech_params.sma_period = 2
     tech_params.sma2_period = 3
+
     # Test Case 1: Increasing prices
     cols = get_cols_name(1)
     signals = ['SMA', 'SMA2']
@@ -282,6 +295,7 @@ def test_sma2():
 
 def test_polarity():
     indicator_name = 'polarity'
+
     # Test Case 1: constant prices
     cols = get_cols_name(1)
     data_df = pd.DataFrame(index=dates, columns=cols, data=1)
@@ -343,11 +357,11 @@ def test_polarity():
 
 
 def test_attr():
-    """
-    Testing of attributes such as long only
+    """Testing of attributes such as long only
     """
     indicator_name = 'SMA'
     tech_params = TechParams()
+
     # Test Case 1: Only longs or only shorts
     # Test Case 1.1: Only longs
     cols = get_cols_name(1)
@@ -418,7 +432,6 @@ def test_attr():
     assert_frame_equal(signal_df, expected_signal_df)
 
     # Test Case 2: Check incompatibility between only_allow_longs and only_allow_shorts
-
     tech_params = TechParams()
     tech_params.only_allow_shorts = True
     with pytest.raises(Exception):

@@ -7,7 +7,7 @@ __author__ = 'saeedamen'
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_vol.
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -27,7 +27,7 @@ from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
 
 from findatapy.util.loggermanager import LoggerManager
 
-from finmarketpy.volatility.fxvolsurface import FXVolSurface
+from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -66,6 +66,7 @@ if run_example == 1 or run_example == 0:
 if run_example == 2 or run_example == 0:
 
     horizon_date = '23 Jun 2016'
+
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
     md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
                                    data_source='bloomberg', cut='LDN', category='fx-vol-market',

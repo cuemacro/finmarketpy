@@ -145,6 +145,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 20 Dec 2020
+  * Changed typo in licence at top of scripts
 * 19 Dec 2020
   * Added VolStats and examples to calculate realized vol, vol risk premium and implied vol addons
   * Added FX total return calculations for FX spot positions

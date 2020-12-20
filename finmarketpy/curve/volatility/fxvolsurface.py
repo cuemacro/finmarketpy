@@ -1,13 +1,13 @@
-__author__ = 'saeedamen' # Saeed Amen
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_vol.
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
@@ -21,7 +21,7 @@ from financepy.market.volatility.FinFXVolSurface import FinVolFunctionTypes
 
 from findatapy.util.dataconstants import DataConstants
 
-from finmarketpy.volatility.abstractvolsurface import AbstractVolSurface
+from finmarketpy.curve.volatility.abstractvolsurface import AbstractVolSurface
 from finmarketpy.util.marketutil import MarketUtil
 
 constants = DataConstants()
@@ -126,24 +126,48 @@ class FXVolSurface(AbstractVolSurface):
 
         # For vols we do NOT need to divide by 100 (financepy does that internally)
         atm_vols = market_df[[currency_pair + "V" + t + field for t in tenors]][date_index].values[0]
+
         market_strangle25DeltaVols = market_df[[currency_pair + "25B" + t + field for t in tenors]][date_index].values[0] #[0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         risk_reversal25DeltaVols = market_df[[currency_pair + "25R" + t + field for t in tenors]][date_index].values[0] #[-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        market_strangle10DeltaVols = market_df[[currency_pair + "10B" + t + field for t in tenors]][date_index].values[0]
+        risk_reversal10DeltaVols = market_df[[currency_pair + "10R" + t + field for t in tenors]][date_index].values[0]
 
         notional_currency = for_name_base
 
+        use_only_25d = True
+
         # Construct financepy vol surface (uses polynomial interpolation for determining vol between strikes)
-        self._fin_fx_vol_surface = FinFXVolSurface(value_fin_date,
-                                   spot_fx_rate,
-                                   currency_pair,
-                                   notional_currency,
-                                   dom_discount_curve,
-                                   for_discount_curve,
-                                   tenors_financepy,
-                                   atm_vols,
-                                   market_strangle25DeltaVols,
-                                   risk_reversal25DeltaVols,
-                                   atm_method,
-                                   delta_method)
+        if use_only_25d:
+            self._fin_fx_vol_surface = FinFXVolSurface(value_fin_date,
+                                       spot_fx_rate,
+                                       currency_pair,
+                                       notional_currency,
+                                       dom_discount_curve,
+                                       for_discount_curve,
+                                       tenors_financepy,
+                                       atm_vols,
+                                       market_strangle25DeltaVols,
+                                       risk_reversal25DeltaVols,
+                                       atm_method,
+                                       delta_method)
+        else:
+            # New implementation in FinancePy also uses 10d for interpolation
+            from financepy.market.volatility.FinFXVolSurfacePlus import FinFXVolSurfacePlus
+
+            self._fin_fx_vol_surface = FinFXVolSurfacePlus(value_fin_date,
+                                       spot_fx_rate,
+                                       currency_pair,
+                                       notional_currency,
+                                       dom_discount_curve,
+                                       for_discount_curve,
+                                       tenors_financepy,
+                                       atm_vols,
+                                       market_strangle25DeltaVols,
+                                       risk_reversal25DeltaVols,
+                                       market_strangle10DeltaVols,
+                                       risk_reversal10DeltaVols,
+                                       atm_method,
+                                       delta_method)
 
     def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor='1M'):
         """Calculates the implied_vol volatility for a given strike
@@ -223,10 +247,10 @@ class FXVolSurface(AbstractVolSurface):
             tenor_label = self._fin_fx_vol_surface._tenors[tenor_index]
 
             atm_vol = self._fin_fx_vol_surface._atmVols[tenor_index] * 100
-            ms_vol = self._fin_fx_vol_surface._mktStrangle25DeltaVols[tenor_index] * 100
-            rr_vol = self._fin_fx_vol_surface._riskReversal25DeltaVols[tenor_index] * 100
+            ms_25d_vol = self._fin_fx_vol_surface._mktStrangle25DeltaVols[tenor_index] * 100
+            rr_10d_vol = self._fin_fx_vol_surface._riskReversal25DeltaVols[tenor_index] * 100
 
-            df_vol_surface_quoted_points[tenor_label] = pd.Series(index=quoted_strikes_names, data=[atm_vol, ms_vol, rr_vol])
+            df_vol_surface_quoted_points[tenor_label] = pd.Series(index=quoted_strikes_names, data=[atm_vol, ms_25d_vol, rr_10d_vol])
 
             # Do interpolation in strike space for the implied_vol vols
             strikes = []

@@ -11,23 +11,3 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
-
-import abc
-
-class AbstractCurve(object):
-    """Abstract class for creating total return indices and curves, which is for example implemented by FXSpotCurve
-    and could be implemented by other asset classes.
-
-    """
-
-    @abc.abstractmethod
-    def generate_key(self):
-        return
-
-    @abc.abstractmethod
-    def fetch_continuous_time_series(self, md_request, market_data_generator):
-        return
-
-    @abc.abstractmethod
-    def construct_total_returns_index(self):
-        return

@@ -113,7 +113,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
 
 * Cuemacro Python libraries (open source)
     * Before we start, make sure we are familiar where your Anaconda site packages folder is (ie. where it will install your Python dependencies),
-    as this will be where we need to edit the various configuation files described in this section.
+    as this will be where we need to edit the various configuration files described in this section.
         * Typically this is in folders like:
             * C:\Anaconda3\Lib\site-packages
             * C:\Program Files\Anaconda\Lib\site-packages

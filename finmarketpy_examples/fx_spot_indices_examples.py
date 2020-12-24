@@ -32,7 +32,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 calculations = Calculations()
 
 # Choose run_example = 0 for everything
-# run_example = 1 - plot GBPUSD 1W implied_vol vol
+# run_example = 1 - create total return indices from FX spot data + deposit for AUDJPY, and compare
 
 run_example = 0
 

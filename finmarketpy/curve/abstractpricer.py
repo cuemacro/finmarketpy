@@ -11,3 +11,11 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 # See the License for the specific language governing permissions and limitations under the License.
 #
+
+class AbstractPricer(object):
+
+    def __init__(self, market_df=None):
+        self._market_df = market_df
+
+    def price_instrument(self):
+        pass

@@ -22,9 +22,11 @@ from financepy.market.volatility.FinFXVolSurface import FinVolFunctionTypes
 from findatapy.util.dataconstants import DataConstants
 
 from finmarketpy.curve.volatility.abstractvolsurface import AbstractVolSurface
+from finmarketpy.util.marketconstants import MarketConstants
 from finmarketpy.util.marketutil import MarketUtil
 
-constants = DataConstants()
+data_constants = DataConstants()
+market_constants = MarketConstants()
 
 import pandas as pd
 
@@ -33,7 +35,7 @@ class FXVolSurface(AbstractVolSurface):
 
     """
 
-    def __init__(self, market_df=None, asset=None, field='close', tenors=constants.fx_vol_tenor):
+    def __init__(self, market_df=None, asset=None, field='close', tenors=data_constants.fx_vol_tenor):
         self._market_df = market_df
         self._tenors = tenors
         self._asset = asset
@@ -79,12 +81,6 @@ class FXVolSurface(AbstractVolSurface):
             Spot delta, forward delta etc.
 
             default - FinFXDeltaMethod.SPOT_DELTA
-
-        engine : str
-            Which pricing engine to use 'financepy' or 'finmarketpy'
-
-            default - 'finmarketpy'
-
         """
 
         value_date = self._market_util.parse_date(value_date)
@@ -112,14 +108,14 @@ class FXVolSurface(AbstractVolSurface):
         for_name_base = asset[0:3]
         dom_name_terms = asset[3:6]
 
+
+        notional_currency = for_name_base
+
         date_index = market_df.index == value_date
 
         # CAREFUL: need to divide by 100 for depo rate, ie. 0.0346 = 3.46%
         forCCRate = market_df[for_name_base + depo_tenor + field][date_index].values[0] / 100.0 # 0.03460  # EUR
         domCCRate = market_df[dom_name_terms + depo_tenor + field][date_index].values[0] / 100.0 # 0.02940  # USD
-
-        dom_discount_curve = FinDiscountCurveFlat(value_fin_date, domCCRate)
-        for_discount_curve = FinDiscountCurveFlat(value_fin_date, forCCRate)
 
         currency_pair = for_name_base + dom_name_terms
         spot_fx_rate = float(market_df[currency_pair + field][date_index].values[0])
@@ -132,7 +128,8 @@ class FXVolSurface(AbstractVolSurface):
         market_strangle10DeltaVols = market_df[[currency_pair + "10B" + t + field for t in tenors]][date_index].values[0]
         risk_reversal10DeltaVols = market_df[[currency_pair + "10R" + t + field for t in tenors]][date_index].values[0]
 
-        notional_currency = for_name_base
+        dom_discount_curve = FinDiscountCurveFlat(value_fin_date, domCCRate)
+        for_discount_curve = FinDiscountCurveFlat(value_fin_date, forCCRate)
 
         use_only_25d = True
 

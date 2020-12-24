@@ -145,6 +145,12 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 24 Dec 2020
+    * Added FX forwards pricer with examples
+      * Interpolation of odd dates
+      * Implied depo calculations
+    * Added FX forwards total return calculator with examples
+    * Rewrote FX spot indices construction to use Numba
 * 20 Dec 2020
   * Changed typo in licence at top of scripts
 * 19 Dec 2020

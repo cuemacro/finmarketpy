@@ -51,6 +51,33 @@ class MarketConstants(object):
 
     write_engine = 'arctic'
 
+    options_pricing_engine = 'finmarketpy' # 'finmarketpy' or 'financepy'
+
+    spot_depo_tenor = 'ON'
+
+    currencies_with_365_basis =  ['AUD', 'CAD', 'GBP', 'NZD']
+
+    fx_forwards_points_divisor_100 = ['JPY']
+    fx_forwards_points_divisor_1000 = []
+
+    # Forwards typically used for interpolation (note: eg. TN and SN are swaps)
+    fx_forwards_tenor_for_interpolation = ["1W", "2W", "3W", "1M", "2M", "3M", "4M", "6M", "9M", "1Y", "2Y", "3Y", "5Y"]
+
+    # What contract will we generally be trading?
+    fx_forwards_trading_tenor = '1M'
+
+    # What is the point at which we roll?
+    fx_forwards_roll_event = 'month-end' # 'month-end', 'quarter-end', 'year-end', 'expiry'
+
+    # How many days before that point should we roll?
+    fx_forwards_roll_days_before = 5
+
+    # Typically when do we roll the contract?
+    fx_forwards_roll_months = 1
+
+    # Whether to output additional fields related to calculation of total return indices
+    output_calculation_fields = False
+
     # overwrite field variables with those listed in MarketCred
     def __init__(self):
         try:

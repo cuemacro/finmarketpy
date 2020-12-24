@@ -12,31 +12,84 @@ __author__ = 'saeedamen'  # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
+import numpy as np
 import pandas as pd
 
-from findatapy.market import Market, MarketDataRequest
-from findatapy.timeseries import Calculations, Calendar
-from findatapy.util.dataconstants import DataConstants
+from pandas.tseries.offsets import CustomBusinessDay, CustomBusinessMonthEnd
 
-constants = DataConstants()
+from findatapy.market import Market, MarketDataRequest
+from findatapy.timeseries import Calculations, Calendar, Filter
+from findatapy.util.dataconstants import DataConstants
+from findatapy.util.fxconv import FXConv
+
+from finmarketpy.curve.rates.fxforwardspricer import FXForwardsPricer
+from finmarketpy.util.marketconstants import MarketConstants
+
+data_constants = DataConstants()
+market_constants = MarketConstants()
 
 class FXForwardsCurve(object):
-    """Constructs continuous forwards time series total return indices from underlying forwards contracts. Incomplete!
+    """Constructs continuous forwards time series total return indices from underlying forwards contracts.
+
 
     """
 
-    def __init__(self, market_data_generator=None, fx_forwards_trading_tenor='1M', roll_date=0, construct_via_currency='no',
-                 fx_forwards_tenor=constants.fx_forwards_tenor, base_depos_tenor=constants.base_depos_tenor):
+    def __init__(self, market_data_generator=None, fx_forwards_trading_tenor=market_constants.fx_forwards_trading_tenor,
+                 roll_days_before=market_constants.fx_forwards_roll_days_before,
+                 roll_event=market_constants.fx_forwards_roll_event, construct_via_currency='no',
+                 fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
+                 base_depos_tenor=data_constants.base_depos_tenor,
+                 roll_months=market_constants.fx_forwards_roll_months,
+                 output_calculation_fields=market_constants.output_calculation_fields):
+        """Initializes FXForwardsCurve
+
+        Parameters
+        ----------
+        market_data_generator : MarketDataGenerator
+            Used for downloading market data
+
+        fx_forwards_trading_tenor : str
+            What is primary forward contract being used to trade (default - '1M')
+
+        roll_days_before : int
+            Number of days before roll event to enter into a new forwards contract
+
+        roll_event : str
+            What constitutes a roll event? ('month-end', 'quarter-end', 'year-end', 'expiry')
+
+        construct_via_currency : str
+            What currency should we construct the forward via? Eg. if we asked for AUDJPY we can construct it via
+            AUDUSD & JPYUSD forwards, as opposed to AUDJPY forwards (default - 'no')
+
+        fx_forwards_tenor_for_interpolation : str(list)
+            Which forwards should we use for interpolation
+
+        base_depos_tenor : str(list)
+            Which base deposits tenors do we need (this is only necessary if we want to start inferring depos)
+
+        roll_months : int
+            After how many months should we initiate a roll. Typically for trading 1M this should 1, 3M this should be 3
+            etc.
+
+        output_calculation_fields : bool
+            Also output additional data should forward expiries etc. alongside total returns indices
+        """
 
         self._market_data_generator = market_data_generator
         self._calculations = Calculations()
         self._calendar = Calendar()
+        self._filter = Filter()
 
         self._fx_forwards_trading_tenor = fx_forwards_trading_tenor
-        self._roll_date = roll_date
+        self._roll_days_before = roll_days_before
+        self._roll_event = roll_event
+
         self._construct_via_currency = construct_via_currency
-        self._fx_forwards_tenor = fx_forwards_tenor
+        self._fx_forwards_tenor_for_interpolation = fx_forwards_tenor_for_interpolation
         self._base_depos_tenor = base_depos_tenor
+
+        self._roll_months = roll_months
+        self._output_calcultion_fields = output_calculation_fields
 
     def generate_key(self):
         from findatapy.market.ioengine import SpeedCache
@@ -45,32 +98,47 @@ class FXForwardsCurve(object):
         return SpeedCache().generate_key(self, ['_market_data_generator', '_calculations', '_calendar'])
 
     def fetch_continuous_time_series(self, md_request, market_data_generator, fx_forwards_trading_tenor=None,
-                                     roll_date=None, construct_via_currency=None, fx_forwards_tenor=None, base_depos_tenor=None):
+                                     roll_days_before=None, roll_event=None,
+                                     construct_via_currency=None, fx_forwards_tenor_for_interpolation=None, base_depos_tenor=None,
+                                     roll_months=None, output_calculation_fields=False):
 
         if market_data_generator is None: market_data_generator = self._market_data_generator
         if fx_forwards_trading_tenor is None: fx_forwards_trading_tenor = self._fx_forwards_trading_tenor
-        if roll_date is None: roll_date = self._roll_date
+        if roll_days_before is None: roll_days_before = self._roll_days_before
+        if roll_event is None: roll_event = self._roll_event
         if construct_via_currency is None: construct_via_currency = self._construct_via_currency
-        if fx_forwards_tenor is None: fx_forwards_tenor = self._fx_forwards_tenor
+        if fx_forwards_tenor_for_interpolation is None: fx_forwards_tenor_for_interpolation = self._fx_forwards_tenor_for_interpolation
         if base_depos_tenor is None: base_depos_tenor = self._base_depos_tenor
+        if roll_months is None: roll_months = self._roll_months
+        if output_calculation_fields is None: output_calculation_fields
 
         # Eg. we construct EURJPY via EURJPY directly (note: would need to have sufficient forward data for this)
         if construct_via_currency == 'no':
-            # Download FX spot, FX forwards points and base depos
+            # Download FX spot, FX forwards points and base depos etc.
             market = Market(market_data_generator=market_data_generator)
 
             md_request_download = MarketDataRequest(md_request=md_request)
 
+            fx_conv = FXConv()
+
+            # CAREFUL: convert the tickers to correct notation, eg. USDEUR => EURUSD, because our data
+            # should be fetched in correct convention
+            md_request_download.tickers = [fx_conv.correct_notation(x) for x in md_request.tickers]
             md_request_download.category = 'fx-forwards-market'
             md_request_download.fields = 'close'
             md_request_download.abstract_curve = None
-            md_request_download.fx_forwards_tenor = fx_forwards_tenor
+            md_request_download.fx_forwards_tenor = fx_forwards_tenor_for_interpolation
             md_request_download.base_depos_tenor = base_depos_tenor
 
             forwards_market_df = market.fetch_market(md_request_download)
 
-            return self.construct_total_return_index(md_request.tickers, fx_forwards_trading_tenor, roll_date, forwards_market_df,
-                                                     fx_forwards_tenor=fx_forwards_tenor, base_depos_tenor=base_depos_tenor)
+            # Now use the original tickers
+            return self.construct_total_return_index(md_request.tickers, forwards_market_df,
+                                                     fx_forwards_trading_tenor=fx_forwards_trading_tenor,
+                                                     roll_days_before=roll_days_before, roll_event=roll_event,
+                                                     fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
+                                                     roll_months=roll_months,
+                                                     output_calculation_fields=output_calculation_fields)
         else:
             # eg. we calculate via your domestic currency such as USD, so returns will be in your domestic currency
             # Hence AUDJPY would be calculated via AUDUSD and JPYUSD (subtracting the difference in returns)
@@ -86,18 +154,30 @@ class FXForwardsCurve(object):
                 md_request_terms = MarketDataRequest(md_request=md_request)
                 md_request_terms.tickers = terms + construct_via_currency
 
+                # Construct the base and terms separately (ie. AUDJPY => AUDUSD & JPYUSD)
                 base_vals = self.fetch_continuous_time_series(md_request_base, market_data_generator,
-                                                              construct_via_currency='no')
+                                     fx_forwards_trading_tenor=fx_forwards_trading_tenor,
+                                     roll_days_before=roll_days_before, roll_event=roll_event,
+                                     fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
+                                     base_depos_tenor=base_depos_tenor,
+                                     roll_months=roll_months, output_calculation_fields=False,
+                                     construct_via_currency='no')
+
                 terms_vals = self.fetch_continuous_time_series(md_request_terms, market_data_generator,
-                                                               construct_via_currency='no')
+                                     fx_forwards_trading_tenor=fx_forwards_trading_tenor,
+                                     roll_days_before=roll_days_before, roll_event=roll_event,
+                                     fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
+                                     base_depos_tenor=base_depos_tenor,
+                                     roll_months=roll_months, output_calculation_fields=False,
+                                     construct_via_currency='no')
 
                 # Special case for USDUSD case (and if base or terms USD are USDUSD
-                if base + terms == 'USDUSD':
+                if base + terms == construct_via_currency + construct_via_currency:
                     base_rets = self._calculations.calculate_returns(base_vals)
                     cross_rets = pd.DataFrame(0, index=base_rets.index, columns=base_rets.columns)
-                elif base + 'USD' == 'USDUSD':
+                elif base + construct_via_currency == construct_via_currency + construct_via_currency:
                     cross_rets = -self._calculations.calculate_returns(terms_vals)
-                elif terms + 'USD' == 'USDUSD':
+                elif terms + construct_via_currency == construct_via_currency + construct_via_currency:
                     cross_rets = self._calculations.calculate_returns(base_vals)
                 else:
                     base_rets = self._calculations.calculate_returns(base_vals)
@@ -109,7 +189,7 @@ class FXForwardsCurve(object):
                 cross_rets.iloc[0] = 0
 
                 cross_vals = self._calculations.create_mult_index(cross_rets)
-                cross_vals.columns = [tick + '-tot.close']
+                cross_vals.columns = [tick + '-forward-tot.close']
 
                 total_return_indices.append(cross_vals)
 
@@ -123,13 +203,18 @@ class FXForwardsCurve(object):
         pass
 
     def get_day_count_conv(self, currency):
-        if currency in ['AUD', 'CAD', 'GBP', 'NZD']:
+        if currency in market_constants.currencies_with_365_basis:
             return 365.0
 
         return 360.0
 
-    def construct_total_return_index(self, cross_fx, fx_forwards_trading_tenor, roll_date, forwards_market_df,
-                                     fx_forwards_tenor=constants.fx_forwards_tenor, base_depos_tenor=constants.base_depos_tenor):
+    def construct_total_return_index(self, cross_fx, forwards_market_df,
+                                     fx_forwards_trading_tenor=market_constants.fx_forwards_trading_tenor,
+                                     roll_days_before=market_constants.fx_forwards_roll_days_before,
+                                     roll_event=market_constants.fx_forwards_roll_event,
+                                     roll_months=1,
+                                     fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
+                                     output_calculation_fields=False):
 
         if not (isinstance(cross_fx, list)):
             cross_fx = [cross_fx]
@@ -137,47 +222,111 @@ class FXForwardsCurve(object):
         total_return_index_agg = []
 
         # Remove columns where there is no data (because these points typically aren't quoted)
-        forwards_market_df = forwards_market_df.dropna(axis=1)
+        forwards_market_df = forwards_market_df.dropna(how='all', axis=1)
+
+        fx_forwards_pricer = FXForwardsPricer()
+
+        def get_roll_date(horizon_d, delivery_d, asset_hols, month_adj=1):
+            if roll_event == 'month-end':
+                roll_d = horizon_d + CustomBusinessMonthEnd(roll_months + month_adj, holidays=asset_hols)
+            elif roll_event == 'delivery-date':
+                roll_d = delivery_d
+
+            return (roll_d - CustomBusinessDay(n=roll_days_before, holidays=asset_hols))
 
         for cross in cross_fx:
 
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
                 total_return_index_agg.append(
-                    pd.DataFrame(100, index=forwards_market_df.index, columns=[cross + "-tot.close"]))
+                    pd.DataFrame(100, index=forwards_market_df.index, columns=[cross + "-forward-tot.close"]))
             else:
-                spot = forwards_market_df[cross + ".close"].to_frame()
+                # Is the FX cross in the correct convention
+                old_cross = cross
+                cross = FXConv().correct_notation(cross)
 
-                fx_forwards_tenor_pickout = []
+                horizon_date = forwards_market_df.index
 
-                for f in fx_forwards_tenor:
-                    if f + ".close" in fx_forwards_tenor:
-                        fx_forwards_tenor_pickout.append(f)
+                delivery_date = []
+                roll_date = []
 
-                    if f == fx_forwards_trading_tenor:
-                        break
+                new_trade = np.full(len(horizon_date), False, dtype=bool)
 
-                divisor = 10000.0
+                asset_holidays = self._filter.get_holidays(cal=cross)
 
-                if cross[3:6] == 'JPY':
-                    divisor = 100.0
+                # Get first delivery date
+                delivery_date.append(
+                    self._calendar.get_delivery_date_from_horizon_date(horizon_date[0],
+                                                                       fx_forwards_trading_tenor, cal=cross, asset_class='fx')[0])
 
-                forward_pts = forwards_market_df[[cross + x + ".close" for x in fx_forwards_tenor_pickout]].to_frame() \
-                              / divisor
+                # For first month want it to expire within that month (for consistency), hence month_adj=0 ONLY here
+                roll_date.append(get_roll_date(horizon_date[0], delivery_date[0], asset_holidays, month_adj=0))
 
-                outright = spot + forward_pts
+                # New trade => entry at beginning AND on every roll
+                new_trade[0] = True
 
-                # Calculate the time difference between each data point
-                spot['index_col'] = spot.index
-                time = spot['index_col'].diff()
-                spot = spot.drop('index_col', 1)
+                # Get all the delivery dates and roll dates
+                # At each "roll/trade" day we need to reset them for the new contract
+                for i in range(1, len(horizon_date)):
 
-                total_return_index = pd.DataFrame(index=spot.index, columns=[cross + "-tot.close"])
-                total_return_index.iloc[0] = 100
+                    # If the horizon date has reached the roll date (from yesterday), we're done, and we have a
+                    # new roll/trade
+                    if (horizon_date[i] - roll_date[i-1]).days == 0:
+                        new_trade[i] = True
+                    # else:
+                    #    new_trade[i] = False
 
-                time_diff = time.values.astype(float) / 86400000000000.0  # get time difference in days
+                    # If we're entering a new trade/contract, we need to get new delivery and roll dates
+                    if new_trade[i]:
+                        delivery_date.append(self._calendar.get_delivery_date_from_horizon_date(horizon_date[i],
+                            fx_forwards_trading_tenor, cal=cross, asset_class='fx')[0])
 
-                # TODO incomplete forwards calculations
+                        roll_date.append(get_roll_date(horizon_date[i], delivery_date[i], asset_holidays))
+                    else:
+                        # Otherwise use previous delivery and roll dates, because we're still holding same contract
+                        delivery_date.append(delivery_date[i-1])
+                        roll_date.append(roll_date[i-1])
+
+                interpolated_forward = fx_forwards_pricer.price_instrument(cross, horizon_date, delivery_date, market_df=forwards_market_df,
+                         fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation)[cross + '-interpolated-outright-forward.close'].values
+
+                # To record MTM prices
+                mtm = np.copy(interpolated_forward)
+
+                # Note: may need to add discount factor to forwards?
+
+                # Special case: for very first trading day
+                # mtm[0] = interpolated_forward[0]
+
+                # On rolling dates, MTM will be the previous forward contract (interpolated)
+                # otherwise it will be the current forward contract
+                for i in range(1, len(horizon_date)):
+                    if new_trade[i]:
+                        mtm[i] = fx_forwards_pricer.price_instrument(cross, horizon_date[i], delivery_date[i-1],
+                            market_df=forwards_market_df,
+                            fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation) \
+                                [cross + '-interpolated-outright-forward.close'].values
+                    # else:
+                    #    mtm[i] = interpolated_forward[i]
+
+                # Eg. if we asked for USDEUR, we first constructed spot/forwards for EURUSD
+                # and then need to invert it
+                if old_cross != cross:
+                    mtm = 1.0 / mtm
+                    interpolated_forward = 1.0 / interpolated_forward
+
+                cum_rets = 100 * np.cumprod(1.0 + mtm / np.roll(interpolated_forward, 1) - 1.0)
+
+                total_return_index = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot.close"])
+                total_return_index[cross + "-forward-tot.close"] = cum_rets
+
+                if output_calculation_fields:
+                    total_return_index[cross + '-interpolated-outright-forward.close'] = interpolated_forward
+                    total_return_index[cross + '-mtm.close'] = mtm
+                    total_return_index[cross + '-roll.close'] = new_trade
+                    total_return_index[cross + '.roll-date'] = roll_date
+                    total_return_index[cross + '.delivery-date'] = delivery_date
+
                 total_return_index_agg.append(total_return_index)
 
         return self._calculations.pandas_outer_join(total_return_index_agg)

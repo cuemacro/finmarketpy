@@ -12,11 +12,48 @@ __author__ = 'saeedamen'  # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-
 import pandas as pd
+
+from numba import guvectorize
 
 from findatapy.market import Market, MarketDataRequest
 from findatapy.timeseries import Calculations
+
+from finmarketpy.util.marketconstants import MarketConstants
+
+market_constants = MarketConstants()
+
+@guvectorize(['void(f8[:], f8[:], f8[:], f8[:], intp, intp, f8[:])'],
+             '(n),(n),(n),(n),(),()->(n)', cache=True, target="cpu", nopython=True)
+def _spot_index_numba(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount, out):
+
+    out[0] = 100
+
+    for i in range(1, len(out)):
+        # Calculate total return index as product of yesterday, changes in spot and carry accrued
+        out[i] = out[i - 1] * \
+                                       (1 + (1 + base_deposit[i] * time_diff[i] / base_daycount) *
+                                        (spot[i] / spot[i - 1]) \
+                                        - (1 + terms_deposit[i] * time_diff[i] / terms_daycount))
+
+def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount):
+    import numpy as np
+
+    out = np.zero((len(spot)))
+    out[0] = 100
+
+    for i in range(1, len(out)):
+        # Calculate total return index as product of yesterday, changes in spot and carry accrued
+        out[i] = out[i - 1] * \
+                                       (1 + (1 + base_deposit[i] * time_diff[i] / base_daycount) *
+                                        (spot[i] / spot[i - 1]) \
+                                        - (1 + terms_deposit[i] * time_diff[i] / terms_daycount))
+
+    return out
+
+
+def _spot_index():
+    pass
 
 class FXSpotCurve(object):
     """Construct total return (spot) indices for FX. In future will also convert assets from local currency to foreign currency
@@ -24,12 +61,14 @@ class FXSpotCurve(object):
 
     """
 
-    def __init__(self, market_data_generator=None, depo_tenor='ON', construct_via_currency='no'):
+    def __init__(self, market_data_generator=None, depo_tenor=market_constants.spot_depo_tenor, construct_via_currency='no',
+                 output_calculation_fields=market_constants.output_calculation_fields):
         self._market_data_generator = market_data_generator
         self._calculations = Calculations()
 
         self._depo_tenor = depo_tenor
         self._construct_via_currency = construct_via_currency
+        self._output_calculation_fields = output_calculation_fields
 
     def generate_key(self):
         from findatapy.market.ioengine import SpeedCache
@@ -37,13 +76,13 @@ class FXSpotCurve(object):
         # Don't include any "large" objects in the key
         return SpeedCache().generate_key(self, ['_market_data_generator', '_calculations'])
 
-    def fetch_continuous_time_series(self, md_request, market_data_generator, construct_via_currency=None):
+    def fetch_continuous_time_series(self, md_request, market_data_generator, depo_tenor=None, construct_via_currency=None,
+                                     output_calculation_fields=None):
 
-        if market_data_generator is None:
-            market_data_generator = self._market_data_generator
-
-        if construct_via_currency is None:
-            construct_via_currency = self._construct_via_currency
+        if market_data_generator is None: market_data_generator = self._market_data_generator
+        if depo_tenor is None: depo_tenor = self._depo_tenor
+        if construct_via_currency is None: construct_via_currency = self._construct_via_currency
+        if output_calculation_fields is None: output_calculation_fields = self._output_calculation_fields
 
         # Eg. we construct AUDJPY via AUDJPY directly
         if construct_via_currency == 'no':
@@ -70,7 +109,9 @@ class FXSpotCurve(object):
 
             spot_df = market.fetch_market(md_request_download)
 
-            return self.construct_total_return_index(md_request.tickers, self._depo_tenor, spot_df, depo_df)
+            return self.construct_total_return_index(md_request.tickers,
+                    self._calculations.pandas_outer_join([spot_df, depo_df]), tenor=depo_tenor,
+                                                     output_calculation_fields=output_calculation_fields)
         else:
             # eg. we calculate via your domestic currency such as USD, so returns will be in your domestic currency
             # Hence AUDJPY would be calculated via AUDUSD and JPYUSD (subtracting the difference in returns)
@@ -90,12 +131,12 @@ class FXSpotCurve(object):
                 terms_vals = self.fetch_continuous_time_series(md_request_terms, market_data_generator, construct_via_currency='no')
 
                 # Special case for USDUSD case (and if base or terms USD are USDUSD
-                if base + terms == 'USDUSD':
+                if base + terms == construct_via_currency + construct_via_currency:
                     base_rets = self._calculations.calculate_returns(base_vals)
                     cross_rets = pd.DataFrame(0, index=base_rets.index, columns=base_rets.columns)
-                elif base + 'USD' == 'USDUSD':
+                elif base + construct_via_currency == construct_via_currency + construct_via_currency:
                     cross_rets = -self._calculations.calculate_returns(terms_vals)
-                elif terms + 'USD' == 'USDUSD':
+                elif terms + construct_via_currency == construct_via_currency + construct_via_currency:
                     cross_rets = self._calculations.calculate_returns(base_vals)
                 else:
                     base_rets = self._calculations.calculate_returns(base_vals)
@@ -120,12 +161,12 @@ class FXSpotCurve(object):
         pass
 
     def get_day_count_conv(self, currency):
-        if currency in ['AUD', 'CAD', 'GBP', 'NZD']:
+        if currency in market_constants.currencies_with_365_basis:
             return 365.0
 
         return 360.0
 
-    def construct_total_return_index(self, cross_fx, tenor, spot_df, deposit_df):
+    def construct_total_return_index(self, cross_fx, market_df, depo_tenor=None, output_calculation_fields=False):
         """Creates total return index for selected FX crosses from spot and deposit data
 
         Parameters
@@ -146,12 +187,14 @@ class FXSpotCurve(object):
         if not (isinstance(cross_fx, list)):
             cross_fx = [cross_fx]
 
+        if depo_tenor is None: depo_tenor = self._depo_tenor
+
         total_return_index_agg = []
 
         for cross in cross_fx:
             # Get the spot series, base deposit
-            base_deposit = deposit_df[cross[0:3] + tenor + ".close"].to_frame()
-            terms_deposit = deposit_df[cross[3:6] + tenor + ".close"].to_frame()
+            base_deposit = market_df[cross[0:3] + depo_tenor + ".close"].to_frame()
+            terms_deposit = market_df[cross[3:6] + depo_tenor + ".close"].to_frame()
 
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
@@ -159,13 +202,13 @@ class FXSpotCurve(object):
             else:
                 carry = base_deposit.join(terms_deposit, how='inner')
 
-                spot = spot_df[cross + ".close"].to_frame()
+                spot = market_df[cross + ".close"].to_frame()
 
                 base_daycount = self.get_day_count_conv(cross[0:3])
                 terms_daycount = self.get_day_count_conv(cross[4:6])
 
-                # Align the base & terms deposits series to spot
-                spot, carry = spot.align(carry, join='left', axis=0)
+                # Align the base & terms deposits series to spot (this should already be done by construction)
+                # spot, carry = spot.align(carry, join='left', axis=0)
 
                 # Sometimes depo data can be patchy, ok to fill down, given not very volatile (don't do this with spot!)
                 carry = carry.fillna(method='ffill') / 100.0
@@ -182,20 +225,16 @@ class FXSpotCurve(object):
                 time = spot['index_col'].diff()
                 spot = spot.drop('index_col', 1)
 
-                total_return_index = pd.DataFrame(index=spot.index, columns=[cross + "-tot.close"])
-                total_return_index.iloc[0] = 100
-
                 time_diff = time.values.astype(float) / 86400000000000.0  # get time difference in days
 
-                for i in range(1, len(total_return_index.index)):
+                total_return_index = pd.DataFrame(index=spot.index, columns=[cross + "-tot.close"],
+                    data=_spot_index_numba(spot.values, time_diff, base_deposit.values, terms_deposit.values,
+                                     base_daycount, terms_daycount))
 
-                    # TODO vectorise this formulae or use Numba
-                    # Calculate total return index as product of yesterday, changes in spot and carry accrued
-                    total_return_index.values[i] = total_return_index.values[i - 1] * \
-                                                   (1 + (1 + base_deposit.values[i] * time_diff[i] / base_daycount) *
-                                                    (spot.values[i] / spot.values[i - 1]) \
-                                                    - (1 + terms_deposit.values[i] * time_diff[i] / terms_daycount))
+                if output_calculation_fields:
+                    total_return_index[cross + '-carry.close'] = carry
 
+                # Use Numba to do total return index calculation given has many loops
                 total_return_index_agg.append(total_return_index)
 
         return self._calculations.pandas_outer_join(total_return_index_agg)

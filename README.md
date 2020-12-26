@@ -145,6 +145,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 26 Dec 2020
+    * Refactored classes to take into account new Calendar object from findatapy
 * 24 Dec 2020
     * Added FX forwards pricer with examples
       * Interpolation of odd dates

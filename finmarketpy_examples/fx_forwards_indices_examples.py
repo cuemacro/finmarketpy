@@ -49,7 +49,7 @@ if run_example == 1 or run_example == 0:
     # Download more tenors
     fx_forwards_tenors = ['1W', '1M', '2M', '3M']
 
-    # Get AUDUSD data for spot, forwards + depos
+    # Get USDBRL data for spot, forwards + depos
     md_request = MarketDataRequest(start_date='02 Jan 2007', finish_date='01 Jun 2007',
                                    data_source='bloomberg', cut='NYC', category='fx-forwards-market',
                                    tickers=cross,
@@ -133,7 +133,7 @@ if run_example == 2 or run_example == 0:
                     roll_months=1,
                     output_calculation_fields=True)
 
-    # Get AUDUSD data for spot, forwards + depos and also construct the total returns forward index
+    # Get AUDJPY (AUDUSD and JPYUSD) data for spot, forwards + depos and also construct the total returns forward index
     md_request = MarketDataRequest(start_date='02 Jan 2007', finish_date='01 Jun 2007',
                                    data_source='bloomberg', cut='NYC', category='fx',
                                    tickers=cross,

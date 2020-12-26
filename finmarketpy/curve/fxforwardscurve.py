@@ -95,7 +95,7 @@ class FXForwardsCurve(object):
         from findatapy.market.ioengine import SpeedCache
 
         # Don't include any "large" objects in the key
-        return SpeedCache().generate_key(self, ['_market_data_generator', '_calculations', '_calendar'])
+        return SpeedCache().generate_key(self, ['_market_data_generator', '_calculations', '_calendar', '_filter'])
 
     def fetch_continuous_time_series(self, md_request, market_data_generator, fx_forwards_trading_tenor=None,
                                      roll_days_before=None, roll_event=None,
@@ -252,7 +252,7 @@ class FXForwardsCurve(object):
 
                 new_trade = np.full(len(horizon_date), False, dtype=bool)
 
-                asset_holidays = self._filter.get_holidays(cal=cross)
+                asset_holidays = self._calendar.get_holidays(cal=cross)
 
                 # Get first delivery date
                 delivery_date.append(
@@ -293,7 +293,7 @@ class FXForwardsCurve(object):
                 # To record MTM prices
                 mtm = np.copy(interpolated_forward)
 
-                # Note: may need to add discount factor to forwards?
+                # Note: may need to add discount factor when marking to market forwards?
 
                 # Special case: for very first trading day
                 # mtm[0] = interpolated_forward[0]

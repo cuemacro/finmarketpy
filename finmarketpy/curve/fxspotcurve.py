@@ -189,7 +189,7 @@ class FXSpotCurve(object):
 
         if depo_tenor is None: depo_tenor = self._depo_tenor
 
-        total_return_index_agg = []
+        total_return_index_df_agg = []
 
         for cross in cross_fx:
             # Get the spot series, base deposit
@@ -198,7 +198,7 @@ class FXSpotCurve(object):
 
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
-                total_return_index_agg.append(pd.DataFrame(100, index=base_deposit.index, columns=[cross + "-tot.close"]))
+                total_return_index_df_agg.append(pd.DataFrame(100, index=base_deposit.index, columns=[cross + "-tot.close"]))
             else:
                 carry = base_deposit.join(terms_deposit, how='inner')
 
@@ -227,14 +227,16 @@ class FXSpotCurve(object):
 
                 time_diff = time.values.astype(float) / 86400000000000.0  # get time difference in days
 
-                total_return_index = pd.DataFrame(index=spot.index, columns=[cross + "-tot.close"],
+                total_return_index_df = pd.DataFrame(index=spot.index, columns=[cross + "-tot.close"],
                     data=_spot_index_numba(spot.values, time_diff, base_deposit.values, terms_deposit.values,
                                      base_daycount, terms_daycount))
 
                 if output_calculation_fields:
-                    total_return_index[cross + '-carry.close'] = carry
+                    total_return_index_df[cross + '-carry.close'] = carry
+                    total_return_index_df[cross + '-tot-return.close'] = total_return_index_df / total_return_index_df.shift(1) - 1.0
+                    total_return_index_df[cross + '-spot-return.close'] =  spot / spot.shift(1) - 1.0
 
                 # Use Numba to do total return index calculation given has many loops
-                total_return_index_agg.append(total_return_index)
+                total_return_index_df_agg.append(total_return_index_df)
 
-        return self._calculations.pandas_outer_join(total_return_index_agg)
+        return self._calculations.pandas_outer_join(total_return_index_df_agg)

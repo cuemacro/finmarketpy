@@ -204,7 +204,7 @@ class FXForwardsPricer(AbstractPricer):
         spot_arr = market_df[cross + '.close'].values
 
         quoted_delivery_df, quoted_delivery_days_arr, forwards_points_arr, divisor = \
-            self._setup_forward_calculation(cross, spot_date, market_df, quoted_delivery_df, fx_forwards_tenor_for_interpolation)
+            self._setup_forwards_calculation(cross, spot_date, market_df, quoted_delivery_df, fx_forwards_tenor_for_interpolation)
 
         interpolated_outright_forwards_arr = _forwards_interpolate_numba(spot_arr, spot_delivery_days_arr, quoted_delivery_days_arr,
                           forwards_points_arr, len(fx_forwards_tenor_for_interpolation))
@@ -235,7 +235,7 @@ class FXForwardsPricer(AbstractPricer):
 
         return divisor
 
-    def _setup_forward_calculation(self, cross, spot_date, market_df, quoted_delivery_df, fx_forwards_tenor):
+    def _setup_forwards_calculation(self, cross, spot_date, market_df, quoted_delivery_df, fx_forwards_tenor):
 
         cal = cross
 
@@ -321,8 +321,8 @@ class FXForwardsPricer(AbstractPricer):
         spot_date = self._calendar.get_spot_date_from_horizon_date(market_df.index, cal)
 
         quoted_delivery_df, quoted_delivery_days_arr, forwards_points_arr, divisor = \
-            self._setup_forward_calculation(cross, spot_date, market_df, quoted_delivery_df,
-                                            fx_forwards_tenor)
+            self._setup_forwards_calculation(cross, spot_date, market_df, quoted_delivery_df,
+                                             fx_forwards_tenor)
 
         spot_arr = market_df[cross + '.close'].values
 

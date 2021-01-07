@@ -40,6 +40,7 @@ class FXForwardsCurve(object):
                  fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
                  base_depos_tenor=data_constants.base_depos_tenor,
                  roll_months=market_constants.fx_forwards_roll_months,
+                 cum_index=market_constants.fx_forwards_cum_index,
                  output_calculation_fields=market_constants.output_calculation_fields):
         """Initializes FXForwardsCurve
 
@@ -71,6 +72,9 @@ class FXForwardsCurve(object):
             After how many months should we initiate a roll. Typically for trading 1M this should 1, 3M this should be 3
             etc.
 
+        cum_index : str
+            In total return index, do we compute in additive or multiplicative way ('add' or 'mult')
+
         output_calculation_fields : bool
             Also output additional data should forward expiries etc. alongside total returns indices
         """
@@ -89,6 +93,7 @@ class FXForwardsCurve(object):
         self._base_depos_tenor = base_depos_tenor
 
         self._roll_months = roll_months
+        self._cum_index = cum_index
         self._output_calcultion_fields = output_calculation_fields
 
     def generate_key(self):
@@ -100,7 +105,7 @@ class FXForwardsCurve(object):
     def fetch_continuous_time_series(self, md_request, market_data_generator, fx_forwards_trading_tenor=None,
                                      roll_days_before=None, roll_event=None,
                                      construct_via_currency=None, fx_forwards_tenor_for_interpolation=None, base_depos_tenor=None,
-                                     roll_months=None, output_calculation_fields=False):
+                                     roll_months=None, cum_index=None, output_calculation_fields=False):
 
         if market_data_generator is None: market_data_generator = self._market_data_generator
         if fx_forwards_trading_tenor is None: fx_forwards_trading_tenor = self._fx_forwards_trading_tenor
@@ -110,6 +115,7 @@ class FXForwardsCurve(object):
         if fx_forwards_tenor_for_interpolation is None: fx_forwards_tenor_for_interpolation = self._fx_forwards_tenor_for_interpolation
         if base_depos_tenor is None: base_depos_tenor = self._base_depos_tenor
         if roll_months is None: roll_months = self._roll_months
+        if cum_index is None: cum_index = self._cum_index
         if output_calculation_fields is None: output_calculation_fields
 
         # Eg. we construct EURJPY via EURJPY directly (note: would need to have sufficient forward data for this)
@@ -138,6 +144,7 @@ class FXForwardsCurve(object):
                                                      roll_days_before=roll_days_before, roll_event=roll_event,
                                                      fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
                                                      roll_months=roll_months,
+                                                     cum_index=cum_index,
                                                      output_calculation_fields=output_calculation_fields)
         else:
             # eg. we calculate via your domestic currency such as USD, so returns will be in your domestic currency
@@ -161,6 +168,7 @@ class FXForwardsCurve(object):
                                      fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
                                      base_depos_tenor=base_depos_tenor,
                                      roll_months=roll_months, output_calculation_fields=False,
+                                     cum_index=cum_index,
                                      construct_via_currency='no')
 
                 terms_vals = self.fetch_continuous_time_series(md_request_terms, market_data_generator,
@@ -168,7 +176,9 @@ class FXForwardsCurve(object):
                                      roll_days_before=roll_days_before, roll_event=roll_event,
                                      fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
                                      base_depos_tenor=base_depos_tenor,
-                                     roll_months=roll_months, output_calculation_fields=False,
+                                     roll_months=roll_months,
+                                     cum_index=cum_index,
+                                     output_calculation_fields=False,
                                      construct_via_currency='no')
 
                 # Special case for USDUSD case (and if base or terms USD are USDUSD
@@ -209,17 +219,25 @@ class FXForwardsCurve(object):
         return 360.0
 
     def construct_total_return_index(self, cross_fx, forwards_market_df,
-                                     fx_forwards_trading_tenor=market_constants.fx_forwards_trading_tenor,
-                                     roll_days_before=market_constants.fx_forwards_roll_days_before,
-                                     roll_event=market_constants.fx_forwards_roll_event,
-                                     roll_months=1,
-                                     fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
+                                     fx_forwards_trading_tenor=None,
+                                     roll_days_before=None,
+                                     roll_event=None,
+                                     roll_months=None,
+                                     fx_forwards_tenor_for_interpolation=None,
+                                     cum_index=None,
                                      output_calculation_fields=False):
 
         if not (isinstance(cross_fx, list)):
             cross_fx = [cross_fx]
 
-        total_return_index_agg = []
+        if fx_forwards_trading_tenor is None: fx_forwards_trading_tenor = self._fx_forwards_trading_tenor
+        if roll_days_before is None: roll_days_before = self._roll_days_before
+        if roll_event is None: roll_event = self._roll_event
+        if roll_months is None: roll_months = self._roll_months
+        if fx_forwards_tenor_for_interpolation is None: fx_forwards_tenor_for_interpolation = self._fx_forwards_tenor_for_interpolation
+        if cum_index is None: cum_index = self._cum_index
+
+        total_return_index_df_agg = []
 
         # Remove columns where there is no data (because these points typically aren't quoted)
         forwards_market_df = forwards_market_df.dropna(how='all', axis=1)
@@ -238,7 +256,7 @@ class FXForwardsCurve(object):
 
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
-                total_return_index_agg.append(
+                total_return_index_df_agg.append(
                     pd.DataFrame(100, index=forwards_market_df.index, columns=[cross + "-forward-tot.close"]))
             else:
                 # Is the FX cross in the correct convention
@@ -315,18 +333,25 @@ class FXForwardsCurve(object):
                     mtm = 1.0 / mtm
                     interpolated_forward = 1.0 / interpolated_forward
 
-                cum_rets = 100 * np.cumprod(1.0 + mtm / np.roll(interpolated_forward, 1) - 1.0)
+                forward_rets = mtm / np.roll(interpolated_forward, 1) - 1.0
+                forward_rets[0] = 0
 
-                total_return_index = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot.close"])
-                total_return_index[cross + "-forward-tot.close"] = cum_rets
+                if cum_index == 'mult':
+                    cum_rets = 100 * np.cumprod(1.0 + forward_rets)
+                elif cum_index == 'add':
+                    cum_rets = 100 + np.cumsum(forward_rets)
+
+                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot.close"])
+                total_return_index_df[cross + "-forward-tot.close"] = cum_rets
 
                 if output_calculation_fields:
-                    total_return_index[cross + '-interpolated-outright-forward.close'] = interpolated_forward
-                    total_return_index[cross + '-mtm.close'] = mtm
-                    total_return_index[cross + '-roll.close'] = new_trade
-                    total_return_index[cross + '.roll-date'] = roll_date
-                    total_return_index[cross + '.delivery-date'] = delivery_date
+                    total_return_index_df[cross + '-interpolated-outright-forward.close'] = interpolated_forward
+                    total_return_index_df[cross + '-mtm.close'] = mtm
+                    total_return_index_df[cross + '-roll.close'] = new_trade
+                    total_return_index_df[cross + '.roll-date'] = roll_date
+                    total_return_index_df[cross + '.delivery-date'] = delivery_date
+                    total_return_index_df[cross + '-forward-return.close'] = forward_rets
 
-                total_return_index_agg.append(total_return_index)
+                total_return_index_df_agg.append(total_return_index_df)
 
-        return self._calculations.pandas_outer_join(total_return_index_agg)
+        return self._calculations.pandas_outer_join(total_return_index_df_agg)

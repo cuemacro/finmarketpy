@@ -22,5 +22,7 @@ setup(name='finmarketpy',
                         'multiprocess',
                         'seasonal',
                         'sklearn',
-                        'matplotlib'],
+                        'matplotlib',
+                        'numba',
+                        'financepy'],
       zip_safe=False)

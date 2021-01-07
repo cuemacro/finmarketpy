@@ -59,7 +59,7 @@ Calculate event study around events for asset (see examples/events_examples.py)
 
 Major requirements
 * Required: Python 3.7
-* Required: pandas 0.24.2, numpy etc.
+* Required: pandas 1.0.5, numpy etc.
 * Required: findatapy for downloading market data (https://github.com/cuemacro/findatapy)
 * Required: chartpy for funky interactive plots (https://github.com/cuemacro/chartpy)
 
@@ -85,12 +85,21 @@ But beforehand please make sure you have already installed both chartpy, findata
 In chartpy you will need to change the chartconstants.py file (to add Plotly API key) and 
 for findatapy, you will also need to change the dataconstants.py file to add the Quandl API 
 (and possibly change other configuration settings there or add a datacred.py file in the util folder, 
-alternatively you will be prompted on your first run to input the API key which will be installed).
+alternatively you will be prompted on your first run to input the API key which will be installed). If you do pip with git 
+you'll get the very latest commit.
 
 ```
 pip install git+https://github.com/cuemacro/chartpy.git
 pip install git+https://github.com/cuemacro/findatapy.git
 ```
+
+However you can also pip install to get from PyPI (might be a slighter older verison from that on GitHub)
+
+```
+pip install chartpy
+pip install findatapy
+```
+
 
 # Binder and Jupyter - Run finmarketpy in your browser
 
@@ -101,6 +110,11 @@ Note that you will need to get a Quandl
 API key to download market data to use some of these, and you can sign up for a free account at https://www.quandl.com.
 
 * [Backtesting an FX trend following strategy - backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/backtest_example.ipynb)
+
+# Syncronizing your fork of finmarketpy with master
+
+I found this [article useful](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository) for 
+explaining how to update your fork to match the master changes.
 
 # Contributors
 
@@ -144,7 +158,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 # Coding log
 
 # finmarketpy log
-
+* 07 Jan 2021 
+  * Added FX vanilla option pricing (via FinancePy)
+  * Calculate total return indices for FX vanilla options
 * 26 Dec 2020
     * Refactored classes to take into account new Calendar object from findatapy
 * 24 Dec 2020

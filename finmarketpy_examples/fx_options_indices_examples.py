@@ -112,19 +112,32 @@ if run_example == 1 or run_example == 0:
 
     calculations = Calculations()
 
-    def prepare_indices(df_tot, df_tc, df_spot_tot):
-        df = calculations.pandas_outer_join([pd.DataFrame(df_tot[cross + '-option-tot.close']),
-                                             pd.DataFrame(df_tot[cross + '-option-delta-tot.close']),
-                                             pd.DataFrame(df_tc[cross + '-option-tot-with-tc.close']),
-                                             pd.DataFrame(df_tc[cross + '-option-delta-tot-with-tc.close']),
-                                             pd.DataFrame(df_tot[cross + '-delta-pnl-index.close']),
-                                             pd.DataFrame(df_tc[cross + '-delta-pnl-index-with-tc.close']),
-                                             df_spot_tot]).fillna(method='ffill')
+    def prepare_indices(df_tot=None, df_tc=None, df_spot_tot=None):
+
+        df_list = []
+
+        if df_tot is not None:
+            df_list.append(pd.DataFrame(df_tot[cross + '-option-tot.close']))
+            df_list.append(pd.DataFrame(df_tot[cross + '-option-delta-tot.close']))
+            df_list.append(pd.DataFrame(df_tot[cross + '-delta-pnl-index.close']))
+
+        if df_tc is not None:
+            df_list.append(pd.DataFrame(df_tc[cross + '-option-tot-with-tc.close']))
+            df_list.append(pd.DataFrame(df_tc[cross + '-option-delta-tot-with-tc.close']))
+            df_list.append(pd.DataFrame(df_tc[cross + '-delta-pnl-index-with-tc.close']))
+
+        if df_spot_tot is not None:
+            df_list.append(df_spot_tot)
+
+        df = calculations.pandas_outer_join(df_list).fillna(method='ffill')
 
         return calculations.create_mult_index_from_prices(df)
 
     chart.plot(calculations.create_mult_index_from_prices(
-        prepare_indices(df_cuemacro_option_call_tot, df_cuemacro_option_call_tc, df_bbg_tot)))
+        prepare_indices(df_tot=df_cuemacro_option_call_tot, df_tc=df_cuemacro_option_call_tc, df_spot_tot=df_bbg_tot)))
 
     chart.plot(calculations.create_mult_index_from_prices(
-        prepare_indices(df_cuemacro_option_put_tot, df_cuemacro_option_put_tc, df_bbg_tot)))
+        prepare_indices(df_tot=df_cuemacro_option_put_tot, df_tc=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))
+
+    chart.plot(calculations.create_mult_index_from_prices(
+        prepare_indices(df_tot=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))

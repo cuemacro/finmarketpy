@@ -140,4 +140,4 @@ if run_example == 1 or run_example == 0:
         prepare_indices(df_tot=df_cuemacro_option_put_tot, df_tc=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))
 
     chart.plot(calculations.create_mult_index_from_prices(
-        prepare_indices(df_tot=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))
+        prepare_indices(df_tc=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))

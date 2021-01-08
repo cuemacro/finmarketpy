@@ -25,12 +25,14 @@ try:
     from financepy.market.volatility.FinFXVolSurfacePlus import FinFXDeltaMethod
     from financepy.market.volatility.FinFXVolSurfacePlus import volFunction
     from financepy.market.volatility.FinFXVolSurfacePlus import FinVolFunctionTypes
+    from financepy.finutils.FinSolvers import FinSolversTypes
 except:
     from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
     from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
     from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
     from financepy.market.volatility.FinFXVolSurface import volFunction
     from financepy.market.volatility.FinFXVolSurface import FinVolFunctionTypes
+    from financepy.finutils.FinSolvers import FinSolversTypes
 
 from findatapy.util.dataconstants import DataConstants
 
@@ -51,6 +53,7 @@ class FXVolSurface(AbstractVolSurface):
                  atm_method=market_constants.fx_options_atm_method,
                  delta_method=market_constants.fx_options_delta_method,
                  depo_tenor=market_constants.fx_options_depo_tenor,
+                 solver=market_constants.fx_options_solver,
                  alpha=market_constants.fx_options_alpha):
         """Initialises object, with market data and various market conventions
 
@@ -83,6 +86,11 @@ class FXVolSurface(AbstractVolSurface):
             Spot delta, forward delta etc.
 
             default - 'spot-delta'
+
+        solver : str
+            Which solver to use in FX vol surface calibration?
+
+            default - 'nelmer-mead'
 
         alpha : float
             Between 0 and 1 (default 0.5)
@@ -134,6 +142,14 @@ class FXVolSurface(AbstractVolSurface):
             self._delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
         elif delta_method == 'fwd-delta-prem-adj':
             self._delta_method = FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ
+
+        # Which solver to use in FX vol surface calibration
+        if solver == 'nelmer-mead':
+            self._solver = FinSolversTypes.NELDER_MEAD
+        elif solver == 'nelmer-mead-numba':
+            self._solver = FinSolversTypes.NELDER_MEAD_NUMBA
+        elif delta_method == 'cg':
+            self._solver = FinSolversTypes.CG
 
         self._alpha = alpha
 
@@ -230,8 +246,7 @@ class FXVolSurface(AbstractVolSurface):
                                        risk_reversal25DeltaVols,
                                        atmMethod=self._atm_method,
                                        deltaMethod=self._delta_method,
-                                       volatilityFunctionType=self._vol_function_type
-                                       )
+                                       volatilityFunctionType=self._vol_function_type)
         else:
             # New implementation in FinancePy also uses 10d for interpolation
             self._fin_fx_vol_surface = FinFXVolSurface(value_fin_date,
@@ -249,7 +264,8 @@ class FXVolSurface(AbstractVolSurface):
                                        self._alpha,
                                        atmMethod=self._atm_method,
                                        deltaMethod=self._delta_method,
-                                       volatilityFunctionType=self._vol_function_type)
+                                       volatilityFunctionType=self._vol_function_type,
+                                       finSolversTypes=self._solver)
 
     def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor='1M'):
         """Calculates the implied_vol volatility for a given strike and tenor (or expiry date, if specified). The
@@ -275,13 +291,35 @@ class FXVolSurface(AbstractVolSurface):
 
         if expiry_date is not None:
             expiry_date = self._findate(self._market_util.parse_date(expiry_date))
-            return self._fin_fx_vol_surface.volatility(K, expiry_date)
+            return self._fin_fx_vol_surface.volatilityFromStrikeDate(K, expiry_date)
         else:
             try:
                 tenor_index = self._get_tenor_index(tenor)
-                return self.vol_function(K, tenor_index)
+                return self.get_vol_from_quoted_tenor(K, tenor_index)
             except:
                 pass
+
+        return None
+
+    def calculate_vol_for_delta_expiry(self, delta_call, expiry_date=None):
+        """Calculates the implied_vol volatility for a given delta call and expiry date. The
+        expiry date/broken dates are intepolated linearly in variance space.
+
+        Parameters
+        ----------
+        delta_call : float
+            Delta for the strike for which to find implied volatility
+
+        expiry_date : str (optional)
+            Expiry date of option
+
+        Returns
+        -------
+        float
+        """
+        if expiry_date is not None:
+            expiry_date = self._findate(self._market_util.parse_date(expiry_date))
+            return self._fin_fx_vol_surface.volatilityFromDeltaDate(delta_call, expiry_date)
 
         return None
 
@@ -351,7 +389,7 @@ class FXVolSurface(AbstractVolSurface):
                 dK = (high_K - low_K) / num_strike_intervals
 
                 for i in range(0, num_strike_intervals):
-                    sigma = self.vol_function(K, tenor_index) * 100.0
+                    sigma = self.get_vol_from_quoted_tenor(K, tenor_index) * 100.0
                     strikes.append(K)
                     vols.append(sigma)
                     K = K + dK
@@ -382,7 +420,7 @@ class FXVolSurface(AbstractVolSurface):
             key_vols = []
 
             for K, name in zip(key_strikes, key_strikes_names):
-                sigma = self.vol_function(K, tenor_index) * 100.0
+                sigma = self.get_vol_from_quoted_tenor(K, tenor_index) * 100.0
                 key_vols.append(sigma)
 
             df_vol_surface_delta_space[tenor_label] = pd.Series(index=key_strikes_names, data=key_vols)
@@ -399,7 +437,13 @@ class FXVolSurface(AbstractVolSurface):
 
         return df_vol_dict
 
-    def vol_function(self, K, tenor_index, gaps=None):
+    def get_vol_from_quoted_tenor(self, K, tenor, gaps=None):
+
+        if not(isinstance(tenor, int)):
+            tenor_index = self._get_tenor_index(tenor)
+        else:
+            tenor_index = tenor
+
         if gaps is None:
             gaps = np.array([0.1])
 

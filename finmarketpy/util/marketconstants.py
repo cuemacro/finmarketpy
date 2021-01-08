@@ -119,6 +119,7 @@ class MarketConstants(object):
     fx_options_premium_output = 'pct-for'
     fx_options_delta_output = 'pct-fwd-delta-prem-adj'
 
+    fx_options_solver = 'nelmer-mead-numba' # 'nelmer-mead' or 'nelmer-mead-numba' or 'cg'
     fx_options_pricing_engine = 'finmarketpy' # 'finmarketpy' or 'financepy'
 
     # overwrite field variables with those listed in MarketCred

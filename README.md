@@ -161,6 +161,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 * 08 Jan 2021
   * Changed FXVolSurface to fit better with newest FinancePy
+  * Added missing FXOptionsCurve class
 * 07 Jan 2021 
   * Added FX vanilla option pricing (via FinancePy)
   * Calculate total return indices for FX vanilla options

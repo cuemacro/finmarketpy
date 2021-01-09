@@ -113,7 +113,7 @@ class MarketConstants(object):
     fx_options_vol_function_type = 'CLARK5' # 'CLARK5', 'CLARK', 'BBG', 'SABR' and 'SABR3'
     fx_options_depo_tenor = '1M'
     fx_options_atm_method = 'fwd-delta-neutral-premium-adj' # 'fwd-delta-neutral' or 'fwd-delta-neutral-premium-adj'
-    fx_options_delta_method = 'spot-delta'
+    fx_options_delta_method = 'fwd-delta-prem-adj'
     fx_options_alpha = 0.5
 
     fx_options_premium_output = 'pct-for'

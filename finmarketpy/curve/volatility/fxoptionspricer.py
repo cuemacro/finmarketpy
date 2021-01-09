@@ -21,6 +21,7 @@ from findatapy.util import LoggerManager
 
 from finmarketpy.util.marketconstants import MarketConstants
 from finmarketpy.curve.abstractpricer import AbstractPricer
+from finmarketpy.curve.rates.fxforwardspricer import FXForwardsPricer
 
 from financepy.finutils.FinDate import FinDate
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
@@ -38,12 +39,13 @@ class FXOptionsPricer(AbstractPricer):
 
         self._calendar = Calendar()
         self._fx_vol_surface = fx_vol_surface
+        self._fx_forwards_price = FXForwardsPricer()
         self._premium_output = premium_output
         self._delta_output = delta_output
 
     def price_instrument(self, cross, horizon_date, strike, expiry_date=None, vol=None, notional=1000000,
                          contract_type='european-call', tenor=None,
-                         fx_vol_surface=None, premium_output=None, delta_output=None, depo_tenor=None):
+                         fx_vol_surface=None, premium_output=None, delta_output=None, depo_tenor=None, return_as_df=True):
         """Prices FX options for horizon dates/expiry dates given by the user from FX spot rates, FX volatility surface
         and deposit rates.
 
@@ -111,108 +113,136 @@ class FXOptionsPricer(AbstractPricer):
             vol = np.empty(len(horizon_date))
             vol.fill(old_vol)
 
-        option_values = np.empty(len(horizon_date))
-        spot = np.empty(len(horizon_date))
-        delta = np.empty(len(horizon_date))
-        intrinsic_values = np.empty(len(horizon_date))
+        option_values = np.zeros(len(horizon_date))
+        spot = np.zeros(len(horizon_date))
+        delta = np.zeros(len(horizon_date))
+        intrinsic_values = np.zeros(len(horizon_date))
+
+        def _price_option(contract_type_, contract_type_fin_):
+            for i in range(len(expiry_date)):
+                built_vol_surface = False
+
+                # If we have a "key strike" need to fit the vol surface
+                if isinstance(strike[i], str):
+                    if not(built_vol_surface):
+
+                        fx_vol_surface.build_vol_surface(horizon_date[i])
+                        fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
+
+                        built_vol_surface = True
+
+                    if strike[i] == 'atm':
+                        strike[i] = fx_vol_surface.get_atm_strike(tenor)
+                    elif strike[i] == 'atms':
+                        strike[i] = fx_vol_surface.get_spot()
+                    elif strike[i] == 'atmf':
+
+                        delivery_date = self._calendar.get_delivery_date_from_horizon_date(horizon_date[i], cal=cross)
+
+                        strike[i] = self._fx_forwards_price.price_instrument(cross, delivery_date,
+                                                                             market_df=fx_vol_surface.get_all_market_data())
+                    elif strike[i] == '25d-otm':
+                        if 'call' in contract_type_:
+                            strike[i] = fx_vol_surface.get_25d_call_strike(tenor)
+                        elif 'put' in contract_type_:
+                            strike[i] = fx_vol_surface.get_25d_put_strike(tenor)
+                    elif strike[i] == '10d-otm':
+                        if 'call' in contract_type_:
+                            strike[i] = fx_vol_surface.get_10d_call_strike(tenor)
+                        elif 'put' in contract_type_:
+                            strike[i] = fx_vol_surface.get_10d_put_strike(tenor)
+
+                if not(built_vol_surface):
+                    fx_vol_surface.build_vol_surface(horizon_date[i])
+                    # fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
+
+                # If an implied vol hasn't been provided, interpolate that one, fit the vol surface (if hasn't already been
+                # done)
+                if np.isnan(vol[i]):
+
+                    if tenor is None:
+                        vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(strike[i], expiry_date=expiry_date[i], tenor=None)
+                    else:
+                        vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(strike[i], expiry_date=None, tenor=tenor)
+
+                model = FinModelBlackScholes(float(vol[i]))
+
+                logger.info("Pricing " + contract_type_ + " option, horizon date = " + str(horizon_date[i]) + ", expiry date = "
+                             + str(expiry_date[i]))
+
+                option = FinFXVanillaOption(self._findate(expiry_date[i]), strike[i],
+                                            cross, contract_type_fin_, notional, cross[0:3])
+
+                spot[i] = fx_vol_surface.get_spot()
+
+                """ FinancePy will return the value in the following dictionary for values
+                    {'v': vdf,
+                    "cash_dom": cash_dom,
+                    "cash_for": cash_for,
+                    "pips_dom": pips_dom,
+                    "pips_for": pips_for,
+                    "pct_dom": pct_dom,
+                    "pct_for": pct_for,
+                    "not_dom": notional_dom,
+                    "not_for": notional_for,
+                    "ccy_dom": self._domName,
+                    "ccy_for": self._forName}
+                """
+
+                option_values[i] = option_values[i] + option.value(self._findate(horizon_date[i]),
+                                                spot[i], fx_vol_surface.get_dom_discount_curve(),
+                                                fx_vol_surface.get_for_discount_curve(),
+                                                model)[premium_output.replace('-', '_')]
+
+                intrinsic_values[i] = intrinsic_values[i] + option.value(self._findate(expiry_date[i]),
+                                                spot[i], fx_vol_surface.get_dom_discount_curve(),
+                                                fx_vol_surface.get_for_discount_curve(),
+                                                model)[premium_output.replace('-', '_')]
+
+                """FinancePy returns this dictionary for deltas
+                    {"pips_spot_delta": pips_spot_delta,
+                    "pips_fwd_delta": pips_fwd_delta,
+                    "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj,
+                    "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj}
+                """
+
+                delta[i] = delta[i] + option.delta(self._findate(horizon_date[i]),
+                            spot[i], fx_vol_surface.get_dom_discount_curve(),
+                            fx_vol_surface.get_for_discount_curve(), model)[delta_output.replace('-', '_')]
 
         if contract_type == 'european-call':
             contract_type_fin = FinOptionTypes.EUROPEAN_CALL
+
+            _price_option(contract_type, contract_type_fin)
         elif contract_type == 'european-put':
             contract_type_fin = FinOptionTypes.EUROPEAN_PUT
-        elif contract_type == 'european-straddle':
-            pass
 
-        for i in range(len(expiry_date)):
-            built_vol_surface = False
+            _price_option(contract_type, contract_type_fin)
+        elif contract_type == 'european-straddle' or contract_type == 'european-strangle':
+            contract_type = 'european-call'
+            contract_type_fin = FinOptionTypes.EUROPEAN_CALL
 
-            # If we have a "key strike" need to fit the vol surface
-            if isinstance(strike[i], str):
-                fx_vol_surface.build_vol_surface(horizon_date[i], depo_tenor=depo_tenor)
-                fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
+            _price_option(contract_type, contract_type_fin)
 
-                built_vol_surface = True
+            contract_type = 'european-put'
+            contract_type_fin = FinOptionTypes.EUROPEAN_PUT
 
-                if strike[i] == 'atm': strike[i] = fx_vol_surface.get_atm_strike(tenor)
-                elif strike[i] == '25d-otm':
-                    if 'call' in contract_type:
-                        strike[i] = fx_vol_surface.get_25d_call_strike(tenor)
-                    elif 'put' in contract_type:
-                        strike[i] = fx_vol_surface.get_25d_put_strike(tenor)
-                elif strike[i] == '10d-otm':
-                        if 'call' in contract_type:
-                            strike[i] = fx_vol_surface.get_10d_call_strike(tenor)
-                        elif 'put' in contract_type:
-                            strike[i] = fx_vol_surface.get_10d_put_strike(tenor)
+            _price_option(contract_type, contract_type_fin)
 
-            # If an implied vol hasn't been provided, interpolate that one, fit the vol surface (if hasn't already been
-            # done)
-            if np.isnan(vol[i]):
-                if not(built_vol_surface):
-                    fx_vol_surface.build_vol_surface(horizon_date[i])
-                    fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
+        if return_as_df:
+            option_prices_df = pd.DataFrame(index=horizon_date)
 
-                if tenor is None:
-                    vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(strike[i], expiry_date=expiry_date[i], tenor=None)
-                else:
-                    vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(strike[i], expiry_date=None, tenor=tenor)
+            option_prices_df[cross + '-option-price.' + field] = option_values
+            option_prices_df[cross + '.' + field] = spot
+            option_prices_df[cross + '-strike.' + field] = strike
+            option_prices_df[cross + '-vol.' + field] = vol
+            option_prices_df[cross + '-delta.' + field] = delta
+            option_prices_df[cross + '.expiry-date'] = expiry_date
+            option_prices_df[cross + '-intrinsic-value.' + field] = intrinsic_values
 
-            model = FinModelBlackScholes(float(vol[i]))
+            return option_prices_df
 
-            logger.info("Pricing " + contract_type + " option, horizon date = " + str(horizon_date[i]) + ", expiry date = "
-                         + str(expiry_date[i]))
-
-            option = FinFXVanillaOption(self._findate(expiry_date[i]), strike[i],
-                                        cross, contract_type_fin, notional, cross[0:3])
-
-            spot[i] = fx_vol_surface.get_spot()
-
-            """ FinancePy will return the value in the following dictionary for values
-                {'v': vdf,
-                "cash_dom": cash_dom,
-                "cash_for": cash_for,
-                "pips_dom": pips_dom,
-                "pips_for": pips_for,
-                "pct_dom": pct_dom,
-                "pct_for": pct_for,
-                "not_dom": notional_dom,
-                "not_for": notional_for,
-                "ccy_dom": self._domName,
-                "ccy_for": self._forName}
-            """
-
-            option_values[i] = option.value(self._findate(horizon_date[i]),
-                                            spot[i], fx_vol_surface.get_dom_discount_curve(),
-                                            fx_vol_surface.get_for_discount_curve(),
-                                            model)[premium_output.replace('-', '_')]
-
-            intrinsic_values[i] = option.value(self._findate(expiry_date[i]),
-                                            spot[i], fx_vol_surface.get_dom_discount_curve(),
-                                            fx_vol_surface.get_for_discount_curve(),
-                                            model)[premium_output.replace('-', '_')]
-
-            """FinancePy returns this dictionary for deltas
-                {"pips_spot_delta": pips_spot_delta,
-                "pips_fwd_delta": pips_fwd_delta,
-                "pct_spot_delta_prem_adj": pct_spot_delta_prem_adj,
-                "pct_fwd_delta_prem_adj": pct_fwd_delta_prem_adj}
-            """
-
-            delta[i] = option.delta(self._findate(horizon_date[i]),
-                        spot[i], fx_vol_surface.get_dom_discount_curve(),
-                        fx_vol_surface.get_for_discount_curve(), model)[delta_output.replace('-', '_')]
-
-        option_prices_df = pd.DataFrame(index=horizon_date)
-
-        option_prices_df[cross + '-option-price.' + field] = option_values
-        option_prices_df[cross + '.' + field] = spot
-        option_prices_df[cross + '-strike.' + field] = strike
-        option_prices_df[cross + '-vol.' + field] = vol
-        option_prices_df[cross + '-delta.' + field] = delta
-        option_prices_df[cross + '.expiry-date'] = expiry_date
-        option_prices_df[cross + '-intrinsic-value.' + field] = intrinsic_values
-
-        return option_prices_df
+        return option_values, spot, strike, vol, delta, expiry_date, intrinsic_values
 
     def get_day_count_conv(self, currency):
         if currency in market_constants.currencies_with_365_basis:

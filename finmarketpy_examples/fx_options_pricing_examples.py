@@ -42,8 +42,9 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 2 - price USDJPY options
 # run_example = 3 - price AUDUSD options
 # run_example = 4 - more pricing of AUDUSD options
+# run_example = 5 - pricing of EURUSD options
 
-run_example = 4
+run_example = 5
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Construct volatility surface using FinancePy library underneath, using polynomial interpolation and
@@ -167,3 +168,29 @@ if run_example == 4 or run_example == 0:
     print("atm 15D european call")
     print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 0.8535,
             expiry_date=pd.Timestamp('05 Sep 2007'), contract_type='european-call').to_string())
+
+###### Fetch market data for pricing EURUSD options during start of 2006
+if run_example == 5 or run_example == 0:
+
+    horizon_date = '04 Jan 2006'
+    cross = 'EURUSD'
+
+    # Download the whole all market data for GBPUSD for pricing options (vol surface)
+    md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
+                                   data_source='bloomberg', cut='BGN', category='fx-vol-market',
+                                   tickers=cross, base_depos_currencies=[cross[0:3], cross[3:6]],
+                                   cache_algo='cache_algo_return')
+
+    df = market.fetch_market(md_request)
+
+    fx_vol_surface = FXVolSurface(market_df=df, asset=cross, tenors=['1W', '1M', '3M'])
+
+    fx_op = FXOptionsPricer(fx_vol_surface=fx_vol_surface)
+
+    # Price several different options
+
+    # Try a broken date 15D option (note, for broken dates, currently doesn't interpolate key strikes)
+    # Specify expiry date instead of the tenor for broken dates
+    print("atm 1W european call")
+    print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 'atm',
+            tenor="1W", depo_tenor='1W', contract_type='european-call').to_string())

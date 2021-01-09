@@ -110,6 +110,22 @@ class FXVolSurface(AbstractVolSurface):
         self._fin_fx_vol_surface = None
         self._df_vol_dict = None
 
+        for_name_base = asset[0:3]
+        dom_name_terms = asset[3:6]
+
+        field = '.' + field
+
+        # CAREFUL: need to divide by 100 for depo rate, ie. 0.0346 = 3.46%
+        self._forCCRate = market_df[for_name_base + depo_tenor + field].values / 100.0  # 0.03460  # EUR
+        self._domCCRate = market_df[dom_name_terms + depo_tenor + field].values / 100.0  # 0.02940  # USD
+
+        self._spot_history = market_df[asset + field].values
+        self._atm_vols = market_df[[asset + "V" + t + field for t in tenors]].values
+        self._market_strangle25DeltaVols = market_df[[asset + "25B" + t + field for t in tenors]].values
+        self._risk_reversal25DeltaVols =  market_df[[asset + "25R" + t + field for t in tenors]].values
+        self._market_strangle25DeltaVols = market_df[[asset + "10B" + t + field for t in tenors]].values
+        self._risk_reversal25DeltaVols = market_df[[asset + "10R" + t + field for t in tenors]].values
+
         if vol_function_type == 'CLARK':
             self._vol_function_type = FinVolFunctionTypes.CLARK
         elif vol_function_type == 'CLARK5':
@@ -148,12 +164,12 @@ class FXVolSurface(AbstractVolSurface):
             self._solver = FinSolversTypes.NELDER_MEAD
         elif solver == 'nelmer-mead-numba':
             self._solver = FinSolversTypes.NELDER_MEAD_NUMBA
-        elif delta_method == 'cg':
+        elif solver == 'cg':
             self._solver = FinSolversTypes.CG
 
         self._alpha = alpha
 
-    def build_vol_surface(self, value_date, asset=None, depo_tenor=None, field=None):
+    def build_vol_surface(self, value_date):
         """Builds the implied volatility surface for a particular value date and calculates the benchmark strikes etc.
 
         Before we do any sort of interpolation later, we need to build the implied_vol vol surface.
@@ -177,90 +193,34 @@ class FXVolSurface(AbstractVolSurface):
             default - 'close'
         """
 
-        value_date = self._market_util.parse_date(value_date)
+        self._value_date = self._market_util.parse_date(value_date)
 
-        self._value_date = value_date
+        value_fin_date = self._findate(self._value_date)
 
-        market_df = self._market_df
-
-        value_fin_date = self._findate(self._market_util.parse_date(value_date))
-
-        tenors = self._tenors
-
-        # Change ON (overnight) to 1D (convention for financepy)
-        # tenors_financepy = list(map(lambda b: b.replace("ON", "1D"), self._tenors.copy()))
-        tenors_financepy = self._tenors.copy()
-
-        if field is None: field = self._field
-
-        field = '.' + field
-
-        if asset is None: asset = self._asset
-        if depo_tenor is None: depo_tenor = self._depo_tenor
-
-        for_name_base = asset[0:3]
-        dom_name_terms = asset[3:6]
-
-        notional_currency = for_name_base
-
-        date_index = market_df.index == value_date
-
-        # CAREFUL: need to divide by 100 for depo rate, ie. 0.0346 = 3.46%
-        forCCRate = market_df[for_name_base + depo_tenor + field][date_index].values[0] / 100.0 # 0.03460  # EUR
-        domCCRate = market_df[dom_name_terms + depo_tenor + field][date_index].values[0] / 100.0 # 0.02940  # USD
-
-        currency_pair = for_name_base + dom_name_terms
-        spot_fx_rate = float(market_df[currency_pair + field][date_index].values[0])
-
-        # For vols we do NOT need to divide by 100 (financepy does that internally)
-        atm_vols = market_df[[currency_pair + "V" + t + field for t in tenors]][date_index].values[0]
-
-        market_strangle25DeltaVols = market_df[[currency_pair + "25B" + t + field for t in tenors]][date_index].values[0] #[0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-        risk_reversal25DeltaVols = market_df[[currency_pair + "25R" + t + field for t in tenors]][date_index].values[0] #[-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
-        market_strangle10DeltaVols = market_df[[currency_pair + "10B" + t + field for t in tenors]][date_index].values[0]
-        risk_reversal10DeltaVols = market_df[[currency_pair + "10R" + t + field for t in tenors]][date_index].values[0]
+        date_index = self._market_df.index == value_date
 
         # TODO: add whole rates curve
-        dom_discount_curve = FinDiscountCurveFlat(value_fin_date, domCCRate)
-        for_discount_curve = FinDiscountCurveFlat(value_fin_date, forCCRate)
+        dom_discount_curve = FinDiscountCurveFlat(value_fin_date, self._domCCRate[date_index])
+        for_discount_curve = FinDiscountCurveFlat(value_fin_date, self._forCCRate[date_index])
 
         self._dom_discount_curve = dom_discount_curve
         self._for_discount_curve = for_discount_curve
 
-        self._spot = spot_fx_rate
+        self._spot = float(self._spot_history[date_index][0])
 
-        # 25d only data should only be used for very old versions of FinancePy
-        use_only_25d = False
-
-        # Construct financepy vol surface (uses polynomial interpolation for determining vol between strikes)
-        if use_only_25d:
-            self._fin_fx_vol_surface = FinFXVolSurface(value_fin_date,
-                                       spot_fx_rate,
-                                       currency_pair,
-                                       notional_currency,
+        # New implementation in FinancePy also uses 10d for interpolation
+        self._fin_fx_vol_surface = FinFXVolSurface(value_fin_date,
+                                       self._spot,
+                                       self._asset,
+                                       self._asset[0:3],
                                        dom_discount_curve,
                                        for_discount_curve,
-                                       tenors_financepy,
-                                       atm_vols,
-                                       market_strangle25DeltaVols,
-                                       risk_reversal25DeltaVols,
-                                       atmMethod=self._atm_method,
-                                       deltaMethod=self._delta_method,
-                                       volatilityFunctionType=self._vol_function_type)
-        else:
-            # New implementation in FinancePy also uses 10d for interpolation
-            self._fin_fx_vol_surface = FinFXVolSurface(value_fin_date,
-                                       spot_fx_rate,
-                                       currency_pair,
-                                       notional_currency,
-                                       dom_discount_curve,
-                                       for_discount_curve,
-                                       tenors_financepy,
-                                       atm_vols,
-                                       market_strangle25DeltaVols,
-                                       risk_reversal25DeltaVols,
-                                       market_strangle10DeltaVols,
-                                       risk_reversal10DeltaVols,
+                                       self._tenors.copy(),
+                                       self._atm_vols[date_index][0],
+                                       self._market_strangle25DeltaVols[date_index][0],
+                                       self._risk_reversal25DeltaVols[date_index][0],
+                                       self._market_strangle25DeltaVols[date_index][0],
+                                       self._risk_reversal25DeltaVols[date_index][0],
                                        self._alpha,
                                        atmMethod=self._atm_method,
                                        deltaMethod=self._delta_method,

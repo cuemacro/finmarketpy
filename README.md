@@ -159,6 +159,13 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 09 Jan 2021
+  * Fixed dom/for rate in FX vol surface
+  * Fixed additive index  
+  * Still sorting issues with total return indices for FX options
+* 08 Jan 2021
+  * Added total returns for straddle (with example)
+  * Fixed positioning flip and expiring on day without market data on FXOptionsCurve
 * 08 Jan 2021
   * Changed FXVolSurface to fit better with newest FinancePy
   * Added missing FXOptionsCurve class

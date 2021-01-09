@@ -140,7 +140,7 @@ class FXForwardsPricer(AbstractPricer):
         self._market_df = market_df
         self._quoted_delivery_df = quoted_delivery_df
 
-    def price_instrument(self, cross, horizon_date, delivery_date, market_df=None, quoted_delivery_df=None,
+    def price_instrument(self, cross, horizon_date, delivery_date, option_expiry_date=None, market_df=None, quoted_delivery_df=None,
                          fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation):
         """Creates an interpolated outright FX forward (and the associated points), for horizon dates/delivery dates
         given by the user from FX spot rates and FX forward points. This can be useful when we have an odd/broken date

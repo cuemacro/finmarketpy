@@ -13,9 +13,10 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 from chartpy import Chart, Style, ChartConstants
+
 from findatapy.util.dataconstants import DataConstants
 from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
-from findatapy.timeseries import Calculations
+from findatapy.timeseries import Calculations, RetStats
 
 import datetime
 
@@ -38,6 +39,7 @@ class QuickChart(object):
                    chart_file=None, chart_type='line', title='',
                    fields={'close' : 'PX_LAST'}, freq='daily', source='Web', brand_label='Cuemacro', display_brand_label=True,
                    reindex=False, additive_index=False, yoy=False, plotly_plot_mode='offline_png',
+                   height=400, width=600, scale_factor=-1,
                    quandl_api_key=dataconstants.quandl_api_key,
                    fred_api_key=dataconstants.fred_api_key,
                    alpha_vantage_api_key=dataconstants.alpha_vantage_api_key, df=None):
@@ -88,8 +90,8 @@ class QuickChart(object):
         df = df.fillna(method='ffill')
         df.columns = [x.split('.')[0] for x in df.columns]
 
-        style = Style(title=title, chart_type=chart_type, html_file_output=chart_file, scale_factor=-1,
-                      height=400, width=600, file_output=datetime.date.today().strftime("%Y%m%d") + " " + title + ".png",
+        style = Style(title=title, chart_type=chart_type, html_file_output=chart_file, scale_factor=scale_factor,
+                      height=height, width=width, file_output=datetime.date.today().strftime("%Y%m%d") + " " + title + ".png",
                       plotly_plot_mode=plotly_plot_mode, source=source, brand_label=brand_label,
                       display_brand_label=display_brand_label)
 
@@ -120,3 +122,23 @@ class QuickChart(object):
             style.y_axis_showgrid = False
 
         return self._chart.plot(df, style=style), df
+
+    def plot_chart_with_ret_stats(self, df=None, chart_file=None, chart_type='line', title='',
+                   height=400, width=600, scale_factor=-1,
+                   ann_factor=252, source='Web', brand_label='Cuemacro', display_brand_label=True,
+                   plotly_plot_mode='offline_png'):
+
+        style = Style(title=title, chart_type=chart_type, html_file_output=chart_file, scale_factor=scale_factor,
+                      height=height, width=width, file_output=datetime.date.today().strftime("%Y%m%d") + " " + title + ".png",
+                      plotly_plot_mode=plotly_plot_mode, source=source, brand_label=brand_label,
+                      display_brand_label=display_brand_label)
+
+        returns_df = df / df.shift(1) - 1.0
+
+        ret_stats = RetStats(returns_df=returns_df, ann_factor=ann_factor)
+
+        df.columns = ret_stats.summary()
+
+        return self._chart.plot(df, style=style), df
+
+

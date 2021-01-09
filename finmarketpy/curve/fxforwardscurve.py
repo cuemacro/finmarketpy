@@ -339,7 +339,7 @@ class FXForwardsCurve(object):
                 if cum_index == 'mult':
                     cum_rets = 100 * np.cumprod(1.0 + forward_rets)
                 elif cum_index == 'add':
-                    cum_rets = 100 + np.cumsum(forward_rets)
+                    cum_rets = 100 + 100 * np.cumsum(forward_rets)
 
                 total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot.close"])
                 total_return_index_df[cross + "-forward-tot.close"] = cum_rets

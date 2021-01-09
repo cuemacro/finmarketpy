@@ -267,6 +267,8 @@ class FXOptionsCurve(object):
                                      position_multiplier=None,
                                      fx_options_tenor_for_interpolation=None,
                                      tot_label=None,
+                                     depo_tenor='1M',
+                                     freeze_implied_vol=False,
                                      output_calculation_fields=None):
 
         if fx_options_trading_tenor is None: fx_options_trading_tenor = self._fx_options_trading_tenor
@@ -326,7 +328,7 @@ class FXOptionsCurve(object):
 
                 fx_vol_surface = FXVolSurface(market_df=market_df, asset=cross,
                                               tenors=fx_options_tenor_for_interpolation,
-                                              depo_tenor='3M')
+                                              depo_tenor=depo_tenor)
                 horizon_date = market_df.index
 
                 expiry_date = []
@@ -353,15 +355,28 @@ class FXOptionsCurve(object):
 
                     # If the horizon date has reached the roll date (from yesterday), we're done, and we have a
                     # new roll/trade
-                    if (horizon_date[i] - roll_date[i-1]).days == 0:
+                    if (horizon_date[i] - roll_date[i-1]).days >= 0:
                         new_trade[i] = True
                     else:
                         new_trade[i] = False
 
                     # If we're entering a new trade/contract, we need to get new expiry and roll dates
                     if new_trade[i]:
-                        expiry_date.append(self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[i]]),
-                            fx_options_trading_tenor, cal=cross, asset_class='fx-vol')[0])
+
+                        exp = self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[i]]),
+                            fx_options_trading_tenor, cal=cross, asset_class='fx-vol')[0]
+
+                        # Make sure we don't expire on a date in the history where there isn't market data
+                        # It is ok for future values to expire after market data (just not in the backtest!)
+                        if exp not in market_df.index:
+                            exp_index = market_df.index.searchsorted(exp)
+
+                            if exp_index < len(market_df.index):
+                                exp_index = min(exp_index, len(market_df.index))
+
+                                exp = market_df.index[exp_index]
+
+                        expiry_date.append(exp)
 
                         roll_date.append(get_roll_date(horizon_date[i], expiry_date[i], asset_holidays))
                     else:
@@ -371,21 +386,11 @@ class FXOptionsCurve(object):
 
                 # Note: may need to add discount factor when marking to market option
 
-                mtm = np.empty(len(horizon_date))
-                calculated_strike = np.empty(len(horizon_date))
-                interpolated_option = np.empty(len(horizon_date))
-                delta = np.empty(len(horizon_date))
-
-                # Special case: for first day of history (given have no previous positions)
-                option_output = fx_options_pricer.price_instrument(cross, horizon_date[0], strike, expiry_date[0],
-                                                                   contract_type=contract_type,
-                                                                   tenor=fx_options_trading_tenor,
-                                                                   fx_vol_surface=fx_vol_surface)
-
-                interpolated_option[0] = option_output[cross + '-option-price.close'].values
-                calculated_strike[0] = option_output[cross + '-strike.close'].values
-
-                mtm[0] = 0
+                mtm = np.zeros(len(horizon_date))
+                calculated_strike = np.zeros(len(horizon_date))
+                interpolated_option = np.zeros(len(horizon_date))
+                implied_vol = np.zeros(len(horizon_date))
+                delta = np.zeros(len(horizon_date))
 
                 # For debugging
                 # df_temp = pd.DataFrame()
@@ -394,46 +399,72 @@ class FXOptionsCurve(object):
                 # df_temp['horizon-date'] = horizon_date
                 # df_temp['roll-date'] = roll_date
 
+                # Special case: for first day of history (given have no previous positions)
+                option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_  = \
+                    fx_options_pricer.price_instrument(cross, horizon_date[0], strike, expiry_date[0],
+                        contract_type=contract_type,
+                        tenor=fx_options_trading_tenor,
+                        fx_vol_surface=fx_vol_surface,
+                        return_as_df=False)
+
+                interpolated_option[0] = option_values_
+                calculated_strike[0] = strike_
+                implied_vol[0] = vol_
+
+                mtm[0] = 0
+
                 # Now price options for rest of history
                 # On rolling dates: MTM will be the previous option contract (interpolated)
                 # On non-rolling dates: it will be the current option contract
                 for i in range(1, len(horizon_date)):
                     if new_trade[i]:
                         # Price option trade being exited
-                        option_output = fx_options_pricer.price_instrument(cross, horizon_date[i], calculated_strike[i-1], expiry_date[i-1],
+                        option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = \
+                            fx_options_pricer.price_instrument(cross, horizon_date[i], calculated_strike[i-1], expiry_date[i-1],
                             contract_type=contract_type,
                             tenor=fx_options_trading_tenor,
-                            fx_vol_surface=fx_vol_surface)
+                            fx_vol_surface=fx_vol_surface,
+                            return_as_df=False)
 
                         # Store as MTM
-                        mtm[i] = option_output[cross + '-option-price.close'].values
+                        mtm[i] = option_values_# option_output[cross + '-option-price.close'].values
 
                         # Price new option trade being entered
-                        option_output = fx_options_pricer.price_instrument(cross, horizon_date[i], strike, expiry_date[i],
+                        option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = \
+                            fx_options_pricer.price_instrument(cross, horizon_date[i], strike, expiry_date[i],
                             contract_type=contract_type,
                             tenor=fx_options_trading_tenor,
-                            fx_vol_surface=fx_vol_surface)
+                            fx_vol_surface=fx_vol_surface,
+                            return_as_df=False)
 
-                        calculated_strike[i] = option_output[cross + '-strike.close'].values
-
-                        interpolated_option[i] = option_output[cross + '-option-price.close'].values
+                        calculated_strike[i] = strike_ # option_output[cross + '-strike.close'].values
+                        implied_vol[i] = vol_
+                        interpolated_option[i] = option_values_ # option_output[cross + '-option-price.close'].values
                     else:
                         # Price current option trade
                         # - strike/expiry the same as yesterday
                         # - other market inputs taken live, closer to expiry
                         calculated_strike[i] = calculated_strike[i-1]
 
-                        option_output = fx_options_pricer.price_instrument(cross, horizon_date[i], calculated_strike[i],
-                                                                           expiry_date[i],
-                                                                           contract_type=contract_type,
-                                                                           tenor=fx_options_trading_tenor,
-                                                                           fx_vol_surface=fx_vol_surface)
+                        if freeze_implied_vol:
+                            frozen_vol = implied_vol[i-1]
+                        else:
+                            frozen_vol = None
 
-                        interpolated_option[i] = option_output[cross + '-option-price.close'].values
+                        option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = \
+                            fx_options_pricer.price_instrument(cross, horizon_date[i], calculated_strike[i],
+                                expiry_date[i],
+                                vol=frozen_vol,
+                                contract_type=contract_type,
+                                tenor=fx_options_trading_tenor,
+                                fx_vol_surface=fx_vol_surface,
+                                return_as_df=False)
 
+                        interpolated_option[i] = option_values_ # option_output[cross + '-option-price.close'].values
+                        implied_vol[i] = vol_
                         mtm[i] = interpolated_option[i]
 
-                    delta[i] = option_output[cross + '-delta.close'].values * position_multiplier
+                    delta[i] = delta_ # option_output[cross + '-delta.close'].values
 
                 # Calculate delta hedging P&L
                 spot_rets = (market_df[cross + ".close"] / market_df[cross + ".close"].shift(1) - 1).values
@@ -445,25 +476,27 @@ class FXOptionsCurve(object):
                                  / market_df[cross + "-" + tot_label + ".close"].shift(1) - 1).values
 
                 # Remember to take the inverted sign, eg. if call is +20%, we need to -20% of spot to flatten delta
-                delta_hedging_pnl = -np.roll(delta, 1) * tot_rets
+                # Also invest for whether we are long or short the option
+                delta_hedging_pnl = -np.roll(delta, 1) * tot_rets * position_multiplier
                 delta_hedging_pnl[0] = 0
 
                 # Calculate options P&L (given option premium is already percentage, only need to subtract)
-                option_rets = mtm - np.roll(interpolated_option, 1)
+                # Again need to invert if we are short option
+                option_rets = (mtm - np.roll(interpolated_option, 1)) * position_multiplier
                 option_rets[0] = 0
 
                 # Calculate option + delta hedging P&L
                 option_delta_rets = delta_hedging_pnl + option_rets
 
                 if cum_index == 'mult':
-                    cum_rets = 100 * np.cumprod(1.0 + option_rets * position_multiplier)
+                    cum_rets = 100 * np.cumprod(1.0 + option_rets)
                     cum_delta_rets = 100 * np.cumprod(1.0 + delta_hedging_pnl)
                     cum_option_delta_rets = 100 * np.cumprod(1.0 + option_delta_rets)
 
                 elif cum_index == 'add':
-                    cum_rets = 100 + np.cumsum(option_rets * position_multiplier)
-                    cum_delta_rets = 100 + np.cumsum(delta_hedging_pnl)
-                    cum_option_delta_rets = 100 + np.cumsum(option_delta_rets)
+                    cum_rets = 100 + 100 * np.cumsum(option_rets)
+                    cum_delta_rets = 100 + 100 * np.cumsum(delta_hedging_pnl)
+                    cum_option_delta_rets = 100 + 100 * np.cumsum(option_delta_rets)
 
                 total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-option-tot.close"])
                 total_return_index_df[cross + "-option-tot.close"] = cum_rets
@@ -471,6 +504,7 @@ class FXOptionsCurve(object):
                 if output_calculation_fields:
                     total_return_index_df[cross + '-interpolated-option.close'] = interpolated_option
                     total_return_index_df[cross + '-mtm.close'] = mtm
+                    total_return_index_df[cross + '-implied-vol.close'] = implied_vol
                     total_return_index_df[cross + '-roll.close'] = new_trade
                     total_return_index_df[cross + '.roll-date'] = roll_date
                     total_return_index_df[cross + '.expiry-date'] = expiry_date
@@ -526,10 +560,10 @@ class FXOptionsCurve(object):
                     1.0 + total_return_index_df[cross + '-option-delta-return-with-tc.close'].values)
 
             elif cum_index == 'add':
-                cum_rets = 100 + np.cumsum(total_return_index_df[cross + '-option-return-with-tc.close'].values)
-                cum_delta_rets = 100 + np.cumsum(
+                cum_rets = 100 + 100 * np.cumsum(total_return_index_df[cross + '-option-return-with-tc.close'].values)
+                cum_delta_rets = 100 + 100 * np.cumsum(
                     total_return_index_df[cross + '-delta-pnl-return-with-tc.close'].values)
-                cum_option_delta_rets = 100 + np.cumsum(
+                cum_option_delta_rets = 100 + 100 * np.cumsum(
                     total_return_index_df[cross + '-option-delta-return-with-tc.close'].values)
 
             total_return_index_df[cross + "-option-tot-with-tc.close"] = cum_rets

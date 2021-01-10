@@ -99,6 +99,7 @@ class MarketConstants(object):
     fx_options_index_strike = 'atm'
     fx_options_index_contract_type = 'european-call'
 
+    fx_options_freeze_implied_vol = False
 
     # What is the point at which we roll?
     fx_options_roll_event = 'month-end'  # 'month-end', 'quarter-end', 'year-end', 'expiry'
@@ -113,14 +114,14 @@ class MarketConstants(object):
     fx_options_vol_function_type = 'CLARK5' # 'CLARK5', 'CLARK', 'BBG', 'SABR' and 'SABR3'
     fx_options_depo_tenor = '1M'
     fx_options_atm_method = 'fwd-delta-neutral-premium-adj' # 'fwd-delta-neutral' or 'fwd-delta-neutral-premium-adj'
-    fx_options_delta_method = 'fwd-delta-prem-adj'
+    fx_options_delta_method = 'fwd-delta'# 'fwd-delta-prem-adj'
     fx_options_alpha = 0.5
 
     fx_options_premium_output = 'pct-for'
     fx_options_delta_output = 'pct-fwd-delta-prem-adj'
 
     fx_options_solver = 'nelmer-mead-numba' # 'nelmer-mead' or 'nelmer-mead-numba' or 'cg'
-    fx_options_pricing_engine = 'finmarketpy' # 'finmarketpy' or 'financepy'
+    fx_options_pricing_engine = 'financepy' # 'finmarketpy' or 'financepy'
 
     # overwrite field variables with those listed in MarketCred
     def __init__(self):

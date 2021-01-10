@@ -159,6 +159,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 10 Jan 2021
+  * Fixed incorrect pushing of 10d quotes on FX vol surface
+  * Added extra parameters for FXOptionsCurve, freezing FX implied, calendar etc.
 * 09 Jan 2021
   * Fixed dom/for rate in FX vol surface
   * Fixed additive index  

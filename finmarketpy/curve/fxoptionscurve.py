@@ -45,7 +45,10 @@ class FXOptionsCurve(object):
                  contract_type=market_constants.fx_options_index_contract_type,
                  premium_output=market_constants.fx_options_index_premium_output,
                  position_multiplier=1,
+                 depo_tenor_for_option=market_constants.fx_options_depo_tenor,
+                 freeze_implied_vol=market_constants.fx_options_freeze_implied_vol,
                  tot_label='',
+                 cal=None,
                  output_calculation_fields=market_constants.output_calculation_fields):
         """Initializes FXForwardsCurve
 
@@ -83,6 +86,9 @@ class FXOptionsCurve(object):
         tot_label : str
             Postfix for the total returns field
 
+        cal : str
+            Calendar to use for expiry (if None, uses that of FX pair)
+
         output_calculation_fields : bool
             Also output additional data should forward expiries etc. alongside total returns indices
         """
@@ -108,7 +114,12 @@ class FXOptionsCurve(object):
 
         self._position_multiplier = position_multiplier
 
+        self._depo_tenor_for_option = depo_tenor_for_option
+
+        self._freeze_implied_vol = freeze_implied_vol
+
         self._tot_label = tot_label
+        self._cal = cal
 
         self._output_calculation_fields = output_calculation_fields
 
@@ -124,7 +135,9 @@ class FXOptionsCurve(object):
                                      roll_months=None, cum_index=None,
                                      strike=None, contract_type=None, premium_output=None,
                                      position_multiplier=None,
-                                     tot_label=None,
+                                     depo_tenor_for_option=None,
+                                     freeze_implied_vol=None,
+                                     tot_label=None, cal=None,
                                      output_calculation_fields=None):
 
         if market_data_generator is None: market_data_generator = self._market_data_generator
@@ -141,7 +154,12 @@ class FXOptionsCurve(object):
 
         if position_multiplier is None: position_multiplier = self._position_multiplier
 
+        if depo_tenor_for_option is None: depo_tenor_for_option = self._depo_tenor_for_option
+
+        if freeze_implied_vol is None: freeze_implied_vol = self._freeze_implied_vol
+
         if tot_label is None: tot_label = self._tot_label
+        if cal is None: cal = self._cal
 
         if output_calculation_fields is None: output_calculation_fields = self._output_calculation_fields
 
@@ -175,7 +193,9 @@ class FXOptionsCurve(object):
                                                      strike=strike, contract_type=contract_type,
                                                      premium_output=premium_output,
                                                      position_multiplier=position_multiplier,
-                                                     tot_label=tot_label,
+                                                     freeze_implied_vol=freeze_implied_vol,
+                                                     depo_tenor_for_option=depo_tenor_for_option,
+                                                     tot_label=tot_label, cal=cal,
                                                      output_calculation_fields=output_calculation_fields)
         else:
             # eg. we calculate via your domestic currency such as USD, so returns will be in your domestic currency
@@ -202,7 +222,9 @@ class FXOptionsCurve(object):
                                      strike=strike, contract_type=contract_type,
                                      premium_output=premium_output,
                                      position_multiplier=position_multiplier,
-                                     tot_label=tot_label,
+                                     depo_tenor_for_option=depo_tenor_for_option,
+                                     freeze_implied_vol=freeze_implied_vol,
+                                     tot_label=tot_label, cal=cal,
                                      output_calculation_fields=output_calculation_fields,
                                      construct_via_currency='no')
 
@@ -214,7 +236,9 @@ class FXOptionsCurve(object):
                                      roll_months=roll_months, cum_index=cum_index,
                                      strike=strike, contract_type=contract_type,
                                      position_multiplier=position_multiplier,
-                                     tot_label=tot_label,
+                                     depo_tenor_for_option=depo_tenor_for_option,
+                                     freeze_implied_vol=freeze_implied_vol,
+                                     tot_label=tot_label, cal=cal,
                                      output_calculation_fields=output_calculation_fields,
                                      construct_via_currency='no')
 
@@ -266,9 +290,10 @@ class FXOptionsCurve(object):
                                      premium_output=None,
                                      position_multiplier=None,
                                      fx_options_tenor_for_interpolation=None,
+                                     freeze_implied_vol=None,
+                                     depo_tenor_for_option=None,
                                      tot_label=None,
-                                     depo_tenor='1M',
-                                     freeze_implied_vol=False,
+                                     cal=None,
                                      output_calculation_fields=None):
 
         if fx_options_trading_tenor is None: fx_options_trading_tenor = self._fx_options_trading_tenor
@@ -281,7 +306,13 @@ class FXOptionsCurve(object):
         if premium_output is None: premium_output = self._premium_output
         if position_multiplier is None: position_multiplier = self._position_multiplier
         if fx_options_tenor_for_interpolation is None: fx_options_tenor_for_interpolation = self._fx_options_tenor_for_interpolation
+
+        if freeze_implied_vol is None: freeze_implied_vol = self._freeze_implied_vol
+
+        if depo_tenor_for_option is None: depo_tenor_for_option = self._depo_tenor_for_option
         if tot_label is None: tot_label = self._tot_label
+        if cal is None: cal = self._cal
+
 
         if output_calculation_fields is None: output_calculation_fields = self._output_calculation_fields
 
@@ -295,11 +326,13 @@ class FXOptionsCurve(object):
 
         fx_options_pricer = FXOptionsPricer(premium_output=premium_output)
 
-        def get_roll_date(horizon_d, expiry_d, asset_hols, month_adj=1):
+        def get_roll_date(horizon_d, expiry_d, asset_hols, month_adj=0):
             if roll_event == 'month-end':
                 roll_d = horizon_d + CustomBusinessMonthEnd(roll_months + month_adj, holidays=asset_hols)
 
-                return (roll_d - CustomBusinessDay(n=roll_days_before, holidays=asset_hols))
+                # Special case so always rolls on month end date, if specify 0 days
+                if roll_days_before > 0:
+                    return (roll_d - CustomBusinessDay(n=roll_days_before, holidays=asset_hols))
 
             elif roll_event == 'expiry-date':
                 roll_d = expiry_d
@@ -311,6 +344,9 @@ class FXOptionsCurve(object):
             return roll_d
 
         for cross in cross_fx:
+
+            if cal is None:
+                cal = cross
 
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
@@ -328,7 +364,7 @@ class FXOptionsCurve(object):
 
                 fx_vol_surface = FXVolSurface(market_df=market_df, asset=cross,
                                               tenors=fx_options_tenor_for_interpolation,
-                                              depo_tenor=depo_tenor)
+                                              depo_tenor=depo_tenor_for_option)
                 horizon_date = market_df.index
 
                 expiry_date = []
@@ -341,7 +377,7 @@ class FXOptionsCurve(object):
                 # Get first expiry date
                 expiry_date.append(
                     self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[0]]),
-                                                            fx_options_trading_tenor, cal=cross, asset_class='fx-vol')[0])
+                                                            fx_options_trading_tenor, cal=cal, asset_class='fx-vol')[0])
 
                 # For first month want it to expire within that month (for consistency), hence month_adj=0 ONLY here
                 roll_date.append(get_roll_date(horizon_date[0], expiry_date[0], asset_holidays, month_adj=0))
@@ -364,7 +400,7 @@ class FXOptionsCurve(object):
                     if new_trade[i]:
 
                         exp = self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[i]]),
-                            fx_options_trading_tenor, cal=cross, asset_class='fx-vol')[0]
+                            fx_options_trading_tenor, cal=cal, asset_class='fx-vol')[0]
 
                         # Make sure we don't expire on a date in the history where there isn't market data
                         # It is ok for future values to expire after market data (just not in the backtest!)
@@ -393,11 +429,11 @@ class FXOptionsCurve(object):
                 delta = np.zeros(len(horizon_date))
 
                 # For debugging
-                # df_temp = pd.DataFrame()
-                #
-                # df_temp['expiry-date'] = expiry_date
-                # df_temp['horizon-date'] = horizon_date
-                # df_temp['roll-date'] = roll_date
+                df_temp = pd.DataFrame()
+
+                df_temp['expiry-date'] = expiry_date
+                df_temp['horizon-date'] = horizon_date
+                df_temp['roll-date'] = roll_date
 
                 # Special case: for first day of history (given have no previous positions)
                 option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_  = \

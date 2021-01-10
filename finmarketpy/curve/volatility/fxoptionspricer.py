@@ -133,6 +133,7 @@ class FXOptionsPricer(AbstractPricer):
 
                     if strike[i] == 'atm':
                         strike[i] = fx_vol_surface.get_atm_strike(tenor)
+                        vol[i] = fx_vol_surface.get_atm_vol(tenor) / 100.0
                     elif strike[i] == 'atms':
                         strike[i] = fx_vol_surface.get_spot()
                     elif strike[i] == 'atmf':
@@ -144,13 +145,17 @@ class FXOptionsPricer(AbstractPricer):
                     elif strike[i] == '25d-otm':
                         if 'call' in contract_type_:
                             strike[i] = fx_vol_surface.get_25d_call_strike(tenor)
+                            vol[i] = fx_vol_surface.get_25d_call_strike(tenor) / 100.0
                         elif 'put' in contract_type_:
                             strike[i] = fx_vol_surface.get_25d_put_strike(tenor)
+                            vol[i] = fx_vol_surface.get_25d_put_strike(tenor) / 100.0
                     elif strike[i] == '10d-otm':
                         if 'call' in contract_type_:
                             strike[i] = fx_vol_surface.get_10d_call_strike(tenor)
+                            vol[i] = fx_vol_surface.get_10d_call_strike(tenor) / 100.0
                         elif 'put' in contract_type_:
                             strike[i] = fx_vol_surface.get_10d_put_strike(tenor)
+                            vol[i] = fx_vol_surface.get_10d_put_strike(tenor) / 100.0
 
                 if not(built_vol_surface):
                     fx_vol_surface.build_vol_surface(horizon_date[i])

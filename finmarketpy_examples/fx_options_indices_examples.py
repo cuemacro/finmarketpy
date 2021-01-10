@@ -91,9 +91,6 @@ if run_example == 1 or run_example == 0:
     # Remove New Year's Day and Christmas
     df = Filter().filter_time_series_by_holidays(df, cal='FX')
 
-    # In case any missing values fill down (particularly can get this for NDFs)
-    df_market = market.fetch_market(md_request=md_request).fillna(method='ffill')
-
     # We want to roll long 1M ATM call at expiry
     # We'll mark to market the price through the month by interpolating between 1W and 1M (and using whole vol curve
     # at each tenor)
@@ -104,6 +101,7 @@ if run_example == 1 or run_example == 0:
         fx_options_tenor_for_interpolation=['1W', '1M'],
         strike='atm',
         contract_type='european-call',
+        depo_tenor_for_option='1M',
         position_multiplier=1.0,
         output_calculation_fields=True)
 
@@ -149,52 +147,56 @@ if run_example == 1 or run_example == 0:
 ###### Enters a short 1W straddle, and MTM every day, and at expiry rolls into another 1W straddle
 if run_example == 2 or run_example == 0:
 
-    # Warning make sure you choose dates, where there is full vol surface! If points are missing interpolation
-    # will fail
-    start_date = '04 Jan 2006'; finish_date = '31 Dec 2020'
-    start_date = '09 Mar 2007'; finish_date = '31 Dec 2014'
+    # Warning make sure you choose dates, where there is full vol surface! If vol points in the tenors you are looking at
+    # are missing then interpolation will fail (or if eg. spot data is missing etc.)
+    start_date = '08 Mar 2007'; finish_date = '31 Dec 2020' # Monday
+    # start_date = '09 Mar 2007'; finish_date = '31 Dec 2014'
     # start_date = '04 Jan 2006'; finish_date = '31 Dec 2008'
     # start_date = '01 Jan 2007'; finish_date = '31 Dec 2007' # Use smaller window for quicker execution
 
-    cross = 'EURUSD'
+    cross = 'USDJPY'
     fx_options_trading_tenor = '1W' # Try changing between 1W, 1M or 3M!
 
     # Download the whole all market data for USDJPY for pricing options (FX vol surface + spot + FX forwards + depos)
     md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
                                    data_source='bloomberg', cut='10AM', category='fx-vol-market',
-                                   tickers=cross, fx_vol_tenor=['1W', '1M', '3M'],
+                                   tickers=cross, fx_vol_tenor=['1W', '1M', '2M', '3M'],
                                    cache_algo='cache_algo_return', base_depos_currencies=[cross[0:3], cross[3:6]])
 
     df = market.fetch_market(md_request)
-    df = df.fillna(method='ffill')
+
+    # Fill data for every workday and use weekend calendar (note: this is a bit of a fudge, filling down)
+    # CHECK DATA isn't missing at start of series
+    df = df.resample('B').last().fillna(method='ffill')
+    # df = df[df.index >= '09 Mar 2007'] # Try starting on a different day of the week & see how it impact P&L
+    cal = 'WKD'
 
     # Remove New Year's Day and Christmas
     # df = Filter().filter_time_series_by_holidays(df, cal='FX')
 
-    # In case any missing values fill down (particularly can get this for NDFs)
-    df_market = market.fetch_market(md_request=md_request).fillna(method='ffill')
-
-    # We want to roll long 1M ATM call at expiry
-    # We'll mark to market the price through the month by interpolating between 1W and 1M (and using whole vol curve
-    # at each tenor)
+    # We want to roll a short 1W option at expiry
+    # If we select longer dates, it will mark to market the price through the month by interpolating between eg. 1W and 1M
+    # (and using whole vol curve at each tenor)
     fx_options_curve = FXOptionsCurve(fx_options_trading_tenor=fx_options_trading_tenor,
         roll_days_before=0,
         roll_event='expiry-date',
         roll_months=1, # This is ignored if we roll on expiry date
-        fx_options_tenor_for_interpolation=['1W'],
+        fx_options_tenor_for_interpolation=['1W', '1M', '2M', '3M'],
         strike='atm',
         contract_type='european-straddle',
         position_multiplier=-1.0, # +1.0 for long options, -1.0 for short options
         output_calculation_fields=True,
-        cum_index='add')
+        cal=cal,
+        cum_index='mult')
 
-    # Let's trade a short 1M straddle, and we roll at expiry
-    df_cuemacro_option_straddle_tot = fx_options_curve.construct_total_return_index(cross, df, depo_tenor='1W')
+    # Let's trade a short straddle, and we roll at expiry
+    df_cuemacro_option_straddle_tot = fx_options_curve.construct_total_return_index(cross, df,
+                                                                                    depo_tenor_for_option=fx_options_trading_tenor)
 
     # Add transaction costs to the option index (bid/ask bp for the option premium and spot FX)
     # Have wider spread for straddle (because adding call + put)
     df_cuemacro_option_straddle_tc = fx_options_curve.apply_tc_to_total_return_index(cross, df_cuemacro_option_straddle_tot,
-                                                                                 option_tc_bp=10, spot_tc_bp=1)
+                                                                                 option_tc_bp=10, spot_tc_bp=2)
 
     # Get total returns for spot
     md_request.abstract_curve = None

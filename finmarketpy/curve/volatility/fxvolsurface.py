@@ -123,8 +123,8 @@ class FXVolSurface(AbstractVolSurface):
         self._atm_vols = market_df[[asset + "V" + t + field for t in tenors]].values
         self._market_strangle25DeltaVols = market_df[[asset + "25B" + t + field for t in tenors]].values
         self._risk_reversal25DeltaVols =  market_df[[asset + "25R" + t + field for t in tenors]].values
-        self._market_strangle25DeltaVols = market_df[[asset + "10B" + t + field for t in tenors]].values
-        self._risk_reversal25DeltaVols = market_df[[asset + "10R" + t + field for t in tenors]].values
+        self._market_strangle10DeltaVols = market_df[[asset + "10B" + t + field for t in tenors]].values
+        self._risk_reversal10DeltaVols = market_df[[asset + "10R" + t + field for t in tenors]].values
 
         if vol_function_type == 'CLARK':
             self._vol_function_type = FinVolFunctionTypes.CLARK
@@ -219,8 +219,8 @@ class FXVolSurface(AbstractVolSurface):
                                        self._atm_vols[date_index][0],
                                        self._market_strangle25DeltaVols[date_index][0],
                                        self._risk_reversal25DeltaVols[date_index][0],
-                                       self._market_strangle25DeltaVols[date_index][0],
-                                       self._risk_reversal25DeltaVols[date_index][0],
+                                       self._market_strangle10DeltaVols[date_index][0],
+                                       self._risk_reversal10DeltaVols[date_index][0],
                                        self._alpha,
                                        atmMethod=self._atm_method,
                                        deltaMethod=self._delta_method,

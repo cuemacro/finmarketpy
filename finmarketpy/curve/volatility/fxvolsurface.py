@@ -25,14 +25,14 @@ try:
     from financepy.market.volatility.FinFXVolSurfacePlus import FinFXDeltaMethod
     from financepy.market.volatility.FinFXVolSurfacePlus import volFunction
     from financepy.market.volatility.FinFXVolSurfacePlus import FinVolFunctionTypes
-    from financepy.finutils.FinSolvers import FinSolversTypes
+    from financepy.finutils.FinGlobalTypes import FinSolverTypes
 except:
     from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
     from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
     from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
     from financepy.market.volatility.FinFXVolSurface import volFunction
     from financepy.market.volatility.FinFXVolSurface import FinVolFunctionTypes
-    from financepy.finutils.FinSolvers import FinSolversTypes
+    from financepy.finutils.FinGlobalTypes import FinSolverTypes
 
 from findatapy.util.dataconstants import DataConstants
 
@@ -161,11 +161,11 @@ class FXVolSurface(AbstractVolSurface):
 
         # Which solver to use in FX vol surface calibration
         if solver == 'nelmer-mead':
-            self._solver = FinSolversTypes.NELDER_MEAD
+            self._solver = FinSolverTypes.NELDER_MEAD
         elif solver == 'nelmer-mead-numba':
-            self._solver = FinSolversTypes.NELDER_MEAD_NUMBA
+            self._solver = FinSolverTypes.NELDER_MEAD_NUMBA
         elif solver == 'cg':
-            self._solver = FinSolversTypes.CG
+            self._solver = FinSolverTypes.CONJUGATE_GRADIENT
 
         self._alpha = alpha
 
@@ -225,7 +225,7 @@ class FXVolSurface(AbstractVolSurface):
                                        atmMethod=self._atm_method,
                                        deltaMethod=self._delta_method,
                                        volatilityFunctionType=self._vol_function_type,
-                                       finSolversTypes=self._solver)
+                                       finSolverType=self._solver)
 
     def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor='1M'):
         """Calculates the implied_vol volatility for a given strike and tenor (or expiry date, if specified). The

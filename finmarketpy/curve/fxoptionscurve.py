@@ -540,6 +540,7 @@ class FXOptionsCurve(object):
                 if output_calculation_fields:
                     total_return_index_df[cross + '-interpolated-option.close'] = interpolated_option
                     total_return_index_df[cross + '-mtm.close'] = mtm
+                    total_return_index_df[cross + ".close"] = market_df[cross + ".close"].values
                     total_return_index_df[cross + '-implied-vol.close'] = implied_vol
                     total_return_index_df[cross + '-roll.close'] = new_trade
                     total_return_index_df[cross + '.roll-date'] = roll_date

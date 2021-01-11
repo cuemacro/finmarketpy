@@ -42,10 +42,10 @@ chart = Chart(engine='plotly')
 market = Market(market_data_generator=MarketDataGenerator())
 
 # Choose run_example = 0 for everything
-# run_example = 1 - create total return index AUDUSD 1M long calls (and separately long puts) over 2008 financial crisis
+# run_example = 1 - create total return index AUDUSD 1M long calls (and separately long puts) over 2008 financial crisis and further
 # run_example = 2 - create total return index USDJPY 1W short straddles over a long sample
 
-run_example = 2
+run_example = 1
 
 def prepare_indices(df_tot=None, df_tc=None, df_spot_tot=None):
     df_list = []
@@ -74,7 +74,7 @@ if run_example == 1 or run_example == 0:
 
     # Warning make sure you choose dates, where there is full vol surface! If points are missing interpolation
     # will fail
-    start_date = '01 Jan 2007'; finish_date = '31 Dec 2008' # Use smaller window for quicker execution
+    start_date = '01 Jan 2007'; finish_date = '31 Dec 2020' # Use smaller window for quicker execution
 
     cross = 'AUDUSD'
     fx_options_trading_tenor = '1M'
@@ -114,7 +114,7 @@ if run_example == 1 or run_example == 0:
 
     # Let's trade a short 1M put, and we roll at expiry
     df_cuemacro_option_put_tot = fx_options_curve.construct_total_return_index(
-        cross, df, contract_type='european-put', position_multiplier=-1.0)
+        cross, df, contract_type='european-put', strike='10d-otm', position_multiplier=1.0)
 
     # Add transaction costs to the option index (bid/ask bp for the option premium and spot FX)
     df_cuemacro_option_put_tc = fx_options_curve.apply_tc_to_total_return_index(cross, df_cuemacro_option_put_tot,

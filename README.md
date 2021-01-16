@@ -100,6 +100,13 @@ pip install chartpy
 pip install findatapy
 ```
 
+Note that if you use the option pricing/total returns you might need to get the latest FinancePy version from GitHub
+https://github.com/domokane/FinancePy/ as opposed to PyPI 
+
+```
+pip install git+https://github.com/domokane/FinancePy/FinancePy.git
+
+```
 
 # Binder and Jupyter - Run finmarketpy in your browser
 
@@ -159,6 +166,11 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 16 Jan 2021
+  * Additional work on FXOptionPricer and total returns (FXOptionCurve)
+    * Speed up and deal with non-convergence of solver
+    * Allow options entry on user specified dates
+  * Added more option examples
 * 11 Jan 2021
   * Fixed issue with OTM strikes in FXOptionPricer
 * 10 Jan 2021

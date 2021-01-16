@@ -43,8 +43,9 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 3 - price AUDUSD options
 # run_example = 4 - more pricing of AUDUSD options
 # run_example = 5 - pricing of EURUSD options
+# run_example = 6 - another USDJPY option
 
-run_example = 5
+run_example = 6
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Construct volatility surface using FinancePy library underneath, using polynomial interpolation and
@@ -194,3 +195,38 @@ if run_example == 5 or run_example == 0:
     print("atm 1W european call")
     print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 'atm',
             tenor="1W", depo_tenor='1W', contract_type='european-call').to_string())
+
+###### Fetch market data for pricing USDJPY ATM 1W
+if run_example == 6 or run_example == 0:
+
+    horizon_date = '30 March 2007'
+    cross = 'USDJPY'
+
+    # Download the whole all market data for GBPUSD for pricing options (vol surface)
+    md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
+                                   data_source='bloomberg', cut='LDN', category='fx-vol-market',
+                                   fx_vol_tenor=['1W'],
+                                   tickers=cross, base_depos_currencies=[cross[0:3], cross[3:6]],
+                                   cache_algo='cache_algo_return')
+
+    df = market.fetch_market(md_request)
+
+    fx_vol_surface = FXVolSurface(market_df=df, asset=cross, tenors=['1W'], solver='nelmer-mead-numba')
+
+    fx_op = FXOptionsPricer(fx_vol_surface=fx_vol_surface)
+
+    market_df = fx_vol_surface.get_all_market_data()
+
+    # Print 1W data
+    print(market_df[[x for x in market_df.columns if '1W' in x]][market_df.index == horizon_date].to_string())
+
+    # Print ATM vol
+    fx_vol_surface.build_vol_surface(horizon_date)
+    fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
+
+    print("ATM vol " + str(fx_vol_surface.get_atm_vol(tenor='1W')))
+
+    # Specify expiry date instead of the tenor for broken dates
+    print("atm 1W european straddle")
+    print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 'atm',
+            tenor="1W", depo_tenor='1W', contract_type='european-straddle').to_string())

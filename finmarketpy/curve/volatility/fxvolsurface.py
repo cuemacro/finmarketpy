@@ -413,6 +413,12 @@ class FXVolSurface(AbstractVolSurface):
 
         return volFunction(self._vol_function_type.value, params, np.array([K]), gaps, f, K, t)
 
+    def get_atm_method(self):
+        return self._atm_method
+
+    def get_delta_method(self):
+        return self._delta_method
+
     def get_all_market_data(self):
         return self._market_df
 
@@ -445,6 +451,20 @@ class FXVolSurface(AbstractVolSurface):
 
     def get_10d_put_ms_strike(self, expiry_date=None, tenor=None):
         return self._df_vol_dict['deltas_vs_strikes'][tenor]['K_10D_P_MS']
+
+    def get_atm_quoted_vol(self, tenor):
+        """The quoted ATM vol from the market (ie. which has NOT been obtained from build vol surface)
+
+        Parameters
+        ----------
+        tenor : str
+            Tenor
+
+        Returns
+        -------
+        float
+        """
+        return self._atm_vols[self._market_df.index == self._value_date][0][self._get_tenor_index(tenor)]
 
     def get_atm_vol(self, tenor=None):
         return self._df_vol_dict['vol_surface_delta_space'][tenor]['ATM']

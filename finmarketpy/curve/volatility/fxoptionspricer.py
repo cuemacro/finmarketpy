@@ -27,6 +27,7 @@ from financepy.finutils.FinDate import FinDate
 from financepy.models.FinModelBlackScholes import FinModelBlackScholes
 from financepy.products.fx.FinFXVanillaOption import FinFXVanillaOption
 from financepy.finutils.FinGlobalTypes import FinOptionTypes
+from financepy.products.fx.FinFXMktConventions import *
 
 market_constants = MarketConstants()
 
@@ -39,7 +40,7 @@ class FXOptionsPricer(AbstractPricer):
 
         self._calendar = Calendar()
         self._fx_vol_surface = fx_vol_surface
-        self._fx_forwards_price = FXForwardsPricer()
+        self._fx_forwards_pricer = FXForwardsPricer()
         self._premium_output = premium_output
         self._delta_output = delta_output
 
@@ -131,17 +132,22 @@ class FXOptionsPricer(AbstractPricer):
 
                         built_vol_surface = True
 
+                    # Delta neutral strike/or whatever strike is quoted as ATM
+                    # usually this is ATM delta neutral strike, but can sometimes be ATMF for some Latam
+                    # Take the vol directly quoted, rather than getting it from building vol surface
                     if strike[i] == 'atm':
                         strike[i] = fx_vol_surface.get_atm_strike(tenor)
-                        vol[i] = fx_vol_surface.get_atm_vol(tenor) / 100.0
+                        vol[i] = fx_vol_surface.get_atm_quoted_vol(tenor) / 100.0
+                        # vol[i] = fx_vol_surface.get_atm_vol(tenor) / 100.0 # interpolated
                     elif strike[i] == 'atms':
-                        strike[i] = fx_vol_surface.get_spot()
+                        strike[i] = fx_vol_surface.get_spot() # Interpolate vol later
                     elif strike[i] == 'atmf':
+                        # Quoted tenor, no need to interpolate
+                        strike[i] = float(fx_vol_surface.get_all_market_data()[cross + ".close"][horizon_date[i]]) \
+                                          + (float(fx_vol_surface.get_all_market_data()[cross + tenor + ".close"][horizon_date[i]]) \
+                                    / self._fx_forwards_pricer.get_forwards_divisor(cross[3:6]))
 
-                        delivery_date = self._calendar.get_delivery_date_from_horizon_date(horizon_date[i], cal=cross)
-
-                        strike[i] = self._fx_forwards_price.price_instrument(cross, delivery_date,
-                                                                             market_df=fx_vol_surface.get_all_market_data())
+                        # Interpolate vol later
                     elif strike[i] == '25d-otm':
                         if 'call' in contract_type_:
                             strike[i] = fx_vol_surface.get_25d_call_strike(tenor)
@@ -158,7 +164,10 @@ class FXOptionsPricer(AbstractPricer):
                             vol[i] = fx_vol_surface.get_10d_put_vol(tenor) / 100.0
 
                 if not(built_vol_surface):
-                    fx_vol_surface.build_vol_surface(horizon_date[i])
+                    try:
+                        fx_vol_surface.build_vol_surface(horizon_date[i])
+                    except:
+                        logger.warn("Failed to build vol surface for " + str(horizon_date) + ", won't be able to interpolate vol")
                     # fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
 
                 # If an implied vol hasn't been provided, interpolate that one, fit the vol surface (if hasn't already been

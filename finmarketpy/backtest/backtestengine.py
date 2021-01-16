@@ -1870,7 +1870,7 @@ class TradingModel(object):
     #### grab signals for specific days
     def _grab_signals(self, strategy_signal, date=None, strip=None):
         if date is None:
-            last_day = strategy_signal.loc[-1].transpose().to_frame()
+            last_day = strategy_signal.iloc[-1].transpose().to_frame()
         else:
             if not (isinstance(date, list)):
                 date = [date]

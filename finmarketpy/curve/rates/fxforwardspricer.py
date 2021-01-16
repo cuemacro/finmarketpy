@@ -141,7 +141,8 @@ class FXForwardsPricer(AbstractPricer):
         self._quoted_delivery_df = quoted_delivery_df
 
     def price_instrument(self, cross, horizon_date, delivery_date, option_expiry_date=None, market_df=None, quoted_delivery_df=None,
-                         fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation):
+                         fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
+                         return_as_df=True):
         """Creates an interpolated outright FX forward (and the associated points), for horizon dates/delivery dates
         given by the user from FX spot rates and FX forward points. This can be useful when we have an odd/broken date
         which isn't quoted.
@@ -209,13 +210,16 @@ class FXForwardsPricer(AbstractPricer):
         interpolated_outright_forwards_arr = _forwards_interpolate_numba(spot_arr, spot_delivery_days_arr, quoted_delivery_days_arr,
                           forwards_points_arr, len(fx_forwards_tenor_for_interpolation))
 
-        interpolated_df = pd.DataFrame(index=market_df.index,
-                            columns=[cross + '-interpolated-outright-forward.close', cross + "-interpolated-forward-points.close"])
+        if return_as_df:
+            interpolated_df = pd.DataFrame(index=market_df.index,
+                                columns=[cross + '-interpolated-outright-forward.close', cross + "-interpolated-forward-points.close"])
 
-        interpolated_df[cross + '-interpolated-outright-forward.close'] = interpolated_outright_forwards_arr
-        interpolated_df[cross + "-interpolated-forward-points.close"] = (interpolated_outright_forwards_arr - spot_arr) * divisor
+            interpolated_df[cross + '-interpolated-outright-forward.close'] = interpolated_outright_forwards_arr
+            interpolated_df[cross + "-interpolated-forward-points.close"] = (interpolated_outright_forwards_arr - spot_arr) * divisor
 
-        return interpolated_df
+            return interpolated_df
+
+        return interpolated_outright_forwards_arr
 
     def get_day_count_conv(self, currency):
         if currency in market_constants.currencies_with_365_basis:
@@ -261,12 +265,17 @@ class FXForwardsPricer(AbstractPricer):
         return quoted_delivery_df, quoted_delivery_days_arr, forwards_points_arr, divisor
 
     def generate_quoted_delivery(self, cross, market_df, quoted_delivery_df, fx_forwards_tenor, cal):
+
+        if not(isinstance(fx_forwards_tenor, list)):
+            fx_forwards_tenor = [fx_forwards_tenor]
+
         # Get the quoted delivery dates for every quoted tenor in our forwards market data
         # Eg. what's the delivery date for EURUSD SN, 1W etc.
         if quoted_delivery_df is None:
             quoted_delivery_df = pd.DataFrame(index=market_df.index,
                                               columns=[cross + tenor + ".delivery" for tenor in
                                                        fx_forwards_tenor])
+
 
             for tenor in fx_forwards_tenor:
                 quoted_delivery_df[cross + tenor + ".delivery"] = \
@@ -307,6 +316,9 @@ class FXForwardsPricer(AbstractPricer):
         -------
         DataFrame
         """
+
+        if not(isinstance(fx_forwards_tenor, list)):
+            fx_forwards_tenor = [fx_forwards_tenor]
 
         if market_df is None: market_df = self._market_df
         if quoted_delivery_df is None: quoted_delivery_df = self._quoted_delivery_df

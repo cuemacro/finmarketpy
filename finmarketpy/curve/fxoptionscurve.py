@@ -34,7 +34,10 @@ class FXOptionsCurve(object):
 
     """
 
-    def __init__(self, market_data_generator=None, fx_options_trading_tenor=market_constants.fx_options_trading_tenor,
+    def __init__(self, market_data_generator=None,
+                 fx_vol_surface=None,
+                 enter_trading_dates=None,
+                 fx_options_trading_tenor=market_constants.fx_options_trading_tenor,
                  roll_days_before=market_constants.fx_options_roll_days_before,
                  roll_event=market_constants.fx_options_roll_event, construct_via_currency='no',
                  fx_options_tenor_for_interpolation=market_constants.fx_options_tenor_for_interpolation,
@@ -56,6 +59,9 @@ class FXOptionsCurve(object):
         ----------
         market_data_generator : MarketDataGenerator
             Used for downloading market data
+
+        fx_vol_surface : FXVolSurface
+            We can specify the FX vol surface beforehand if we want
 
         fx_options_trading_tenor : str
             What is primary forward contract being used to trade (default - '1M')
@@ -98,6 +104,9 @@ class FXOptionsCurve(object):
         self._calendar = Calendar()
         self._filter = Filter()
 
+        self._fx_vol_surface = fx_vol_surface
+
+        self._enter_trading_dates = enter_trading_dates
         self._fx_options_trading_tenor = fx_options_trading_tenor
         self._roll_days_before = roll_days_before
         self._roll_event = roll_event
@@ -129,7 +138,8 @@ class FXOptionsCurve(object):
         # Don't include any "large" objects in the key
         return SpeedCache().generate_key(self, ['_market_data_generator', '_calculations', '_calendar', '_filter'])
 
-    def fetch_continuous_time_series(self, md_request, market_data_generator, fx_options_trading_tenor=None,
+    def fetch_continuous_time_series(self, md_request, market_data_generator, fx_vol_surface=None, enter_trading_dates=None,
+                                     fx_options_trading_tenor=None,
                                      roll_days_before=None, roll_event=None,
                                      construct_via_currency=None, fx_options_tenor_for_interpolation=None, base_depos_tenor=None,
                                      roll_months=None, cum_index=None,
@@ -140,6 +150,8 @@ class FXOptionsCurve(object):
                                      tot_label=None, cal=None,
                                      output_calculation_fields=None):
 
+        if fx_vol_surface is None: fx_vol_surface = self._fx_vol_surface
+        if enter_trading_dates is None: enter_trading_dates = self._enter_trading_dates
         if market_data_generator is None: market_data_generator = self._market_data_generator
         if fx_options_trading_tenor is None: fx_options_trading_tenor = self._fx_options_trading_tenor
         if roll_days_before is None: roll_days_before = self._roll_days_before
@@ -165,27 +177,33 @@ class FXOptionsCurve(object):
 
         # Eg. we construct EURJPY via EURJPY directly (note: would need to have sufficient options/forward data for this)
         if construct_via_currency == 'no':
-            # Download FX spot, FX forwards points and base depos etc.
-            market = Market(market_data_generator=market_data_generator)
 
-            md_request_download = MarketDataRequest(md_request=md_request)
+            if fx_vol_surface is None:
+                # Download FX spot, FX forwards points and base depos etc.
+                market = Market(market_data_generator=market_data_generator)
 
-            fx_conv = FXConv()
+                md_request_download = MarketDataRequest(md_request=md_request)
 
-            # CAREFUL: convert the tickers to correct notation, eg. USDEUR => EURUSD, because our data
-            # should be fetched in correct convention
-            md_request_download.tickers = [fx_conv.correct_notation(x) for x in md_request.tickers]
-            md_request_download.category = 'fx-vol-market'
-            md_request_download.fields = 'close'
-            md_request_download.abstract_curve = None
-            md_request_download.fx_options_tenor = fx_options_tenor_for_interpolation
-            md_request_download.base_depos_tenor = base_depos_tenor
-            # md_request_download.base_depos_currencies = []
+                fx_conv = FXConv()
 
-            forwards_market_df = market.fetch_market(md_request_download)
+                # CAREFUL: convert the tickers to correct notation, eg. USDEUR => EURUSD, because our data
+                # should be fetched in correct convention
+                md_request_download.tickers = [fx_conv.correct_notation(x) for x in md_request.tickers]
+                md_request_download.category = 'fx-vol-market'
+                md_request_download.fields = 'close'
+                md_request_download.abstract_curve = None
+                md_request_download.fx_options_tenor = fx_options_tenor_for_interpolation
+                md_request_download.base_depos_tenor = base_depos_tenor
+                # md_request_download.base_depos_currencies = []
+
+                forwards_market_df = market.fetch_market(md_request_download)
+            else:
+                forwards_market_df = None
 
             # Now use the original tickers
             return self.construct_total_return_index(md_request.tickers, forwards_market_df,
+                                                     fx_vol_surface=fx_vol_surface,
+                                                     enter_trading_dates=enter_trading_dates,
                                                      fx_options_trading_tenor=fx_options_trading_tenor,
                                                      roll_days_before=roll_days_before, roll_event=roll_event,
                                                      fx_options_tenor_for_interpolation=fx_options_tenor_for_interpolation,
@@ -214,6 +232,8 @@ class FXOptionsCurve(object):
 
                 # Construct the base and terms separately (ie. AUDJPY => AUDUSD & JPYUSD)
                 base_vals = self.fetch_continuous_time_series(md_request_base, market_data_generator,
+                                     fx_vol_surface=fx_vol_surface,
+                                     enter_trading_dates=enter_trading_dates,
                                      fx_options_trading_tenor=fx_options_trading_tenor,
                                      roll_days_before=roll_days_before, roll_event=roll_event,
                                      fx_options_tenor_for_interpolation=fx_options_tenor_for_interpolation,
@@ -229,6 +249,8 @@ class FXOptionsCurve(object):
                                      construct_via_currency='no')
 
                 terms_vals = self.fetch_continuous_time_series(md_request_terms, market_data_generator,
+                                     fx_vol_surface=fx_vol_surface,
+                                     enter_trading_dates=enter_trading_dates,
                                      fx_options_trading_tenor=fx_options_trading_tenor,
                                      roll_days_before=roll_days_before, roll_event=roll_event,
                                      fx_options_tenor_for_interpolation=fx_options_tenor_for_interpolation,
@@ -280,6 +302,8 @@ class FXOptionsCurve(object):
         return 360.0
 
     def construct_total_return_index(self, cross_fx, market_df,
+                                     fx_vol_surface=None,
+                                     enter_trading_dates=None,
                                      fx_options_trading_tenor=None,
                                      roll_days_before=None,
                                      roll_event=None,
@@ -296,6 +320,8 @@ class FXOptionsCurve(object):
                                      cal=None,
                                      output_calculation_fields=None):
 
+        if fx_vol_surface is None: fx_vol_surface = self._fx_vol_surface
+        if enter_trading_dates is None: enter_trading_dates = self._enter_trading_dates
         if fx_options_trading_tenor is None: fx_options_trading_tenor = self._fx_options_trading_tenor
         if roll_days_before is None: roll_days_before = self._roll_days_before
         if roll_event is None: roll_event = self._roll_event
@@ -313,7 +339,6 @@ class FXOptionsCurve(object):
         if tot_label is None: tot_label = self._tot_label
         if cal is None: cal = self._cal
 
-
         if output_calculation_fields is None: output_calculation_fields = self._output_calculation_fields
 
         if not (isinstance(cross_fx, list)):
@@ -322,7 +347,8 @@ class FXOptionsCurve(object):
         total_return_index_df_agg = []
 
         # Remove columns where there is no data (because these vols typically aren't quoted)
-        market_df = market_df.dropna(how='all', axis=1)
+        if market_df is not None:
+            market_df = market_df.dropna(how='all', axis=1)
 
         fx_options_pricer = FXOptionsPricer(premium_output=premium_output)
 
@@ -362,63 +388,138 @@ class FXOptionsCurve(object):
                 if old_cross != cross:
                     pass
 
-                fx_vol_surface = FXVolSurface(market_df=market_df, asset=cross,
-                                              tenors=fx_options_tenor_for_interpolation,
-                                              depo_tenor=depo_tenor_for_option)
+                if fx_vol_surface is None:
+                    fx_vol_surface = FXVolSurface(market_df=market_df, asset=cross,
+                                                  tenors=fx_options_tenor_for_interpolation,
+                                                  depo_tenor=depo_tenor_for_option)
+
+                    market_df = fx_vol_surface.get_all_market_data()
+
                 horizon_date = market_df.index
 
-                expiry_date = []
-                roll_date = []
+                expiry_date = np.zeros(len(horizon_date), dtype=object)
+                roll_date = np.zeros(len(horizon_date), dtype=object)
 
                 new_trade = np.full(len(horizon_date), False, dtype=bool)
+                exit_trade = np.full(len(horizon_date), False, dtype=bool)
+                has_position = np.full(len(horizon_date), False, dtype=bool)
 
                 asset_holidays = self._calendar.get_holidays(cal=cross)
 
-                # Get first expiry date
-                expiry_date.append(
-                    self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[0]]),
-                                                            fx_options_trading_tenor, cal=cal, asset_class='fx-vol')[0])
+                # If no entry dates specified, assume we just keep rolling
+                if enter_trading_dates is None:
+                    # Get first expiry date
+                    expiry_date[0] = self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[0]]),
+                                                                fx_options_trading_tenor, cal=cal, asset_class='fx-vol')[0]
 
-                # For first month want it to expire within that month (for consistency), hence month_adj=0 ONLY here
-                roll_date.append(get_roll_date(horizon_date[0], expiry_date[0], asset_holidays, month_adj=0))
+                    # For first month want it to expire within that month (for consistency), hence month_adj=0 ONLY here
+                    roll_date[0] = get_roll_date(horizon_date[0], expiry_date[0], asset_holidays, month_adj=0)
 
-                # New trade => entry at beginning AND on every roll
-                new_trade[0] = True
+                    # New trade => entry at beginning AND on every roll
+                    new_trade[0] = True
+                    exit_trade[0] = False
+                    has_position[0] = True
 
-                # Get all the expiry dates and roll dates
-                # At each "roll/trade" day we need to reset them for the new contract
-                for i in range(1, len(horizon_date)):
+                    # Get all the expiry dates and roll dates
+                    # At each "roll/trade" day we need to reset them for the new contract
+                    for i in range(1, len(horizon_date)):
+                        has_position[i] = True
 
-                    # If the horizon date has reached the roll date (from yesterday), we're done, and we have a
-                    # new roll/trade
-                    if (horizon_date[i] - roll_date[i-1]).days >= 0:
-                        new_trade[i] = True
-                    else:
-                        new_trade[i] = False
+                        # If the horizon date has reached the roll date (from yesterday), we're done, and we have a
+                        # new roll/trade
+                        if (horizon_date[i] - roll_date[i - 1]).days >= 0:
+                            new_trade[i] = True
+                        else:
+                            new_trade[i] = False
 
-                    # If we're entering a new trade/contract, we need to get new expiry and roll dates
-                    if new_trade[i]:
+                        # If we're entering a new trade/contract (and exiting an old trade) we need to get new expiry and roll dates
+                        if new_trade[i]:
+                            exp = self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[i]]),
+                                fx_options_trading_tenor, cal=cal, asset_class='fx-vol')[0]
 
-                        exp = self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[i]]),
-                            fx_options_trading_tenor, cal=cal, asset_class='fx-vol')[0]
+                            # Make sure we don't expire on a date in the history where there isn't market data
+                            # It is ok for future values to expire after market data (just not in the backtest!)
+                            if exp not in market_df.index:
+                                exp_index = market_df.index.searchsorted(exp)
 
-                        # Make sure we don't expire on a date in the history where there isn't market data
-                        # It is ok for future values to expire after market data (just not in the backtest!)
-                        if exp not in market_df.index:
-                            exp_index = market_df.index.searchsorted(exp)
+                                if exp_index < len(market_df.index):
+                                    exp_index = min(exp_index, len(market_df.index))
 
-                            if exp_index < len(market_df.index):
-                                exp_index = min(exp_index, len(market_df.index))
+                                    exp = market_df.index[exp_index]
 
-                                exp = market_df.index[exp_index]
+                            expiry_date[i] = exp
 
-                        expiry_date.append(exp)
+                            roll_date[i] = get_roll_date(horizon_date[i], expiry_date[i], asset_holidays)
+                            exit_trade[i] = True
+                        else:
+                            if horizon_date[i] <= expiry_date[i-1]:
+                                # Otherwise use previous expiry and roll dates, because we're still holding same contract
+                                expiry_date[i] = expiry_date[i-1]
+                                roll_date[i] = roll_date[i-1]
+                                exit_trade[i] = False
+                            else:
+                                exit_trade[i] = True
+                else:
+                    new_trade[horizon_date.searchsorted(enter_trading_dates)] = True
+                    has_position[horizon_date.searchsorted(enter_trading_dates)] = True
 
-                        roll_date.append(get_roll_date(horizon_date[i], expiry_date[i], asset_holidays))
-                    else:
-                        # Otherwise use previous expiry and roll dates, because we're still holding same contract
-                        expiry_date.append(expiry_date[i-1])
-                        roll_date.append(roll_date[i-1])
+                    # Get first expiry date
+                    #expiry_date[0] = \
+                    #    self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[0]]),
+                    #                                                     fx_options_trading_tenor, cal=cal,
+                    #                                                     asset_class='fx-vol')[0]
+
+                    # For first month want it to expire within that month (for consistency), hence month_adj=0 ONLY here
+                    #roll_date[0] = get_roll_date(horizon_date[0], expiry_date[0], asset_holidays, month_adj=0)
+
+                    # New trade => entry at beginning AND on every roll
+                    #new_trade[0] = True
+                    #exit_trade[0] = False
+                    #has_position[0] = True
+
+                    # Get all the expiry dates and roll dates
+                    # At each "roll/trade" day we need to reset them for the new contract
+                    for i in range(0, len(horizon_date)):
+
+                        # If we're entering a new trade/contract (and exiting an old trade) we need to get new expiry and roll dates
+                        if new_trade[i]:
+                            exp = \
+                                self._calendar.get_expiry_date_from_horizon_date(pd.DatetimeIndex([horizon_date[i]]),
+                                                                                 fx_options_trading_tenor, cal=cal,
+                                                                                 asset_class='fx-vol')[0]
+
+                            # Make sure we don't expire on a date in the history where there isn't market data
+                            # It is ok for future values to expire after market data (just not in the backtest!)
+                            if exp not in market_df.index:
+                                exp_index = market_df.index.searchsorted(exp)
+
+                                if exp_index < len(market_df.index):
+                                    exp_index = min(exp_index, len(market_df.index))
+
+                                    exp = market_df.index[exp_index]
+
+                            expiry_date[i] = exp
+
+                            # roll_date[i] = get_roll_date(horizon_date[i], expiry_date[i], asset_holidays)
+                            # if i > 0:
+                            # Makes the assumption we aren't rolling contracts
+                            exit_trade[i] = False
+                        else:
+                            if i > 0:
+                                # Check there's valid expiry on previous day (if not then we're not in an option trade here!)
+                                if expiry_date[i-1] == 0:
+                                    has_position[i] = False
+                                else:
+                                    if horizon_date[i] <= expiry_date[i - 1]:
+                                        # Otherwise use previous expiry and roll dates, because we're still holding same contract
+                                        expiry_date[i] = expiry_date[i - 1]
+                                        # roll_date[i] = roll_date[i - 1]
+                                        has_position[i] = True
+
+                                    if horizon_date[i] == expiry_date[i]:
+                                        exit_trade[i] = True
+                                    else:
+                                        exit_trade[i] = False
 
                 # Note: may need to add discount factor when marking to market option
 
@@ -434,18 +535,22 @@ class FXOptionsCurve(object):
                 df_temp['expiry-date'] = expiry_date
                 df_temp['horizon-date'] = horizon_date
                 df_temp['roll-date'] = roll_date
+                df_temp['new-trade'] = new_trade
+                df_temp['exit-trade'] = exit_trade
+                df_temp['has-position'] = has_position
 
-                # Special case: for first day of history (given have no previous positions)
-                option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_  = \
-                    fx_options_pricer.price_instrument(cross, horizon_date[0], strike, expiry_date[0],
-                        contract_type=contract_type,
-                        tenor=fx_options_trading_tenor,
-                        fx_vol_surface=fx_vol_surface,
-                        return_as_df=False)
+                if has_position[0]:
+                    # Special case: for first day of history (given have no previous positions)
+                    option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_  = \
+                        fx_options_pricer.price_instrument(cross, horizon_date[0], strike, expiry_date[0],
+                            contract_type=contract_type,
+                            tenor=fx_options_trading_tenor,
+                            fx_vol_surface=fx_vol_surface,
+                            return_as_df=False)
 
-                interpolated_option[0] = option_values_
-                calculated_strike[0] = strike_
-                implied_vol[0] = vol_
+                    interpolated_option[0] = option_values_
+                    calculated_strike[0] = strike_
+                    implied_vol[0] = vol_
 
                 mtm[0] = 0
 
@@ -453,7 +558,7 @@ class FXOptionsCurve(object):
                 # On rolling dates: MTM will be the previous option contract (interpolated)
                 # On non-rolling dates: it will be the current option contract
                 for i in range(1, len(horizon_date)):
-                    if new_trade[i]:
+                    if exit_trade[i]:
                         # Price option trade being exited
                         option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = \
                             fx_options_pricer.price_instrument(cross, horizon_date[i], calculated_strike[i-1], expiry_date[i-1],
@@ -463,8 +568,11 @@ class FXOptionsCurve(object):
                             return_as_df=False)
 
                         # Store as MTM
-                        mtm[i] = option_values_# option_output[cross + '-option-price.close'].values
+                        mtm[i] = option_values_
+                        delta[i] = 0 # Note: this will get overwritten if there's a new trade
+                        calculated_strike[i] = calculated_strike[i-1] # Note: this will get overwritten if there's a new trade
 
+                    if new_trade[i]:
                         # Price new option trade being entered
                         option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = \
                             fx_options_pricer.price_instrument(cross, horizon_date[i], strike, expiry_date[i],
@@ -475,8 +583,10 @@ class FXOptionsCurve(object):
 
                         calculated_strike[i] = strike_ # option_output[cross + '-strike.close'].values
                         implied_vol[i] = vol_
-                        interpolated_option[i] = option_values_ # option_output[cross + '-option-price.close'].values
-                    else:
+                        interpolated_option[i] = option_values_
+                        delta[i] = delta_
+
+                    elif has_position[i] and not(exit_trade[i]):
                         # Price current option trade
                         # - strike/expiry the same as yesterday
                         # - other market inputs taken live, closer to expiry
@@ -496,11 +606,10 @@ class FXOptionsCurve(object):
                                 fx_vol_surface=fx_vol_surface,
                                 return_as_df=False)
 
-                        interpolated_option[i] = option_values_ # option_output[cross + '-option-price.close'].values
+                        interpolated_option[i] = option_values_
                         implied_vol[i] = vol_
                         mtm[i] = interpolated_option[i]
-
-                    delta[i] = delta_ # option_output[cross + '-delta.close'].values
+                        delta[i] = delta_
 
                 # Calculate delta hedging P&L
                 spot_rets = (market_df[cross + ".close"] / market_df[cross + ".close"].shift(1) - 1).values
@@ -542,8 +651,9 @@ class FXOptionsCurve(object):
                     total_return_index_df[cross + '-mtm.close'] = mtm
                     total_return_index_df[cross + ".close"] = market_df[cross + ".close"].values
                     total_return_index_df[cross + '-implied-vol.close'] = implied_vol
-                    total_return_index_df[cross + '-roll.close'] = new_trade
+                    total_return_index_df[cross + '-new-trade.close'] = new_trade
                     total_return_index_df[cross + '.roll-date'] = roll_date
+                    total_return_index_df[cross + '-exit-trade.close'] = exit_trade
                     total_return_index_df[cross + '.expiry-date'] = expiry_date
                     total_return_index_df[cross + '-calculated-strike.close'] = calculated_strike
                     total_return_index_df[cross + '-option-return.close'] = option_rets
@@ -575,12 +685,12 @@ class FXOptionsCurve(object):
 
         for cross in cross_fx:
 
-            p = abs(total_return_index_df[cross + '-roll.close'].shift(1)) * option_tc
-            q = abs(total_return_index_df[cross + '-delta.close'] - total_return_index_df[cross + '-delta.close'].shift(1)) * spot_tc
+            # p = abs(total_return_index_df[cross + '-roll.close'].shift(1)) * option_tc
+            # q = abs(total_return_index_df[cross + '-delta.close'] - total_return_index_df[cross + '-delta.close'].shift(1)) * spot_tc
 
             # Additional columns to include P&L with transaction costs
             total_return_index_df[cross + '-option-return-with-tc.close'] = \
-                total_return_index_df[cross + '-option-return.close'] - abs(total_return_index_df[cross + '-roll.close'].shift(1)) * option_tc
+                total_return_index_df[cross + '-option-return.close'] - abs(total_return_index_df[cross + '-new-trade.close'].shift(1)) * option_tc
             total_return_index_df[cross + '-delta-pnl-return-with-tc.close'] = \
                 total_return_index_df[cross + '-delta-pnl-return.close'] \
                 - abs(total_return_index_df[cross + '-delta.close'] - total_return_index_df[cross + '-delta.close'].shift(1)) * spot_tc

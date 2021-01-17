@@ -41,7 +41,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 4 - get implied vol for a particular strike, interpolating the surface
 # run_example = 5 - get USDJPY vol surface around US presidential election and plot
 
-run_example = 2
+run_example = 3
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Show how to plot ATM 1M implied_vol vol time series
@@ -77,9 +77,9 @@ if run_example == 2 or run_example == 0:
 
     df = market.fetch_market(md_request)
 
-    fx_vol_surface = FXVolSurface(market_df=df, vol_function_type='BBG')
+    fx_vol_surface = FXVolSurface(market_df=df, vol_function_type='BBG', asset='GBPUSD')
 
-    fx_vol_surface.build_vol_surface(horizon_date, 'GBPUSD')
+    fx_vol_surface.build_vol_surface(horizon_date)
 
     # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance in FinancePy
     # FinFXVolSurface.buildVolSurface method to get it to fill, or choose different vol_function_type (eg. 'CLARK5')
@@ -130,7 +130,7 @@ if run_example == 3 or run_example == 0:
 
     df = market.fetch_market(md_request)
 
-    fx_vol_surface = FXVolSurface(market_df=df)
+    fx_vol_surface = FXVolSurface(market_df=df, asset='GBPUSD')
 
     animate_titles = []
 
@@ -139,7 +139,7 @@ if run_example == 3 or run_example == 0:
 
     # Note this does take a few minutes, given it's fitting the vol surface for every date
     # TODO explore speeding up using Numba or similar
-    vol_surface_dict, extremes_dict = fx_vol_surface.extract_vol_surface_across_dates(df.index, 'GBPUSD',
+    vol_surface_dict, extremes_dict = fx_vol_surface.extract_vol_surface_across_dates(df.index,
                                          vol_surface_type='vol_surface_strike_space')
 
     animate_titles = [x.strftime('%d %b %Y') for x in vol_surface_dict.keys()]
@@ -165,17 +165,17 @@ if run_example == 4 or run_example == 0:
 
     df = market.fetch_market(md_request)
 
-    fx_vol_surface = FXVolSurface(market_df=df)
+    fx_vol_surface = FXVolSurface(market_df=df, asset='GBPUSD')
 
     df_vol_surface_strike_space_list = []
     animate_titles = []
 
-    fx_vol_surface.build_vol_surface('20 Jun 2016', 'GBPUSD')
+    fx_vol_surface.build_vol_surface('20 Jun 2016')
 
     # Get the implied_vol volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 20 Jun 2016
     vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000, tenor='1W')
 
-    fx_vol_surface.build_vol_surface('23 Jun 2016', 'GBPUSD')
+    fx_vol_surface.build_vol_surface('23 Jun 2016')
 
     # Get the implied_vol volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 23 Jun 2016
     vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000, tenor='1W')
@@ -199,9 +199,9 @@ if run_example == 5 or run_example == 0:
 
     # Skip 3W/4M because this particular close (NYC) doesn't have that in USDJPY market data
     tenors = ["ON", "1W", "2W", "1M", "2M", "3M", "6M", "9M", "1Y", "2Y", "3Y"]
-    fx_vol_surface = FXVolSurface(market_df=df, tenors=tenors)
+    fx_vol_surface = FXVolSurface(market_df=df, tenors=tenors, asset='USDJPY')
 
-    fx_vol_surface.build_vol_surface(horizon_date, 'USDJPY')
+    fx_vol_surface.build_vol_surface(horizon_date)
 
     # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance in FinancePy
     # FinFXVolSurface.buildVolSurface method to get it to fill

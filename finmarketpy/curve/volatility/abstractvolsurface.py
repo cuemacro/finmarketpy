@@ -52,7 +52,7 @@ class AbstractVolSurface(ABC):
 
         return min, max
 
-    def extract_vol_surface_across_dates(self, dates, asset,
+    def extract_vol_surface_across_dates(self, dates,
                                          num_strike_intervals=60, vol_surface_type='vol_surface_strike_space',
                                          reverse_plot=True):
 
@@ -65,7 +65,7 @@ class AbstractVolSurface(ABC):
 
         for i in range(0, len(dates)):
 
-            self.build_vol_surface(dates[i], asset)
+            self.build_vol_surface(dates[i])
 
             # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance
             # in FinancePy

@@ -166,6 +166,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 17 Jan 2021
+  * Fix vol surface examples to work with new FXVolSurface
 * 16 Jan 2021
   * Additional work on FXOptionPricer and total returns (FXOptionCurve)
     * Speed up and deal with non-convergence of solver

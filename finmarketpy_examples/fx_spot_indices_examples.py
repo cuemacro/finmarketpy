@@ -132,11 +132,11 @@ if run_example == 2 or run_example == 0:
 
     df_intraday_tot = FXSpotCurve().construct_total_return_index('GBPUSD', df_intraday_market, depo_tenor='ON')
 
-    # df_intraday_spot.columns = [x + '-intraday-spot' for x in df_intraday_spot.columns]
+    df_intraday_spot.columns = [x + '-intraday-spot' for x in df_intraday_spot.columns]
     df_intraday_tot.columns = [x + '-intraday-tot' for x in df_intraday_spot.columns]
 
     # Combine into a single data frame and plot
-    df = calculations.pandas_outer_join([df_bbg_tot, df_tot, df_intraday_tot]).fillna(method='ffill')
+    df = calculations.pandas_outer_join([df_bbg_tot, df_tot, df_intraday_tot, df_intraday_spot]).fillna(method='ffill')
     df = calculations.create_mult_index_from_prices(df)
 
     chart.plot(df)

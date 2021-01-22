@@ -45,9 +45,8 @@ market = Market(market_data_generator=MarketDataGenerator())
 # Choose run_example = 0 for everything
 # run_example = 1 - create total return index AUDUSD 1M long calls (and separately long puts) over 2008 financial crisis and further
 # run_example = 2 - create total return index USDJPY 1W short straddles over a long sample
-# run_example = 3 - create total return index USDJPY 1W short straddles (only selling on the last day of every month)
 
-run_example = 2
+run_example = 0
 
 def prepare_indices(cross, df_option_tot=None, df_option_tc=None, df_spot_tot=None):
     df_list = []

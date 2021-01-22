@@ -23,7 +23,7 @@ from finmarketpy.util.marketconstants import MarketConstants
 
 market_constants = MarketConstants()
 
-@guvectorize(['void(f8[:], f8[:], f8[:], f8[:], intp, intp, f8[:])'],
+@guvectorize(['void(f8[:], f8[:], f8[:], f8[:], f8, f8, f8[:])'],
              '(n),(n),(n),(n),(),()->(n)', cache=True, target="cpu", nopython=True)
 def _spot_index_numba(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount, out):
 
@@ -39,7 +39,7 @@ def _spot_index_numba(spot, time_diff, base_deposit, terms_deposit, base_daycoun
 def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount):
     import numpy as np
 
-    out = np.zero((len(spot)))
+    out = np.zeros((len(spot)))
     out[0] = 100
 
     for i in range(1, len(out)):
@@ -50,10 +50,6 @@ def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, ter
                                         - (1 + terms_deposit[i] * time_diff[i] / terms_daycount))
 
     return out
-
-
-def _spot_index():
-    pass
 
 class FXSpotCurve(object):
     """Construct total return (spot) indices for FX. In future will also convert assets from local currency to foreign currency
@@ -110,7 +106,7 @@ class FXSpotCurve(object):
             spot_df = market.fetch_market(md_request_download)
 
             return self.construct_total_return_index(md_request.tickers,
-                    self._calculations.pandas_outer_join([spot_df, depo_df]), tenor=depo_tenor,
+                    self._calculations.pandas_outer_join([spot_df, depo_df]), depo_tenor=depo_tenor,
                                                      output_calculation_fields=output_calculation_fields)
         else:
             # eg. we calculate via your domestic currency such as USD, so returns will be in your domestic currency
@@ -217,26 +213,30 @@ class FXSpotCurve(object):
                 carry = carry.fillna(method='bfill')
 
                 spot = spot[cross + ".close"].to_frame()
-                base_deposit = carry[base_deposit.columns]
-                terms_deposit = carry[terms_deposit.columns]
 
-                # Calculate the time difference between each data point
-                spot['index_col'] = spot.index
+                spot_vals = spot[cross + ".close"].values
+                base_deposit_vals = carry[cross[0:3] + depo_tenor + ".close"].values
+                terms_deposit_vals = carry[cross[3:6] + depo_tenor + ".close"].values
+
+                # Calculate the time difference between each data point (flooring it to whole days, because carry
+                # is accured when there's a new day)
+                spot['index_col'] = spot.index.floor('D')
                 time = spot['index_col'].diff()
                 spot = spot.drop('index_col', 1)
 
                 time_diff = time.values.astype(float) / 86400000000000.0  # get time difference in days
+                time_diff[0] = 0.0
 
+                # Use Numba to do total return index calculation given has many loops
                 total_return_index_df = pd.DataFrame(index=spot.index, columns=[cross + "-tot.close"],
-                    data=_spot_index_numba(spot.values, time_diff, base_deposit.values, terms_deposit.values,
+                    data=_spot_index_numba(spot_vals, time_diff, base_deposit_vals, terms_deposit_vals,
                                      base_daycount, terms_daycount))
 
                 if output_calculation_fields:
                     total_return_index_df[cross + '-carry.close'] = carry
                     total_return_index_df[cross + '-tot-return.close'] = total_return_index_df / total_return_index_df.shift(1) - 1.0
-                    total_return_index_df[cross + '-spot-return.close'] =  spot / spot.shift(1) - 1.0
+                    total_return_index_df[cross + '-spot-return.close'] = spot / spot.shift(1) - 1.0
 
-                # Use Numba to do total return index calculation given has many loops
                 total_return_index_df_agg.append(total_return_index_df)
 
         return self._calculations.pandas_outer_join(total_return_index_df_agg)

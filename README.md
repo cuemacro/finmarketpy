@@ -166,6 +166,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 22 Jan 2021
+  * FX spot total returns now supports intraday data and added example
+  * Fixed problem with Numba implementation of FX spot total returns
 * 17 Jan 2021
   * Fix vol surface examples to work with new FXVolSurface
 * 16 Jan 2021

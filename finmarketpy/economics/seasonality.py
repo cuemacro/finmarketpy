@@ -32,12 +32,15 @@ class Seasonality(object):
         self.logger = LoggerManager().getLogger(__name__)
         return
 
-    def time_of_day_seasonality(self, data_frame, years=False):
+    def time_of_day_seasonality(self, data_frame, years=False, seconds=False):
 
         calculations = Calculations()
 
         if years is False:
-            return calculations.average_by_hour_min_of_day_pretty_output(data_frame)
+            if seconds:
+                return calculations.average_by_hour_min_sec_of_day_pretty_output(data_frame)
+            else:
+                return calculations.average_by_hour_min_of_day_pretty_output(data_frame)
 
         set_year = set(data_frame.index.year)
         year = sorted(list(set_year))
@@ -47,8 +50,12 @@ class Seasonality(object):
         commonman = CommonMan()
 
         for i in year:
-            temp_seasonality = calculations.average_by_hour_min_of_day_pretty_output(
-                data_frame[data_frame.index.year == i])
+            if seconds:
+                temp_seasonality = calculations.average_by_hour_min_sec_of_day_pretty_output(
+                    data_frame[data_frame.index.year == i])
+            else:
+                temp_seasonality = calculations.average_by_hour_min_of_day_pretty_output(
+                    data_frame[data_frame.index.year == i])
 
             temp_seasonality.columns = commonman.postfix_list(temp_seasonality.columns.values, " " + str(i))
 

@@ -12,7 +12,6 @@ __author__ = 'saeedamen'  # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-
 """
 Here we show how to use VolStats to calculate various volatility metrics (like realized volatility, volatility risk 
 premium and the implied volatility addons)
@@ -124,7 +123,7 @@ if run_example == 2 or run_example == 0:
 
         realized_vol.append(rv)
 
-    realized_vol = calc.pandas_outer_join(realized_vol)
+    realized_vol = calc.join(realized_vol, how='outer')
     style = Style()
 
     style.title = 'GBPUSD ON realized volatility over Brexit with different minute sampling frequencies'

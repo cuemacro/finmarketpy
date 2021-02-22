@@ -25,14 +25,14 @@ try:
     from financepy.market.volatility.FinFXVolSurfacePlus import FinFXDeltaMethod
     from financepy.market.volatility.FinFXVolSurfacePlus import volFunction
     from financepy.market.volatility.FinFXVolSurfacePlus import FinVolFunctionTypes
-    from financepy.finutils.FinGlobalTypes import FinSolverTypes
 except:
     from financepy.market.volatility.FinFXVolSurface import FinFXVolSurface
     from financepy.market.volatility.FinFXVolSurface import FinFXATMMethod
     from financepy.market.volatility.FinFXVolSurface import FinFXDeltaMethod
     from financepy.market.volatility.FinFXVolSurface import volFunction
     from financepy.market.volatility.FinFXVolSurface import FinVolFunctionTypes
-    from financepy.finutils.FinGlobalTypes import FinSolverTypes
+
+from financepy.finutils.FinGlobalTypes import FinSolverTypes
 
 from findatapy.util.dataconstants import DataConstants
 
@@ -54,7 +54,8 @@ class FXVolSurface(AbstractVolSurface):
                  delta_method=market_constants.fx_options_delta_method,
                  depo_tenor=market_constants.fx_options_depo_tenor,
                  solver=market_constants.fx_options_solver,
-                 alpha=market_constants.fx_options_alpha):
+                 alpha=market_constants.fx_options_alpha,
+                 tol=market_constants.fx_options_tol):
         """Initialises object, with market data and various market conventions
 
         Parameters
@@ -71,7 +72,7 @@ class FXVolSurface(AbstractVolSurface):
             default - 'close'
 
         tenors : str(list)
-            Tenors to be used
+            Tenors to be used (we need to avoid tenors, where there might be NaNs)
 
         vol_function_type : str
             What type of interpolation scheme to use
@@ -168,6 +169,7 @@ class FXVolSurface(AbstractVolSurface):
             self._solver = FinSolverTypes.CONJUGATE_GRADIENT
 
         self._alpha = alpha
+        self._tol = tol
 
     def build_vol_surface(self, value_date):
         """Builds the implied volatility surface for a particular value date and calculates the benchmark strikes etc.
@@ -225,7 +227,8 @@ class FXVolSurface(AbstractVolSurface):
                                        atmMethod=self._atm_method,
                                        deltaMethod=self._delta_method,
                                        volatilityFunctionType=self._vol_function_type,
-                                       finSolverType=self._solver)
+                                       finSolverType=self._solver,
+                                       tol=self._tol) # TODO add tol
 
     def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor='1M'):
         """Calculates the implied_vol volatility for a given strike and tenor (or expiry date, if specified). The
@@ -283,7 +286,7 @@ class FXVolSurface(AbstractVolSurface):
 
         return None
 
-    def extract_vol_surface(self, num_strike_intervals=60):
+    def extract_vol_surface(self, num_strike_intervals=60, low_K_pc=0.95, high_K_pc=1.05):
         """Creates an interpolated implied vol surface which can be plotted (in strike space), and also in delta
         space for key strikes (ATM, 25d call and put). Also for key strikes converts from delta to strike space.
 
@@ -316,8 +319,8 @@ class FXVolSurface(AbstractVolSurface):
         key_strikes_names = ['K_10D_P', 'K_10D_P_MS', 'K_25D_P', 'K_25D_P_MS', 'ATM', 'K_25D_C', 'K_25D_C_MS', 'K_10D_C', 'K_10D_C_MS']
 
         # Get max/min strikes to interpolate (from the longest dated tenor)
-        low_K = self._fin_fx_vol_surface._K_25D_P[-1] * 0.95
-        high_K = self._fin_fx_vol_surface._K_25D_C[-1] * 1.05
+        low_K = self._fin_fx_vol_surface._K_25D_P[-1] * low_K_pc
+        high_K = self._fin_fx_vol_surface._K_25D_C[-1] * high_K_pc
 
         if num_strike_intervals is not None:
             # In case using old version of FinancePy
@@ -412,6 +415,18 @@ class FXVolSurface(AbstractVolSurface):
         f = self._fin_fx_vol_surface._F0T[tenor_index]
 
         return volFunction(self._vol_function_type.value, params, np.array([K]), gaps, f, K, t)
+
+    def get_vol_strike_from_delta_tenor(self, call_delta, tenor=None, expiry_date=None):
+
+        if tenor is not None:
+            if not (isinstance(tenor, int)):
+                tenor_index = self._get_tenor_index(tenor)
+            else:
+                tenor_index = tenor
+
+            expiry_date = self._fin_fx_vol_surface._expiryDates[tenor_index]
+
+        return self._fin_fx_vol_surface.volatilityFromDeltaDate(call_delta, expiryDate=expiry_date)
 
     def get_atm_method(self):
         return self._atm_method

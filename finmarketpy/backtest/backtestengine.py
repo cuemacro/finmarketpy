@@ -46,7 +46,7 @@ class Backtest(object):
         return
 
     def calculate_diagnostic_trading_PnL(self, asset_a_df, signal_df, further_df=[], further_df_labels=[]):
-        """Calculates P&L table which can be used for debugging purposes,
+        """Calculates P&L table which can be used for debugging purposes.
 
         The table is populated with asset, signal and further dataframes provided by the user, can be used to check signalling methodology.
         It does not apply parameters such as transaction costs, vol adjusment and so on.
@@ -93,7 +93,7 @@ class Backtest(object):
         for f in further_df:
             flatten_df.append(f)
 
-        return calculations.pandas_outer_join(flatten_df)
+        return calculations.join(flatten_df, how='outer')
 
     def calculate_trading_PnL(self, br, asset_a_df, signal_df, contract_value_df, run_in_parallel):
         """Calculates P&L of a trading strategy and statistics to be retrieved later
@@ -122,13 +122,13 @@ class Backtest(object):
         calculations = Calculations()
         risk_engine = RiskEngine()
 
-        # # do an outer join first, so can fill out signal and fill it down
+        # # Do an outer join first, so can fill out signal and fill it down
         # # this captures the case where the signal changes on an asset holiday
         # # it will just get delayed till the next tradable day when we do this
         # asset_df_2, signal_df_2 = asset_a_df.align(signal_df, join='outer', axis='index')
         # signal_df = signal_df_2.fillna(method='ffill')
         #
-        # # now make sure the dates of both traded asset and signal are aligned properly
+        # # Now make sure the dates of both traded asset and signal are aligned properly
         # # and use as reference only those days where we have asset information
         # asset_df, signal_df = asset_a_df.align(signal_df, join='left', axis = 'index')
 
@@ -144,11 +144,11 @@ class Backtest(object):
             contract_value_df = contract_value_df.fillna(
                 method='ffill')  # fill down asset holidays (we won't trade on these days)
 
-        # non-trading days of the assets (this may of course vary between the assets we are trading
+        # Non-trading days of the assets (this may of course vary between the assets we are trading
         # if they are from different asset classes)
         non_trading_days = numpy.isnan(asset_df.values)
 
-        # only allow signals to change on the days when we can trade assets
+        # Only allow signals to change on the days when we can trade assets
         signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
         signal_df = signal_df.fillna(method='ffill')  # fill these down
 
@@ -165,12 +165,12 @@ class Backtest(object):
         asset_df = asset_df.fillna(method='ffill')  # fill down asset holidays (we won't trade on these days)
         returns_df = calculations.calculate_returns(asset_df)
 
-        # apply a stop loss/take profit to every trade if this has been specified
+        # Apply a stop loss/take profit to every trade if this has been specified
         # do this before we start to do vol weighting etc.
         if br.take_profit is not None and br.stop_loss is not None:
             returns_df = calculations.calculate_returns(asset_df)
 
-            # makes assumption that signal column order matches that of returns
+            # Makes assumption that signal column order matches that of returns
             temp_strategy_rets_df = calculations.calculate_signal_returns_as_matrix(signal_df, returns_df)
 
             trade_rets_df = calculations.calculate_cum_rets_trades(signal_df, temp_strategy_rets_df)
@@ -196,7 +196,7 @@ class Backtest(object):
             #     to_plot = _calculations.pandas_outer_join([asset_df_copy, pre_signal_df, signal_df_copy, trade_rets_df_copy, temp_strategy_rets_df])
             #     to_plot.to_csv('test.csv')
 
-        # do we have a vol target for individual signals?
+        # Do we have a vol target for individual signals?
         if br.signal_vol_adjust is True:
             leverage_df = risk_engine.calculate_leverage_factor(returns_df, br.signal_vol_target,
                                                                 br.signal_vol_max_leverage,
@@ -216,7 +216,7 @@ class Backtest(object):
 
         adjusted_weights_matrix = None
 
-        # portfolio is average of the underlying signals: should we sum them or average them or use another
+        # Portfolio is average of the underlying signals: should we sum them or average them or use another
         # weighting scheme?
         if br.portfolio_combination is not None:
             if br.portfolio_combination == 'sum' and br.portfolio_combination_weights is None:
@@ -244,7 +244,7 @@ class Backtest(object):
         portfolio_leverage_df = pandas.DataFrame(data=numpy.ones(len(_pnl.index)), index=_pnl.index,
                                                  columns=['Portfolio'])
 
-        # should we apply vol target on a portfolio level basis?
+        # Should we apply vol target on a portfolio level basis?
         if br.portfolio_vol_adjust is True:
             # calculate portfolio leverage
             portfolio_leverage_df = risk_engine.calculate_leverage_factor(portfolio,
@@ -259,17 +259,17 @@ class Backtest(object):
 
             # portfolio, portfolio_leverage_df = risk_engine.calculate_vol_adjusted_returns(portfolio, br = br)
 
-        # multiply portfolio leverage * individual signals to get final position signals
+        # Multiply portfolio leverage * individual signals to get final position signals
         length_cols = len(signal_df.columns)
         leverage_matrix = numpy.transpose(
             numpy.repeat(portfolio_leverage_df.values.flatten()[numpy.newaxis, :], length_cols, 0))
 
-        # final portfolio signals (including signal & portfolio leverage)
+        # Final portfolio signals (including signal & portfolio leverage)
         portfolio_signal = pandas.DataFrame(
             data=numpy.multiply(leverage_matrix, signal_df.values),
             index=signal_df.index, columns=signal_df.columns)
 
-        # later when we plot the portfolio components, we do that without weighting the individual components
+        # Later when we plot the portfolio components, we do that without weighting the individual components
         portfolio_signal_before_weighting = portfolio_signal.copy()
 
         if br.portfolio_combination is not None:
@@ -288,57 +288,57 @@ class Backtest(object):
         portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure \
             = self.calculate_exposures(portfolio_signal)
 
-        # apply position limits?
+        # Apply position limits?
         position_clip_adjustment = risk_engine.calculate_position_clip_adjustment \
             (portfolio_net_exposure, portfolio_total_exposure, br)
 
-        # if we have any position clip adjustment, for example related to max position sizes
+        # If we have any position clip adjustment, for example related to max position sizes
         if position_clip_adjustment is not None:
             position_clip_adjustment_matrix = numpy.transpose(
                 numpy.repeat(position_clip_adjustment.values.flatten()[numpy.newaxis, :], length_cols, 0))
 
-            # recalculate portfolio signals after adjustment (for individual components - without
+            # Recalculate portfolio signals after adjustment (for individual components - without
             # weighting each signal separately)
             portfolio_signal_before_weighting = pandas.DataFrame(
                 data=(portfolio_signal_before_weighting.values * position_clip_adjustment_matrix),
                 index=portfolio_signal_before_weighting.index,
                 columns=portfolio_signal_before_weighting.columns)
 
-            # recalculate portfolio signal after adjustment (for portfolio level positions)
+            # Recalculate portfolio signal after adjustment (for portfolio level positions)
             portfolio_signal = pandas.DataFrame(
                 data=(portfolio_signal.values * position_clip_adjustment_matrix),
                 index=portfolio_signal.index,
                 columns=portfolio_signal.columns)
 
-            # recalculate portfolio leverage with position constraint (multiply vectors elementwise)
+            # Recalculate portfolio leverage with position constraint (multiply vectors elementwise)
             portfolio_leverage_df = pandas.DataFrame(
                 data=(portfolio_leverage_df.values * position_clip_adjustment.values),
                 index=portfolio_leverage_df.index,
                 columns=portfolio_leverage_df.columns)
 
-            # recalculate total long, short, net and absolute exposures of the whole portfolio after the position
+            # Recalculate total long, short, net and absolute exposures of the whole portfolio after the position
             # clip adjustment
             portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure \
                 = self.calculate_exposures(portfolio_signal)
 
-        # calculate final portfolio returns with the amended portfolio leverage (by default just 1s)
+        # Calculate final portfolio returns with the amended portfolio leverage (by default just 1s)
         portfolio = calculations.calculate_signal_returns_with_tc_matrix(portfolio_leverage_df, portfolio, tc=tc)
 
-        # assign all the property variables
+        # Assign all the property variables
         self._signal = signal_df  # individual signals (before portfolio leverage)
         self._portfolio_signal = portfolio_signal  # individual signals (AFTER portfolio leverage/constraints)
         self._portfolio_leverage = portfolio_leverage_df  # leverage on portfolio
 
         self._portfolio = portfolio
 
-        # calculate each period of trades
+        # Calculate each period of trades
         self._portfolio_trade = self._portfolio_signal - self._portfolio_signal.shift(1)
 
-        # expressing trades/positions in terms of notionals
+        # Expressing trades/positions in terms of notionals
         self._portfolio_signal_notional = None
         self._portfolio_signal_trade_notional = None
 
-        # expressing trades/positions in terms of contracts (useful for futures)
+        # Expressing trades/positions in terms of contracts (useful for futures)
         self._portfolio_signal_contracts = None
         self._portfolio_signal_trade_contracts = None
 
@@ -353,14 +353,15 @@ class Backtest(object):
         self._portfolio_total_exposure_notional = None
         self._portfolio_signal_trade_notional_sizes = None
 
-        # also create other measures of portfolio
+        # Also create other measures of portfolio
         # portfolio & trades in terms of a predefined notional (in USD)
         # portfolio & trades in terms of contract sizes (particularly useful for futures)
         if br.portfolio_notional_size is not None:
-            # express positions in terms of the notional size specified
+
+            # Express positions in terms of the notional size specified
             self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
-            self._portfolio_signal_trade_notional = self._portfolio_signal_notional - self._portfolio_signal_notional.shift(
-                1)
+            self._portfolio_signal_trade_notional = self._portfolio_signal_notional \
+                                                    - self._portfolio_signal_notional.shift(1)
 
             df_trades_sizes = pandas.DataFrame()
 
@@ -378,25 +379,26 @@ class Backtest(object):
             self._portfolio_net_exposure_notional = portfolio_net_exposure * br.portfolio_notional_size
             self._portfolio_total_exposure_notional = portfolio_total_exposure * br.portfolio_notional_size
 
-            # get the positions in terms of the contract sizes
+            # Get the positions in terms of the contract sizes
             notional_copy = self._portfolio_signal_notional.copy(deep=True)
             notional_copy_cols = [x.split('.')[0] for x in notional_copy.columns]
             notional_copy_cols = [x + '.contract-value' for x in notional_copy_cols]
 
             notional_copy.columns = notional_copy_cols
 
-            # can only give contract sizes if these are defined
+            # Can only give contract sizes if these are defined
             if contract_value_df is not None:
                 contract_value_df = contract_value_df[notional_copy_cols]
                 notional_df, contract_value_df = notional_copy.align(contract_value_df, join='left', axis='index')
 
-                # careful make sure orders of magnitude are same for the notional and the contract value
+                # Careful make sure orders of magnitude are same for the notional and the contract value
                 self._portfolio_signal_contracts = notional_df / contract_value_df
                 self._portfolio_signal_contracts.columns = self._portfolio_signal_notional.columns
                 self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts - self._portfolio_signal_contracts.shift(
                     1)
 
-        self._pnl = _pnl  # individual signals P&L (before portfolio volatility targeting, position limits etc)
+        # Individual signals P&L (before portfolio volatility targeting, position limits etc)
+        self._pnl = _pnl
 
         # _pnl_components of individual assets after all the portfolio level risk signals and position limits have been applied
         self._components_pnl = calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting,
@@ -419,7 +421,7 @@ class Backtest(object):
 
         # TODO parallel version still work in progress!
 
-        logger.info("Cumulative index _calculations")
+        logger.info("Cumulative index calculations")
 
         if False: # market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
             swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
@@ -474,7 +476,7 @@ class Backtest(object):
 
                 self._portfolio_cum = calculations.create_add_index(self._portfolio)  # portfolio cumulative P&L
 
-        logger.info("Completed cumulative index _calculations")
+        logger.info("Completed cumulative index calculations")
 
         self._pnl_cum.columns = pnl_cols
         self._components_pnl_cum.columns = pnl_cols
@@ -493,7 +495,8 @@ class Backtest(object):
         DataFrame (list)
 
         """
-        # calculate total portfolio longs/total portfolio shorts/total portfolio exposure
+
+        # Calculate total portfolio longs/total portfolio shorts/total portfolio exposure
         portfolio_total_longs = pandas.DataFrame(portfolio_signal[portfolio_signal > 0].sum(axis=1))
         portfolio_total_shorts = pandas.DataFrame(portfolio_signal[portfolio_signal < 0].sum(axis=1))
 
@@ -535,27 +538,28 @@ class Backtest(object):
         pandas.DataFrame
             Contains the portfolio weights
         """
+
         if method == 'mean':
             weights_vector = numpy.ones(len(_pnl.columns))
         elif method == 'weighted' or 'weighted-sum':
             # get the weights for each asset
             weights_vector = numpy.array([float(br.portfolio_combination_weights[col]) for col in _pnl.columns])
 
-        # repeat this down for every day
+        # Repeat this down for every day
         weights_matrix = numpy.repeat(weights_vector[numpy.newaxis, :], len(_pnl.index), 0)
 
-        # where we don't have old price data, make the weights 0 there
+        # Where we don't have old price data, make the weights 0 there
         ind = numpy.isnan(_pnl.values)
         weights_matrix[ind] = 0
 
         if method != 'weighted-sum':
-            # the total weights will vary, as historically might not have all the assets trading
+            # The total weights will vary, as historically might not have all the assets trading
             total_weights = numpy.sum(weights_matrix, axis=1)
 
-            # replicate across columns
+            # Replicate across columns
             total_weights = numpy.transpose(numpy.repeat(total_weights[numpy.newaxis, :], len(_pnl.columns), 0))
 
-            # to avoid divide by zero
+            # To avoid divide by zero
             total_weights[total_weights == 0.0] = 1.0
 
             adjusted_weights_matrix = weights_matrix / total_weights
@@ -947,12 +951,10 @@ from chartpy import Chart, Style, ChartConstants
 from finmarketpy.economics import TechParams
 from findatapy.timeseries import Calculations, RetStats, Filter
 
-
 class TradingModel(object):
     """Abstract class which wraps around Backtest, providing convenient functions for analaysis. Implement your own
     subclasses of this for your own strategy. See tradingmodelfxtrend_example.py for a simple implementation of a
     FX trend following strategy.
-
     """
 
     #### Default parameters for outputting of results from trading model
@@ -973,7 +975,7 @@ class TradingModel(object):
     def __init__(self):
         pass
 
-    # to be implemented by every trading strategy
+    # To be implemented by every trading strategy
     @abc.abstractmethod
     def load_parameters(self, br=None):
         """Fills parameters for the backtest, such as start-end dates, transaction costs etc. To
@@ -1038,7 +1040,6 @@ class TradingModel(object):
         ----------
         br : BacktestRequest
             Parameters which define the backtest (for example start date, end date, transaction costs etc.
-
         """
 
         logger = LoggerManager().getLogger(__name__)
@@ -1082,7 +1083,7 @@ class TradingModel(object):
 
         bask_keys = basket_dict.keys()
 
-        # each portfolio key calculate returns - can put parts of the portfolio in the key
+        # Each portfolio key calculate returns - can put parts of the portfolio in the key
         if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
             swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
 
@@ -1101,8 +1102,8 @@ class TradingModel(object):
                 if key != self.FINAL_STRATEGY:
                     logger.info("Calculating (parallel) " + key)
 
-                    asset_cut_df = asset_df[[x + '.close' for x in basket_dict[key]]]
-                    spot_cut_df = spot_df[[x + '.close' for x in basket_dict[key]]]
+                    asset_cut_df = asset_df[[x + '.' + br.trading_field for x in basket_dict[key]]]
+                    spot_cut_df = spot_df[[x + '.' + br.trading_field for x in basket_dict[key]]]
 
                     mult_results.append(
                         pool.apply_async(self.construct_individual_strategy, args=(br, spot_cut_df, spot_df2, asset_cut_df,
@@ -1110,13 +1111,13 @@ class TradingModel(object):
                                                                                    False, True,))
                     )
 
-                    # calculate final strategy separately in my main process (so don't have issues with pickling back large output)
+                    # Calculate final strategy separately in my main process (so don't have issues with pickling back large output)
 
             logger.info("Calculating final strategy " + self.FINAL_STRATEGY)
 
-            # calculate the final strategy separately (can often be a lot larger)
-            asset_cut_df = asset_df[[x + '.close' for x in basket_dict[self.FINAL_STRATEGY]]]
-            spot_cut_df = spot_df[[x + '.close' for x in basket_dict[self.FINAL_STRATEGY]]]
+            # Calculate the final strategy separately (can often be a lot larger)
+            asset_cut_df = asset_df[[x + '.' + br.trading_field for x in basket_dict[self.FINAL_STRATEGY]]]
+            spot_cut_df = spot_df[[x + '.' + br.trading_field for x in basket_dict[self.FINAL_STRATEGY]]]
 
             desc, results, leverage, stats, key, backtest = \
                     self.construct_individual_strategy(br, spot_cut_df, spot_df2,
@@ -1156,10 +1157,10 @@ class TradingModel(object):
             for key in bask_keys:
                 logger.info("Calculating (single thread) " + key)
 
-                asset_cut_df = asset_df[[x + '.close' for x in basket_dict[key]]]
-                spot_cut_df = spot_df[[x + '.close' for x in basket_dict[key]]]
+                asset_cut_df = asset_df[[x + '.' + br.trading_field for x in basket_dict[key]]]
+                spot_cut_df = spot_df[[x + '.' + br.trading_field for x in basket_dict[key]]]
 
-                desc, results, leverage, stats, key, backtest = \
+                desc, results, leverage, ret_stats, key, backtest = \
                     self.construct_individual_strategy(br, spot_cut_df, spot_df2, asset_cut_df,
                                                                        tech_params, key,
                                                                        contract_value_df, False, False)
@@ -1169,12 +1170,12 @@ class TradingModel(object):
 
                 cum_results[results.columns[0]] = results
                 port_leverage[results.columns[0]] = leverage
-                ret_stats_results[key] = stats
+                ret_stats_results[key] = ret_stats
 
                 if key == self.FINAL_STRATEGY:
                     self._assign_final_strategy_results(results, backtest)
 
-        # get benchmark for comparison
+        # Get benchmark for comparison
         benchmark = self.construct_strategy_benchmark()
 
         cum_results_benchmark = self.compare_strategy_vs_benchmark(br, cum_results, benchmark)
@@ -1186,33 +1187,34 @@ class TradingModel(object):
             ret_stats_list['Benchmark'] = (self._strategy_benchmark_pnl_ret_stats)
             self._strategy_group_benchmark_pnl_ret_stats = ret_stats_list
 
-        self._strategy_group_pnl = cum_results  # individual parts (all after individually applying portfolio level vol adjustment)
+        # Individual parts (all after individually applying portfolio level vol adjustment)
+        self._strategy_group_pnl = cum_results
         self._strategy_group_pnl_ret_stats = ret_stats_results
 
         self._strategy_group_leverage = port_leverage
         self._strategy_group_benchmark_pnl = cum_results_benchmark
 
     def _assign_final_strategy_results(self, results, backtest):
-            # for a key, designated as the final strategy save that as the "strategy"
+            # For a key, designated as the final strategy save that as the "strategy"
 
-            self._strategy_pnl = results  # cumulative P&L for the final strategy
+            self._strategy_pnl = results  # Cumulative P&L for the final strategy
             self._strategy_components_pnl = backtest.pnl_cum()  # P&L of the individual components (after portfolio level vol adjustments)
             self._strategy_components_pnl_ret_stats = backtest.components_pnl_ret_stats().split_into_dict()  # backtest.get_pnl_components_ret_stats()
 
             self._strategy_pnl_ret_stats = backtest.portfolio_pnl_ret_stats()
             self._strategy_leverage = backtest.portfolio_leverage()
 
-            # collect the position sizes and trade sizes (in several different formats)
+            # Collect the position sizes and trade sizes (in several different formats)
             self._strategy_signal = backtest.portfolio_signal()
             self._strategy_trade_no = backtest.portfolio_trade_no()
             self._strategy_trade = backtest.portfolio_trade()
 
-            # scaled by notional
+            # Scaled by notional
             self._strategy_signal_notional = backtest.portfolio_signal_notional()
             self._strategy_trade_notional = backtest.portfolio_trade_notional()
             self._strategy_trade_notional_sizes = backtest.portfolio_trade_notional_sizes()
 
-            # scaled by notional and adjusted into contract sizes
+            # Scaled by notional and adjusted into contract sizes
             self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
             self._strategy_trade_contracts = backtest.portfolio_trade_contracts()
 
@@ -1276,7 +1278,7 @@ class TradingModel(object):
         else:
             desc = [key]
 
-        # for final strategy return heavyweight backtest object (contains lots of auxilliary information about trades etc)
+        # For final strategy return heavyweight backtest object (contains lots of auxilliary information about trades etc)
         if key == self.FINAL_STRATEGY and compress_output:
             logger.debug('Compressing ' + key)
 
@@ -1287,9 +1289,10 @@ class TradingModel(object):
         logger.info('Calculated for ' + key)
 
         if key != self.FINAL_STRATEGY:
-            return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.pnl_ret_stats(), key, None
+            # return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.pnl_ret_stats(), key, None
+            return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.portfolio_pnl_ret_stats(), key, None
 
-        return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.pnl_ret_stats(), key, backtest
+        return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.portfolio_pnl_ret_stats(), key, backtest
 
         # have lightweight output for subcomponents of portfolio
         # return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.portfolio_pnl_ret_stats(), \
@@ -1314,15 +1317,15 @@ class TradingModel(object):
             filter = Filter()
             calculations = Calculations()
 
-            # align strategy time series with that of benchmark
+            # Align strategy time series with that of benchmark
             benchmark_df.columns = [x + ' be' for x in benchmark_df.columns]
             strategy_df, benchmark_df = strategy_df.align(benchmark_df, join='left', axis=0)
 
-            # if necessary apply vol target to benchmark (to make it comparable with strategy)
+            # If necessary apply vol target to benchmark (to make it comparable with strategy)
             if br.portfolio_vol_adjust is True:
                 benchmark_df = risk_engine.calculate_vol_adjusted_index_from_prices(benchmark_df, br=br)
 
-            # only calculate return statistics if this has been specified (note when different frequencies of data
+            # Only calculate return statistics if this has been specified (note when different frequencies of data
             # might underrepresent vol
             # if calc_stats:
             benchmark_df = benchmark_df.fillna(method='ffill')
@@ -1331,7 +1334,7 @@ class TradingModel(object):
             if br.calc_stats:
                 benchmark_df.columns = ret_stats.summary()
 
-            # realign strategy & benchmark
+            # Realign strategy & benchmark
             strategy_benchmark_df = strategy_df.join(benchmark_df, how='inner')
             strategy_benchmark_df = strategy_benchmark_df.fillna(method='ffill')
 
@@ -1391,7 +1394,7 @@ class TradingModel(object):
     def strategy_components_pnl_ret_stats(self):
         return self._strategy_components_pnl_ret_stats
 
-    ### final strategy
+    ### Final strategy
     def strategy_pnl(self):
         return self._strategy_pnl
 
@@ -1401,21 +1404,21 @@ class TradingModel(object):
     def strategy_leverage(self):
         return self._strategy_leverage
 
-    ### final PNL strategy + benchmark
+    ### Final PNL strategy + benchmark
     def strategy_benchmark_pnl(self):
         return self._strategy_benchmark_pnl
 
     def strategy_benchmark_pnl_ret_stats(self):
         return self._strategy_benchmark_pnl_ret_stats
 
-    ### final PNL + group
+    ### Final PNL + group
     def strategy_group_pnl(self):
         return self._strategy_group_pnl
 
     def strategy_group_pnl_ret_stats(self):
         return self._strategy_group_pnl_ret_stats
 
-    ### final P&L + group + benchmark
+    ### Final P&L + group + benchmark
     def strategy_group_benchmark_pnl(self):
         return self._strategy_group_benchmark_pnl
 
@@ -1425,7 +1428,7 @@ class TradingModel(object):
     def strategy_group_leverage(self):
         return self._strategy_group_leverage
 
-    # signals
+    # Signals
     def strategy_signal(self):
         return self._strategy_signal
 
@@ -1738,7 +1741,7 @@ class TradingModel(object):
             yoy.append(col)
 
         calculations = Calculations()
-        ret_stats = calculations.pandas_outer_join(yoy)
+        ret_stats = calculations.join(yoy, how='outer')
         ret_stats.index = ret_stats.index.year
 
         ret_stats = self._strip_dataframe(ret_stats, strip)
@@ -1765,7 +1768,7 @@ class TradingModel(object):
         if not (silent_plot): chart.plot()
         return chart
 
-    ###### plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
+    ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
     def plot_strategy_signals(self, date=None, strip=None, silent_plot=False):
         self._plot_signal(self._strategy_signal, label="positions (% portfolio notional)", caption="Positions",
                           date=date, strip=strip, silent_plot=silent_plot)
@@ -1867,7 +1870,7 @@ class TradingModel(object):
         except:
             pass
 
-    #### grab signals for specific days
+    #### Grab signals for specific days
     def _grab_signals(self, strategy_signal, date=None, strip=None):
         if date is None:
             last_day = strategy_signal.iloc[-1].transpose().to_frame()
@@ -1878,7 +1881,8 @@ class TradingModel(object):
             last_day = []
 
             for d in date:
-                last_day.append(strategy_signal[d].transpose().to_frame())
+
+                last_day.append(strategy_signal.iloc[d].transpose().to_frame())
 
             last_day = pandas.concat(last_day, axis=1)
             last_day = last_day.sort_index(axis=1)
@@ -1942,7 +1946,6 @@ class TradingModel(object):
 
 class PortfolioModel(object):
     pass
-
 
 #######################################################################################################################
 
@@ -2093,7 +2096,7 @@ class RiskEngine(object):
 
         position_clip_adjustment = None
 
-        # adjust leverage of portfolio based on max NET position sizes
+        # Adjust leverage of portfolio based on max NET position sizes
         if br.max_net_exposure is not None:
             portfolio_net_exposure = portfolio_net_exposure.shift(br.position_clip_period_shift)
 
@@ -2104,11 +2107,11 @@ class RiskEngine(object):
 
             portfolio_abs_exposure = portfolio_net_exposure.abs()
 
-            # for those periods when the absolute net positioning is greater than our limit cut down the leverage
+            # For those periods when the absolute net positioning is greater than our limit cut down the leverage
             position_clip_adjustment[(portfolio_abs_exposure > br.max_net_exposure).values] = \
                 br.max_net_exposure / portfolio_abs_exposure
 
-        # adjust leverage of portfolio based on max TOTAL position sizes
+        # Adjust leverage of portfolio based on max TOTAL position sizes
         if br.max_abs_exposure is not None:
             portfolio_abs_exposure = portfolio_abs_exposure.shift(br.position_clip_period_shift)
 
@@ -2117,11 +2120,11 @@ class RiskEngine(object):
                                                         index=portfolio_abs_exposure.index,
                                                         columns=['Portfolio'])
 
-            # for those periods when the absolute TOTAL positioning is greater than our limit cut down the leverage
+            # For those periods when the absolute TOTAL positioning is greater than our limit cut down the leverage
             position_clip_adjustment[(portfolio_total_exposure > br.max_abs_exposure).values] = \
                 br.max_abs_exposure / portfolio_total_exposure
 
-        # only allow the position clip adjustment to change on certain days (eg. 'BM' = month end)
+        # Only allow the position clip adjustment to change on certain days (eg. 'BM' = month end)
         if br.position_clip_rebalance_freq is not None:
             calculations = Calculations()
             filter = Filter()

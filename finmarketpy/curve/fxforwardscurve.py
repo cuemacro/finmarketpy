@@ -41,7 +41,8 @@ class FXForwardsCurve(object):
                  base_depos_tenor=data_constants.base_depos_tenor,
                  roll_months=market_constants.fx_forwards_roll_months,
                  cum_index=market_constants.fx_forwards_cum_index,
-                 output_calculation_fields=market_constants.output_calculation_fields):
+                 output_calculation_fields=market_constants.output_calculation_fields,
+                 field='close'):
         """Initializes FXForwardsCurve
 
         Parameters
@@ -96,6 +97,8 @@ class FXForwardsCurve(object):
         self._cum_index = cum_index
         self._output_calcultion_fields = output_calculation_fields
 
+        self._field = field
+
     def generate_key(self):
         from findatapy.market.ioengine import SpeedCache
 
@@ -105,7 +108,7 @@ class FXForwardsCurve(object):
     def fetch_continuous_time_series(self, md_request, market_data_generator, fx_forwards_trading_tenor=None,
                                      roll_days_before=None, roll_event=None,
                                      construct_via_currency=None, fx_forwards_tenor_for_interpolation=None, base_depos_tenor=None,
-                                     roll_months=None, cum_index=None, output_calculation_fields=False):
+                                     roll_months=None, cum_index=None, output_calculation_fields=False, field=None):
 
         if market_data_generator is None: market_data_generator = self._market_data_generator
         if fx_forwards_trading_tenor is None: fx_forwards_trading_tenor = self._fx_forwards_trading_tenor
@@ -116,7 +119,8 @@ class FXForwardsCurve(object):
         if base_depos_tenor is None: base_depos_tenor = self._base_depos_tenor
         if roll_months is None: roll_months = self._roll_months
         if cum_index is None: cum_index = self._cum_index
-        if output_calculation_fields is None: output_calculation_fields
+        if output_calculation_fields is None: output_calculation_fields = self._output_calcultion_fields
+        if field is None: field = self._field
 
         # Eg. we construct EURJPY via EURJPY directly (note: would need to have sufficient forward data for this)
         if construct_via_currency == 'no':
@@ -131,7 +135,7 @@ class FXForwardsCurve(object):
             # should be fetched in correct convention
             md_request_download.tickers = [fx_conv.correct_notation(x) for x in md_request.tickers]
             md_request_download.category = 'fx-forwards-market'
-            md_request_download.fields = 'close'
+            md_request_download.fields = field
             md_request_download.abstract_curve = None
             md_request_download.fx_forwards_tenor = fx_forwards_tenor_for_interpolation
             md_request_download.base_depos_tenor = base_depos_tenor
@@ -145,7 +149,8 @@ class FXForwardsCurve(object):
                                                      fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation,
                                                      roll_months=roll_months,
                                                      cum_index=cum_index,
-                                                     output_calculation_fields=output_calculation_fields)
+                                                     output_calculation_fields=output_calculation_fields,
+                                                     field=field)
         else:
             # eg. we calculate via your domestic currency such as USD, so returns will be in your domestic currency
             # Hence AUDJPY would be calculated via AUDUSD and JPYUSD (subtracting the difference in returns)
@@ -169,7 +174,8 @@ class FXForwardsCurve(object):
                                      base_depos_tenor=base_depos_tenor,
                                      roll_months=roll_months, output_calculation_fields=False,
                                      cum_index=cum_index,
-                                     construct_via_currency='no')
+                                     construct_via_currency='no',
+                                     field=field)
 
                 terms_vals = self.fetch_continuous_time_series(md_request_terms, market_data_generator,
                                      fx_forwards_trading_tenor=fx_forwards_trading_tenor,
@@ -179,7 +185,8 @@ class FXForwardsCurve(object):
                                      roll_months=roll_months,
                                      cum_index=cum_index,
                                      output_calculation_fields=False,
-                                     construct_via_currency='no')
+                                     construct_via_currency='no',
+                                     field=field)
 
                 # Special case for USDUSD case (and if base or terms USD are USDUSD
                 if base + terms == construct_via_currency + construct_via_currency:
@@ -199,11 +206,11 @@ class FXForwardsCurve(object):
                 cross_rets.iloc[0] = 0
 
                 cross_vals = self._calculations.create_mult_index(cross_rets)
-                cross_vals.columns = [tick + '-forward-tot.close']
+                cross_vals.columns = [tick + '-forward-tot.' + field]
 
                 total_return_indices.append(cross_vals)
 
-            return self._calculations.pandas_outer_join(total_return_indices)
+            return self._calculations.join(total_return_indices, how='outer')
 
     def unhedged_asset_fx(self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None):
         pass
@@ -225,7 +232,8 @@ class FXForwardsCurve(object):
                                      roll_months=None,
                                      fx_forwards_tenor_for_interpolation=None,
                                      cum_index=None,
-                                     output_calculation_fields=False):
+                                     output_calculation_fields=None,
+                                     field=None):
 
         if not (isinstance(cross_fx, list)):
             cross_fx = [cross_fx]
@@ -236,6 +244,7 @@ class FXForwardsCurve(object):
         if roll_months is None: roll_months = self._roll_months
         if fx_forwards_tenor_for_interpolation is None: fx_forwards_tenor_for_interpolation = self._fx_forwards_tenor_for_interpolation
         if cum_index is None: cum_index = self._cum_index
+        if field is None: field = self._field
 
         total_return_index_df_agg = []
 
@@ -275,7 +284,7 @@ class FXForwardsCurve(object):
                 # Get first delivery date
                 delivery_date.append(
                     self._calendar.get_delivery_date_from_horizon_date(horizon_date[0],
-                                                                       fx_forwards_trading_tenor, cal=cross, asset_class='fx')[0])
+                        fx_forwards_trading_tenor, cal=cross, asset_class='fx')[0])
 
                 # For first month want it to expire within that month (for consistency), hence month_adj=0 ONLY here
                 roll_date.append(get_roll_date(horizon_date[0], delivery_date[0], asset_holidays, month_adj=0))
@@ -306,7 +315,7 @@ class FXForwardsCurve(object):
                         roll_date.append(roll_date[i-1])
 
                 interpolated_forward = fx_forwards_pricer.price_instrument(cross, horizon_date, delivery_date, market_df=forwards_market_df,
-                         fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation)[cross + '-interpolated-outright-forward.close'].values
+                         fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation)[cross + '-interpolated-outright-forward.' + field].values
 
                 # To record MTM prices
                 mtm = np.copy(interpolated_forward)
@@ -323,7 +332,7 @@ class FXForwardsCurve(object):
                         mtm[i] = fx_forwards_pricer.price_instrument(cross, horizon_date[i], delivery_date[i-1],
                             market_df=forwards_market_df,
                             fx_forwards_tenor_for_interpolation=fx_forwards_tenor_for_interpolation) \
-                                [cross + '-interpolated-outright-forward.close'].values
+                                [cross + '-interpolated-outright-forward.' + field].values
                     # else:
                     #    mtm[i] = interpolated_forward[i]
 
@@ -341,17 +350,17 @@ class FXForwardsCurve(object):
                 elif cum_index == 'add':
                     cum_rets = 100 + 100 * np.cumsum(forward_rets)
 
-                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot.close"])
-                total_return_index_df[cross + "-forward-tot.close"] = cum_rets
+                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot." + field])
+                total_return_index_df[cross + "-forward-tot." + field] = cum_rets
 
                 if output_calculation_fields:
-                    total_return_index_df[cross + '-interpolated-outright-forward.close'] = interpolated_forward
+                    total_return_index_df[cross + '-interpolated-outright-forward.' + field] = interpolated_forward
                     total_return_index_df[cross + '-mtm.close'] = mtm
                     total_return_index_df[cross + '-roll.close'] = new_trade
                     total_return_index_df[cross + '.roll-date'] = roll_date
                     total_return_index_df[cross + '.delivery-date'] = delivery_date
-                    total_return_index_df[cross + '-forward-return.close'] = forward_rets
+                    total_return_index_df[cross + '-forward-return.' + field] = forward_rets
 
                 total_return_index_df_agg.append(total_return_index_df)
 
-        return self._calculations.pandas_outer_join(total_return_index_df_agg)
+        return self._calculations.join(total_return_index_df_agg, how='outer')

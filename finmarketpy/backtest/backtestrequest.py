@@ -39,6 +39,8 @@ class BacktestRequest(MarketDataRequest):
         self.__plot_interim = False
         self.__include_benchmark = False
 
+        self.__trading_field = 'close'
+
         self.__tech_params = TechParams()
 
         # default parameters for portfolio level vol adjustment
@@ -131,6 +133,12 @@ class BacktestRequest(MarketDataRequest):
 
     @include_benchmark.setter
     def include_benchmark(self, include_benchmark): self.__include_benchmark = include_benchmark
+    
+    @property
+    def trading_field(self): return self.__trading_field
+
+    @trading_field.setter
+    def trading_field(self, trading_field): self.__trading_field = trading_field
 
     ##### properties for portfolio level volatility adjustment
     @property

@@ -131,6 +131,8 @@ class MarketConstants(object):
     fx_options_solver = 'nelmer-mead-numba'
     fx_options_pricing_engine = 'financepy' # 'financepy' or 'finmarketpy'
 
+    fx_options_tol = 1e-8
+
     # overwrite field variables with those listed in MarketCred
     def __init__(self):
         try:

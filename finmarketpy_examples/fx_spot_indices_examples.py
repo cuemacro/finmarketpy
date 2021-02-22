@@ -76,7 +76,7 @@ if run_example == 1 or run_example == 0:
     # Combine into a single data frame and plot, we note that the Cuemacro constructed indices track the Bloomberg
     # indices relatively well (both from spot and 1M forwards). Also note the large difference with spot indices
     # CAREFUL to fill down, before reindexing because 1M forwards indices are likely to have different publishing dates
-    df = calculations.pandas_outer_join([df_tot, df_bbg_tot, df_spot, df_bbg_tot_forwards]).fillna(method='ffill')
+    df = calculations.join([df_tot, df_bbg_tot, df_spot, df_bbg_tot_forwards], how='outer').fillna(method='ffill')
     df = calculations.create_mult_index_from_prices(df)
 
     chart.plot(df)
@@ -136,7 +136,7 @@ if run_example == 2 or run_example == 0:
     df_intraday_tot.columns = [x + '-intraday-tot' for x in df_intraday_spot.columns]
 
     # Combine into a single data frame and plot
-    df = calculations.pandas_outer_join([df_bbg_tot, df_tot, df_intraday_tot, df_intraday_spot]).fillna(method='ffill')
+    df = calculations.join([df_bbg_tot, df_tot, df_intraday_tot, df_intraday_spot], how='outer').fillna(method='ffill')
     df = calculations.create_mult_index_from_prices(df)
 
     chart.plot(df)

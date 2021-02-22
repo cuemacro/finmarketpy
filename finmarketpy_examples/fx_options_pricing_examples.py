@@ -13,7 +13,8 @@ __author__ = 'saeedamen'
 #
 
 """
-Shows how to use finmarketpy to price FX options (uses FinancePy underneath).
+Shows how to use finmarketpy to price FX options (uses FinancePy underneath - it is recommended you pull the latest
+version of FinancePy from GitHub).
 
 Note, you will need to have a Bloomberg terminal (with blpapi Python library) to download the FX market data in order
 to plot these vol surface (FX spot, FX forwards, FX implied_vol volatility quotes and deposits)
@@ -29,6 +30,7 @@ from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
 
 from findatapy.util.loggermanager import LoggerManager
 
+from finmarketpy.curve.rates.fxforwardspricer import FXForwardsPricer
 from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface
 from finmarketpy.curve.volatility.fxoptionspricer import FXOptionsPricer
 
@@ -44,8 +46,9 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 4 - more pricing of AUDUSD options
 # run_example = 5 - pricing of EURUSD options
 # run_example = 6 - another USDJPY option
+# run_example = 7 - price USDBRL options
 
-run_example = 6
+run_example = 7
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Construct volatility surface using FinancePy library underneath, using polynomial interpolation and
@@ -115,7 +118,7 @@ if run_example == 2 or run_example == 0:
                                  tenor='3M', depo_tenor='3M').to_string())
 
     print("10d 1M european put")
-    print(fx_op.price_instrument(cross, horizon_date, '10d-put', contract_type='european-put',
+    print(fx_op.price_instrument(cross, horizon_date, '10d-otm', contract_type='european-put',
                                  tenor='1M', depo_tenor='1M').to_string())
 
 ###### Fetch market data for pricing AUDUSD options on 18 Apr 2007, just before credit crisis
@@ -159,6 +162,7 @@ if run_example == 4 or run_example == 0:
     df = market.fetch_market(md_request)
 
     fx_vol_surface = FXVolSurface(market_df=df, asset=cross, tenors=['1W', '1M', '3M'])
+    fx_vol_surface.build_vol_surface(pd.Timestamp(horizon_date))
 
     fx_op = FXOptionsPricer(fx_vol_surface=fx_vol_surface)
 
@@ -167,6 +171,7 @@ if run_example == 4 or run_example == 0:
     # Try a broken date 15D option (note, for broken dates, currently doesn't interpolate key strikes)
     # Specify expiry date instead of the tenor for broken dates
     print("atm 15D european call")
+
     print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 0.8535,
             expiry_date=pd.Timestamp('05 Sep 2007'), contract_type='european-call').to_string())
 
@@ -230,3 +235,42 @@ if run_example == 6 or run_example == 0:
     print("atm 1W european straddle")
     print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 'atm',
             tenor="1W", depo_tenor='1W', contract_type='european-straddle').to_string())
+
+
+###### Price USDBRL option around 2018 2nd round of presidential election
+if run_example == 7 or run_example == 0:
+
+    horizon_date = '26 Oct 2018'
+    cross = 'USDBRL'
+    non_usd = 'BRL'
+
+    # Download the whole all market data for USDBRL for pricing options (vol surface)
+    md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
+                                   data_source='bloomberg', cut='NYC', category='fx-vol-market',
+                                   tickers=cross, base_depos_currencies=[cross[0:3]],
+                                   cache_algo='cache_algo_return')
+
+    df = market.fetch_market(md_request)
+
+    # Compute implied deposit BRL 1M from USDBRL forwards (and USD 1M depo)
+    fx_forwards_price = FXForwardsPricer()
+
+    implied_depo_df = fx_forwards_price.calculate_implied_depo(cross, non_usd, market_df=df,
+                               fx_forwards_tenor=['1W', '1M'],
+                               depo_tenor=['1W', '1M'])
+
+    implied_depo_df.columns = [x.replace('-implied-depo', '') for x in implied_depo_df.columns]
+    df = df.join(implied_depo_df, how='left')
+
+    # USDBRL quoted ATMF implied vol (as opposed to delta neutral) hence 'fwd' parameter
+    fx_op = FXOptionsPricer(fx_vol_surface=FXVolSurface(market_df=df, asset=cross, atm_method='fwd', depo_tenor='1M'))
+
+    # Price several different options
+    print(df)
+
+    print("atm 1M european put")
+    print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 'atm', contract_type='european-put', tenor='1M').to_string())
+
+    # TODO: calendar around election results in slightly different pricing
+    # print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), '25d-otm', contract_type='european-put', tenor='1W').to_string())
+    # print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 3.5724, contract_type='european-put', expiry_date=pd.Timestamp('2 Nov 2018')).to_string())

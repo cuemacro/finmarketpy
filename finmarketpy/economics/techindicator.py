@@ -336,7 +336,7 @@ class TechIndicator(object):
                 df.append(true_range)
 
             calc = Calculations()
-            true_range = calc.pandas_outer_join(df)
+            true_range = calc.join(df, how='outer')
 
             self._techind = true_range.rolling(
                 window=tech_params.atr_period, center=False).mean()
@@ -378,7 +378,7 @@ class TechIndicator(object):
                 df.append(vwap)
 
             calc = Calculations()
-            vwap = calc.pandas_outer_join(df)
+            vwap = calc.join(df, how='outer')
 
             self._techind = vwap
 

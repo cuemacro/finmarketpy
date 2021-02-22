@@ -296,7 +296,7 @@ class TradeAnalysis(object):
                 port_list.append(port)
                 ret_stats_list.append(ret_stats)
 
-        port_list = Calculations().pandas_outer_join(port_list)
+        port_list = Calculations().join(port_list, how='outer')
 
         # reset the parameters of the strategy
         trading_model.br = trading_model.load_parameters()
@@ -421,15 +421,15 @@ class TradeAnalysis(object):
         trading_model.construct_strategy()
         pnl = trading_model.strategy_pnl()
 
-        # get seasonality by day of the month
+        # Get seasonality by day of the month
         pnl = pnl.resample('B').mean()
-        rets = calculations.calculate_returns(pnl)
+        rets = calculations.calculate_returns(pnl).tz_localize(None)
 
         bus_day = seas.bus_day_of_month_seasonality(rets, add_average=True, resample_freq=resample_freq)
 
-        # get seasonality by month
+        # Get seasonality by month
         pnl = pnl.resample('BM').mean()
-        rets = calculations.calculate_returns(pnl)
+        rets = calculations.calculate_returns(pnl).tz_localize(None)
         month = seas.monthly_seasonality(rets)
 
         logger.info("About to plot seasonality...")

@@ -46,7 +46,8 @@ class FXOptionsPricer(AbstractPricer):
 
     def price_instrument(self, cross, horizon_date, strike, expiry_date=None, vol=None, notional=1000000,
                          contract_type='european-call', tenor=None,
-                         fx_vol_surface=None, premium_output=None, delta_output=None, depo_tenor=None, return_as_df=True):
+                         fx_vol_surface=None, premium_output=None, delta_output=None, depo_tenor=None, use_atm_quoted=False,
+                         return_as_df=True):
         """Prices FX options for horizon dates/expiry dates given by the user from FX spot rates, FX volatility surface
         and deposit rates.
 
@@ -58,11 +59,51 @@ class FXOptionsPricer(AbstractPricer):
         horizon_date : DateTimeIndex
             Horizon dates for options
 
-        expiry_date : DateTimeIndex
-            expiry dates for options
+        strike : np.ndarray, float or str
+            Strike of option
 
-        market_df : DataFrame
-            Contains FX spot, FX vol surface quotes, FX forwards and base depos
+            eg. 'atm' - at-the-money
+            eg. 'atmf' - at-the-money forward
+            eg. 'atms' - at-the-money spot
+            eg. '25d-otm' - out-of-the-money 25d
+            eg. '10d-otm
+
+        expiry_date : DateTimeIndex (optional)
+            Expiry dates for options
+
+        vol : np.ndarray (optional)
+            Umplied vol for options
+
+        notional : float
+            Notional in base currency of the option
+
+        contract_type : str
+            What type of option are we pricing?
+
+            eg. 'european-call'
+
+        tenor : str (optional)
+            Tenor of option
+
+        fx_vol_surface : FXVolSurface
+            Interpolates FX vol surface
+
+        premium_output : str
+            'pct-for' (in base currency pct) or 'pct-dom' (in terms currency pct)
+
+        delta_output : bool
+            Also output delta of options
+
+        depo_tenor : str
+            Tenor of the deposit to use in the option pricing
+
+        use_atm_quoted : bool
+            True - takes the direct market quote
+            False - uses interpolated version
+
+        return_as_df : bool
+            True - returns output as DataFrame
+            False - returns output as np.ndarray
 
         Returns
         -------
@@ -137,8 +178,11 @@ class FXOptionsPricer(AbstractPricer):
                     # Take the vol directly quoted, rather than getting it from building vol surface
                     if strike[i] == 'atm':
                         strike[i] = fx_vol_surface.get_atm_strike(tenor)
-                        vol[i] = fx_vol_surface.get_atm_quoted_vol(tenor) / 100.0
-                        # vol[i] = fx_vol_surface.get_atm_vol(tenor) / 100.0 # interpolated
+
+                        if use_atm_quoted:
+                            vol[i] = fx_vol_surface.get_atm_quoted_vol(tenor) / 100.0
+                        else:
+                            vol[i] = fx_vol_surface.get_atm_vol(tenor) / 100.0 # interpolated
                     elif strike[i] == 'atms':
                         strike[i] = fx_vol_surface.get_spot() # Interpolate vol later
                     elif strike[i] == 'atmf':
@@ -148,13 +192,17 @@ class FXOptionsPricer(AbstractPricer):
                                     / self._fx_forwards_pricer.get_forwards_divisor(cross[3:6]))
 
                         # Interpolate vol later
+
+                    # TODO: work on 25d and 10d strikes
                     elif strike[i] == '25d-otm':
                         if 'call' in contract_type_:
                             strike[i] = fx_vol_surface.get_25d_call_strike(tenor)
+
                             vol[i] = fx_vol_surface.get_25d_call_vol(tenor) / 100.0
                         elif 'put' in contract_type_:
                             strike[i] = fx_vol_surface.get_25d_put_strike(tenor)
                             vol[i] = fx_vol_surface.get_25d_put_vol(tenor) / 100.0
+
                     elif strike[i] == '10d-otm':
                         if 'call' in contract_type_:
                             strike[i] = fx_vol_surface.get_10d_call_strike(tenor)

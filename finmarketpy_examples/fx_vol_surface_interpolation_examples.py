@@ -41,7 +41,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 4 - get implied vol for a particular strike, interpolating the surface
 # run_example = 5 - get USDJPY vol surface around US presidential election and plot
 
-run_example = 3
+run_example = 2
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Show how to plot ATM 1M implied_vol vol time series
@@ -83,7 +83,7 @@ if run_example == 2 or run_example == 0:
 
     # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance in FinancePy
     # FinFXVolSurface.buildVolSurface method to get it to fill, or choose different vol_function_type (eg. 'CLARK5')
-    df_vol_dict = fx_vol_surface.extract_vol_surface()
+    df_vol_dict = fx_vol_surface.extract_vol_surface(low_K_pc=0.80, high_K_pc=1.1)
 
     # Print out the various vol surface and data produced
     print(df_vol_dict['vol_surface_implied_pdf'])

@@ -64,7 +64,7 @@ def prepare_indices(cross, df_option_tot=None, df_option_tc=None, df_spot_tot=No
     if df_spot_tot is not None:
         df_list.append(df_spot_tot)
 
-    df = calculations.pandas_outer_join(df_list).fillna(method='ffill')
+    df = calculations.join(df_list, how='outer').fillna(method='ffill')
 
     return calculations.create_mult_index_from_prices(df)
 
@@ -86,14 +86,26 @@ if run_example == 1 or run_example == 0:
                                    tickers=cross, fx_vol_tenor=['1W', '1M', '3M'],
                                    cache_algo='cache_algo_return', base_depos_currencies=[cross[0:3], cross[3:6]])
 
-    df = market.fetch_market(md_request)
-    df = df.fillna(method='ffill')
+    df_vol_market = market.fetch_market(md_request)
+    df_vol_market = df_vol_market.fillna(method='ffill')
 
     # Remove New Year's Day and Christmas
-    df = Filter().filter_time_series_by_holidays(df, cal='FX')
+    df_vol_market = Filter().filter_time_series_by_holidays(df_vol_market, cal='FX')
+
+    # Get a total return index for trading spot
+    # This way we can take into account carry when calculating delta hedging P&L
+    md_request = MarketDataRequest(start_date=start_date, finish_date=finish_date,
+                                   data_source='bloomberg', cut='NYC', category='fx-tot',
+                                   tickers=cross,
+                                   cache_algo='cache_algo_return')
+
+    df_tot = market.fetch_market(md_request)
+
+    df_vol_market = df_vol_market.join(df_tot, how='left')
+    df_vol_market = df_vol_market.fillna(method='ffill')
 
     # We want to roll long 1M ATM call at expiry
-    # We'll mark to market the price through the month by interpolating between 1W and 1M (and using whole vol curve
+    # We'll mark to market the option price through the month by interpolating between 1W and 1M (and using whole vol curve
     # at each tenor)
     fx_options_curve = FXOptionsCurve(fx_options_trading_tenor=fx_options_trading_tenor,
         roll_days_before=0,
@@ -104,32 +116,27 @@ if run_example == 1 or run_example == 0:
         contract_type='european-call',
         depo_tenor_for_option='1M',
         position_multiplier=1.0,
+        tot_label='tot',
         output_calculation_fields=True)
 
     # Let's trade a long 1M call, and we roll at expiry
-    df_cuemacro_option_call_tot = fx_options_curve.construct_total_return_index(cross, df)
+    df_cuemacro_option_call_tot = fx_options_curve.construct_total_return_index(cross, df_vol_market)
 
     # Add transaction costs to the option index (bid/ask bp for the option premium and spot FX)
-    df_cuemacro_option_call_tc = fx_options_curve.apply_tc_to_total_return_index(cross, df_cuemacro_option_call_tot,
+    df_cuemacro_option_call_tc = fx_options_curve.apply_tc_signals_to_total_return_index(cross, df_cuemacro_option_call_tot,
                                                                             option_tc_bp=5, spot_tc_bp=2)
 
     # Let's trade a long 1M OTM put, and we roll at expiry
     df_cuemacro_option_put_tot = fx_options_curve.construct_total_return_index(
-        cross, df, contract_type='european-put', strike='10d-otm', position_multiplier=1.0)
+        cross, df_vol_market, contract_type='european-put', strike='10d-otm', position_multiplier=1.0)
 
     # Add transaction costs to the option index (bid/ask bp for the option premium and spot FX)
-    df_cuemacro_option_put_tc = fx_options_curve.apply_tc_to_total_return_index(cross, df_cuemacro_option_put_tot,
+    df_cuemacro_option_put_tc = fx_options_curve.apply_tc_signals_to_total_return_index(cross, df_cuemacro_option_put_tot,
                                                                                  option_tc_bp=5, spot_tc_bp=2)
 
 
     # Get total returns for spot
-    md_request.abstract_curve = None
-
-    # Get Bloomberg calculated total return indices (for spot)
-    md_request.category = 'fx-tot'
-    md_request.cut = 'NYC'
-
-    df_bbg_tot = market.fetch_market(md_request)
+    df_bbg_tot = df_tot # from earlier!
     df_bbg_tot.columns = [x + '-bbg' for x in df_bbg_tot.columns]
 
     # Calculate a hedged portfolio of spot + 2*options (can we reduce drawdowns?)
@@ -137,27 +144,35 @@ if run_example == 1 or run_example == 0:
 
     ret_stats = RetStats()
 
-    df_hedged = calculations.pandas_outer_join([df_bbg_tot[cross + '-tot.close-bbg'].to_frame(), df_cuemacro_option_put_tc[cross + '-option-tot-with-tc.close'].to_frame()])
+    df_hedged = calculations.join([df_bbg_tot[cross + '-tot.close-bbg'].to_frame(), df_cuemacro_option_put_tc[cross + '-option-tot-with-tc.close'].to_frame()], how='outer')
     df_hedged = df_hedged.fillna(method='ffill')
     df_hedged = df_hedged.pct_change()
 
-    df_hedged['Spot + 2*option hedge'] = df_hedged[cross + '-tot.close-bbg'] + df_hedged[cross + '-option-tot-with-tc.close']
+    df_hedged['Spot + 2*option put hedge'] = df_hedged[cross + '-tot.close-bbg'] + df_hedged[cross + '-option-tot-with-tc.close']
 
     df_hedged.columns = RetStats(returns_df=df_hedged, ann_factor=252).summary()
 
     # Plot everything
+
+    # P&L from call
     chart.plot(calculations.create_mult_index_from_prices(
         prepare_indices(cross=cross, df_option_tot=df_cuemacro_option_call_tot,
                         df_option_tc=df_cuemacro_option_call_tc, df_spot_tot=df_bbg_tot)))
 
+    # P&L from put option, put option + TC and total returns from spot
     chart.plot(calculations.create_mult_index_from_prices(
         prepare_indices(cross=cross,df_option_tot=df_cuemacro_option_put_tot,
                         df_option_tc=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))
 
+    # P&L from put option + TC and total returns from spot
     chart.plot(calculations.create_mult_index_from_prices(
-        prepare_indices(cross=cross,df_option_tc=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))
+        prepare_indices(cross=cross, df_option_tc=df_cuemacro_option_put_tc, df_spot_tot=df_bbg_tot)))
 
+    # P&L for total returns from spot and total returns from + 2*put option + TC (ie. hedged portfolio)
     chart.plot(calculations.create_mult_index(df_hedged))
+
+    # Plot delta from put option
+    chart.plot(df_cuemacro_option_put_tot[cross + '-delta.close'])
 
 
 ###### Fetch market data for pricing EURUSD options from 2006-2020 (ie. FX spot, FX forwards, FX deposits and FX vol quotes)

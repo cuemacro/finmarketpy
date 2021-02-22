@@ -286,7 +286,7 @@ class FXOptionsCurve(object):
 
                 total_return_indices.append(cross_vals)
 
-            return self._calculations.pandas_outer_join(total_return_indices)
+            return self._calculations.join(total_return_indices, how='outer')
 
     def unhedged_asset_fx(self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None):
         pass
@@ -667,10 +667,11 @@ class FXOptionsCurve(object):
 
                 total_return_index_df_agg.append(total_return_index_df)
 
-        return self._calculations.pandas_outer_join(total_return_index_df_agg)
+        return self._calculations.join(total_return_index_df_agg, how='outer')
 
-    def apply_tc_to_total_return_index(self, cross_fx, total_return_index_orig_df, option_tc_bp, spot_tc_bp, cum_index=None):
+    def apply_tc_signals_to_total_return_index(self, cross_fx, total_return_index_orig_df, option_tc_bp, spot_tc_bp, signal_df=None, cum_index=None):
 
+        # TODO signal not implemented yet
         if cum_index is None: cum_index = self._cum_index
 
         total_return_index_df_agg = []
@@ -719,7 +720,7 @@ class FXOptionsCurve(object):
 
             total_return_index_df_agg.append(total_return_index_df)
 
-        return self._calculations.pandas_outer_join(total_return_index_df_agg)
+        return self._calculations.join(total_return_index_df_agg, how='outer')
 
 
 

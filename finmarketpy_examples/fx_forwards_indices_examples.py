@@ -108,9 +108,9 @@ if run_example == 1 or run_example == 0:
     # Combine into a single data frame and plot, we note that the Cuemacro constructed indices track the Bloomberg
     # indices relatively well (both from spot and forwards). Also note the large difference with spot indices
     # CAREFUL to fill down, before reindexing because forwards indices are likely to have different publishing dates
-    df = calculations.pandas_outer_join([pd.DataFrame(df_cuemacro_tot_1M[cross + '-forward-tot-1M-cuemacro.close']),
+    df = calculations.join([pd.DataFrame(df_cuemacro_tot_1M[cross + '-forward-tot-1M-cuemacro.close']),
                                          pd.DataFrame(df_cuemacro_tot_3M[cross + '-forward-tot-3M-cuemacro.close']),
-                                         df_bbg_tot, df_spot, df_bbg_tot_forwards]).fillna(method='ffill')
+                                         df_bbg_tot, df_spot, df_bbg_tot_forwards], how='outer').fillna(method='ffill')
 
     df = calculations.create_mult_index_from_prices(df)
 
@@ -171,8 +171,8 @@ if run_example == 2 or run_example == 0:
     # Combine into a single data frame and plot, we note that the Cuemacro constructed indices track the Bloomberg
     # indices relatively well (both from spot and forwards). Also note the large difference with spot indices
     # CAREFUL to fill down, before reindexing because forwards indices are likely to have different publishing dates
-    df = calculations.pandas_outer_join([pd.DataFrame(df_cuemacro_tot_1M[cross + '-forward-tot-1M-cuemacro.close']),
-                                         df_bbg_tot, df_spot, df_bbg_tot_forwards]).fillna(method='ffill')
+    df = calculations.join([pd.DataFrame(df_cuemacro_tot_1M[cross + '-forward-tot-1M-cuemacro.close']),
+                                         df_bbg_tot, df_spot, df_bbg_tot_forwards], how='outer').fillna(method='ffill')
 
     df = calculations.create_mult_index_from_prices(df)
 

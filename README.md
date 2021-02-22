@@ -167,6 +167,14 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 22 Feb 2021
+  * Fix bug when plotting IR of strategies
+* 16 Feb 2021
+  * Added total returns in example for options indices construction
+* 11 Feb 2021
+  * Refactored to use join from Calculations instead of pandas_outer_join
+  * Allowed backtesting by fields other than close
+  * Customize strike range for extracting FX vol surface
 * 22 Jan 2021
   * FX spot total returns now supports intraday data and added example
   * Fixed problem with Numba implementation of FX spot total returns

@@ -91,5 +91,8 @@ class AbstractVolSurface(ABC):
     def _get_tenor_index(self, tenor):
         return self._tenors.index(tenor)
 
+    def _get_tenor_expiry(self, tenor):
+        return
+
     def _findate(self, date):
         return FinDate(date.day, date.month, date.year)

@@ -68,16 +68,17 @@ if run_example == 1 or run_example == 0:
 if run_example == 2 or run_example == 0:
 
     horizon_date = '23 Jun 2016'
+    cross = 'GBPUSD'
 
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
     md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
                                    data_source='bloomberg', cut='LDN', category='fx-vol-market',
-                                   tickers=['GBPUSD'],
+                                   tickers=cross,
                                    cache_algo='cache_algo_return')
 
     df = market.fetch_market(md_request)
 
-    fx_vol_surface = FXVolSurface(market_df=df, vol_function_type='BBG', asset='GBPUSD')
+    fx_vol_surface = FXVolSurface(market_df=df, vol_function_type='BBG', asset=cross)
 
     fx_vol_surface.build_vol_surface(horizon_date)
 

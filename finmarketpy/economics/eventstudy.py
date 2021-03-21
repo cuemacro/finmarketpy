@@ -13,7 +13,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 import math
-
+import numpy as np
 from pandas.tseries.offsets import CustomBusinessDay
 
 from findatapy.timeseries import Calculations, Timezone, Filter, Calendar
@@ -28,8 +28,7 @@ class EventStudy(object):
         return
 
     def get_economic_event_ret_over_custom_event_day(self, data_frame_in, event_dates, name, event, start, end,
-                                                     lagged=False,
-                                                     NYC_cutoff=10):
+                                                     lagged=False, NYC_cutoff=10):
 
         filter = Filter()
         event_dates = filter.filter_time_series_by_date(start, end, event_dates)
@@ -46,7 +45,7 @@ class EventStudy(object):
 
         event_dates = calendar.floor_date(event_dates)
 
-        # realised is traditionally on later day eg. 3rd Jan realised ON is 2nd-3rd Jan realised
+        # Realised is traditionally on later day eg. 3rd Jan realised ON is 2nd-3rd Jan realised
         # so if Fed meeting is on 2nd Jan later, then we need realised labelled on 3rd (so minus a day)
         # implied_vol expires on next day eg. 3rd Jan implied_vol ON is 3rd-4th Jan implied_vol
 
@@ -62,9 +61,32 @@ class EventStudy(object):
 
         return data_frame_events
 
+    def get_daily_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
+                                             day_start=20, days=20, day_offset=0, create_index=False,
+                                             resample=False, cumsum=True, adj_cumsum_zero_point=False,
+                                             adj_zero_point=2):
+
+        return self.get_intraday_moves_over_custom_event(data_frame_rets, ef_time_frame, vol=vol,
+                                                         minute_start=day_start, mins=days, min_offset=day_offset,
+                                                         create_index=create_index, resample=resample, freq='days',
+                                                         cumsum=cumsum, adj_cumsum_zero_point=adj_cumsum_zero_point,
+                                                         adj_zero_point=adj_zero_point)
+
+    def get_weekly_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
+                                             day_start=20, days=20, day_offset=0, create_index=False,
+                                             resample=False, cumsum=True, adj_cumsum_zero_point=False,
+                                             adj_zero_point=2):
+
+        return self.get_intraday_moves_over_custom_event(data_frame_rets, ef_time_frame, vol=vol,
+                                                         minute_start=day_start, mins=days, min_offset=day_offset,
+                                                         create_index=create_index, resample=resample, freq='weeks',
+                                                         cumsum=cumsum, adj_cumsum_zero_point=adj_cumsum_zero_point,
+                                                         adj_zero_point=adj_zero_point)
+
     def get_intraday_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
                                              minute_start=5, mins=3 * 60, min_offset=0, create_index=False,
-                                             resample=False, freq='minutes', cumsum=True):
+                                             resample=False, freq='minutes', cumsum=True, adj_cumsum_zero_point=False,
+                                             adj_zero_point=2):
 
         filter = Filter()
 
@@ -78,45 +100,75 @@ class EventStudy(object):
             ann_factor = 252 * 1440
         elif freq == 'days':
             ef_time = ef_time_frame.index.normalize()
-            ef_time_start = ef_time - timedelta(days=minute_start)
-            ef_time_end = ef_time + timedelta(days=mins)
+            ef_time_start = ef_time - pandas.tseries.offsets.BusinessDay() * minute_start
+            ef_time_end = ef_time + pandas.tseries.offsets.BusinessDay() * mins
             ann_factor = 252
+        elif freq == 'weeks':
+            ef_time = ef_time_frame.index.normalize()
+            ef_time_start = ef_time - pandas.tseries.offsets.Week() * minute_start
+            ef_time_end = ef_time + pandas.tseries.offsets.Week() * mins
+            ann_factor = 52
 
-        ords = range(-minute_start + min_offset, mins + min_offset)
+        ords = list(range(-minute_start + min_offset, mins + min_offset))
+        lst_ords = list(ords)
 
-        # all data needs to be equally spaced
+        # All data needs to be equally spaced
         if resample:
             # make sure time series is properly sampled at 1 min intervals
-            data_frame_rets = data_frame_rets.resample('1min')
-            data_frame_rets = data_frame_rets.fillna(value=0)
-            data_frame_rets = filter.remove_out_FX_out_of_hours(data_frame_rets)
+            if freq == 'minutes':
+                data_frame_rets = data_frame_rets.resample('1min').last()
+                data_frame_rets = data_frame_rets.fillna(value=0)
+                data_frame_rets = filter.remove_out_FX_out_of_hours(data_frame_rets)
+            elif freq == 'daily':
+                data_frame_rets = data_frame_rets.resample('B').last()
+                data_frame_rets = data_frame_rets.fillna(value=0)
+            elif freq == 'daily':
+                data_frame_rets = data_frame_rets.resample('W').last()
+                data_frame_rets = data_frame_rets.fillna(value=0)
 
-        data_frame_rets['Ind'] = numpy.nan
+        # data_frame_rets['Ind'] = numpy.nan
 
         start_index = data_frame_rets.index.searchsorted(ef_time_start)
         finish_index = data_frame_rets.index.searchsorted(ef_time_end)
 
-        # not all observation windows will be same length (eg. last one?)
+        # Not all observation windows will be same length (eg. last one?)
 
-        # fill the indices which represent minutes
-        # TODO vectorise this!
+        # # fill the indices which represent minutes
+        # # TODO vectorise this!
+        # for i in range(0, len(ef_time_frame.index)):
+        #     try:
+        #         data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords
+        #     except:
+        #         data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords[0:(finish_index[i] - start_index[i])]
+        #
+        # data_frame_rets['Rel'] = numpy.nan
+        #
+        # # Set the release dates
+        # data_frame_rets['Rel'][start_index] = ef_time  # set entry points
+        # data_frame_rets['Rel'][finish_index + 1] = numpy.zeros(len(start_index))  # set exit points
+        # data_frame_rets['Rel'] = data_frame_rets['Rel'].fillna(method='pad')  # fill down signals
+        #
+        # data_frame_rets = data_frame_rets[pandas.notnull(data_frame_rets['Ind'])]  # get rid of other
+        #
+        # data_frame = data_frame_rets.pivot(index='Ind',
+        #                                    columns='Rel', values=data_frame_rets.columns[0])
+
+        data_frame = pandas.DataFrame(index=ords, columns=ef_time_frame.index)
+
         for i in range(0, len(ef_time_frame.index)):
-            try:
-                data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords
-            except:
-                data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords[0:(finish_index[i] - start_index[i])]
+            #try:
+                vals = data_frame_rets.iloc[start_index[i]:finish_index[i]].values
 
-        data_frame_rets['Rel'] = numpy.nan
+                print(vals.size)
 
-        # Set the release dates
-        data_frame_rets['Rel'][start_index] = ef_time  # set entry points
-        data_frame_rets['Rel'][finish_index + 1] = numpy.zeros(len(start_index))  # set exit points
-        data_frame_rets['Rel'] = data_frame_rets['Rel'].fillna(method='pad')  # fill down signals
+                if len(vals) < len(lst_ords):
+                    extend = np.zeros((len(lst_ords) - len(vals), 1)) * np.nan
+                    vals = np.append(vals, extend)
 
-        data_frame_rets = data_frame_rets[pandas.notnull(data_frame_rets['Ind'])]  # get rid of other
+                data_frame[ef_time_frame.index[i]] = vals
 
-        data_frame = data_frame_rets.pivot(index='Ind',
-                                           columns='Rel', values=data_frame_rets.columns[0])
+            #except:
+            #    data_frame_rets['Ind'][start_index[i]:finish_index[i]] = ords[0:(finish_index[i] - start_index[i])]
 
         data_frame.index.names = [None]
 
@@ -126,10 +178,18 @@ class EventStudy(object):
             data_frame = calculations.create_mult_index(data_frame)
         else:
             if vol is True:
-                # annualise (if vol)
+                # Annualise (if vol)
                 data_frame = data_frame.rolling(center=False, window=5).std() * math.sqrt(ann_factor)
             elif cumsum:
+
                 data_frame = data_frame.cumsum()
+
+                # Adjust DataFrame so zero point shows zero returns
+                if adj_cumsum_zero_point:
+                    ind = abs(minute_start) - adj_zero_point
+
+                    for i, c in enumerate(data_frame.columns):
+                        data_frame[c] = data_frame[c] - data_frame[c].values[ind]
 
         return data_frame
 
@@ -426,7 +486,7 @@ class EventsFactory(EventStudy):
         # TODO
         pass
 
-    # return only US events etc. by dates
+    # Return only US events etc. by dates
     def get_intraday_moves_over_event(self, data_frame_rets, cross, event_fx, event_name, start, end, vol, mins=3 * 60,
                                       min_offset=0, create_index=False, resample=False, freq='minutes'):
 

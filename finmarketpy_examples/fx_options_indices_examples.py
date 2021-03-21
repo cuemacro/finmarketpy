@@ -229,7 +229,7 @@ if run_example == 2 or run_example == 0:
 
     # Add transaction costs to the option index (bid/ask bp for the option premium and spot FX)
     # Have wider spread for straddle (because adding call + put)
-    df_cuemacro_option_straddle_tc = fx_options_curve.apply_tc_to_total_return_index(cross, df_cuemacro_option_straddle_tot,
+    df_cuemacro_option_straddle_tc = fx_options_curve.apply_tc_signals_to_total_return_index(cross, df_cuemacro_option_straddle_tot,
                                                                                  option_tc_bp=10, spot_tc_bp=2)
 
     # Get total returns for spot

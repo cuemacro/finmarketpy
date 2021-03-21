@@ -12,7 +12,8 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-import numpy
+import numpy as np
+import pandas as pd
 
 from finmarketpy.util.marketconstants import MarketConstants
 
@@ -23,7 +24,7 @@ import pickle
 #import zlib
 #import lz4framed    # conda install -c conda-forge py-lz4framed
 
-# make blosc optional (only when trying to run backtests in parallel)
+# Make blosc optional (only when trying to run backtests in parallel)
 try:
     import blosc
 except:
@@ -32,7 +33,6 @@ except:
 import pickle
 
 market_constants = MarketConstants()
-
 
 class Backtest(object):
     """Conducts backtest for strategies trading assets. Assumes we have an input of total returns. Reports historical return statistics
@@ -77,7 +77,7 @@ class Backtest(object):
         reset_points = ((signal_df - signal_df.shift(1)).abs())
 
         asset_a_df_entry = asset_a_df.copy(deep=True)
-        asset_a_df_entry[reset_points == 0] = numpy.nan
+        asset_a_df_entry[reset_points == 0] = np.nan
         asset_a_df_entry = asset_a_df_entry.ffill()
 
         asset_a_df_entry.columns = [x + '_entry' for x in asset_a_df_entry.columns]
@@ -109,13 +109,13 @@ class Backtest(object):
         br : BacktestRequest
             Parameters for the backtest specifying start date, finish data, transaction costs etc.
 
-        asset_a_df : pandas.DataFrame
+        asset_a_df : pd.DataFrame
             Asset prices to be traded
 
-        signal_df : pandas.DataFrame
+        signal_df : pd.DataFrame
             Signals for the trading strategy
 
-        contract_value_df : pandas.DataFrame
+        contract_value_df : pd.DataFrame
             Daily size of contracts
         """
 
@@ -146,7 +146,7 @@ class Backtest(object):
 
         # Non-trading days of the assets (this may of course vary between the assets we are trading
         # if they are from different asset classes)
-        non_trading_days = numpy.isnan(asset_df.values)
+        non_trading_days = np.isnan(asset_df.values)
 
         # Only allow signals to change on the days when we can trade assets
         signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
@@ -196,94 +196,15 @@ class Backtest(object):
             #     to_plot = _calculations.pandas_outer_join([asset_df_copy, pre_signal_df, signal_df_copy, trade_rets_df_copy, temp_strategy_rets_df])
             #     to_plot.to_csv('test.csv')
 
-        # Do we have a vol target for individual signals?
-        if br.signal_vol_adjust is True:
-            leverage_df = risk_engine.calculate_leverage_factor(returns_df, br.signal_vol_target,
-                                                                br.signal_vol_max_leverage,
-                                                                br.signal_vol_periods, br.signal_vol_obs_in_year,
-                                                                br.signal_vol_rebalance_freq,
-                                                                br.signal_vol_resample_freq,
-                                                                br.signal_vol_resample_type,
-                                                                period_shift=br.signal_vol_period_shift)
-
-            signal_df = pandas.DataFrame(
-                signal_df.values * leverage_df.values, index=signal_df.index, columns=signal_df.columns)
-
-            self._individual_leverage = leverage_df  # contains leverage of individual signal (before portfolio vol target)
-
-        _pnl = calculations.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc=tc)
-        _pnl.columns = pnl_cols
-
-        adjusted_weights_matrix = None
-
-        # Portfolio is average of the underlying signals: should we sum them or average them or use another
-        # weighting scheme?
-        if br.portfolio_combination is not None:
-            if br.portfolio_combination == 'sum' and br.portfolio_combination_weights is None:
-                portfolio = pandas.DataFrame(data=_pnl.sum(axis=1), index=_pnl.index, columns=['Portfolio'])
-            elif br.portfolio_combination == 'mean' and br.portfolio_combination_weights is None:
-                portfolio = pandas.DataFrame(data=_pnl.mean(axis=1), index=_pnl.index, columns=['Portfolio'])
-
-                adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
-            elif 'weighted' in br.portfolio_combination and isinstance(br.portfolio_combination_weights, dict):
-
-                # get the weights for each asset
-                adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method=br.portfolio_combination)
-
-                portfolio = pandas.DataFrame(data=(_pnl.values * adjusted_weights_matrix), index=_pnl.index)
-                is_all_na = pandas.isnull(portfolio).all(axis=1)
-                portfolio = pandas.DataFrame(portfolio.sum(axis=1), columns=['Portfolio'])
-
-                # overwrite days when every asset PnL was null is NaN with nan
-                portfolio[is_all_na] = numpy.nan
+        if br.portfolio_weight_construction is None:
+            pwc = PortfolioWeightConstruction(br=br)
         else:
-            portfolio = pandas.DataFrame(data=_pnl.mean(axis=1), index=_pnl.index, columns=['Portfolio'])
+            pwc = br.portfolio_weight_construction
 
-            adjusted_weights_matrix = self.create_portfolio_weights(br, _pnl, method='mean')
-
-        portfolio_leverage_df = pandas.DataFrame(data=numpy.ones(len(_pnl.index)), index=_pnl.index,
-                                                 columns=['Portfolio'])
-
-        # Should we apply vol target on a portfolio level basis?
-        if br.portfolio_vol_adjust is True:
-            # calculate portfolio leverage
-            portfolio_leverage_df = risk_engine.calculate_leverage_factor(portfolio,
-                                                                          br.portfolio_vol_target,
-                                                                          br.portfolio_vol_max_leverage,
-                                                                          br.portfolio_vol_periods,
-                                                                          br.portfolio_vol_obs_in_year,
-                                                                          br.portfolio_vol_rebalance_freq,
-                                                                          br.portfolio_vol_resample_freq,
-                                                                          br.portfolio_vol_resample_type,
-                                                                          period_shift=br.portfolio_vol_period_shift)
-
-            # portfolio, portfolio_leverage_df = risk_engine.calculate_vol_adjusted_returns(portfolio, br = br)
-
-        # Multiply portfolio leverage * individual signals to get final position signals
-        length_cols = len(signal_df.columns)
-        leverage_matrix = numpy.transpose(
-            numpy.repeat(portfolio_leverage_df.values.flatten()[numpy.newaxis, :], length_cols, 0))
-
-        # Final portfolio signals (including signal & portfolio leverage)
-        portfolio_signal = pandas.DataFrame(
-            data=numpy.multiply(leverage_matrix, signal_df.values),
-            index=signal_df.index, columns=signal_df.columns)
-
-        # Later when we plot the portfolio components, we do that without weighting the individual components
-        portfolio_signal_before_weighting = portfolio_signal.copy()
-
-        if br.portfolio_combination is not None:
-            if 'sum' in br.portfolio_combination:
-                pass
-            elif br.portfolio_combination == 'mean' \
-                    or (br.portfolio_combination == 'weighted' and isinstance(br.portfolio_combination_weights, dict)):
-                portfolio_signal = pandas.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
-                                                    index=portfolio_signal.index,
-                                                    columns=portfolio_signal.columns)
-        else:
-            portfolio_signal = pandas.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
-                                                index=portfolio_signal.index,
-                                                columns=portfolio_signal.columns)
+        # Adjust signal weights and portfolio weights (eg. using various rules, like vol targeting)
+        # and also aggregate final portfolio weights
+        portfolio_signal_before_weighting, portfolio_signal, portfolio_leverage_df, portfolio, individual_leverage_df, pnl = \
+            pwc.optimize_portfolio_weights(returns_df, signal_df, pnl_cols)
 
         portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure \
             = self.calculate_exposures(portfolio_signal)
@@ -294,24 +215,26 @@ class Backtest(object):
 
         # If we have any position clip adjustment, for example related to max position sizes
         if position_clip_adjustment is not None:
-            position_clip_adjustment_matrix = numpy.transpose(
-                numpy.repeat(position_clip_adjustment.values.flatten()[numpy.newaxis, :], length_cols, 0))
+            length_cols = len(signal_df.columns)
+
+            position_clip_adjustment_matrix = np.transpose(
+                np.repeat(position_clip_adjustment.values.flatten()[np.newaxis, :], length_cols, 0))
 
             # Recalculate portfolio signals after adjustment (for individual components - without
             # weighting each signal separately)
-            portfolio_signal_before_weighting = pandas.DataFrame(
+            portfolio_signal_before_weighting = pd.DataFrame(
                 data=(portfolio_signal_before_weighting.values * position_clip_adjustment_matrix),
                 index=portfolio_signal_before_weighting.index,
                 columns=portfolio_signal_before_weighting.columns)
 
             # Recalculate portfolio signal after adjustment (for portfolio level positions)
-            portfolio_signal = pandas.DataFrame(
+            portfolio_signal = pd.DataFrame(
                 data=(portfolio_signal.values * position_clip_adjustment_matrix),
                 index=portfolio_signal.index,
                 columns=portfolio_signal.columns)
 
             # Recalculate portfolio leverage with position constraint (multiply vectors elementwise)
-            portfolio_leverage_df = pandas.DataFrame(
+            portfolio_leverage_df = pd.DataFrame(
                 data=(portfolio_leverage_df.values * position_clip_adjustment.values),
                 index=portfolio_leverage_df.index,
                 columns=portfolio_leverage_df.columns)
@@ -325,11 +248,12 @@ class Backtest(object):
         portfolio = calculations.calculate_signal_returns_with_tc_matrix(portfolio_leverage_df, portfolio, tc=tc)
 
         # Assign all the property variables
-        self._signal = signal_df  # individual signals (before portfolio leverage)
-        self._portfolio_signal = portfolio_signal  # individual signals (AFTER portfolio leverage/constraints)
-        self._portfolio_leverage = portfolio_leverage_df  # leverage on portfolio
+        # Trim them if we have asked for a different plot start/finish
+        self._signal = self._filter_by_plot_start_finish_date(signal_df, br)  # individual signals (before portfolio leverage)
+        self._portfolio_signal = self._filter_by_plot_start_finish_date(portfolio_signal, br)  # individual signals (AFTER portfolio leverage/constraints)
+        self._portfolio_leverage = self._filter_by_plot_start_finish_date(portfolio_leverage_df, br)  # leverage on portfolio
 
-        self._portfolio = portfolio
+        self._portfolio = self._filter_by_plot_start_finish_date(portfolio, br)
 
         # Calculate each period of trades
         self._portfolio_trade = self._portfolio_signal - self._portfolio_signal.shift(1)
@@ -342,10 +266,10 @@ class Backtest(object):
         self._portfolio_signal_contracts = None
         self._portfolio_signal_trade_contracts = None
 
-        self._portfolio_total_longs = portfolio_total_longs
-        self._portfolio_total_shorts = portfolio_total_shorts
-        self._portfolio_net_exposure = portfolio_net_exposure
-        self._portfolio_total_exposure = portfolio_total_exposure
+        self._portfolio_total_longs = self._filter_by_plot_start_finish_date(portfolio_total_longs, br)
+        self._portfolio_total_shorts = self._filter_by_plot_start_finish_date(portfolio_total_shorts, br)
+        self._portfolio_net_exposure = self._filter_by_plot_start_finish_date(portfolio_net_exposure, br)
+        self._portfolio_total_exposure = self._filter_by_plot_start_finish_date(portfolio_total_exposure, br)
 
         self._portfolio_total_longs_notional = None
         self._portfolio_total_shorts_notional = None
@@ -353,9 +277,33 @@ class Backtest(object):
         self._portfolio_total_exposure_notional = None
         self._portfolio_signal_trade_notional_sizes = None
 
+        # Individual signals P&L (before portfolio volatility targeting, position limits etc)
+        self._pnl = pnl
+
+        self._individual_leverage = individual_leverage_df
+
+        # P&L components of individual assets after all the portfolio level risk signals and position limits have been applied
+        self._components_pnl = self._filter_by_plot_start_finish_date(calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting,
+                                                                                    returns_df, tc=tc), br)
+        self._components_pnl.columns = pnl_cols
+
+        # TODO FIX very slow - hence only calculate on demand
+        # _pnl_trades = _calculations.calculate_individual_trade_gains(signal_df, _pnl)
+        self._pnl_trades = None
+        self._components_pnl_trades = None
+
+        self._trade_no = None
+        self._portfolio_trade_no = None
+
+        self._portfolio.columns = ['Port']
+
+        self._pnl_ret_stats = RetStats(self._pnl, br.ann_factor, br.resample_ann_factor)
+        self._components_pnl_ret_stats = RetStats(self._components_pnl, br.ann_factor, br.resample_ann_factor)
+        self._portfolio_ret_stats = RetStats(self._portfolio, br.ann_factor, br.resample_ann_factor)
+
         # Also create other measures of portfolio
-        # portfolio & trades in terms of a predefined notional (in USD)
-        # portfolio & trades in terms of contract sizes (particularly useful for futures)
+        # * portfolio & trades in terms of a predefined notional (in USD)
+        # * portfolio & trades in terms of contract sizes (particularly useful for futures)
         if br.portfolio_notional_size is not None:
 
             # Express positions in terms of the notional size specified
@@ -363,12 +311,12 @@ class Backtest(object):
             self._portfolio_signal_trade_notional = self._portfolio_signal_notional \
                                                     - self._portfolio_signal_notional.shift(1)
 
-            df_trades_sizes = pandas.DataFrame()
+            df_trades_sizes = pd.DataFrame()
 
             rounded_portfolio_signal_trade_notional = self._portfolio_signal_trade_notional.round(2)
 
             for k in rounded_portfolio_signal_trade_notional.columns:
-                df_trades_sizes[k] = pandas.value_counts(rounded_portfolio_signal_trade_notional[k], sort=True)
+                df_trades_sizes[k] = pd.value_counts(rounded_portfolio_signal_trade_notional[k], sort=True)
 
             df_trades_sizes = df_trades_sizes[df_trades_sizes.index != 0]
 
@@ -394,30 +342,8 @@ class Backtest(object):
                 # Careful make sure orders of magnitude are same for the notional and the contract value
                 self._portfolio_signal_contracts = notional_df / contract_value_df
                 self._portfolio_signal_contracts.columns = self._portfolio_signal_notional.columns
-                self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts - self._portfolio_signal_contracts.shift(
-                    1)
-
-        # Individual signals P&L (before portfolio volatility targeting, position limits etc)
-        self._pnl = _pnl
-
-        # _pnl_components of individual assets after all the portfolio level risk signals and position limits have been applied
-        self._components_pnl = calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting,
-                                                                                    returns_df, tc=tc)
-        self._components_pnl.columns = pnl_cols
-
-        # TODO FIX very slow - hence only calculate on demand
-        # _pnl_trades = _calculations.calculate_individual_trade_gains(signal_df, _pnl)
-        self._pnl_trades = None
-        self._components_pnl_trades = None
-
-        self._trade_no = None
-        self._portfolio_trade_no = None
-
-        self._portfolio.columns = ['Port']
-
-        self._pnl_ret_stats = RetStats(self._pnl, br.ann_factor, br.resample_ann_factor)
-        self._components_pnl_ret_stats = RetStats(self._components_pnl, br.ann_factor, br.resample_ann_factor)
-        self._portfolio_ret_stats = RetStats(self._portfolio, br.ann_factor, br.resample_ann_factor)
+                self._portfolio_signal_trade_contracts = self._portfolio_signal_contracts \
+                                                         - self._portfolio_signal_contracts.shift(1)
 
         # TODO parallel version still work in progress!
 
@@ -482,6 +408,23 @@ class Backtest(object):
         self._components_pnl_cum.columns = pnl_cols
         self._portfolio_cum.columns = ['Port']
 
+    def _filter_by_plot_start_finish_date(self, df, br):
+
+        if br.plot_start is None and br.plot_finish is None:
+            return df
+        else:
+            filter = Filter()
+            plot_start = br.start_date;
+            plot_finish = br.finish_date
+
+            if br.plot_start is not None:
+                plot_start = br.plot_start
+
+            if br.plot_finish is not None:
+                plot_finish = br.plot_finish
+
+            return filter.filter_time_series_by_date(plot_start, plot_finish, df)
+
     def calculate_exposures(self, portfolio_signal):
         """Calculates time series for the total longs, short, net and absolute exposure on an aggregated portfolio basis.
 
@@ -497,77 +440,22 @@ class Backtest(object):
         """
 
         # Calculate total portfolio longs/total portfolio shorts/total portfolio exposure
-        portfolio_total_longs = pandas.DataFrame(portfolio_signal[portfolio_signal > 0].sum(axis=1))
-        portfolio_total_shorts = pandas.DataFrame(portfolio_signal[portfolio_signal < 0].sum(axis=1))
+        portfolio_total_longs = pd.DataFrame(portfolio_signal[portfolio_signal > 0].sum(axis=1))
+        portfolio_total_shorts = pd.DataFrame(portfolio_signal[portfolio_signal < 0].sum(axis=1))
 
         portfolio_total_longs.columns = ['Total Longs']
         portfolio_total_shorts.columns = ['Total Shorts']
 
         # NOTE: careful usage of signs (portfolio_total_shorts are NEGATIVE)
-        portfolio_net_exposure = pandas.DataFrame(
+        portfolio_net_exposure = pd.DataFrame(
             index=portfolio_signal.index, columns=['Net Exposure'],
             data=portfolio_total_longs.values + portfolio_total_shorts.values)
 
-        portfolio_total_exposure = pandas.DataFrame(
+        portfolio_total_exposure = pd.DataFrame(
             index=portfolio_signal.index, columns=['Total Exposure'],
             data=portfolio_total_longs.values - portfolio_total_shorts.values)
 
         return portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure
-
-    def create_portfolio_weights(self, br, _pnl, method='mean'):
-        """Calculates P&L of a trading strategy and statistics to be retrieved later
-
-        Parameters
-        ----------
-        br : BacktestRequest
-            Parameters for the backtest specifying start date, finish data, transaction costs etc.
-
-        _pnl : pandas.DataFrame
-            Contains the daily P&L for the portfolio
-
-        method : String
-            'mean' - assumes equal weighting for each signal
-            'weighted' - can use predefined user weights (eg. if we assign weighting of 1, 1, 0.5, for three signals
-            the third signal will have a weighting of half versus the others)
-        
-        weights : dict
-            Portfolio weights
-
-        Returns
-        -------
-        pandas.DataFrame
-            Contains the portfolio weights
-        """
-
-        if method == 'mean':
-            weights_vector = numpy.ones(len(_pnl.columns))
-        elif method == 'weighted' or 'weighted-sum':
-            # get the weights for each asset
-            weights_vector = numpy.array([float(br.portfolio_combination_weights[col]) for col in _pnl.columns])
-
-        # Repeat this down for every day
-        weights_matrix = numpy.repeat(weights_vector[numpy.newaxis, :], len(_pnl.index), 0)
-
-        # Where we don't have old price data, make the weights 0 there
-        ind = numpy.isnan(_pnl.values)
-        weights_matrix[ind] = 0
-
-        if method != 'weighted-sum':
-            # The total weights will vary, as historically might not have all the assets trading
-            total_weights = numpy.sum(weights_matrix, axis=1)
-
-            # Replicate across columns
-            total_weights = numpy.transpose(numpy.repeat(total_weights[numpy.newaxis, :], len(_pnl.columns), 0))
-
-            # To avoid divide by zero
-            total_weights[total_weights == 0.0] = 1.0
-
-            adjusted_weights_matrix = weights_matrix / total_weights
-            adjusted_weights_matrix[ind] = numpy.nan
-
-            return adjusted_weights_matrix
-
-        return weights_matrix
 
     def backtest_output(self):
         return
@@ -578,7 +466,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
         return self._pnl
 
@@ -587,7 +475,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
 
         if self._trade_no is None:
@@ -601,7 +489,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
 
         if self._pnl_trades is None:
@@ -634,7 +522,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._pnl_cum
@@ -645,7 +533,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
         return self._components_pnl
 
@@ -654,7 +542,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
 
         if self._components_pnl_trades is None:
@@ -688,7 +576,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._components_pnl_cum
@@ -700,7 +588,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._portfolio_cum
@@ -710,7 +598,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._portfolio
@@ -720,7 +608,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._portfolio_ret_stats.summary()
@@ -740,7 +628,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._individual_leverage
@@ -750,7 +638,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._portfolio_leverage
@@ -760,7 +648,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
 
         if self._portfolio_trade_no is None:
@@ -933,7 +821,7 @@ class Backtest(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         return self._signal
@@ -942,7 +830,6 @@ class Backtest(object):
 ########################################################################################################################
 
 import abc
-import pandas
 import datetime
 import copy
 
@@ -964,6 +851,8 @@ class TradingModel(object):
 
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
+    WIDTH = ChartConstants().chartfactory_width
+    HEIGHT = ChartConstants().chartfactory_height
     CHART_SOURCE = ChartConstants().chartfactory_source
     CHART_STYLE = Style()
 
@@ -996,10 +885,10 @@ class TradingModel(object):
 
         Parameters
         ----------
-        spot_df : pandas.DataFrame
+        spot_df : pd.DataFrame
             Market time series for generating signals
 
-        spot_df2 : pandas.DataFrame
+        spot_df2 : pd.DataFrame
             Market time series for generated signals (can be of different frequency)
 
         tech_params : TechParams
@@ -1045,7 +934,9 @@ class TradingModel(object):
         logger = LoggerManager().getLogger(__name__)
 
         # Get the parameters for backtesting
-        if hasattr(self, 'br'):
+        if br is not None:
+            pass
+        elif hasattr(self, 'br'):
             br = self.br
         elif br is None:
             br = self.load_parameters()
@@ -1073,8 +964,8 @@ class TradingModel(object):
         else:
             tech_params = TechParams()
 
-        cum_results = pandas.DataFrame(index=asset_df.index)
-        port_leverage = pandas.DataFrame(index=asset_df.index)
+        cum_results = pd.DataFrame(index=asset_df.index)
+        port_leverage = pd.DataFrame(index=asset_df.index)
 
         from collections import OrderedDict
         ret_stats_results = OrderedDict()
@@ -1195,41 +1086,41 @@ class TradingModel(object):
         self._strategy_group_benchmark_pnl = cum_results_benchmark
 
     def _assign_final_strategy_results(self, results, backtest):
-            # For a key, designated as the final strategy save that as the "strategy"
+        # For a key, designated as the final strategy save that as the "strategy"
 
-            self._strategy_pnl = results  # Cumulative P&L for the final strategy
-            self._strategy_components_pnl = backtest.pnl_cum()  # P&L of the individual components (after portfolio level vol adjustments)
-            self._strategy_components_pnl_ret_stats = backtest.components_pnl_ret_stats().split_into_dict()  # backtest.get_pnl_components_ret_stats()
+        self._strategy_pnl = results  # Cumulative P&L for the final strategy
+        self._strategy_components_pnl = backtest.pnl_cum()  # P&L of the individual components (after portfolio level vol adjustments)
+        self._strategy_components_pnl_ret_stats = backtest.components_pnl_ret_stats().split_into_dict()  # backtest.get_pnl_components_ret_stats()
 
-            self._strategy_pnl_ret_stats = backtest.portfolio_pnl_ret_stats()
-            self._strategy_leverage = backtest.portfolio_leverage()
+        self._strategy_pnl_ret_stats = backtest.portfolio_pnl_ret_stats()
+        self._strategy_leverage = backtest.portfolio_leverage()
 
-            # Collect the position sizes and trade sizes (in several different formats)
-            self._strategy_signal = backtest.portfolio_signal()
-            self._strategy_trade_no = backtest.portfolio_trade_no()
-            self._strategy_trade = backtest.portfolio_trade()
+        # Collect the position sizes and trade sizes (in several different formats)
+        self._strategy_signal = backtest.portfolio_signal()
+        self._strategy_trade_no = backtest.portfolio_trade_no()
+        self._strategy_trade = backtest.portfolio_trade()
 
-            # Scaled by notional
-            self._strategy_signal_notional = backtest.portfolio_signal_notional()
-            self._strategy_trade_notional = backtest.portfolio_trade_notional()
-            self._strategy_trade_notional_sizes = backtest.portfolio_trade_notional_sizes()
+        # Scaled by notional
+        self._strategy_signal_notional = backtest.portfolio_signal_notional()
+        self._strategy_trade_notional = backtest.portfolio_trade_notional()
+        self._strategy_trade_notional_sizes = backtest.portfolio_trade_notional_sizes()
 
-            # Scaled by notional and adjusted into contract sizes
-            self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
-            self._strategy_trade_contracts = backtest.portfolio_trade_contracts()
+        # Scaled by notional and adjusted into contract sizes
+        self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
+        self._strategy_trade_contracts = backtest.portfolio_trade_contracts()
 
-            self._strategy_group_pnl_trades = backtest.pnl_trades()  # get individual trades P&L before (before portfolio adjustment)
-            self._strategy_pnl_trades_components = backtest.components_pnl_trades()
+        self._strategy_group_pnl_trades = backtest.pnl_trades()  # get individual trades P&L before (before portfolio adjustment)
+        self._strategy_pnl_trades_components = backtest.components_pnl_trades()
 
-            self._strategy_total_longs = backtest.portfolio_total_longs()
-            self._strategy_total_shorts = backtest.portfolio_total_shorts()
-            self._strategy_net_exposure = backtest.portfolio_net_exposure()
-            self._strategy_total_exposure = backtest.portfolio_total_exposure()
+        self._strategy_total_longs = backtest.portfolio_total_longs()
+        self._strategy_total_shorts = backtest.portfolio_total_shorts()
+        self._strategy_net_exposure = backtest.portfolio_net_exposure()
+        self._strategy_total_exposure = backtest.portfolio_total_exposure()
 
-            self._strategy_total_longs_notional = backtest.portfolio_total_longs_notional()
-            self._strategy_total_shorts_notional = backtest.portfolio_total_shorts_notional()
-            self._strategy_net_exposure_notional = backtest.portfolio_net_exposure_notional()
-            self._strategy_total_exposure_notional = backtest.portfolio_total_exposure_notional()
+        self._strategy_total_longs_notional = backtest.portfolio_total_longs_notional()
+        self._strategy_total_shorts_notional = backtest.portfolio_total_shorts_notional()
+        self._strategy_net_exposure_notional = backtest.portfolio_net_exposure_notional()
+        self._strategy_total_exposure_notional = backtest.portfolio_total_exposure_notional()
 
     def construct_individual_strategy(self, br, spot_df, spot_df2, asset_df, tech_params, key, contract_value_df,
                                       run_in_parallel, compress_output):
@@ -1240,21 +1131,21 @@ class TradingModel(object):
         br : BacktestRequest
             Parameters for backtest such as start and finish dates
 
-        spot_df : pandas.DataFrame
+        spot_df : pd.DataFrame
             Market time series for generating signals
 
-        spot_df2 : pandas.DataFrame
+        spot_df2 : pd.DataFrame
             Secondary Market time series for generated signals (can be of different frequency)
 
         tech_params : TechParams
             Parameters for generating signals
 
-        contract_value_df : pandas.DataFrame
+        contract_value_df : pd.DataFrame
             Dataframe with the contract sizes for each asset
 
         Returns
         -------
-        portfolio_cum : pandas.DataFrame
+        portfolio_cum : pd.DataFrame
         backtest : Backtest
         """
         backtest = Backtest()
@@ -1305,9 +1196,9 @@ class TradingModel(object):
         ----------
         br : BacktestRequest
             Parameters for backtest such as start and finish dates
-        strategy_df : pandas.DataFrame
+        strategy_df : pd.DataFrame
             Strategy time series
-        benchmark_df : pandas.DataFrame
+        benchmark_df : pd.DataFrame
             Benchmark time series
         """
 
@@ -1338,9 +1229,7 @@ class TradingModel(object):
             strategy_benchmark_df = strategy_df.join(benchmark_df, how='inner')
             strategy_benchmark_df = strategy_benchmark_df.fillna(method='ffill')
 
-            if br.plot_start is not None:
-                strategy_benchmark_df = filter.filter_time_series_by_date(br.plot_start, br.finish_date,
-                                                                          strategy_benchmark_df)
+            strategy_benchmark_df = self._filter_by_plot_start_finish_date(strategy_benchmark_df, br)
 
             if br.cum_index == 'mult':
                 strategy_benchmark_df = calculations.create_mult_index_from_prices(strategy_benchmark_df)
@@ -1353,6 +1242,22 @@ class TradingModel(object):
             return strategy_benchmark_df
 
         return strategy_df
+
+    def _filter_by_plot_start_finish_date(self, df, br):
+        if br.plot_start is None and br.plot_finish is None:
+            return df
+        else:
+            filter = Filter()
+            plot_start = br.start_date;
+            plot_finish = br.finish_date
+
+            if br.plot_start is not None:
+                plot_start = br.plot_start
+
+            if br.plot_finish is not None:
+                plot_finish = br.plot_finish
+
+            return filter.filter_time_series_by_date(plot_start, plot_finish, df)
 
     def _flatten_list(self, list_of_lists):
         """Flattens list, particularly useful for combining baskets
@@ -1481,15 +1386,15 @@ class TradingModel(object):
 
         Parameters
         ----------
-        data_frame: pandas.DataFrame
+        data_frame: pd.DataFrame
             Strategy time series
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
         try:
-            if reduce_plot:
+            if reduce_plot and resample is not None:
                 # make plots on every business day (will downsample intraday data)
                 data_frame = data_frame.resample(resample).last()
                 data_frame = data_frame.fillna(method='pad')
@@ -1498,21 +1403,29 @@ class TradingModel(object):
         except:
             return data_frame
 
+    def _chart_return_with_df(self, df, style, silent_plot, chart_type='line', ret_with_df=False):
+
+        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type=chart_type, style=style)
+        if not (silent_plot): chart.plot()
+        if ret_with_df:
+            return chart, df
+
+        return chart
+
     ##### Quick helper functions to plot aspects of the strategy such as P&L, leverage etc.
-    def plot_individual_leverage(self, strip, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_individual_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
         style = self._create_style("Leverage", "Individual Leverage", reduce_plot=reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._individual_leverage,
-                                                                  reduce_plot=reduce_plot, resample=resample), strip),
-                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(self._individual_leverage,
+                reduce_plot=reduce_plot, resample=resample), strip)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_group_pnl_trades(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_group_pnl_trades(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
         style = self._create_style("(bp)", "Individual Trade PnL", reduce_plot=reduce_plot)
 
@@ -1523,15 +1436,14 @@ class TradingModel(object):
         # note only works with single large basket trade
         try:
             strategy_pnl_trades = self._strategy_group_pnl_trades.fillna(0) * 100 * 100
-            chart = Chart(self._strip_dataframe(self._reduce_plot(strategy_pnl_trades, reduce_plot=reduce_plot,
-                                                                  resample=resample), strip),
-                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(strategy_pnl_trades, reduce_plot=reduce_plot,
+                                                                  resample=resample), strip)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
         style = self._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
@@ -1539,19 +1451,17 @@ class TradingModel(object):
             df = self._strip_dataframe(self._reduce_plot(self._strategy_pnl,
                                                         reduce_plot=reduce_plot, resample=resample), strip)
 
-            chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
 
-            if not (silent_plot): chart.plot()
 
             if hasattr(self, 'br'):
                 if self.br.write_csv_pnl:
                     df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
 
-            return chart
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except Exception as e:
             print(str(e))
 
-    def plot_strategy_trade_no(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_trade_no(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
         df_trades = self._strategy_trade_no
 
         if strip is not None: df_trades.index = [k.replace(strip, '') for k in df_trades.index]
@@ -1562,16 +1472,13 @@ class TradingModel(object):
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade no).html'
 
-            chart = Chart(self._strip_dataframe(self._reduce_plot(df_trades, reduce_plot=reduce_plot,
-                                                                  resample=resample), strip),
-                          engine=self.DEFAULT_PLOT_ENGINE,
-                          chart_type='bar', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(df_trades, reduce_plot=reduce_plot, resample=resample), strip)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_signal_proportion(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_signal_proportion(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
         signal = self._strategy_signal
 
@@ -1580,7 +1487,7 @@ class TradingModel(object):
         short = signal[signal < 0].count()
         flat = signal[signal == 0].count()
 
-        df = pandas.DataFrame(index=long.index, columns=['Long', 'Short', 'Flat'])
+        df = pd.DataFrame(index=long.index, columns=['Long', 'Short', 'Flat'])
 
         df['Long'] = long
         df['Short'] = short
@@ -1594,69 +1501,67 @@ class TradingModel(object):
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).html'
 
-            chart = Chart(self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot=reduce_plot,
-                                                resample=resample), engine=self.DEFAULT_PLOT_ENGINE,
-                          chart_type='bar', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot=reduce_plot,
+                                                resample=resample)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
         style = self._create_style("Leverage", "Strategy Leverage", reduce_plot=reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_leverage,
-                                                                  reduce_plot=reduce_plot, resample=resample), strip),
-                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(self._strategy_leverage,
+                reduce_plot=reduce_plot, resample=resample), strip)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    ##### plot the individual components cumulative returns and return statistics (including portfolio level constraints)
-    def plot_strategy_components_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    ##### Plot the individual components cumulative returns and return statistics (including portfolio level constraints)
+    def plot_strategy_components_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
         style = self._create_style("Ind Components", "Strategy PnL Components", reduce_plot=reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_components_pnl,
-                                                                  reduce_plot=reduce_plot, resample=resample), strip),
-                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(self._strategy_components_pnl,
+                                                                  reduce_plot=reduce_plot, resample=resample), strip)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_components_pnl_ir(self, strip=None, silent_plot=False):
+    def plot_strategy_components_pnl_ir(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'IR', 'Ind Component',
                                            'Ind Component IR',
                                            strip=strip,
-                                           silent_plot=silent_plot)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_components_pnl_returns(self, strip=None, silent_plot=False):
+    def plot_strategy_components_pnl_returns(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'Returns', 'Ind Component (%)',
                                            'Ind Component Returns', strip=strip,
-                                           silent_plot=silent_plot)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_components_pnl_vol(self, strip=None, silent_plot=False):
+    def plot_strategy_components_pnl_vol(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'Vol', 'Ind Component (%)',
                                            'Ind Component Vol', strip=strip,
-                                           silent_plot=silent_plot)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_components_pnl_drawdowns(self, strip=None, silent_plot=False):
+    def plot_strategy_components_pnl_drawdowns(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'Drawdowns', 'Ind Component (%)',
                                            'Ind Component Drawdowns', strip=strip,
-                                           silent_plot=silent_plot)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_components_pnl_yoy(self, strip=None, silent_plot=False):
+    def plot_strategy_components_pnl_yoy(self, strip=None, silent_plot=False, ret_with_df=False):
 
         return self.plot_yoy_helper(self._strategy_components_pnl_ret_stats, 'Ind Component YoY', 'Ind Component (%)',
-                                    strip=strip, silent_plot=silent_plot)
+                                    strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
 
     ##### plot the cumulative returns and return statistics for the strategy group
     ##### this will plot the final strategy, benchmark and all the individual baskets (as though they were run by themselves)
-    def plot_strategy_group_benchmark_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_group_benchmark_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                          ret_with_df=False):
         logger = LoggerManager().getLogger(__name__)
 
         style = self._create_style("", "Group Benchmark PnL - cumulative")
@@ -1666,35 +1571,32 @@ class TradingModel(object):
         for line in strat_list: logger.info(line)
 
         # plot cumulative line of returns
-        chart = Chart(
-            self._strip_dataframe(self._reduce_plot(self._strategy_group_benchmark_pnl,
-                                                    reduce_plot=reduce_plot, resample=resample), strip),
-            engine=self.DEFAULT_PLOT_ENGINE, chart_type='line', style=style)
+        df = self._strip_dataframe(self._reduce_plot(self._strategy_group_benchmark_pnl,
+                                                    reduce_plot=reduce_plot, resample=resample), strip)
 
-        if not (silent_plot): chart.plot()
-        return chart
+        return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
 
-    def plot_strategy_group_benchmark_pnl_ir(self, strip=None, silent_plot=False):
+    def plot_strategy_group_benchmark_pnl_ir(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'IR', '',
                                            'Group Benchmark IR',
-                                           strip=strip, silent_plot=silent_plot)
+                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_group_benchmark_pnl_returns(self, strip=None, silent_plot=False):
+    def plot_strategy_group_benchmark_pnl_returns(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'Returns', '(%)',
                                            'Group Benchmark Returns',
-                                           strip=strip, silent_plot=silent_plot)
+                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_group_benchmark_pnl_vol(self, strip=None, silent_plot=False):
+    def plot_strategy_group_benchmark_pnl_vol(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'Vol', '(%)',
                                            'Group Benchmark Vol',
-                                           strip=strip, silent_plot=silent_plot)
+                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def plot_strategy_group_benchmark_pnl_drawdowns(self, strip=None, silent_plot=False):
+    def plot_strategy_group_benchmark_pnl_drawdowns(self, strip=None, silent_plot=False, ret_with_df=False):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'Drawdowns', '(%)',
                                            'Group Benchmark Drawdowns', strip=strip,
-                                           silent_plot=silent_plot)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
 
-    def _plot_ret_stats_helper(self, ret_stats, metric, title, file_tag, strip=None, silent_plot=False):
+    def _plot_ret_stats_helper(self, ret_stats, metric, title, file_tag, strip=None, silent_plot=False, ret_with_df=False):
         style = self._create_style(title, file_tag)
         keys = ret_stats.keys()
         ret_metric = []
@@ -1711,7 +1613,7 @@ class TradingModel(object):
 
         if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
-        ret_stats = pandas.DataFrame(index=keys, data=ret_metric, columns=[metric])
+        ret_stats = pd.DataFrame(index=keys, data=ret_metric, columns=[metric])
         # ret_stats = ret_stats.sort_index()
         style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (' + file_tag + ') ' + str(
             style.scale_factor) + '.png'
@@ -1719,17 +1621,14 @@ class TradingModel(object):
             style.scale_factor) + '.html'
         style.display_brand_label = False
 
-        chart = Chart(ret_stats, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
-        if not (silent_plot): chart.plot()
-
-        return chart
+        return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
 
     def plot_strategy_group_benchmark_pnl_yoy(self, strip=None, silent_plot=False):
 
         return self.plot_yoy_helper(self._strategy_group_benchmark_pnl_ret_stats, "", "Group Benchmark PnL YoY",
                                     strip=strip, silent_plot=silent_plot)
 
-    def plot_yoy_helper(self, ret_stats, title, file_tag, strip=None, silent_plot=False):
+    def plot_yoy_helper(self, ret_stats, title, file_tag, strip=None, silent_plot=False, ret_with_df=False):
 
         style = self._create_style(title, title)
         # keys = self._strategy_group_benchmark_ret_stats.keys()
@@ -1754,38 +1653,64 @@ class TradingModel(object):
         style.display_brand_label = False
         style.date_formatter = "%Y"
 
-        chart = Chart(ret_stats * 100, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
-        if not (silent_plot): chart.plot()
-        return chart
+        ret_stats = ret_stats * 100
 
-    def plot_strategy_group_leverage(self, silent_plot=False, reduce_plot=True, resample='B'):
+        return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+
+    def plot_strategy_group_leverage(self, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
         style = self._create_style("Leverage", "Group Leverage", reduce_plot=reduce_plot)
 
-        chart = Chart(self._reduce_plot(self._strategy_group_leverage,
-                                        reduce_plot=reduce_plot, resample=resample), engine=self.DEFAULT_PLOT_ENGINE,
-                      chart_type='line', style=style)
-        if not (silent_plot): chart.plot()
-        return chart
+        df = self._reduce_plot(self._strategy_group_leverage, reduce_plot=reduce_plot, resample=resample)
+
+        return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
 
     ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
-    def plot_strategy_signals(self, date=None, strip=None, silent_plot=False):
-        self._plot_signal(self._strategy_signal, label="positions (% portfolio notional)", caption="Positions",
-                          date=date, strip=strip, silent_plot=silent_plot)
 
-    def plot_strategy_trades(self, date=None, strip=None, silent_plot=False):
-        self._plot_signal(self._strategy_trade, label="trades (% portfolio notional)", caption="Trades",
-                          date=date, strip=strip, silent_plot=silent_plot)
+    def plot_strategy_all_signals(self, signal_show=None, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                  ret_with_df=False):
 
-    def plot_strategy_signals_notional(self, date=None, strip=None, silent_plot=False):
-        self._plot_signal(self._strategy_signal_notional, label="positions (scaled by notional)", caption="Positions",
-                          date=date, strip=strip, silent_plot=silent_plot)
+        style = self._create_style("positions (% portfolio notional)", "Positions", reduce_plot=reduce_plot)
 
-    def plot_strategy_trades_notional(self, date=None, strip=None, silent_plot=False):
-        self._plot_signal(self._strategy_trade_notional, label="trades (scaled by notional)", caption="Trades",
-                          date=date, strip=strip, silent_plot=silent_plot)
+        df = self._strategy_signal.copy()
 
-    def plot_strategy_trades_notional_sizes(self, strip=None, silent_plot=False):
+        if signal_show is not None:
+
+            if signal_show != []:
+                not_found = []
+
+                for d in df.columns:
+                    d_split = d.split(".")[0]
+
+                    if d_split not in signal_show:
+                        not_found.append(d)
+
+                df = df.drop(not_found, axis=1)
+
+        try:
+            df = self._strip_dataframe(self._reduce_plot(df, reduce_plot=reduce_plot,
+                                                         resample=resample), strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+        except:
+            pass
+
+    def plot_strategy_signals(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+        return self._plot_signal(self._strategy_signal, label="positions (% portfolio notional)", caption="Positions",
+                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+
+    def plot_strategy_trades(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+        return self._plot_signal(self._strategy_trade, label="trades (% portfolio notional)", caption="Trades",
+                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+
+    def plot_strategy_signals_notional(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+        return self._plot_signal(self._strategy_signal_notional, label="positions (scaled by notional)", caption="Positions",
+                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+
+    def plot_strategy_trades_notional(self, date=None, strip=None, silent_plot=False, strip_times=False):
+        return self._plot_signal(self._strategy_trade_notional, label="trades (scaled by notional)", caption="Trades",
+                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times)
+
+    def plot_strategy_trades_notional_sizes(self, strip=None, silent_plot=False, ret_with_df=False):
 
         if strip is not None: self._strategy_trade_notional_sizes.index = [k.replace(strip, '')
                                                                            for k in
@@ -1797,76 +1722,64 @@ class TradingModel(object):
             style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade notional size).png'
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy trade notional size).html'
 
-            chart = Chart(self._strip_dataframe(self._strategy_trade_notional_sizes, strip),
-                          engine=self.DEFAULT_PLOT_ENGINE,
-                          chart_type='bar', style=style)
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._strategy_trade_notional_sizes, strip)
+
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_signals_contracts(self, date=None, strip=None, silent_plot=False):
-        self._plot_signal(self._strategy_signal_contracts, label="positions (contracts)", caption="Positions",
-                          date=date, strip=strip, silent_plot=silent_plot)
+    def plot_strategy_signals_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+        return self._plot_signal(self._strategy_signal_contracts, label="positions (contracts)", caption="Positions",
+                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
 
-    def plot_strategy_trades_contracts(self, date=None, strip=None, silent_plot=False):
-        self._plot_signal(self._strategy_trade_contracts, label="trades (contracts)", caption="Contracts",
-                          date=date, strip=strip, silent_plot=silent_plot)
+    def plot_strategy_trades_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+        return self._plot_signal(self._strategy_trade_contracts, label="trades (contracts)", caption="Contracts",
+                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
 
     ###### plot aggregated portfolio exposures
-    def plot_strategy_total_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_total_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
-        df = pandas.concat([self._strategy_total_longs, self._strategy_total_shorts, self._strategy_total_exposure],
+        style = self._create_style("", "Strategy Total Exposures")
+        df = pd.concat([self._strategy_total_longs, self._strategy_total_shorts, self._strategy_total_exposure],
                            axis=1)
 
         try:
-            chart = Chart(
-                self._strip_dataframe(self._reduce_plot(df, reduce_plot=reduce_plot, resample=resample), strip),
-                engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                style=self._create_style("", "Strategy Total Exposures"))
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(df, reduce_plot=reduce_plot, resample=resample), strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_net_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_net_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+        style = self._create_style("", "Strategy Net Exposures", reduce_plot=reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure,
-                                                                  reduce_plot=reduce_plot, resample=resample), strip),
-                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=self._create_style("", "Strategy Net Exposures", reduce_plot=reduce_plot))
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure,
+                                                                  reduce_plot=reduce_plot, resample=resample), strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_total_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_total_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
 
-        df = pandas.concat([self._strategy_total_longs_notional,
+        style = self._create_style("(mm)", "Strategy Total Exposures (mm)", reduce_plot=reduce_plot)
+        df = pd.concat([self._strategy_total_longs_notional,
                             self._strategy_total_shorts_notional, self._strategy_total_exposure_notional], axis=1)
 
         try:
-            chart = Chart(
-                self._strip_dataframe(self._reduce_plot(df / 1000000.0, reduce_plot=reduce_plot, resample=resample),
-                                      strip),
-                engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                style=self._create_style("(mm)", "Strategy Total Exposures (mm)", reduce_plot=reduce_plot))
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(df / 1000000.0, reduce_plot=reduce_plot, resample=resample),
+                                      strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
-    def plot_strategy_net_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B'):
+    def plot_strategy_net_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+
+        style = self._create_style("(mm)", "Strategy Net Exposures (mm)", reduce_plot=reduce_plot)
 
         try:
-            chart = Chart(self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure_notional / 1000000.0,
-                                                                  reduce_plot=reduce_plot, resample=resample),
-                                                strip),
-                          engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                          style=self._create_style("(mm)", "Strategy Net Exposures (mm)", reduce_plot=reduce_plot))
-            if not (silent_plot): chart.plot()
-            return chart
+            df = self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure_notional / 1000000.0,
+                reduce_plot=reduce_plot, resample=resample), strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
         except:
             pass
 
@@ -1880,11 +1793,14 @@ class TradingModel(object):
 
             last_day = []
 
+            # In case our history is not long enough
             for d in date:
+                try:
+                    last_day.append(strategy_signal.iloc[d].transpose().to_frame())
+                except:
+                    pass
 
-                last_day.append(strategy_signal.iloc[d].transpose().to_frame())
-
-            last_day = pandas.concat(last_day, axis=1)
+            last_day = pd.concat(last_day, axis=1)
             last_day = last_day.sort_index(axis=1)
 
         if strip is not None:
@@ -1892,23 +1808,43 @@ class TradingModel(object):
 
         return last_day
 
-    def _plot_signal(self, sig, label=' ', caption='', date=None, strip=None, silent_plot=False):
+    def _plot_signal(self, sig, label=' ', caption='', date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
 
-        ######## plot signals
+        ######## Plot signals
+
         strategy_signal = 100 * (sig)
         last_day = self._grab_signals(strategy_signal, date=date, strip=strip)
 
         style = self._create_style(label, caption)
 
-        chart = Chart(last_day, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar', style=style)
-        if not (silent_plot): chart.plot()
-        return chart
+        # style.legend_x_pos = 1
+        style.legend_y_anchor = 'top'
+
+        if strip_times:
+            try:
+                last_day.index = [x.date() for x in last_day.index]
+            except:
+                pass
+
+            try:
+                last_day.columns = [x.date() for x in last_day.columns]
+            except:
+                pass
+
+        return self._chart_return_with_df(last_day, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
 
     def _strip_dataframe(self, data_frame, strip):
         if strip is None:
             return data_frame
 
-        data_frame.columns = [x.replace(strip, '') for x in data_frame.columns]
+        if not(isinstance(strip, list)):
+            strip = [strip]
+
+        for s in strip:
+            if s == '.':
+                data_frame.columns = [x.split(s)[0] if s in x else x for x in data_frame.columns]
+            else:
+                data_frame.columns = [x.replace(s, '') if s in x else x for x in data_frame.columns]
 
         return data_frame
 
@@ -1920,11 +1856,15 @@ class TradingModel(object):
             
         style.display_legend = True
         style.scale_factor = self.SCALE_FACTOR
+        style.width = self.WIDTH
+        style.height = self.HEIGHT
         style.source = self.CHART_SOURCE
-        style.silent_display = not (self.SHOW_CHARTS)
+        style.silent_display = not(self.SHOW_CHARTS)
 
-        # when plotting many points use WebGl version of plotly if specified
-        if not (reduce_plot):
+        style.legend_bgcolor = 'rgba(0,0,0,0)'
+
+        # When plotting many points use WebGl version of plotly if specified
+        if not(reduce_plot):
             style.plotly_webgl = True
 
         if self.DEFAULT_PLOT_ENGINE not in ['plotly', 'cufflinks'] and self.SAVE_FIGURES:
@@ -1944,8 +1884,173 @@ class TradingModel(object):
 
 #######################################################################################################################
 
-class PortfolioModel(object):
-    pass
+class PortfolioWeightConstruction(object):
+    """Creates dynamics weights for signals and also the portfolio
+
+    """
+
+    def __init__(self, br=None):
+        self._br = br
+        self._risk_engine = RiskEngine()
+        self._calculations = Calculations()
+
+    def optimize_portfolio_weights(self, returns_df, signal_df, signal_pnl_cols, br=None):
+
+        if br is None:
+            br = self._br
+
+        tc = br.spot_tc_bp
+
+        individual_leverage_df = None
+
+        # Do we have a vol target for individual signals?
+        if br.signal_vol_adjust is True:
+            leverage_df = self._risk_engine.calculate_leverage_factor(returns_df, br.signal_vol_target,
+                                                                br.signal_vol_max_leverage,
+                                                                br.signal_vol_periods, br.signal_vol_obs_in_year,
+                                                                br.signal_vol_rebalance_freq,
+                                                                br.signal_vol_resample_freq,
+                                                                br.signal_vol_resample_type,
+                                                                period_shift=br.signal_vol_period_shift)
+
+            signal_df = pd.DataFrame(
+                signal_df.values * leverage_df.values, index=signal_df.index, columns=signal_df.columns)
+
+            individual_leverage_df = leverage_df  # Contains leverage of individual signal (before portfolio vol target)
+
+        signal_pnl = self._calculations.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc=tc)
+        signal_pnl.columns = signal_pnl_cols
+
+        adjusted_weights_matrix = None
+
+        # Portfolio is average of the underlying signals: should we sum them or average them or use another
+        # weighting scheme?
+        if br.portfolio_combination is not None:
+            if br.portfolio_combination == 'sum' and br.portfolio_combination_weights is None:
+                portfolio = pd.DataFrame(data=signal_pnl.sum(axis=1), index=signal_pnl.index, columns=['Portfolio'])
+            elif br.portfolio_combination == 'mean' and br.portfolio_combination_weights is None:
+                portfolio = pd.DataFrame(data=signal_pnl.mean(axis=1), index=signal_pnl.index, columns=['Portfolio'])
+
+                adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method='mean')
+            elif 'weighted' in br.portfolio_combination and isinstance(br.portfolio_combination_weights, dict):
+
+                # Get the weights for each asset
+                adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method=br.portfolio_combination)
+
+                portfolio = pd.DataFrame(data=(signal_pnl.values * adjusted_weights_matrix), index=signal_pnl.index)
+                is_all_na = pd.isnull(portfolio).all(axis=1)
+                portfolio = pd.DataFrame(portfolio.sum(axis=1), columns=['Portfolio'])
+
+                # Overwrite days when every asset PnL was null is NaN with nan
+                portfolio[is_all_na] = np.nan
+        else:
+            # Just assume to take the mean / ie. equal weights for each signal
+            portfolio = pd.DataFrame(data=signal_pnl.mean(axis=1), index=signal_pnl.index, columns=['Portfolio'])
+
+            adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method='mean')
+
+        portfolio_leverage_df = pd.DataFrame(data=np.ones(len(signal_pnl.index)), index=signal_pnl.index,
+                                                 columns=['Portfolio'])
+
+        # Should we apply vol target on a portfolio level basis?
+        if br.portfolio_vol_adjust is True:
+            # Calculate portfolio leverage
+            portfolio_leverage_df = self._risk_engine.calculate_leverage_factor(portfolio,
+                                                                          br.portfolio_vol_target,
+                                                                          br.portfolio_vol_max_leverage,
+                                                                          br.portfolio_vol_periods,
+                                                                          br.portfolio_vol_obs_in_year,
+                                                                          br.portfolio_vol_rebalance_freq,
+                                                                          br.portfolio_vol_resample_freq,
+                                                                          br.portfolio_vol_resample_type,
+                                                                          period_shift=br.portfolio_vol_period_shift)
+
+            # portfolio, portfolio_leverage_df = risk_engine.calculate_vol_adjusted_returns(portfolio, br = br)
+
+        # Multiply portfolio leverage * individual signals to get final position signals
+        length_cols = len(signal_df.columns)
+        leverage_matrix = np.transpose(
+            np.repeat(portfolio_leverage_df.values.flatten()[np.newaxis, :], length_cols, 0))
+
+        # Final portfolio signals (including signal & portfolio leverage)
+        portfolio_signal = pd.DataFrame(
+            data=np.multiply(leverage_matrix, signal_df.values),
+            index=signal_df.index, columns=signal_df.columns)
+
+        # Later, when we plot the portfolio components, we do that without weighting the individual components
+        portfolio_signal_before_weighting = portfolio_signal.copy()
+
+        if br.portfolio_combination is not None:
+            if 'sum' in br.portfolio_combination:
+                pass
+            elif br.portfolio_combination == 'mean' \
+                    or (br.portfolio_combination == 'weighted' and isinstance(br.portfolio_combination_weights, dict)):
+                portfolio_signal = pd.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
+                                                    index=portfolio_signal.index,
+                                                    columns=portfolio_signal.columns)
+        else:
+            # Otherwise it's "mean"
+            portfolio_signal = pd.DataFrame(data=(portfolio_signal.values * adjusted_weights_matrix),
+                                                index=portfolio_signal.index,
+                                                columns=portfolio_signal.columns)
+
+        
+        return portfolio_signal_before_weighting, portfolio_signal, portfolio_leverage_df, portfolio, individual_leverage_df, signal_pnl
+
+    def calculate_signal_weights_for_portfolio(self, br, signal_pnl, method='mean'):
+        """Calculates the weights of each signal for the portfolio
+
+        Parameters
+        ----------
+        br : BacktestRequest
+            Parameters for the backtest specifying start date, finish data, transaction costs etc.
+
+        signal_pnl : pd.DataFrame
+            Contains the daily P&L for the portfolio
+
+        method : String
+            'mean' - assumes equal weighting for each signal
+            'weighted' - can use predefined user weights (eg. if we assign weighting of 1, 1, 0.5, for three signals
+            the third signal will have a weighting of half versus the others)
+
+        weights : dict
+            Portfolio weights
+
+        Returns
+        -------
+        pd.DataFrame
+            Contains the portfolio weights
+        """
+
+        if method == 'mean':
+            weights_vector = np.ones(len(signal_pnl.columns))
+        elif method == 'weighted' or 'weighted-sum':
+            # Get the weights for each asset
+            weights_vector = np.array([float(br.portfolio_combination_weights[col]) for col in signal_pnl.columns])
+
+        # Repeat this down for every day
+        weights_matrix = np.repeat(weights_vector[np.newaxis, :], len(signal_pnl.index), 0)
+
+        # Where we don't have old price data, make the weights 0 there
+        ind = np.isnan(signal_pnl.values)
+        weights_matrix[ind] = 0
+
+        if method != 'weighted-sum':
+            # The total weights will vary, as historically might not have all the assets trading
+            total_weights = np.sum(weights_matrix, axis=1)
+
+            # Replicate across columns
+            total_weights = np.transpose(np.repeat(total_weights[np.newaxis, :], len(signal_pnl.columns), 0))
+
+            # To avoid divide by zero
+            total_weights[total_weights == 0.0] = 1.0
+
+            adjusted_weights_matrix = weights_matrix / total_weights
+            adjusted_weights_matrix[ind] = np.nan
+
+            return adjusted_weights_matrix
+
+        return weights_matrix
 
 #######################################################################################################################
 
@@ -1961,12 +2066,12 @@ class RiskEngine(object):
         ----------
         br : BacktestRequest
             Parameters for the backtest specifying start date, finish data, transaction costs etc.
-        asset_a_df : pandas.DataFrame
+        asset_a_df : pd.DataFrame
             Asset prices to be traded
 
         Returns
         -------
-        pandas.Dataframe containing vol adjusted index
+        pd.Dataframe containing vol adjusted index
         """
 
         calculations = Calculations()
@@ -1985,12 +2090,12 @@ class RiskEngine(object):
         ----------
         br : BacktestRequest
             Parameters for the backtest specifying start date, finish data, transaction costs etc.
-        returns_a_df : pandas.DataFrame
+        returns_a_df : pd.DataFrame
             Asset returns to be traded
 
         Returns
         -------
-        pandas.DataFrame
+        pd.DataFrame
         """
 
         calculations = Calculations()
@@ -2037,7 +2142,7 @@ class RiskEngine(object):
 
         Returns
         -------
-        pandas.Dataframe
+        pd.Dataframe
         """
 
         calculations = Calculations()
@@ -2072,7 +2177,7 @@ class RiskEngine(object):
         # # now realign back to days when we trade
         # returns_df, lev_df = returns_df.align(lev_df, join='left', axis=0)
 
-        lev_df[0:vol_periods] = numpy.nan  # ignore the first elements before the vol window kicks in
+        lev_df[0:vol_periods] = np.nan  # ignore the first elements before the vol window kicks in
 
         return lev_df
 
@@ -2101,7 +2206,7 @@ class RiskEngine(object):
             portfolio_net_exposure = portfolio_net_exposure.shift(br.position_clip_period_shift)
 
             # add further constraints on portfolio (total net amount of longs and short)
-            position_clip_adjustment = pandas.DataFrame(data=numpy.ones(len(portfolio_net_exposure.index)),
+            position_clip_adjustment = pd.DataFrame(data=np.ones(len(portfolio_net_exposure.index)),
                                                         index=portfolio_net_exposure.index,
                                                         columns=['Portfolio'])
 
@@ -2116,7 +2221,7 @@ class RiskEngine(object):
             portfolio_abs_exposure = portfolio_abs_exposure.shift(br.position_clip_period_shift)
 
             # add further constraints on portfolio (total net amount of longs and short)
-            position_clip_adjustment = pandas.DataFrame(data=numpy.ones(len(portfolio_abs_exposure.index)),
+            position_clip_adjustment = pd.DataFrame(data=np.ones(len(portfolio_abs_exposure.index)),
                                                         index=portfolio_abs_exposure.index,
                                                         columns=['Portfolio'])
 

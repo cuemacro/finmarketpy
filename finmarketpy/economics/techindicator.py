@@ -42,7 +42,6 @@ class TechIndicator(object):
     """
 
     def __init__(self):
-        self.logger = LoggerManager().getLogger(__name__)
         self._techind = None
         self._signal = None
 
@@ -52,6 +51,9 @@ class TechIndicator(object):
             name,
             tech_params,
             data_frame_non_nan_early=None):
+
+        logger = LoggerManager().getLogger(__name__)
+
         self._signal = None
         self._techind = None
 
@@ -66,7 +68,7 @@ class TechIndicator(object):
         if name == "SMA":
 
             if (data_frame_non_nan_early is not None):
-                # calculate the lagged sum of the n-1 point
+                # Calculate the lagged sum of the n-1 point
                 if pd.__version__ < '0.17':
                     rolling_sum = pd.rolling_sum(
                         data_frame.shift(1).rolling,
@@ -120,7 +122,7 @@ class TechIndicator(object):
                 x + " EMA" for x in data_frame.columns.values]
 
         elif name == "ROC":
-
+            # Rate of change
             if (data_frame_non_nan_early is not None):
                 self._techind = data_frame_early / \
                     data_frame.shift(tech_params.roc_period) - 1
@@ -139,6 +141,7 @@ class TechIndicator(object):
                 x + " ROC" for x in data_frame.columns.values]
 
         elif name == "polarity":
+            # If data is positive or negative
             self._techind = data_frame
 
             narray = np.where(self._techind > 0, 1, -1)
@@ -151,6 +154,7 @@ class TechIndicator(object):
                 x + " Polarity" for x in data_frame.columns.values]
 
         elif name == "SMA2":
+            # Double moving average
             sma = data_frame.rolling(
                 window=tech_params.sma_period,
                 center=False).mean()
@@ -171,6 +175,8 @@ class TechIndicator(object):
             self._techind = pd.concat([sma, sma2], axis=1)
 
         elif name in ['RSI']:
+            # Relative Strength Index
+
             # delta = data_frame.diff()
             #
             # dUp, dDown = delta.copy(), delta.copy()
@@ -239,7 +245,7 @@ class TechIndicator(object):
                 x + " RSI Signal" for x in data_frame.columns.values]
 
         elif name in ["BB"]:
-            # calcuate Bollinger bands
+            # Calcuate Bollinger bands
             mid = data_frame.rolling(
                 center=False, window=tech_params.bb_period).mean()
             mid.columns = [x + " BB Mid" for x in data_frame.columns.values]
@@ -257,7 +263,7 @@ class TechIndicator(object):
                 index=mid.index,
                 columns=data_frame.columns)
 
-            # calculate signals
+            # Calculate signals (buy/sell)
             signal = data_frame.copy()
 
             buys = signal > upper
@@ -281,7 +287,7 @@ class TechIndicator(object):
 
             self._techind = pd.concat([lower, mid, upper], axis=1)
         elif name == "long-only":
-            # have +1 signals only
+            # Have +1 signals only
             self._techind = data_frame  # the technical indicator is just "prices"
 
             narray = np.ones((len(data_frame.index), len(data_frame.columns)))
@@ -293,22 +299,35 @@ class TechIndicator(object):
             self._techind.columns = [
                 x + " Long Only" for x in data_frame.columns.values]
 
+        elif name == "short-only":
+            # Have -1 signals only
+            self._techind = data_frame  # the technical indicator is just "prices"
+
+            narray = np.ones((len(data_frame.index), len(data_frame.columns)))
+
+            self._signal = pd.DataFrame(index=data_frame.index, data=narray)
+            self._signal.columns = [
+                x + " Short Only Signal" for x in data_frame.columns.values]
+
+            self._techind.columns = [
+                x + " Short Only" for x in data_frame.columns.values]
+
         elif name == "ATR":
-            # get all the asset names (assume we have names 'close', 'low', 'high' in the Data)
+            # Get all the asset names (assume we have names 'close', 'low', 'high' in the Data)
             # keep ordering of assets
             asset_name = list(OrderedDict.fromkeys(
                 [x.split('.')[0] for x in data_frame.columns]))
 
             df = []
 
-            # can improve the performance of this if vectorise more!
+            # Can improve the performance of this if vectorise more!
             for a in asset_name:
 
                 close = [a + '.close']
                 low = [a + '.low']
                 high = [a + '.high']
 
-                # if we don't fill NaNs, we need to remove those rows and then
+                # If we don't fill NaNs, we need to remove those rows and then
                 # calculate the ATR
                 if not(tech_params.fillna):
                     data_frame_short = data_frame[[close[0], low[0], high[0]]]
@@ -425,7 +444,7 @@ class TechIndicator(object):
 ##########################################################################
 
 
-class TechParams:
+class TechParams(object):
     """Holds parameters for calculation of technical indicators.
 
     """

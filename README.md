@@ -167,6 +167,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 21 Mar 2021
+  * Fixed issue with EventStudy
+  * Refactored TradingModel when constructing weights
 * 22 Feb 2021
   * Fix bug when plotting IR of strategies
 * 16 Feb 2021

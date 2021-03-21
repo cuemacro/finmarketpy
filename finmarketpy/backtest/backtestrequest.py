@@ -33,6 +33,7 @@ class BacktestRequest(MarketDataRequest):
 
         # output parameters for backtest (should we add returns statistics on legends, write CSVs with returns etc.)
         self.__plot_start = None
+        self.__plot_finish = None
         self.__calc_stats = True
         self.__write_csv = False
         self.__write_csv_pnl = False
@@ -42,6 +43,8 @@ class BacktestRequest(MarketDataRequest):
         self.__trading_field = 'close'
 
         self.__tech_params = TechParams()
+
+        self.__portfolio_weight_construction = None
 
         # default parameters for portfolio level vol adjustment
         self.__portfolio_vol_adjust = False
@@ -101,6 +104,14 @@ class BacktestRequest(MarketDataRequest):
 
     @plot_start.setter
     def plot_start(self, plot_start): self.__plot_start = plot_start
+
+    @property
+    def plot_finish(self):
+        return self.__plot_finish
+
+    @plot_finish.setter
+    def plot_finish(self, plot_finish):
+        self.__plot_finish = plot_finish
     
     @property
     def calc_stats(self): return self.__calc_stats
@@ -139,8 +150,17 @@ class BacktestRequest(MarketDataRequest):
 
     @trading_field.setter
     def trading_field(self, trading_field): self.__trading_field = trading_field
+    
+    @property
+    def portfolio_weight_construction(self):
+        return self.__portfolio_weight_construction
 
-    ##### properties for portfolio level volatility adjustment
+    @portfolio_weight_construction.setter
+    def portfolio_weight_construction(self, portfolio_weight_construction):
+        self.__portfolio_weight_construction = portfolio_weight_construction
+    
+    ##### Properties for portfolio level volatility adjustment
+    
     @property
     def portfolio_vol_adjust(self): return self.__portfolio_vol_adjust
 

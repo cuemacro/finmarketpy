@@ -47,7 +47,7 @@ if run_example == 1 or run_example == 0:
     ###### then plot intraday price action around NFP for EUR/USD
 
     start_date = datetime.date.today() - timedelta(days=180)
-    finish_date = datetime.datetime.utcnow()
+    finish_date = datetime.datetime.utcnow().date()
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -61,7 +61,7 @@ if run_example == 1 or run_example == 0:
         tickers=['NFP'],
         fields=['release-date-time-full'],  # which fields to download
         vendor_tickers=['NFP TCH Index'],   # ticker (Bloomberg)
-        cache_algo='internet_load_return')  # how to return data
+        cache_algo='cache_algo_return')  # how to return data
 
     df_event_times = market.fetch_market(md_request)
     df_event_times = pandas.DataFrame(index=df_event_times['NFP.release-date-time-full'])
@@ -78,7 +78,7 @@ if run_example == 1 or run_example == 0:
         data_source='bloomberg',        # use Bloomberg as data source
         tickers=['USDJPY'],             # ticker (finmarketpy)
         fields=['close'],               # which fields to download
-        cache_algo='internet_load_return')  # how to return data
+        cache_algo='cache_algo_return')  # how to return data
 
     df = None
     df = market.fetch_market(md_request)

@@ -134,11 +134,21 @@ class EventStudy(object):
 
             vals = data_frame_rets.iloc[start_index[i]:finish_index[i]].values
 
+            st = ef_time_start[i]
+            en = ef_time_end[i]
+
             # Add extra "future" history in case we are doing an event study which goes outside our data window
             # (will just be filled with NaN)
             if len(vals) < len(lst_ords):
                 extend = np.zeros((len(lst_ords) - len(vals), 1)) * np.nan
-                vals = np.append(vals, extend)
+
+                # If start window date is before we have data
+                if st < data_frame_rets.index[0]:
+                    vals = np.append(extend, vals)
+
+                # If end date window is after we have data
+                else:
+                    vals = np.append(vals, extend)
 
             data_frame[ef_time_frame.index[i]] = vals
 

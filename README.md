@@ -167,6 +167,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 08 Apr 2021
+  * Fixed EventStudy issue when start window is before time series
 * 21 Mar 2021
   * Fixed issue with EventStudy
   * Refactored TradingModel when constructing weights

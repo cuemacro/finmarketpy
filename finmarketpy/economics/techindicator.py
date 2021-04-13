@@ -95,7 +95,7 @@ class TechIndicator(object):
                 narray = np.where(data_frame > self._techind, 1, -1)
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
-            self._signal.loc[0:tech_params.sma_period] = np.nan
+            self._signal.iloc[0:tech_params.sma_period] = np.nan
             self._signal.columns = [
                 x + " SMA Signal" for x in data_frame.columns.values]
 
@@ -114,7 +114,7 @@ class TechIndicator(object):
             narray = np.where(data_frame > self._techind, 1, -1)
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
-            self._signal.loc[0:tech_params.ema_period] = np.nan
+            self._signal.iloc[0:tech_params.ema_period] = np.nan
             self._signal.columns = [
                 x + " EMA Signal" for x in data_frame.columns.values]
 
@@ -133,7 +133,7 @@ class TechIndicator(object):
             narray = np.where(self._techind > 0, 1, -1)
 
             self._signal = pd.DataFrame(index=data_frame.index, data=narray)
-            self._signal.loc[0:tech_params.roc_period] = np.nan
+            self._signal.iloc[0:tech_params.roc_period] = np.nan
             self._signal.columns = [
                 x + " ROC Signal" for x in data_frame.columns.values]
 
@@ -171,7 +171,7 @@ class TechIndicator(object):
             sma.columns = [x + " SMA" for x in data_frame.columns.values]
             sma2.columns = [x + " SMA2" for x in data_frame.columns.values]
             most = max(tech_params.sma_period, tech_params.sma2_period)
-            self._signal.loc[0:most] = np.nan
+            self._signal.iloc[0:most] = np.nan
             self._techind = pd.concat([sma, sma2], axis=1)
 
         elif name in ['RSI']:
@@ -240,7 +240,7 @@ class TechIndicator(object):
 
             self._signal = signal
 
-            self._signal.loc[0:tech_params.rsi_period] = np.nan
+            self._signal.iloc[0:tech_params.rsi_period] = np.nan
             self._signal.columns = [
                 x + " RSI Signal" for x in data_frame.columns.values]
 
@@ -275,7 +275,7 @@ class TechIndicator(object):
             signal = signal.fillna(method='ffill')
 
             self._signal = signal
-            self._signal.loc[0:tech_params.bb_period] = np.nan
+            self._signal.iloc[0:tech_params.bb_period] = np.nan
             self._signal.columns = [
                 x + " " + name + " Signal" for x in data_frame.columns.values]
 

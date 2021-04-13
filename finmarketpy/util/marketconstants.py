@@ -1,7 +1,7 @@
 __author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
+# Copyright 2016-2021 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -133,8 +133,8 @@ class MarketConstants(object):
 
     fx_options_tol = 1e-8
 
-    # overwrite field variables with those listed in MarketCred
-    def __init__(self):
+    # Overwrite field variables with those listed in MarketCred or we can pass through an override_fields dictionary
+    def __init__(self, override_fields={}):
         try:
             from finmarketpy.util.marketcred import MarketCred
             cred_keys = MarketCred.__dict__.keys()
@@ -144,3 +144,7 @@ class MarketConstants(object):
                     setattr(MarketConstants, k, getattr(MarketCred, k))
         except:
             pass
+
+        for k in override_fields.keys():
+            if '__' not in k:
+                setattr(MarketConstants, k, override_fields[k])

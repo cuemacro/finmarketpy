@@ -167,6 +167,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 13 Apr 2021
+  * Replaced loc with iloc in TechIndicator to remove Pandas deprecated functionality
 * 08 Apr 2021
   * Fixed EventStudy issue when start window is before time series
 * 21 Mar 2021

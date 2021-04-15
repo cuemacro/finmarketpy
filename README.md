@@ -167,6 +167,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 15 Apr 2021
+  * Constant overrides now persist
 * 13 Apr 2021
   * Replaced loc with iloc in TechIndicator to remove Pandas deprecated functionality
 * 08 Apr 2021

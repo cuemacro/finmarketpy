@@ -133,6 +133,8 @@ class MarketConstants(object):
 
     fx_options_tol = 1e-8
 
+    override_fields = {}
+
     # Overwrite field variables with those listed in MarketCred or we can pass through an override_fields dictionary
     def __init__(self, override_fields={}):
         try:
@@ -144,6 +146,12 @@ class MarketConstants(object):
                     setattr(MarketConstants, k, getattr(MarketCred, k))
         except:
             pass
+
+        # Store overrided fields
+        if override_fields == {}:
+            override_fields = MarketConstants.override_fields
+        else:
+            MarketConstants.override_fields = override_fields
 
         for k in override_fields.keys():
             if '__' not in k:

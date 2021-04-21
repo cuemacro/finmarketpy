@@ -167,6 +167,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 21 Apr 2021
+  * Format changes to TradingModel charts
 * 15 Apr 2021
   * Constant overrides now persist
 * 13 Apr 2021

@@ -1109,14 +1109,17 @@ class TradingModel(object):
         self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
         self._strategy_trade_contracts = backtest.portfolio_trade_contracts()
 
+        # Get PnL by component (before portfolio vol targeting and after)
         self._strategy_group_pnl_trades = backtest.pnl_trades()  # get individual trades P&L before (before portfolio adjustment)
         self._strategy_pnl_trades_components = backtest.components_pnl_trades()
 
+        # Get the total size of longs, short, net exposure and total exposure
         self._strategy_total_longs = backtest.portfolio_total_longs()
         self._strategy_total_shorts = backtest.portfolio_total_shorts()
         self._strategy_net_exposure = backtest.portfolio_net_exposure()
         self._strategy_total_exposure = backtest.portfolio_total_exposure()
 
+        # Get the total notionals of longs, short, net exposure and total exposure
         self._strategy_total_longs_notional = backtest.portfolio_total_longs_notional()
         self._strategy_total_shorts_notional = backtest.portfolio_total_shorts_notional()
         self._strategy_net_exposure_notional = backtest.portfolio_net_exposure_notional()
@@ -1381,6 +1384,8 @@ class TradingModel(object):
 
     #### Plotting
 
+    #### Plotting
+
     def _reduce_plot(self, data_frame, reduce_plot=True, resample='B'):
         """Reduces the frequency of a time series to every business day so it can be plotted more easily
 
@@ -1403,7 +1408,18 @@ class TradingModel(object):
         except:
             return data_frame
 
-    def _chart_return_with_df(self, df, style, silent_plot, chart_type='line', ret_with_df=False):
+    def _chart_return_with_df(self, df, style, silent_plot, chart_type='line', ret_with_df=False, split_on_char=None):
+
+        if split_on_char is not None:
+            d_split = []
+
+            for d in df.columns:
+                try:
+                    d_split.append(d.split(".")[0])
+                except:
+                    d_split.append(d)
+
+            df.columns = d_split
 
         chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type=chart_type, style=style)
         if not (silent_plot): chart.plot()
@@ -1412,20 +1428,24 @@ class TradingModel(object):
 
         return chart
 
-    ##### Quick helper functions to plot aspects of the strategy such as P&L, leverage etc.
-    def plot_individual_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+        ##### Quick helper functions to plot aspects of the strategy such as P&L, leverage etc.
+
+    def plot_individual_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
+                                 split_on_char=None):
 
         style = self._create_style("Leverage", "Individual Leverage", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._individual_leverage,
-                reduce_plot=reduce_plot, resample=resample), strip)
+                                                         reduce_plot=reduce_plot, resample=resample), strip)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_group_pnl_trades(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_group_pnl_trades(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                       ret_with_df=False, split_on_char=None):
 
         style = self._create_style("(bp)", "Individual Trade PnL", reduce_plot=reduce_plot)
 
@@ -1437,31 +1457,33 @@ class TradingModel(object):
         try:
             strategy_pnl_trades = self._strategy_group_pnl_trades.fillna(0) * 100 * 100
             df = self._strip_dataframe(self._reduce_plot(strategy_pnl_trades, reduce_plot=reduce_plot,
-                                                                  resample=resample), strip)
+                                                         resample=resample), strip)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
+                          split_on_char=None):
 
         style = self._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._strategy_pnl,
-                                                        reduce_plot=reduce_plot, resample=resample), strip)
-
-
+                                                         reduce_plot=reduce_plot, resample=resample), strip)
 
             if hasattr(self, 'br'):
                 if self.br.write_csv_pnl:
                     df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except Exception as e:
             print(str(e))
 
-    def plot_strategy_trade_no(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_trade_no(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
+                               split_on_char=None):
         df_trades = self._strategy_trade_no
 
         if strip is not None: df_trades.index = [k.replace(strip, '') for k in df_trades.index]
@@ -1474,11 +1496,14 @@ class TradingModel(object):
 
             df = self._strip_dataframe(self._reduce_plot(df_trades, reduce_plot=reduce_plot, resample=resample), strip)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_signal_proportion(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_signal_proportion(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                        ret_with_df=False,
+                                        split_on_char=None):
 
         signal = self._strategy_signal
 
@@ -1502,66 +1527,82 @@ class TradingModel(object):
             style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + ' (Strategy signal proportion).html'
 
             df = self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot=reduce_plot,
-                                                resample=resample)
+                                       resample=resample)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
+                               split_on_char=None):
         style = self._create_style("Leverage", "Strategy Leverage", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._strategy_leverage,
-                reduce_plot=reduce_plot, resample=resample), strip)
+                                                         reduce_plot=reduce_plot, resample=resample), strip)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    ##### Plot the individual components cumulative returns and return statistics (including portfolio level constraints)
-    def plot_strategy_components_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+        ##### Plot the individual components cumulative returns and return statistics (including portfolio level constraints)
+
+    def plot_strategy_components_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                     ret_with_df=False, split_on_char=None):
 
         style = self._create_style("Ind Components", "Strategy PnL Components", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._strategy_components_pnl,
-                                                                  reduce_plot=reduce_plot, resample=resample), strip)
+                                                         reduce_plot=reduce_plot, resample=resample), strip)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_components_pnl_ir(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_components_pnl_ir(self, strip=None, silent_plot=False, ret_with_df=False,
+                                        split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'IR', 'Ind Component',
                                            'Ind Component IR',
                                            strip=strip,
-                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_components_pnl_returns(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_components_pnl_returns(self, strip=None, silent_plot=False, ret_with_df=False,
+                                             split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'Returns', 'Ind Component (%)',
                                            'Ind Component Returns', strip=strip,
-                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_components_pnl_vol(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_components_pnl_vol(self, strip=None, silent_plot=False, ret_with_df=False, split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'Vol', 'Ind Component (%)',
                                            'Ind Component Vol', strip=strip,
-                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_components_pnl_drawdowns(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_components_pnl_drawdowns(self, strip=None, silent_plot=False, ret_with_df=False,
+                                               split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_components_pnl_ret_stats, 'Drawdowns', 'Ind Component (%)',
                                            'Ind Component Drawdowns', strip=strip,
-                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_components_pnl_yoy(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_components_pnl_yoy(self, strip=None, silent_plot=False, ret_with_df=False,
+                                         split_on_char=None):
 
         return self.plot_yoy_helper(self._strategy_components_pnl_ret_stats, 'Ind Component YoY', 'Ind Component (%)',
-                                    strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                    strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                    split_on_char=split_on_char)
 
-    ##### plot the cumulative returns and return statistics for the strategy group
-    ##### this will plot the final strategy, benchmark and all the individual baskets (as though they were run by themselves)
+        ##### plot the cumulative returns and return statistics for the strategy group
+        ##### this will plot the final strategy, benchmark and all the individual baskets (as though they were run by themselves)
+
     def plot_strategy_group_benchmark_pnl(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
-                                          ret_with_df=False):
+                                          ret_with_df=False, split_on_char=None):
         logger = LoggerManager().getLogger(__name__)
 
         style = self._create_style("", "Group Benchmark PnL - cumulative")
@@ -1572,31 +1613,41 @@ class TradingModel(object):
 
         # plot cumulative line of returns
         df = self._strip_dataframe(self._reduce_plot(self._strategy_group_benchmark_pnl,
-                                                    reduce_plot=reduce_plot, resample=resample), strip)
+                                                     reduce_plot=reduce_plot, resample=resample), strip)
 
-        return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+        return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                          split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_ir(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_group_benchmark_pnl_ir(self, strip=None, silent_plot=False, ret_with_df=False,
+                                             split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'IR', '',
                                            'Group Benchmark IR',
-                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_returns(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_group_benchmark_pnl_returns(self, strip=None, silent_plot=False, ret_with_df=False,
+                                                  split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'Returns', '(%)',
                                            'Group Benchmark Returns',
-                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_vol(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_group_benchmark_pnl_vol(self, strip=None, silent_plot=False, ret_with_df=False,
+                                              split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'Vol', '(%)',
                                            'Group Benchmark Vol',
-                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           strip=strip, silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_drawdowns(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_group_benchmark_pnl_drawdowns(self, strip=None, silent_plot=False, ret_with_df=False,
+                                                    split_on_char=None):
         return self._plot_ret_stats_helper(self._strategy_group_benchmark_pnl_ret_stats, 'Drawdowns', '(%)',
                                            'Group Benchmark Drawdowns', strip=strip,
-                                           silent_plot=silent_plot, ret_with_df=ret_with_df)
+                                           silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                           split_on_char=split_on_char)
 
-    def _plot_ret_stats_helper(self, ret_stats, metric, title, file_tag, strip=None, silent_plot=False, ret_with_df=False):
+    def _plot_ret_stats_helper(self, ret_stats, metric, title, file_tag, strip=None, silent_plot=False,
+                               ret_with_df=False, split_on_char=None):
         style = self._create_style(title, file_tag)
         keys = ret_stats.keys()
         ret_metric = []
@@ -1621,14 +1672,16 @@ class TradingModel(object):
             style.scale_factor) + '.html'
         style.display_brand_label = False
 
-        return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
+        return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df,
+                                          split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_yoy(self, strip=None, silent_plot=False):
+    def plot_strategy_group_benchmark_pnl_yoy(self, strip=None, silent_plot=False, split_on_char=None):
 
         return self.plot_yoy_helper(self._strategy_group_benchmark_pnl_ret_stats, "", "Group Benchmark PnL YoY",
                                     strip=strip, silent_plot=silent_plot)
 
-    def plot_yoy_helper(self, ret_stats, title, file_tag, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_yoy_helper(self, ret_stats, title, file_tag, strip=None, silent_plot=False, ret_with_df=False,
+                        split_on_char=None):
 
         style = self._create_style(title, title)
         # keys = self._strategy_group_benchmark_ret_stats.keys()
@@ -1655,20 +1708,23 @@ class TradingModel(object):
 
         ret_stats = ret_stats * 100
 
-        return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+        return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                          split_on_char=split_on_char)
 
-    def plot_strategy_group_leverage(self, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_group_leverage(self, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
+                                     split_on_char=None):
 
         style = self._create_style("Leverage", "Group Leverage", reduce_plot=reduce_plot)
 
         df = self._reduce_plot(self._strategy_group_leverage, reduce_plot=reduce_plot, resample=resample)
 
-        return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+        return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                          split_on_char=split_on_char)
 
-    ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
+        ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
 
     def plot_strategy_all_signals(self, signal_show=None, strip=None, silent_plot=False, reduce_plot=True, resample='B',
-                                  ret_with_df=False):
+                                  ret_with_df=False, split_on_char=None):
 
         style = self._create_style("positions (% portfolio notional)", "Positions", reduce_plot=reduce_plot)
 
@@ -1679,13 +1735,14 @@ class TradingModel(object):
             if signal_show != []:
                 not_found = []
 
-                for d in df.columns:
-                    d_split = d.split(".")[0]
+                if split_on_char is not None:
+                    for d in df.columns:
+                        d_split = d.split(".")[0]
 
-                    if d_split not in signal_show:
-                        not_found.append(d)
+                        if d_split not in signal_show:
+                            not_found.append(d)
 
-                df = df.drop(not_found, axis=1)
+                    df = df.drop(not_found, axis=1)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(df, reduce_plot=reduce_plot,
@@ -1694,23 +1751,36 @@ class TradingModel(object):
         except:
             pass
 
-    def plot_strategy_signals(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+    def plot_strategy_signals(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False,
+                              split_on_char=None):
         return self._plot_signal(self._strategy_signal, label="positions (% portfolio notional)", caption="Positions",
-                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+                                 date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
+                                 ret_with_df=ret_with_df,
+                                 split_on_char=split_on_char)
 
-    def plot_strategy_trades(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+    def plot_strategy_trades(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False,
+                             split_on_char=None):
         return self._plot_signal(self._strategy_trade, label="trades (% portfolio notional)", caption="Trades",
-                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+                                 date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
+                                 ret_with_df=ret_with_df,
+                                 split_on_char=split_on_char)
 
-    def plot_strategy_signals_notional(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
-        return self._plot_signal(self._strategy_signal_notional, label="positions (scaled by notional)", caption="Positions",
-                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+    def plot_strategy_signals_notional(self, date=None, strip=None, silent_plot=False, strip_times=False,
+                                       ret_with_df=False,
+                                       split_on_char=None):
+        return self._plot_signal(self._strategy_signal_notional, label="positions (scaled by notional)",
+                                 caption="Positions",
+                                 date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
+                                 ret_with_df=ret_with_df,
+                                 split_on_char=split_on_char)
 
-    def plot_strategy_trades_notional(self, date=None, strip=None, silent_plot=False, strip_times=False):
+    def plot_strategy_trades_notional(self, date=None, strip=None, silent_plot=False, strip_times=False,
+                                      split_on_char=None):
         return self._plot_signal(self._strategy_trade_notional, label="trades (scaled by notional)", caption="Trades",
-                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times)
+                                 date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
+                                 split_on_char=split_on_char)
 
-    def plot_strategy_trades_notional_sizes(self, strip=None, silent_plot=False, ret_with_df=False):
+    def plot_strategy_trades_notional_sizes(self, strip=None, silent_plot=False, ret_with_df=False, split_on_char=None):
 
         if strip is not None: self._strategy_trade_notional_sizes.index = [k.replace(strip, '')
                                                                            for k in
@@ -1724,66 +1794,81 @@ class TradingModel(object):
 
             df = self._strip_dataframe(self._strategy_trade_notional_sizes, strip)
 
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_signals_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+    def plot_strategy_signals_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False,
+                                        ret_with_df=False, split_on_char=None):
         return self._plot_signal(self._strategy_signal_contracts, label="positions (contracts)", caption="Positions",
-                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+                                 date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
+                                 ret_with_df=ret_with_df, split_on_char=split_on_char)
 
-    def plot_strategy_trades_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+    def plot_strategy_trades_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False,
+                                       ret_with_df=False, split_on_char=None):
         return self._plot_signal(self._strategy_trade_contracts, label="trades (contracts)", caption="Contracts",
-                          date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times, ret_with_df=ret_with_df)
+                                 date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
+                                 ret_with_df=ret_with_df, split_on_char=split_on_char)
 
-    ###### plot aggregated portfolio exposures
-    def plot_strategy_total_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+        ###### plot aggregated portfolio exposures
+
+    def plot_strategy_total_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                      ret_with_df=False, split_on_char=None):
 
         style = self._create_style("", "Strategy Total Exposures")
         df = pd.concat([self._strategy_total_longs, self._strategy_total_shorts, self._strategy_total_exposure],
-                           axis=1)
+                       axis=1)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(df, reduce_plot=reduce_plot, resample=resample), strip)
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_net_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_net_exposures(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                    ret_with_df=False, split_on_char=None):
         style = self._create_style("", "Strategy Net Exposures", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure,
-                                                                  reduce_plot=reduce_plot, resample=resample), strip)
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+                                                         reduce_plot=reduce_plot, resample=resample), strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_total_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_total_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                               ret_with_df=False, split_on_char=None):
 
         style = self._create_style("(mm)", "Strategy Total Exposures (mm)", reduce_plot=reduce_plot)
         df = pd.concat([self._strategy_total_longs_notional,
-                            self._strategy_total_shorts_notional, self._strategy_total_exposure_notional], axis=1)
+                        self._strategy_total_shorts_notional, self._strategy_total_exposure_notional], axis=1)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(df / 1000000.0, reduce_plot=reduce_plot, resample=resample),
-                                      strip)
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+                                       strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    def plot_strategy_net_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False):
+    def plot_strategy_net_exposures_notional(self, strip=None, silent_plot=False, reduce_plot=True, resample='B',
+                                             ret_with_df=False, split_on_char=None):
 
         style = self._create_style("(mm)", "Strategy Net Exposures (mm)", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._strategy_net_exposure_notional / 1000000.0,
-                reduce_plot=reduce_plot, resample=resample), strip)
-            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df)
+                                                         reduce_plot=reduce_plot, resample=resample), strip)
+            return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
+                                              split_on_char=split_on_char)
         except:
             pass
 
-    #### Grab signals for specific days
+        #### Grab signals for specific days
+
     def _grab_signals(self, strategy_signal, date=None, strip=None):
         if date is None:
             last_day = strategy_signal.iloc[-1].transpose().to_frame()
@@ -1808,7 +1893,8 @@ class TradingModel(object):
 
         return last_day
 
-    def _plot_signal(self, sig, label=' ', caption='', date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False):
+    def _plot_signal(self, sig, label=' ', caption='', date=None, strip=None, silent_plot=False, strip_times=False,
+                     ret_with_df=False, split_on_char=None):
 
         ######## Plot signals
 
@@ -1831,7 +1917,8 @@ class TradingModel(object):
             except:
                 pass
 
-        return self._chart_return_with_df(last_day, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df)
+        return self._chart_return_with_df(last_day, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df,
+                                          split_on_char=split_on_char)
 
     def _strip_dataframe(self, data_frame, strip):
         if strip is None:

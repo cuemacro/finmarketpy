@@ -1900,7 +1900,7 @@ class TradingModel(object):
         return last_day
 
     def _plot_signal(self, sig, label=' ', caption='', date=None, strip=None, silent_plot=False, strip_times=False,
-                     ret_with_df=False, split_on_char=None, mulitiplier=100):
+                     ret_with_df=False, split_on_char=None, multiplier=100):
 
         ######## Plot signals
 

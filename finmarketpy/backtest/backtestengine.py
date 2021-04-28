@@ -1088,9 +1088,15 @@ class TradingModel(object):
     def _assign_final_strategy_results(self, results, backtest):
         # For a key, designated as the final strategy save that as the "strategy"
 
+        # backtest.pnl_cum()
+        # self._strategy_components_pnl_after_portfolio_weights = backtest.components_pnl_cum()
+        # self._strategy_components_pnl_ret_stats_after_portfolio_weights = backtest.components_pnl_ret_stats()
+
         self._strategy_pnl = results  # Cumulative P&L for the final strategy
-        self._strategy_components_pnl = backtest.pnl_cum()  # P&L of the individual components (after portfolio level vol adjustments)
+        self._strategy_components_pnl = backtest.components_pnl_cum()  # P&L of the individual components (after portfolio level vol adjustments)
         self._strategy_components_pnl_ret_stats = backtest.components_pnl_ret_stats().split_into_dict()  # backtest.get_pnl_components_ret_stats()
+
+        self._individual_leverage = backtest.individual_leverage()
 
         self._strategy_pnl_ret_stats = backtest.portfolio_pnl_ret_stats()
         self._strategy_leverage = backtest.portfolio_leverage()
@@ -1295,7 +1301,7 @@ class TradingModel(object):
     def strategy_group_pnl_trades(self):
         return self._strategy_group_pnl_trades
 
-    ### components
+    ### components (after signal and portfolio weighting)
     def strategy_components_pnl(self):
         return self._strategy_components_pnl
 
@@ -1433,7 +1439,7 @@ class TradingModel(object):
     def plot_individual_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
                                  split_on_char=None):
 
-        style = self._create_style("Leverage", "Individual Leverage", reduce_plot=reduce_plot)
+        style = self._create_style("Individual Leverage", "Individual Leverage", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._individual_leverage,
@@ -1536,7 +1542,7 @@ class TradingModel(object):
 
     def plot_strategy_leverage(self, strip=None, silent_plot=False, reduce_plot=True, resample='B', ret_with_df=False,
                                split_on_char=None):
-        style = self._create_style("Leverage", "Strategy Leverage", reduce_plot=reduce_plot)
+        style = self._create_style("Portfolio Leverage", "Strategy Leverage", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(self._strategy_leverage,
@@ -1721,14 +1727,14 @@ class TradingModel(object):
         return self._chart_return_with_df(df, style, silent_plot, chart_type='line', ret_with_df=ret_with_df,
                                           split_on_char=split_on_char)
 
-        ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
+    ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
 
     def plot_strategy_all_signals(self, signal_show=None, strip=None, silent_plot=False, reduce_plot=True, resample='B',
-                                  ret_with_df=False, split_on_char=None):
+                                  ret_with_df=False, split_on_char=None, multiplier=100):
 
         style = self._create_style("positions (% portfolio notional)", "Positions", reduce_plot=reduce_plot)
 
-        df = self._strategy_signal.copy()
+        df = self._strategy_signal.copy() * multiplier
 
         if signal_show is not None:
 
@@ -1737,7 +1743,7 @@ class TradingModel(object):
 
                 if split_on_char is not None:
                     for d in df.columns:
-                        d_split = d.split(".")[0]
+                        d_split = d.split(split_on_char)[0]
 
                         if d_split not in signal_show:
                             not_found.append(d)
@@ -1752,33 +1758,33 @@ class TradingModel(object):
             pass
 
     def plot_strategy_signals(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False,
-                              split_on_char=None):
+                              split_on_char=None, multiplier=100):
         return self._plot_signal(self._strategy_signal, label="positions (% portfolio notional)", caption="Positions",
                                  date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
                                  ret_with_df=ret_with_df,
-                                 split_on_char=split_on_char)
+                                 split_on_char=split_on_char, multiplier=multiplier)
 
     def plot_strategy_trades(self, date=None, strip=None, silent_plot=False, strip_times=False, ret_with_df=False,
-                             split_on_char=None):
+                             split_on_char=None, multiplier=100):
         return self._plot_signal(self._strategy_trade, label="trades (% portfolio notional)", caption="Trades",
                                  date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
                                  ret_with_df=ret_with_df,
-                                 split_on_char=split_on_char)
+                                 split_on_char=split_on_char, multiplier=multiplier)
 
     def plot_strategy_signals_notional(self, date=None, strip=None, silent_plot=False, strip_times=False,
                                        ret_with_df=False,
-                                       split_on_char=None):
+                                       split_on_char=None, multiplier=1):
         return self._plot_signal(self._strategy_signal_notional, label="positions (scaled by notional)",
                                  caption="Positions",
                                  date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
                                  ret_with_df=ret_with_df,
-                                 split_on_char=split_on_char)
+                                 split_on_char=split_on_char, multiplier=multiplier)
 
     def plot_strategy_trades_notional(self, date=None, strip=None, silent_plot=False, strip_times=False,
-                                      split_on_char=None):
+                                      split_on_char=None, multiplier=1):
         return self._plot_signal(self._strategy_trade_notional, label="trades (scaled by notional)", caption="Trades",
                                  date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
-                                 split_on_char=split_on_char)
+                                 split_on_char=split_on_char, multiplier=multiplier)
 
     def plot_strategy_trades_notional_sizes(self, strip=None, silent_plot=False, ret_with_df=False, split_on_char=None):
 
@@ -1800,16 +1806,16 @@ class TradingModel(object):
             pass
 
     def plot_strategy_signals_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False,
-                                        ret_with_df=False, split_on_char=None):
+                                        ret_with_df=False, split_on_char=None, multiplier=1):
         return self._plot_signal(self._strategy_signal_contracts, label="positions (contracts)", caption="Positions",
                                  date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
-                                 ret_with_df=ret_with_df, split_on_char=split_on_char)
+                                 ret_with_df=ret_with_df, split_on_char=split_on_charm, multiplier=multiplier)
 
     def plot_strategy_trades_contracts(self, date=None, strip=None, silent_plot=False, strip_times=False,
-                                       ret_with_df=False, split_on_char=None):
+                                       ret_with_df=False, split_on_char=None, multiplier=1):
         return self._plot_signal(self._strategy_trade_contracts, label="trades (contracts)", caption="Contracts",
                                  date=date, strip=strip, silent_plot=silent_plot, strip_times=strip_times,
-                                 ret_with_df=ret_with_df, split_on_char=split_on_char)
+                                 ret_with_df=ret_with_df, split_on_char=split_on_charm, multiplier=multiplier)
 
         ###### plot aggregated portfolio exposures
 
@@ -1894,11 +1900,11 @@ class TradingModel(object):
         return last_day
 
     def _plot_signal(self, sig, label=' ', caption='', date=None, strip=None, silent_plot=False, strip_times=False,
-                     ret_with_df=False, split_on_char=None):
+                     ret_with_df=False, split_on_char=None, mulitiplier=100):
 
         ######## Plot signals
 
-        strategy_signal = 100 * (sig)
+        strategy_signal =  mulitiplier * (sig)
         last_day = self._grab_signals(strategy_signal, date=date, strip=strip)
 
         style = self._create_style(label, caption)

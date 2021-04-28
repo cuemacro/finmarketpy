@@ -167,6 +167,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 28 Apr 2021
+  * Added signal multiplier parameter for charts
 * 21 Apr 2021
   * Format changes to TradingModel charts
 * 15 Apr 2021

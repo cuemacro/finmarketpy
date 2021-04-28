@@ -1904,7 +1904,7 @@ class TradingModel(object):
 
         ######## Plot signals
 
-        strategy_signal =  mulitiplier * (sig)
+        strategy_signal =  multiplier * (sig)
         last_day = self._grab_signals(strategy_signal, date=date, strip=strip)
 
         style = self._create_style(label, caption)

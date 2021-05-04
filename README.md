@@ -117,8 +117,9 @@ Note that you will need to get a Quandl
 API key to download market data to use some of these, and you can sign up for a free account at https://www.quandl.com.
 
 * [Backtesting an FX trend following strategy - backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/backtest_example.ipynb)
+* [Downloading market data examples - market_data_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/market_data_example.ipynb)
 
-# Syncronizing your fork of finmarketpy with master
+# Synchronizing your fork of finmarketpy with master
 
 I found this [article useful](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository) for 
 explaining how to update your fork to match the master changes.
@@ -167,6 +168,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 04 May 2021
+  * Revamped Jupyter notebook for downloading market data with findatapy
 * 28 Apr 2021
   * Added signal multiplier parameter for charts
 * 21 Apr 2021

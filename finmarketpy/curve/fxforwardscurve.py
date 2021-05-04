@@ -31,7 +31,6 @@ market_constants = MarketConstants()
 class FXForwardsCurve(object):
     """Constructs continuous forwards time series total return indices from underlying forwards contracts.
 
-
     """
 
     def __init__(self, market_data_generator=None, fx_forwards_trading_tenor=market_constants.fx_forwards_trading_tenor,

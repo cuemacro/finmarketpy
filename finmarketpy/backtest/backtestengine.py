@@ -280,7 +280,7 @@ class Backtest(object):
         # Individual signals P&L (before portfolio volatility targeting, position limits etc)
         self._pnl = pnl
 
-        self._individual_leverage = individual_leverage_df
+        self._individual_leverage = self._filter_by_plot_start_finish_date(individual_leverage_df, br)
 
         # P&L components of individual assets after all the portfolio level risk signals and position limits have been applied
         self._components_pnl = self._filter_by_plot_start_finish_date(calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting,

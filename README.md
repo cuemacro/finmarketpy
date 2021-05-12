@@ -168,6 +168,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 12 May 2021
+  * Fixed bug when calculating benchmark return statistics in TradingModel with different start/finish date
 * 04 May 2021
   * Revamped Jupyter notebook for downloading market data with findatapy
 * 28 Apr 2021

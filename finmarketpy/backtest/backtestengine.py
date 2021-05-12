@@ -1229,6 +1229,8 @@ class TradingModel(object):
             # might underrepresent vol
             # if calc_stats:
             benchmark_df = benchmark_df.fillna(method='ffill')
+            benchmark_df = self._filter_by_plot_start_finish_date(benchmark_df, br)
+
             ret_stats.calculate_ret_stats_from_prices(benchmark_df, br.ann_factor)
 
             if br.calc_stats:

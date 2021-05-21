@@ -412,6 +412,8 @@ class Backtest(object):
 
         if br.plot_start is None and br.plot_finish is None:
             return df
+        elif df is None:
+            return None
         else:
             filter = Filter()
             plot_start = br.start_date;

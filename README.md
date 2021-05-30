@@ -168,6 +168,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 30 May 2021
+  * Added S3 Jupyter notebook for use with findatapy
 * 21 May 2021
   * Fix bug with plotting vol target charts when vol targeting is off
 * 12 May 2021

@@ -2,6 +2,8 @@
 
 # [finmarketpy (formerly pythalesians)](https://github.com/cuemacro/finmarketpy)
 
+[![Downloads](https://pepy.tech/badge/finmarketpy)](https://pepy.tech/project/finmarketpy)
+
 finmarketpy is a Python based library that enables you to analyze market data and also to backtest trading strategies using
 a simple to use API, which has prebuilt templates for you to define backtest. Included in the library
 

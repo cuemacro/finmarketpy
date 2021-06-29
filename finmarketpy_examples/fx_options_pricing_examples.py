@@ -274,3 +274,28 @@ if run_example == 7 or run_example == 0:
     # TODO: calendar around election results in slightly different pricing
     # print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), '25d-otm', contract_type='european-put', tenor='1W').to_string())
     # print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 3.5724, contract_type='european-put', expiry_date=pd.Timestamp('2 Nov 2018')).to_string())
+
+###### Price GBPUSD option around Brexit with unquoted deltas
+if run_example == 8 or run_example == 0:
+
+    horizon_date = '23 Jun 2016'
+    cross = 'GBPUSD'
+
+    # Download the whole all market data for GBPUSD for pricing options (vol surface)
+    md_request = MarketDataRequest(start_date=horizon_date, finish_date=horizon_date,
+                                   data_source='bloomberg', cut='NYC', category='fx-vol-market',
+                                   tickers=cross, base_depos_currencies=[cross[0:3], cross[3:6]],
+                                   cache_algo='cache_algo_return')
+
+    df = market.fetch_market(md_request)
+
+    fx_vol_surface = FXVolSurface(market_df=df, asset=cross)
+
+    fx_op = FXOptionsPricer(fx_vol_surface=fx_vol_surface)
+
+    # Price several different options
+    print("atm 1M european call")
+    print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), 'atm', contract_type='european-call', tenor='1M').to_string())
+
+    print("25d 1W european put")
+    print(fx_op.price_instrument(cross, pd.Timestamp(horizon_date), '25d-otm', contract_type='european-put', tenor='1W').to_string())

@@ -31,7 +31,7 @@ class BacktestRequest(MarketDataRequest):
 
         self.__signal_name = None
 
-        # output parameters for backtest (should we add returns statistics on legends, write CSVs with returns etc.)
+        # Output parameters for backtest (should we add returns statistics on legends, write CSVs with returns etc.)
         self.__plot_start = None
         self.__plot_finish = None
         self.__calc_stats = True
@@ -46,7 +46,7 @@ class BacktestRequest(MarketDataRequest):
 
         self.__portfolio_weight_construction = None
 
-        # default parameters for portfolio level vol adjustment
+        # Default parameters for portfolio level vol adjustment
         self.__portfolio_vol_adjust = False
         self.__portfolio_vol_period_shift = 0
         self.__portfolio_vol_rebalance_freq = None
@@ -57,7 +57,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_periods = 20
         self.__portfolio_vol_obs_in_year = 252
 
-        # default parameters for signal level vol adjustment
+        # Default parameters for signal level vol adjustment
         self.__signal_vol_adjust = False
         self.__signal_vol_period_shift = 0
         self.__signal_vol_rebalance_freq = None
@@ -68,12 +68,12 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_periods = 20
         self.__signal_vol_obs_in_year = 252
 
-        # portfolio notional size
+        # Portfolio notional size
         self.__portfolio_notional_size = None
         self.__portfolio_combination = None
         self.__portfolio_combination_weights = None
         
-        # parameters for maximum position limits (expressed as whole portfolio)
+        # Parameters for maximum position limits (expressed as whole portfolio)
         self.__max_net_exposure = None
         self.__max_abs_exposure = None
 
@@ -82,18 +82,21 @@ class BacktestRequest(MarketDataRequest):
         self.__position_clip_resample_type = 'mean'
         self.__position_clip_period_shift = 0
 
-        # take profit and stop loss parameters
+        # Take profit and stop loss parameters
         self.__take_profit = None
         self.__stop_loss = None
 
-        # should we delay the signal?
+        # Should we delay the signal?
         self.__signal_delay = 0
 
-        # annualization factor for return stats (and should we resample data first before calculating it?)
+        # Annualization factor for return stats (and should we resample data first before calculating it?)
         self.__ann_factor = 252
         self.__resample_ann_factor = None
 
-        # how do we create a cumulative index of strategy returns
+
+        self.__spot_rc_bp = None
+
+        # How do we create a cumulative index of strategy returns
         # either multiplicative starting a 100
         # or additive starting at 0
         self.__cum_index = 'mult' # 'mult' or 'add'
@@ -365,6 +368,25 @@ class BacktestRequest(MarketDataRequest):
             self.__spot_tc_bp = spot_tc_bp # assume that DataFrame is in the percentage form (bid to mid)
         else:
             self.__spot_tc_bp = float(spot_tc_bp) / (2.0 * 100.0 * 100.0)
+
+    @property
+    def spot_rc_bp(self):
+        return self.__spot_rc_bp
+
+    @spot_rc_bp.setter
+    def spot_rc_bp(self, spot_rc_bp):
+        if isinstance(spot_rc_bp, dict):
+            spot_rc_bp = spot_rc_bp.copy()
+
+            for k in spot_rc_bp.keys():
+                spot_rc_bp[k] = float(spot_rc_bp[k]) / (100.0 * 100.0)
+
+            self.__spot_rc_bp = spot_rc_bp
+
+        elif isinstance(spot_rc_bp, DataFrame):
+            self.__spot_rc_bp = spot_rc_bp  # assume that DataFrame is in the percentage form (bid to mid)
+        else:
+            self.__spot_rc_bp = float(spot_rc_bp) / (100.0 * 100.0)
 
     #### FOR FUTURE USE ###
 

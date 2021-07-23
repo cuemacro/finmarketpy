@@ -152,7 +152,9 @@ class Backtest(object):
         signal_df = signal_df.mask(non_trading_days)  # fill asset holidays with NaN signals
         signal_df = signal_df.fillna(method='ffill')  # fill these down
 
+        # Transaction costs and roll costs
         tc = br.spot_tc_bp
+        rc = br.spot_rc_bp
 
         signal_cols = signal_df.columns.values
         asset_df_cols = asset_df.columns.values
@@ -245,7 +247,7 @@ class Backtest(object):
                 = self.calculate_exposures(portfolio_signal)
 
         # Calculate final portfolio returns with the amended portfolio leverage (by default just 1s)
-        portfolio = calculations.calculate_signal_returns_with_tc_matrix(portfolio_leverage_df, portfolio, tc=tc)
+        portfolio = calculations.calculate_signal_returns_with_tc_matrix(portfolio_leverage_df, portfolio, tc=tc, rc=rc)
 
         # Assign all the property variables
         # Trim them if we have asked for a different plot start/finish
@@ -284,7 +286,7 @@ class Backtest(object):
 
         # P&L components of individual assets after all the portfolio level risk signals and position limits have been applied
         self._components_pnl = self._filter_by_plot_start_finish_date(calculations.calculate_signal_returns_with_tc_matrix(portfolio_signal_before_weighting,
-                                                                                    returns_df, tc=tc), br)
+                                                                                    returns_df, tc=tc, rc=rc), br)
         self._components_pnl.columns = pnl_cols
 
         # TODO FIX very slow - hence only calculate on demand
@@ -1997,6 +1999,7 @@ class PortfolioWeightConstruction(object):
             br = self._br
 
         tc = br.spot_tc_bp
+        rc = br.spot_rc_bp
 
         individual_leverage_df = None
 
@@ -2015,7 +2018,7 @@ class PortfolioWeightConstruction(object):
 
             individual_leverage_df = leverage_df  # Contains leverage of individual signal (before portfolio vol target)
 
-        signal_pnl = self._calculations.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc=tc)
+        signal_pnl = self._calculations.calculate_signal_returns_with_tc_matrix(signal_df, returns_df, tc=tc, rc=rc)
         signal_pnl.columns = signal_pnl_cols
 
         adjusted_weights_matrix = None

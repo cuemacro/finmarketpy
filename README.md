@@ -171,6 +171,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 23 Jul 2021
+  * Added roll costs in backtest
 * 30 May 2021
   * Added S3 Jupyter notebook for use with findatapy
 * 21 May 2021

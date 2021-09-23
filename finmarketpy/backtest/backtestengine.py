@@ -1077,10 +1077,12 @@ class TradingModel(object):
 
         self._strategy_group_benchmark_pnl_ret_stats = ret_stats_results
 
-        if hasattr(self, '_benchmark_ret_stats'):
+        try:
             ret_stats_list = ret_stats_results
             ret_stats_list['Benchmark'] = (self._strategy_benchmark_pnl_ret_stats)
             self._strategy_group_benchmark_pnl_ret_stats = ret_stats_list
+        except:
+            pass
 
         # Individual parts (all after individually applying portfolio level vol adjustment)
         self._strategy_group_pnl = cum_results
@@ -1687,10 +1689,12 @@ class TradingModel(object):
         return self._chart_return_with_df(ret_stats, style, silent_plot, chart_type='bar', ret_with_df=ret_with_df,
                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_yoy(self, strip=None, silent_plot=False, split_on_char=None):
+    def plot_strategy_group_benchmark_pnl_yoy(self, strip=None, silent_plot=False, ret_with_df=False, split_on_char=None):
 
         return self.plot_yoy_helper(self._strategy_group_benchmark_pnl_ret_stats, "", "Group Benchmark PnL YoY",
-                                    strip=strip, silent_plot=silent_plot)
+                                    strip=strip,
+                                    silent_plot=silent_plot, ret_with_df=ret_with_df,
+                                    split_on_char=split_on_char)
 
     def plot_yoy_helper(self, ret_stats, title, file_tag, strip=None, silent_plot=False, ret_with_df=False,
                         split_on_char=None):

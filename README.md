@@ -60,8 +60,8 @@ Calculate event study around events for asset (see examples/events_examples.py)
 # Requirements
 
 Major requirements
-* Required: Python 3.7
-* Required: pandas 1.0.5, numpy etc.
+* Required: Python 3.8
+* Required: pandas 1.2.3, numpy etc.
 * Required: findatapy for downloading market data (https://github.com/cuemacro/findatapy)
 * Required: chartpy for funky interactive plots (https://github.com/cuemacro/chartpy)
 
@@ -171,6 +171,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 23 Sep 2021
+  * Fixed bug in YoY plot
 * 23 Jul 2021
   * Added roll costs in backtest
 * 30 May 2021

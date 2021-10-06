@@ -156,6 +156,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.10 - finmarketpy (06 Oct 2021)
 * 0.11.9 - finmarketpy (01 Jun 2021)
 * 0.11.8 - finmarketpy (25 Jan 2021)
 * 0.11.7 - finmarketpy (20 Oct 2020)

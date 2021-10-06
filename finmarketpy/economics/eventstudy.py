@@ -24,8 +24,7 @@ class EventStudy(object):
     """
 
     def __init__(self):
-        self.logger = LoggerManager().getLogger(__name__)
-        return
+        pass
 
     def get_economic_event_ret_over_custom_event_day(self, data_frame_in, event_dates, name, event, start, end,
                                                      lagged=False, NYC_cutoff=10):
@@ -278,7 +277,6 @@ class EventsFactory(EventStudy):
         super(EventStudy, self).__init__()
 
         self.config = ConfigManager()
-        self.logger = LoggerManager().getLogger(__name__)
         self.filter = Filter()
         self.io_engine = IOEngine()
         self.speed_cache = SpeedCache()
@@ -523,7 +521,6 @@ from findatapy.util import DataConstants, LoggerManager
 class HistEconDataFactory(object):
 
     def __init__(self, market_data_generator=None):
-        self.logger = LoggerManager().getLogger(__name__)
 
         self._all_econ_tickers = pandas.read_csv(DataConstants().all_econ_tickers)
         self._econ_country_codes = pandas.read_csv(DataConstants().econ_country_codes)
@@ -536,6 +533,8 @@ class HistEconDataFactory(object):
 
     def get_economic_data_history(self, start_date, finish_date, country_group, data_type,
                                   source='alfred', cache_algo="internet_load_return"):
+
+        logger = LoggerManager().getLogger(__name__)
 
         # vendor_country_codes = self.fred_country_codes[country_group]
         # vendor_pretty_country = self.fred_nice_country_codes[country_group]
@@ -559,7 +558,7 @@ class HistEconDataFactory(object):
 
             if vendor_ticker == []:
                 vendor_ticker = None
-                self.logger.error('Could not find match for ' + pretty_ticker)
+                logger.error('Could not find match for ' + pretty_ticker)
             else:
                 vendor_ticker = vendor_ticker[0]
 

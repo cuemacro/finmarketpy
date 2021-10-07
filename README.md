@@ -156,6 +156,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.11 - finmarketpy (07 Oct 2021)
 * 0.11.10 - finmarketpy (06 Oct 2021)
 * 0.11.9 - finmarketpy (01 Jun 2021)
 * 0.11.8 - finmarketpy (25 Jan 2021)
@@ -172,6 +173,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 07 Oct 2021
+  * Set FinancePy version required to 0.193
 * 23 Sep 2021
   * Fixed bug in YoY plot
 * 23 Jul 2021

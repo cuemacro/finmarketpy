@@ -4,7 +4,7 @@ long_description = """finmarketpy is a Python based library that enables you to 
 trading strategies using a simple to use API, which has prebuilt templates for you to define backtest."""
 
 setup(name='finmarketpy',
-      version='0.11.10',
+      version='0.11.11',
       description='finmarketpy is a Python based library for backtesting trading strategies',
       author='Saeed Amen',
       author_email='saeed@cuemacro.com',
@@ -24,5 +24,5 @@ setup(name='finmarketpy',
                         'sklearn',
                         'matplotlib',
                         'numba',
-                        'financepy'],
+                        'financepy==0.193'],
       zip_safe=False)

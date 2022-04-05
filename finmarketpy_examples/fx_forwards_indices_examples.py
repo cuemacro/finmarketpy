@@ -34,7 +34,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 calculations = Calculations()
 
 # Choose run_example = 0 for everything
-# run_example = 1 - creating USDTRY total return index rolling forwards and compare with BBG indices
+# run_example = 1 - creating USDBRL total return index rolling forwards and compare with BBG indices
 # run_example = 2 - creating AUDJPY (via AUDUSD and JPYUSD) total return index rolling forwards & compare with BBG indices
 
 run_example = 0

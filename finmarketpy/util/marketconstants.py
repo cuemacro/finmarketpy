@@ -59,6 +59,7 @@ class MarketConstants(object):
     output_calculation_fields = False
 
 ### FX Forwards ########################################################################################################
+    fx_forwards_points_divisor_1 = ['IDR']
     fx_forwards_points_divisor_100 = ['JPY']
     fx_forwards_points_divisor_1000 = []
 

@@ -24,5 +24,5 @@ setup(name='finmarketpy',
                         'sklearn',
                         'matplotlib',
                         'numba',
-                        'financepy==0.193'],
+                        'financepy==0.220'],
       zip_safe=False)

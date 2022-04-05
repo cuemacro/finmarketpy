@@ -150,6 +150,19 @@ If you are interested in our commercial services please contact saeed@cuemacro.c
 All these sources of funding, whether it is sponsorship or our commercial services, help us to maintain Cuemacro's libraries, 
 so we can improve our open source libraries for the community.
 
+# Problems with Numba and doing options pricing in finmarketpy/financepy
+
+Underneath finmarketpy uses financepy to do option pricing. It uses Numba to speed up the computation.
+
+You may sometimes experience Numba errors like such as `Failed in nopython mode pipeline (step: nopython frontend)`
+
+One possible way to fix this is to delete the `__pycache__` folders underneath wherever financepy is installed:
+
+Eg. if you are using the `py38class` environment, if you've installed Anaconda in `C:\Anaconda3`, you might find the financepy
+folder at the below location
+
+`C:\Anaconda3\envs\py38\Lib\site-packages\financepy`
+
 # finmarketpy examples
 
 In finmarketpy/examples you will find several examples, including some simple trading models
@@ -173,6 +186,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 05 Apr 2022
+  * Set FinancePy version required to 0.220 and refactored FXVolSurface for
+  this
 * 07 Oct 2021
   * Set FinancePy version required to 0.193
 * 23 Sep 2021

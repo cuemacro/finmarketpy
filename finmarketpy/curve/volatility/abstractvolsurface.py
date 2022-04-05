@@ -18,7 +18,7 @@ import numpy as np
 
 ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
 
-from financepy.finutils.FinDate import FinDate
+from financepy.utils.date import Date
 
 class AbstractVolSurface(ABC):
     """Holds data for an asset class vol surface
@@ -95,4 +95,4 @@ class AbstractVolSurface(ABC):
         return
 
     def _findate(self, date):
-        return FinDate(date.day, date.month, date.year)
+        return Date(date.day, date.month, date.year)

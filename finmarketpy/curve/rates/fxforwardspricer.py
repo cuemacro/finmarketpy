@@ -231,10 +231,13 @@ class FXForwardsPricer(AbstractPricer):
         # Typically most divisors of forward points are 10000.0
         divisor = 10000.0
 
-        if currency in market_constants.fx_forwards_points_divisor_100:
+        if currency in market_constants.fx_forwards_points_divisor_1:
+            divisor = 1.0
+
+        elif currency in market_constants.fx_forwards_points_divisor_100:
             divisor = 100.0
 
-        if currency in market_constants.fx_forwards_points_divisor_1000:
+        elif currency in market_constants.fx_forwards_points_divisor_1000:
             divisor = 1000.0
 
         return divisor

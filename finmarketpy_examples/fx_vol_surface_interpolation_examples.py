@@ -29,6 +29,12 @@ from findatapy.util.loggermanager import LoggerManager
 
 from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface
 
+try:
+    from finaddpy.market.cachedmarketdatagenerator import \
+        CachedMarketDataGenerator as MarketDataGenerator
+except:
+    pass
+
 logger = LoggerManager().getLogger(__name__)
 
 chart = Chart(engine='plotly')
@@ -41,7 +47,7 @@ market = Market(market_data_generator=MarketDataGenerator())
 # run_example = 4 - get implied vol for a particular strike, interpolating the surface
 # run_example = 5 - get USDJPY vol surface around US presidential election and plot
 
-run_example = 2
+run_example = 3
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Show how to plot ATM 1M implied_vol vol time series

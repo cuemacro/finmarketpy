@@ -186,6 +186,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 26 Apr 2023
+  * Changed sklearn to scikit-learn dependency
 * 05 Apr 2022
   * Set FinancePy version required to 0.220 and refactored FXVolSurface for
   this

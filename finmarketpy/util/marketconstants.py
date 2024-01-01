@@ -89,21 +89,21 @@ class MarketConstants(object):
     fx_options_tenor_for_interpolation = ["ON", "1W", "2W", "3W", "1M", "2M", "3M", "4M", "6M", "9M", "1Y"]#, "2Y", "3Y"]
 
     # What contract will we generally be trading?
-    fx_options_trading_tenor = '1M'
+    fx_options_trading_tenor = "1M"
 
     # When constructing total return index 'mult' or 'add'
-    fx_options_cum_index = 'mult'
+    fx_options_cum_index = "mult"
 
     # For total return index use option price in base currency/for
-    fx_options_index_premium_output = 'pct-for'
+    fx_options_index_premium_output = "pct-for"
 
-    fx_options_index_strike = 'atm'
-    fx_options_index_contract_type = 'european-call'
+    fx_options_index_strike = "atm"
+    fx_options_index_contract_type = "european-call"
 
     fx_options_freeze_implied_vol = False
 
     # What is the point at which we roll?
-    fx_options_roll_event = 'expiry-date'  # 'month-end', 'expiry-date', 'no-roll'
+    fx_options_roll_event = "expiry-date"  # 'month-end', 'expiry-date', 'no-roll'
 
     # How many days before that point should we roll?
     fx_options_roll_days_before = 5
@@ -114,23 +114,23 @@ class MarketConstants(object):
     # For fitting vol surface
 
     # 'CLARK5', 'CLARK', 'BBG', 'SABR' and 'SABR3'
-    fx_options_vol_function_type = 'CLARK5'
-    fx_options_depo_tenor = '1M'
+    fx_options_vol_function_type = "CLARK5"
+    fx_options_depo_tenor = "1M"
 
     # 'fwd-delta-neutral' or 'fwd-delta-neutral-premium-adj' or 'spot' or 'fwd'
-    fx_options_atm_method = 'fwd-delta-neutral-premium-adj'
+    fx_options_atm_method = "fwd-delta-neutral-premium-adj"
 
     # 'fwd-delta' or 'fwd-delta-prem-adj' or 'spot-delta-prem-adj' or 'spot-delta'
-    fx_options_delta_method = 'spot-delta-prem-adj'
+    fx_options_delta_method = "spot-delta-prem-adj"
     fx_options_alpha = 0.5
 
     # 'pct-for' (in base currency pct) or 'pct-dom' (in terms currency pct)
-    fx_options_premium_output = 'pct-for'
-    fx_options_delta_output = 'pct-fwd-delta-prem-adj'
+    fx_options_premium_output = "pct-for"
+    fx_options_delta_output = "pct-fwd-delta-prem-adj"
 
     # 'nelmer-mead' or 'nelmer-mead-numba' (faster but less accurate) or 'cg' (conjugate gradient tends to be slower, but more accurate)
-    fx_options_solver = 'nelmer-mead-numba'
-    fx_options_pricing_engine = 'financepy' # 'financepy' or 'finmarketpy'
+    fx_options_solver = "nelmer-mead-numba"
+    fx_options_pricing_engine = "financepy" # 'financepy' or 'finmarketpy'
 
     fx_options_tol = 1e-8
 

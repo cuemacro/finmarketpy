@@ -24,19 +24,19 @@ class MarketUtil(object):
 
             date1 = datetime.datetime.utcnow()
 
-            if date is 'midnight':
+            if date == "midnight":
                 date1 = datetime.datetime(date1.year, date1.month, date1.day, 0, 0, 0)
-            elif date is 'decade':
+            elif date == "decade":
                 date1 = date1 - timedelta(days=365 * 10)
-            elif date is 'year':
+            elif date == "year":
                 date1 = date1 - timedelta(days=365)
-            elif date is 'month':
+            elif date == "month":
                 date1 = date1 - timedelta(days=30)
-            elif date is 'week':
+            elif date == "week":
                 date1 = date1 - timedelta(days=7)
-            elif date is 'day':
+            elif date == "day":
                 date1 = date1 - timedelta(days=1)
-            elif date is 'hour':
+            elif date == "hour":
                 date1 = date1 - timedelta(hours=1)
             else:
                 # format expected 'Jun 1 2005 01:33', '%b %d %Y %H:%M'

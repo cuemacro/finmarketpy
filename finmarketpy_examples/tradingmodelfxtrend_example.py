@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -21,6 +21,11 @@ from finmarketpy.economics import TechIndicator
 
 from chartpy import Style
 
+from findatapy.util.dataconstants import DataConstants
+
+# You will likely need to change this!
+quandl_api_key = DataConstants().quandl_api_key
+
 class TradingModelFXTrend_Example(TradingModel):
     """Shows how to create a simple FX CTA style strategy, using the TradingModel abstract class (backtest_examples.py
     is a lower level way of doing this).
@@ -31,17 +36,17 @@ class TradingModelFXTrend_Example(TradingModel):
 
         ##### FILL IN WITH YOUR OWN PARAMETERS FOR display, dumping, TSF etc.
         self.market = Market(market_data_generator=MarketDataGenerator())
-        self.DUMP_PATH = ''
-        self.FINAL_STRATEGY = 'FX trend'
+        self.DUMP_PATH = ""
+        self.FINAL_STRATEGY = "FX trend"
         self.SCALE_FACTOR = 1
-        self.DEFAULT_PLOT_ENGINE = 'matplotlib'
-        # self.CHART_STYLE = Style(plotly_plot_mode='offline_jupyter')
+        self.DEFAULT_PLOT_ENGINE = "matplotlib"
+        # self.CHART_STYLE = Style(plotly_plot_mode="offline_jupyter")
 
         self.br = self.load_parameters()
         return
 
     ###### Parameters and signal generations (need to be customised for every model)
-    def load_parameters(self, br = None):
+    def load_parameters(self, br=None):
 
         if br is not None: return br
 
@@ -66,7 +71,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.signal_vol_max_leverage = 5
         br.signal_vol_periods = 20
         br.signal_vol_obs_in_year = 252
-        br.signal_vol_rebalance_freq = 'BM'
+        br.signal_vol_rebalance_freq = "BM"
         br.signal_vol_resample_freq = None
 
         # Have vol target for portfolio
@@ -75,14 +80,14 @@ class TradingModelFXTrend_Example(TradingModel):
         br.portfolio_vol_max_leverage = 5
         br.portfolio_vol_periods = 20
         br.portfolio_vol_obs_in_year = 252
-        br.portfolio_vol_rebalance_freq = 'BM'
+        br.portfolio_vol_rebalance_freq = "BM"
         br.portfolio_vol_resample_freq = None
 
         # Tech params
         br.tech_params.sma_period = 200
 
         # To make additive indices
-        # br.cum_index = 'add'
+        # br.cum_index = "add"
 
         return br
 
@@ -92,33 +97,37 @@ class TradingModelFXTrend_Example(TradingModel):
         logger = LoggerManager().getLogger(__name__)
 
         # For FX basket
-        full_bkt    = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
-                       'NZDUSD', 'USDCHF', 'USDNOK', 'USDSEK']
+        full_bkt    = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD",
+                       "NZDUSD", "USDCHF", "USDNOK", "USDSEK"]
 
         basket_dict = {}
 
         for i in range(0, len(full_bkt)):
             basket_dict[full_bkt[i]] = [full_bkt[i]]
 
-        basket_dict['FX trend'] = full_bkt
+        basket_dict["FX trend"] = full_bkt
 
         br = self.load_parameters(br = br)
 
         logger.info("Loading asset data...")
 
-        vendor_tickers = ['FRED/DEXUSEU', 'FRED/DEXJPUS', 'FRED/DEXUSUK', 'FRED/DEXUSAL', 'FRED/DEXCAUS',
-                          'FRED/DEXUSNZ', 'FRED/DEXSZUS', 'FRED/DEXNOUS', 'FRED/DEXSDUS']
+        vendor_tickers = ["FRED/DEXUSEU", "FRED/DEXJPUS",
+                          "FRED/DEXUSUK", "FRED/DEXUSAL",
+                          "FRED/DEXCAUS",
+                          "FRED/DEXUSNZ", "FRED/DEXSZUS",
+                          "FRED/DEXNOUS", "FRED/DEXSDUS"]
 
         market_data_request = MarketDataRequest(
-                    start_date = br.start_date,                     # start date
-                    finish_date = br.finish_date,                   # finish date
-                    freq = 'daily',                                 # daily data
-                    data_source = 'quandl',                         # use Quandl as data source
-                    tickers = full_bkt,                             # ticker (Thalesians)
-                    fields = ['close'],                                 # which fields to download
-                    vendor_tickers = vendor_tickers,                    # ticker (Quandl)
-                    vendor_fields = ['close'],                          # which Bloomberg fields to download
-                    cache_algo = 'cache_algo_return')                # how to return data
+                    start_date=br.start_date,                     # start date
+                    finish_date=br.finish_date,                   # finish date
+                    freq="daily",                                 # daily data
+                    data_source="quandl",                         # use Quandl as data source
+                    tickers=full_bkt,                             # ticker (Cuemacro)
+                    fields=["close"],                             # which fields to download
+                    vendor_tickers=vendor_tickers,                # ticker (Quandl)
+                    vendor_fields=["close"],                      # which Quandl fields to download
+                    cache_algo="cache_algo_return",               # how to return data
+                    quandl_api_key=quandl_api_key)
 
         asset_df = self.market.fetch_market(market_data_request)
 
@@ -126,8 +135,9 @@ class TradingModelFXTrend_Example(TradingModel):
         if asset_df is None:
             import pandas
 
-            asset_df = pandas.read_csv("d:/fxcta.csv", index_col=0, parse_dates=['Date'],
-                                       date_parser = lambda x: pandas.datetime.strptime(x, '%Y-%m-%d'))
+            asset_df = pandas.read_csv(
+                "fxcta.csv", index_col=0, parse_dates=["Date"],
+                date_parser=lambda x: pandas.datetime.strptime(x, "%Y-%m-%d"))
 
         # Signalling variables
         spot_df = asset_df
@@ -144,7 +154,7 @@ class TradingModelFXTrend_Example(TradingModel):
         # Use technical indicator to create signals
         # (we could obviously create whatever function we wanted for generating the signal dataframe)
         tech_ind = TechIndicator()
-        tech_ind.create_tech_ind(spot_df, 'SMA', tech_params);
+        tech_ind.create_tech_ind(spot_df, "SMA", tech_params);
         signal_df = tech_ind.get_signal()
 
         return signal_df
@@ -154,15 +164,16 @@ class TradingModelFXTrend_Example(TradingModel):
         ###### FILL IN WITH YOUR OWN BENCHMARK
 
         tsr_indices = MarketDataRequest(
-            start_date = self.br.start_date,                # start date
-            finish_date = self.br.finish_date,              # finish date
-            freq = 'daily',                                 # intraday data
-            data_source = 'quandl',                         # use Bloomberg as data source
-            tickers = ["EURUSD"],                           # tickers to download
-            vendor_tickers=['FRED/DEXUSEU'],
-            fields = ['close'],                             # which fields to download
-            vendor_fields = ['close'],
-            cache_algo = 'cache_algo_return')               # how to return data)
+            start_date=self.br.start_date,                # start date
+            finish_date=self.br.finish_date,              # finish date
+            freq="daily",                                 # daily frequen
+            data_source="quandl",                         # use Bloomberg as data source
+            tickers=["EURUSD"],                           # tickers to download
+            vendor_tickers=["FRED/DEXUSEU"],
+            fields=["close"],                             # which fields to download
+            vendor_fields =["close"],
+            cache_algo="cache_algo_return",               # how to return data
+            quandl_api_key=quandl_api_key)
 
         df = self.market.fetch_market(tsr_indices)
 
@@ -170,7 +181,7 @@ class TradingModelFXTrend_Example(TradingModel):
 
         return df
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
 # Just change "False" to "True" to run any of the below examples
 
@@ -192,8 +203,8 @@ if __name__ == '__main__':
         ta = TradeAnalysis()
 
         # Create statistics for the model returns using both finmarketpy and pyfolio
-        ta.run_strategy_returns_stats(model, engine='finmarketpy')
-        # ta.run_strategy_returns_stats(model, engine='pyfolio')
+        ta.run_strategy_returns_stats(model, engine="finmarketpy")
+        # ta.run_strategy_returns_stats(model, engine="pyfolio")
 
         # model.plot_strategy_group_benchmark_annualised_pnl()
 
@@ -205,20 +216,20 @@ if __name__ == '__main__':
         from finmarketpy.backtest import TradeAnalysis
 
         ta = TradeAnalysis()
-        ta.run_strategy_returns_stats(model, engine='finmarketpy')
+        ta.run_strategy_returns_stats(model, engine="finmarketpy")
 
         # Which backtesting parameters to change
         # names of the portfolio
         # broad type of parameter name
         parameter_list = [
-            {'portfolio_vol_adjust': True, 'signal_vol_adjust' : True},
-            {'portfolio_vol_adjust': False, 'signal_vol_adjust' : False}]
+            {"portfolio_vol_adjust": True, "signal_vol_adjust" : True},
+            {"portfolio_vol_adjust": False, "signal_vol_adjust" : False}]
 
         pretty_portfolio_names = \
-            ['Vol target',
-             'No vol target']
+            ["Vol target",
+             "No vol target"]
 
-        parameter_type = 'vol target'
+        parameter_type = "vol target"
 
         ta.run_arbitrary_sensitivity(strategy,
                                      parameter_list=parameter_list,

@@ -161,7 +161,7 @@ One possible way to fix this is to delete the `__pycache__` folders underneath w
 Eg. if you are using the `py38class` environment, if you've installed Anaconda in `C:\Anaconda3`, you might find the financepy
 folder at the below location
 
-`C:\Anaconda3\envs\py38\Lib\site-packages\financepy`
+`C:\Anaconda3\envs\py38class\Lib\site-packages\financepy`
 
 # finmarketpy examples
 
@@ -187,6 +187,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 01 Jan 2024
+  * Helper code to reduce boiler plate code for TradingModel
+  * Upgraded to FinancePy 0.310 and refactored FXVolSurface
 * 26 Apr 2023
   * Changed sklearn to scikit-learn dependency
 * 05 Apr 2022

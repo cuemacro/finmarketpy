@@ -43,6 +43,12 @@ from finmarketpy.curve.fxoptionscurve import FXOptionsCurve
 from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface
 from finmarketpy.curve.volatility.fxoptionspricer import FXOptionsPricer
 
+try:
+    from finaddpy.market import CachedMarketDataGenerator as MarketDataGenerator
+except:
+    pass
+
+
 logger = LoggerManager().getLogger(__name__)
 
 chart = Chart(engine="plotly")

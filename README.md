@@ -187,6 +187,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 01 Apr 2024
+  * Added Jupyter notebook for new ArcticDB support from findatapy
 * 01 Jan 2024
   * Helper code to reduce boiler plate code for TradingModel
   * Upgraded to FinancePy 0.310 and refactored FXVolSurface

@@ -1036,7 +1036,7 @@ class TradingModel(object):
         return pkl
 
     ####### Generic functions for every backtest
-    def construct_strategy(self, br: BacktestRequest = None):
+    def construct_strategy(self, br: BacktestRequest = None, run_in_parallel: bool = False) -> pd.DataFrame:
         """Constructs the returns for all the strategies which have been specified.
 
         It gets backtesting parameters from fill_backtest_request (although

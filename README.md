@@ -187,6 +187,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 19 May 2024
+  * Fixed run in parallel bug on 
+
 * 01 Apr 2024
   * Added Jupyter notebook for new ArcticDB support from findatapy
 * 01 Jan 2024

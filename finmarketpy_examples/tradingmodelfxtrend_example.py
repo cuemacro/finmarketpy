@@ -125,8 +125,8 @@ class TradingModelFXTrend_Example(TradingModel):
                     data_source="alfred",                         # use ALFRED/FRED as data source
                     tickers=full_bkt,                             # ticker (Cuemacro)
                     fields=["close"],                             # which fields to download
-                    vendor_tickers=vendor_tickers,                # ticker (Quandl)
-                    vendor_fields=["close"],                      # which Quandl fields to download
+                    vendor_tickers=vendor_tickers,                # ticker
+                    vendor_fields=["close"],                      # which fields to download
                     cache_algo="cache_algo_return",               # how to return data
                     fred_api_key=fred_api_key)
 

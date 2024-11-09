@@ -88,12 +88,12 @@ if run_example == 1 or run_example == 0:
     md_request = MarketDataRequest(
         start_date="01 Jan 1989",  # start date
         finish_date=datetime.date.today(),  # finish date
-        freq='daily',           # daily data
-        data_source='alfred',   # use ALFRED/FRED as data source
-        tickers=tickers,        # ticker (findatapy)
-        fields=['close'],       # which fields to download
-        vendor_tickers=vendor_tickers,  # ticker (ALFRED/FRED)
-        vendor_fields=['close'],        # which ALFRED/FRED fields to download
+        freq='daily',  # daily data
+        data_source='alfred',  # use FRED as data source
+        tickers=tickers,  # ticker (findatapy)
+        fields=['close'],  # which fields to download
+        vendor_tickers=vendor_tickers,  # ticker
+        vendor_fields=['close'],  # which Bloomberg fields to download
         cache_algo='internet_load_return',
         fred_api_key=fred_api_key)  # how to return data
 
@@ -123,7 +123,7 @@ if run_example == 1 or run_example == 0:
 
     style = Style()
     style.title = "FX trend strategy"
-    style.source = 'Quandl'
+    style.source = 'FRED'
     style.scale_factor = 1
     style.file_output = 'fx-trend-example.png'
 
@@ -175,12 +175,13 @@ if run_example == 2 or run_example == 0:
         start_date="01 Jan 1989",  # start date
         finish_date=datetime.date.today(),  # finish date
         freq='daily',  # daily data
-        data_source='quandl',  # use Quandl as data source
+        data_source='alfred',  # use FRED as data source
         tickers=['EURUSD'],  # ticker (findatapy)
         fields=['close'],  # which fields to download
-        vendor_tickers=['FRED/DEXUSEU'],  # ticker (Quandl)
+        vendor_tickers=['DEXUSEU'],  # ticker
         vendor_fields=['close'],  # which Bloomberg fields to download
-        cache_algo='internet_load_return')  # how to return data
+        cache_algo='internet_load_return', # how to return data
+        fred_api_key=fred_api_key,)
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -212,7 +213,7 @@ if run_example == 2 or run_example == 0:
 
     style = Style()
     style.title = "EUR/USD trend model"
-    style.source = 'Quandl'
+    style.source = 'FRED'
     style.scale_factor = 1
     style.file_output = 'eurusd-trend-example.png'
 

@@ -174,6 +174,98 @@ class TechIndicator(object):
             self._signal.iloc[0:most] = np.nan
             self._techind = pd.concat([sma, sma2], axis=1)
 
+        elif name == "GMMA":
+            # Guppy Multiple Moving Average
+            # short-term MA 3, 5, 7, 10, 12, 15  and the long-term MA are 30, 35, 40, 45, 50, 60
+
+            tech_params.gmma_period_list = [3, 5, 7, 10, 12, 15, 30, 35, 40, 45, 50, 60]
+
+            sma = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[0],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma2 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[1],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma3 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[2],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma4 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[3],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma5 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[4],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma6 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[5],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma7 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[6],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma8 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[7],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma9 =  data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[8],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma10 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[9],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma11 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[10],
+                 min_periods=0,
+                 adjust=True).mean()
+            sma12 = data_frame.ewm(
+                 ignore_na=False,
+                 span=tech_params.gmma_period_list[11],
+                 min_periods=0,
+                 adjust=True).mean()
+
+            short_ma = np.mean(np.array([sma, sma2, sma3, sma4, sma5, sma6]), axis=0)
+            long_ma = np.mean(np.array([sma7, sma8, sma9, sma10, sma11, sma12]), axis=0)
+            narray = np.where(short_ma > long_ma, 1, -1)
+
+            self._signal = pd.DataFrame(index=data_frame.index, data=narray)
+            self._signal.columns = [
+                x + " GMMA Signal" for x in data_frame.columns.values]
+
+            sma.columns = [x + " SMA" for x in data_frame.columns.values]
+            sma2.columns = [x + " SMA2" for x in data_frame.columns.values]
+            sma3.columns = [x + " SMA3" for x in data_frame.columns.values]
+            sma4.columns = [x + " SMA4" for x in data_frame.columns.values]
+            sma5.columns = [x + " SMA5" for x in data_frame.columns.values]
+            sma6.columns = [x + " SMA6" for x in data_frame.columns.values]
+            sma7.columns = [x + " SMA7" for x in data_frame.columns.values]
+            sma8.columns = [x + " SMA8" for x in data_frame.columns.values]
+            sma9.columns = [x + " SMA9" for x in data_frame.columns.values]
+            sma10.columns = [x + " SMA10" for x in data_frame.columns.values]
+            sma11.columns = [x + " SMA11" for x in data_frame.columns.values]
+            sma12.columns = [x + " SMA12" for x in data_frame.columns.values]
+
+            most = max(tech_params.sma_period, tech_params.sma2_period)
+            self._signal.iloc[0:most] = np.nan
+            self._techind = pd.concat([sma, sma2, sma3, sma4, sma5, sma6, sma7, sma8, sma9, sma10, sma11, sma12], axis=1)
+
         elif name in ['RSI']:
             # Relative Strength Index
 

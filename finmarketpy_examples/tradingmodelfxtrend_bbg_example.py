@@ -108,10 +108,10 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
                     start_date=br.start_date,                     # start date
                     finish_date=br.finish_date,                   # finish date
                     freq="daily",                                 # daily data
-                    data_source="bloomberg",                      # use Quandl as data source
+                    data_source="bloomberg",                      # use Bloomberg as data source
                     tickers=full_bkt,                             # ticker (Cuemacro)
                     fields=["close"],                             # which fields to download
-                    vendor_tickers=vendor_tickers,                # ticker (Quandl)
+                    vendor_tickers=vendor_tickers,                # ticker
                     vendor_fields=["PX_LAST"],                    # which Bloomberg fields to download
                     cache_algo="internet_load_return")            # how to return data
 

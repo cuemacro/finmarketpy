@@ -1,5 +1,7 @@
 __author__ = 'saeedamen'  # Saeed Amen
 
+from finmarketpy_examples.tradingmodelfxtrend_example import fred_api_key
+
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
@@ -22,6 +24,12 @@ from findatapy.timeseries import Calculations
 # run_example = 1 - do a backtest of a FX basket with trend following
 # run_example = 2 - do a backtest of EURUSD traded with trend following
 run_example = 0
+
+from findatapy.util.dataconstants import DataConstants
+
+# You will likely need to change this!
+# Get an API key from the FRED website https://fred.stlouisfed.org/docs/api/api_key.html
+fred_api_key = DataConstants().fred_api_key
 
 ###### backtest simple trend following strategy for FX spot basket
 if run_example == 1 or run_example == 0:
@@ -74,19 +82,20 @@ if run_example == 1 or run_example == 0:
     tickers = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
                'NZDUSD', 'USDCHF', 'USDNOK', 'USDSEK']
 
-    vendor_tickers = ['FRED/DEXUSEU', 'FRED/DEXJPUS', 'FRED/DEXUSUK', 'FRED/DEXUSAL', 'FRED/DEXCAUS',
-                      'FRED/DEXUSNZ', 'FRED/DEXSZUS', 'FRED/DEXNOUS', 'FRED/DEXSDUS']
+    vendor_tickers = ['DEXUSEU', 'DEXJPUS', 'DEXUSUK', 'DEXUSAL', 'DEXCAUS',
+                      'DEXUSNZ', 'DEXSZUS', 'DEXNOUS', 'DEXSDUS']
 
     md_request = MarketDataRequest(
         start_date="01 Jan 1989",  # start date
         finish_date=datetime.date.today(),  # finish date
         freq='daily',  # daily data
-        data_source='quandl',  # use Quandl as data source
+        data_source='alfred',  # use Quandl as data source
         tickers=tickers,  # ticker (findatapy)
         fields=['close'],  # which fields to download
         vendor_tickers=vendor_tickers,  # ticker (Quandl)
         vendor_fields=['close'],  # which Bloomberg fields to download
-        cache_algo='internet_load_return')  # how to return data
+        cache_algo='internet_load_return',
+        fred_api_key=fred_api_key)  # how to return data
 
     market = Market(market_data_generator=MarketDataGenerator())
 

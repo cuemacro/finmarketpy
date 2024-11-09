@@ -58,12 +58,12 @@ class TechIndicator(object):
         self._techind = None
 
         if tech_params.fillna:
-            data_frame = data_frame_non_nan.fillna(method="ffill")
+            data_frame = data_frame_non_nan.ffill()
         else:
             data_frame = data_frame_non_nan
 
         if data_frame_non_nan_early is not None:
-            data_frame_early = data_frame_non_nan_early.fillna(method="ffill")
+            data_frame_early = data_frame_non_nan_early.ffill()
 
         if name == "SMA":
 
@@ -236,7 +236,7 @@ class TechIndicator(object):
             signal[buys] = 1
             signal[sells] = -1
             signal[~(buys | sells)] = np.nan
-            signal = signal.fillna(method='ffill')
+            signal = signal.ffill()
 
             self._signal = signal
 
@@ -272,7 +272,7 @@ class TechIndicator(object):
             signal[buys] = 1
             signal[sells] = -1
             signal[~(buys | sells)] = np.nan
-            signal = signal.fillna(method='ffill')
+            signal = signal.ffill()
 
             self._signal = signal
             self._signal.iloc[0:tech_params.bb_period] = np.nan

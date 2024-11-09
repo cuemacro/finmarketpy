@@ -40,6 +40,9 @@ market = Market(market_data_generator=MarketDataGenerator())
 
 run_example = 0
 
+# Note: that many of the free datasets have been removed, so this ticker
+# no longer has data
+
 ###### fetch data from Quandl for BoE rate (using Bloomberg data)
 if run_example == 1 or run_example == 0:
     # Monthly average of UK resident monetary financial institutions" 

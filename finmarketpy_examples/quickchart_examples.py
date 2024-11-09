@@ -30,8 +30,8 @@ run_example = 0
 if run_example == 1 or run_example == 0:
 
     # Plot with Matplotlib - S&P 500 on LHS y-axis and S&P 500 net long spec positioning on RHS y-axis
-    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(tickers={'S&P500' : 'SP500'},
-        tickers_rhs={'Net long spec S&P 500 futures' : 'SP500'},
+    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(tickers={'S&P500' : 'SPX Index'},
+        tickers_rhs={'Net long spec S&P 500 futures' : 'IMM0ENCN  Index'},
         title='S&P500 vs. net spec pos RHS (2008-2010)',
                 start_date='01 Jan 2007', finish_date='01 Jan 2010', source='Bloomberg')
 

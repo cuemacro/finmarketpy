@@ -1,7 +1,5 @@
 __author__ = 'saeedamen'  # Saeed Amen
 
-from finmarketpy_examples.tradingmodelfxtrend_example import fred_api_key
-
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #

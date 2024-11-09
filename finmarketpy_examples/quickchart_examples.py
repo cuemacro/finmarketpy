@@ -24,7 +24,7 @@ from finmarketpy.economics import QuickChart
 # run_example = 2 - Plot FX chart with Plotly
 # run_example = 3 - Plot mutli-country GDP chart with Matplotlib
 
-run_example = 3
+run_example = 0
 
 ###### Plot with Matplotlib
 if run_example == 1 or run_example == 0:

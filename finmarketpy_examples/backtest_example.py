@@ -88,12 +88,12 @@ if run_example == 1 or run_example == 0:
     md_request = MarketDataRequest(
         start_date="01 Jan 1989",  # start date
         finish_date=datetime.date.today(),  # finish date
-        freq='daily',  # daily data
-        data_source='alfred',  # use Quandl as data source
-        tickers=tickers,  # ticker (findatapy)
-        fields=['close'],  # which fields to download
-        vendor_tickers=vendor_tickers,  # ticker (Quandl)
-        vendor_fields=['close'],  # which Bloomberg fields to download
+        freq='daily',           # daily data
+        data_source='alfred',   # use ALFRED/FRED as data source
+        tickers=tickers,        # ticker (findatapy)
+        fields=['close'],       # which fields to download
+        vendor_tickers=vendor_tickers,  # ticker (ALFRED/FRED)
+        vendor_fields=['close'],        # which ALFRED/FRED fields to download
         cache_algo='internet_load_return',
         fred_api_key=fred_api_key)  # how to return data
 

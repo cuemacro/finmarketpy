@@ -275,22 +275,30 @@ def test_sma2():
 
     # Test Case 3: Costant prices
     cols = get_cols_name(1)
-    signals = ['SMA', 'SMA2']
+    signals = ["SMA", "SMA2"]
     data_df = pd.DataFrame(index=dates, columns=cols, data=1)
     tech_ind.create_tech_ind(data_df, indicator_name, tech_params)
-    expected_signal_df = pd.DataFrame(index=dates, columns=[' '.join([col, indicator_name, 'Signal'])
-                                                            for col in cols], data=-1)
-    expected_df = pd.DataFrame(index=dates, columns=[' '.join([col, sig])
-                                                     for col in cols for sig in signals],
-                               data=np.tile(np.ones(len(dates)), (2, 1)).T)
-    expected_signal_df.iloc[:tech_params.sma2_period] = np.nan
-    expected_df.iloc[:tech_params.sma2_period - 1] = np.nan
-    expected_df.set_value('2018-01-02', 'Asset1.close SMA', 1.0)
-    df = tech_ind.get_techind()
-    signal_df = tech_ind.get_signal()
 
-    assert_frame_equal(df, expected_df)
+    expected_signal_df = pd.DataFrame(
+        data=-1.0,
+        index=dates,
+        columns=[" ".join([col, indicator_name, "Signal"]) for col in cols],
+    )
+    expected_signal_df.iloc[: tech_params.sma2_period] = np.nan
+
+    signal_df = tech_ind.get_signal()
     assert_frame_equal(signal_df, expected_signal_df)
+
+    expected_df = pd.DataFrame(
+        data=1.0,
+        index=dates,
+        columns=[" ".join([col, sig]) for col in cols for sig in signals],
+    )
+    expected_df.iloc[: tech_params.sma2_period - 1] = np.nan
+    expected_df.loc["2018-01-02", "Asset1.close SMA"] = 1.0
+
+    df = tech_ind.get_techind()
+    assert_frame_equal(df, expected_df)
 
 
 def test_polarity():
@@ -510,3 +518,7 @@ def test_attr():
 
     assert_frame_equal(df, expected_df)
     assert_frame_equal(signal_df, expected_signal_df)
+
+
+if __name__=='__main__':
+    pytest.main([__file__])

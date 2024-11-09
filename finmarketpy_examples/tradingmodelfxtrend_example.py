@@ -24,7 +24,8 @@ from chartpy import Style
 from findatapy.util.dataconstants import DataConstants
 
 # You will likely need to change this!
-quandl_api_key = DataConstants().quandl_api_key
+# Get an API key from the FRED website https://fred.stlouisfed.org/docs/api/api_key.html
+fred_api_key = DataConstants().fred_api_key
 
 class TradingModelFXTrend_Example(TradingModel):
     """Shows how to create a simple FX CTA style strategy, using the TradingModel abstract class (backtest_examples.py
@@ -59,7 +60,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.spot_tc_bp = 0.5
         br.ann_factor = 252
 
-        br.plot_start = "01 Apr 2015"
+        br.plot_start = "01 Jan 2000"
         br.calc_stats = True
         br.write_csv = False
         br.plot_interim = True
@@ -111,23 +112,23 @@ class TradingModelFXTrend_Example(TradingModel):
 
         logger.info("Loading asset data...")
 
-        vendor_tickers = ["FRED/DEXUSEU", "FRED/DEXJPUS",
-                          "FRED/DEXUSUK", "FRED/DEXUSAL",
-                          "FRED/DEXCAUS",
-                          "FRED/DEXUSNZ", "FRED/DEXSZUS",
-                          "FRED/DEXNOUS", "FRED/DEXSDUS"]
+        vendor_tickers = ["DEXUSEU", "DEXJPUS",
+                          "DEXUSUK", "DEXUSAL",
+                          "DEXCAUS",
+                          "DEXUSNZ", "DEXSZUS",
+                          "DEXNOUS", "DEXSDUS"]
 
         market_data_request = MarketDataRequest(
                     start_date=br.start_date,                     # start date
                     finish_date=br.finish_date,                   # finish date
                     freq="daily",                                 # daily data
-                    data_source="quandl",                         # use Quandl as data source
+                    data_source="alfred",                         # use ALFRED/FRED as data source
                     tickers=full_bkt,                             # ticker (Cuemacro)
                     fields=["close"],                             # which fields to download
                     vendor_tickers=vendor_tickers,                # ticker (Quandl)
                     vendor_fields=["close"],                      # which Quandl fields to download
                     cache_algo="cache_algo_return",               # how to return data
-                    quandl_api_key=quandl_api_key)
+                    fred_api_key=fred_api_key)
 
         asset_df = self.market.fetch_market(market_data_request)
 
@@ -166,14 +167,14 @@ class TradingModelFXTrend_Example(TradingModel):
         tsr_indices = MarketDataRequest(
             start_date=self.br.start_date,                # start date
             finish_date=self.br.finish_date,              # finish date
-            freq="daily",                                 # daily frequen
-            data_source="quandl",                         # use Bloomberg as data source
+            freq="daily",                                 # daily frequency
+            data_source="alfred",                         # use ALFRED/FRED as data source
             tickers=["EURUSD"],                           # tickers to download
-            vendor_tickers=["FRED/DEXUSEU"],
+            vendor_tickers=["DEXUSEU"],
             fields=["close"],                             # which fields to download
             vendor_fields =["close"],
             cache_algo="cache_algo_return",               # how to return data
-            quandl_api_key=quandl_api_key)
+            fred_api_key=fred_api_key)
 
         df = self.market.fetch_market(tsr_indices)
 

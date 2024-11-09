@@ -967,6 +967,7 @@ class TradingModel(object):
     HEIGHT = ChartConstants().chartfactory_height
     CHART_SOURCE = ChartConstants().chartfactory_source
     CHART_STYLE = Style()
+    PLOTLY_PLOT_MODE = "offline_html_exc_embed_js"
 
     DUMP_CSV = ''
     DUMP_PATH = datetime.date.today().strftime("%Y%m%d") + ' '
@@ -2478,6 +2479,7 @@ class TradingModel(object):
         style.height = self.HEIGHT
         style.source = self.CHART_SOURCE
         style.silent_display = not (self.SHOW_CHARTS)
+        style.plotly_plot_mode = self.PLOTLY_PLOT_MODE # Smaller file sizes
 
         style.legend_bgcolor = 'rgba(0,0,0,0)'
 

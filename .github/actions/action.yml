@@ -1,0 +1,38 @@
+name: "Bump version and create release"
+description: "Bumps version, creates a tag, and publishes a release."
+
+inputs:
+  github_token:
+    description: "GitHub token for authentication"
+    required: true
+
+outputs:
+  tag:
+    description: 'A new tag'
+    value: ${{ steps.tag_version.outputs.new_tag }}
+
+runs:
+  using: "composite"
+  steps:
+    # -----------------------------------------------------------------------------
+    # Step 1: Bump version and tag
+    # -----------------------------------------------------------------------------
+    - name: Bump version and tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v6.2
+      with:
+        github_token: ${{ inputs.github_token }}
+
+    # -----------------------------------------------------------------------------
+    # Step 2: Create GitHub release
+    # -----------------------------------------------------------------------------
+    - name: Create GitHub release without artifacts
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        generate_release_notes: true
+
+    - name: Debug Output Tag
+      shell: bash
+      run: |
+          echo "DEBUG: ${{ steps.tag_version.outputs.new_tag }}"

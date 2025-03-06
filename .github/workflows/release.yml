@@ -11,7 +11,14 @@ jobs:
       - name: Checkout [${{ github.repository }}]
         uses: actions/checkout@v4
 
-      - name: Generate Tag
-        uses: ./.github/actions/tag
+      - name: Bump version and tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ inputs.github_token }}
+
+      - name: Create GitHub release without artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          generate_release_notes: true

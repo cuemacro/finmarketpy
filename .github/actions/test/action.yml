@@ -1,0 +1,23 @@
+name: Run Tests
+description: "Run pytest test suite"
+
+inputs:
+  tests-folder:
+    description: 'Source folder with all tests'
+    required: false
+    default: 'tests'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update pip
+      shell: bash
+      run: |
+        # Ensure pip is installed and up-to-date
+        python -m ensurepip --upgrade
+
+    - name: Run tests
+      shell: bash
+      run: |
+        python -m pip install --no-cache-dir pytest
+        pytest ${{ inputs.tests-folder }}

@@ -20,6 +20,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: cvxgrp/.github/actions/test@v2.2.5
+      - uses: ./.github/actions/test
         with:
           tests-folder: tests

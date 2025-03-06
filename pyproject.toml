@@ -1,6 +1,6 @@
 [project]
 name = 'finmarketpy'
-version = "0.0.0"
+version = "0.0.0"      # do not change by hand!
 description = "Extract market data"
 # Please add authors and correct the email...
 authors = [{name='Saeed Aman', email= 'saeed@cuemacro.com'}]

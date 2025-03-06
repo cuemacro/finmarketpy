@@ -37,19 +37,19 @@ repos:
 #      - id: check-github-workflows
 #        args: ["--verbose"]
 #
-#  - repo: https://github.com/rhysd/actionlint
-#    rev: v1.7.7
-#    hooks:
-#      - id: actionlint
-#        args: [-ignore, SC]
-#
-#  - repo: https://github.com/abravalheri/validate-pyproject
-#    rev: v0.23
-#    hooks:
-#      - id: validate-pyproject
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+        args: [-ignore, SC]
+
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.23
+    hooks:
+      - id: validate-pyproject
 #
 #  - repo: https://github.com/crate-ci/typos
-#    rev: v1.29.8
+#    rev: v1.30.1
 #    hooks:
 #      - id: typos
 #        exclude: ^\.gitignore|\.copier.answers$

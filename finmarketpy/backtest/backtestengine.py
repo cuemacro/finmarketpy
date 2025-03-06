@@ -51,7 +51,7 @@ class Backtest(object):
         self._portfolio = None
         return
 
-    def calculate_diagnostic_trading_PnL(
+    def calculate_diagnostic_trading_OnL(
             self,
             asset_a_df: pd.DataFrame,
             signal_df: pd.DataFrame,
@@ -61,7 +61,7 @@ class Backtest(object):
 
         The table is populated with asset, signal and further dataframes
         provided by the user, can be used to check signalling methodology.
-        It does not apply parameters such as transaction costs, vol adjusment
+        It does not apply parameters such as transaction costs, vol adjustment
         and so on.
 
         Parameters
@@ -116,7 +116,7 @@ class Backtest(object):
 
         return calculations.join(flatten_df, how='outer')
 
-    def calculate_trading_PnL(
+    def calculate_trading_OnL(
             self,
             br: BacktestRequest,
             asset_a_df: pd.DataFrame,
@@ -568,7 +568,7 @@ class Backtest(object):
     def backtest_output(self):
         return
 
-    ### Get PnL of individual assets before portfolio constraints
+    ### Get OnL of individual assets before portfolio constraints
     def pnl(self) -> pd.DataFrame:
         """Gets P&L returns of all the individual sub_components of the model (before any portfolio level leverage is applied)
 
@@ -636,7 +636,7 @@ class Backtest(object):
 
         return self._pnl_cum
 
-    ### Get PnL of individual assets AFTER portfolio constraints
+    ### Get OnL of individual assets AFTER portfolio constraints
     def components_pnl(self) -> pd.DataFrame:
         """Gets P&L returns of all the individual subcomponents of the model (after portfolio level leverage is applied)
 
@@ -691,7 +691,7 @@ class Backtest(object):
 
         return self._components_pnl_cum
 
-    ### Get PnL of the final portfolio
+    ### Get OnL of the final portfolio
 
     def portfolio_cum(self) -> pd.DataFrame:
         """Gets P&L as a cumulative time series of portfolio
@@ -951,7 +951,7 @@ from findatapy.timeseries import Calculations, RetStats, Filter
 
 
 class TradingModel(object):
-    """Abstract class which wraps around Backtest, providing convenient functions for analaysis. Implement your own
+    """Abstract class which wraps around Backtest, providing convenient functions for analysis. Implement your own
     subclasses of this for your own strategy. See tradingmodelfxtrend_example.py for a simple implementation of a
     FX trend following strategy.
     """
@@ -1295,7 +1295,7 @@ class TradingModel(object):
         self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
         self._strategy_trade_contracts = backtest.portfolio_trade_contracts()
 
-        # Get PnL by component (before portfolio vol targeting and after)
+        # Get OnL by component (before portfolio vol targeting and after)
         self._strategy_group_pnl_trades = backtest.pnl_trades()  # get individual trades P&L before (before portfolio adjustment)
         self._strategy_pnl_trades_components = backtest.components_pnl_trades()
 
@@ -1357,7 +1357,7 @@ class TradingModel(object):
 
         logger.info("Calculated trading signals for " + key)
 
-        backtest.calculate_trading_PnL(br, asset_df, signal,
+        backtest.calculate_trading_OnL(br, asset_df, signal,
                                        contract_value_df,
                                        run_in_parallel)  # calculate P&L (and adjust signals for vol etc)
 
@@ -1369,7 +1369,7 @@ class TradingModel(object):
         else:
             desc = [key]
 
-        # For final strategy return heavyweight backtest object (contains lots of auxilliary information about trades etc)
+        # For final strategy return heavyweight backtest object (contains lots of auxiliary information about trades etc)
         if key == self.FINAL_STRATEGY and compress_output:
             logger.debug('Compressing ' + key)
 
@@ -1691,7 +1691,7 @@ class TradingModel(object):
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        style = self._create_style("(bp)", "Individual Trade PnL",
+        style = self._create_style("(bp)", "Individual Trade OnL",
                                    reduce_plot=reduce_plot)
 
         # zero when there isn't a trade exit
@@ -1722,7 +1722,7 @@ class TradingModel(object):
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        style = self._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
+        style = self._create_style("", "Strategy OnL", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(
@@ -1847,7 +1847,7 @@ class TradingModel(object):
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        style = self._create_style("Ind Components", "Strategy PnL Components",
+        style = self._create_style("Ind Components", "Strategy OnL Components",
                                    reduce_plot=reduce_plot)
 
         try:
@@ -1915,14 +1915,14 @@ class TradingModel(object):
             silent_plot=silent_plot, ret_with_df=ret_with_df,
             split_on_char=split_on_char)
 
-    def plot_strategy_components_pnl_yoy(
+    def plot_strategy_components_pnl_you(
             self,
             strip: str = None,
             silent_plot: bool = False,
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        return self.plot_yoy_helper(self._strategy_components_pnl_ret_stats,
+        return self.plot_you_helper(self._strategy_components_pnl_ret_stats,
                                     'Ind Component YoY', 'Ind Component (%)',
                                     strip=strip, silent_plot=silent_plot,
                                     ret_with_df=ret_with_df,
@@ -1941,7 +1941,7 @@ class TradingModel(object):
             split_on_char: str = None):
         logger = LoggerManager().getLogger(__name__)
 
-        style = self._create_style("", "Group Benchmark PnL - cumulative")
+        style = self._create_style("", "Group Benchmark OnL - cumulative")
 
         strat_list = self._strategy_group_benchmark_pnl.columns  # .sort_values()
 
@@ -2037,21 +2037,21 @@ class TradingModel(object):
                                           ret_with_df=ret_with_df,
                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_yoy(
+    def plot_strategy_group_benchmark_pnl_you(
             self,
             strip: str = None,
             silent_plot: bool = False,
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        return self.plot_yoy_helper(
+        return self.plot_you_helper(
             self._strategy_group_benchmark_pnl_ret_stats, "",
-            "Group Benchmark PnL YoY",
+            "Group Benchmark OnL YoY",
             strip=strip,
             silent_plot=silent_plot, ret_with_df=ret_with_df,
             split_on_char=split_on_char)
 
-    def plot_yoy_helper(
+    def plot_you_helper(
             self,
             ret_stats: dict,
             title: str,
@@ -2063,15 +2063,15 @@ class TradingModel(object):
 
         style = self._create_style(title, title)
         # keys = self._strategy_group_benchmark_ret_stats.keys()
-        yoy = []
+        you = []
 
         for key in ret_stats.keys():
-            col = ret_stats[key].yoy_rets()
+            col = ret_stats[key].you_rets()
             col.columns = [key]
-            yoy.append(col)
+            you.append(col)
 
         calculations = Calculations()
-        ret_stats = calculations.join(yoy, how='outer')
+        ret_stats = calculations.join(you, how='outer')
         ret_stats.index = ret_stats.index.year
 
         ret_stats = self._strip_dataframe(ret_stats, strip)
@@ -2584,7 +2584,7 @@ class PortfolioWeightConstruction(object):
                 portfolio = pd.DataFrame(portfolio.sum(axis=1),
                                          columns=["Portfolio"])
 
-                # Overwrite days when every asset PnL was null is NaN with nan
+                # Overwrite days when every asset OnL was null is NaN with nan
                 portfolio[is_all_na] = np.nan
         else:
             # Just assume to take the mean / ie. equal weights for each signal

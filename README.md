@@ -95,7 +95,7 @@ pip install git+https://github.com/cuemacro/chartpy.git
 pip install git+https://github.com/cuemacro/findatapy.git
 ```
 
-However you can also pip install to get from PyPI (might be a slighter older verison from that on GitHub)
+However you can also pip install to get from PyPI (might be a slighter older version from that on GitHub)
 
 ```
 pip install chartpy
@@ -315,7 +315,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
     * Added backtestcomparison.py
 * 29 Mar 2019 - Added variable transaction costs
 * 14 Nov 2018 - Fixed contract bug in backtest_example
-* 18 Sep 2018 - Fixed bug on writing PnL CSV
+* 18 Sep 2018 - Fixed bug on writing OnL CSV
 * 17 Sep 2018 - Added rounding for trade size display (otherwise trades can be ungrounded because of rounding errors)
 * 11 Jun 2018 - Fixed bug with single threaded TradeAnalysis
 * 29 May 2018 - Added port

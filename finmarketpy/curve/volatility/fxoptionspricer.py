@@ -297,7 +297,7 @@ class FXOptionsPricer(AbstractPricer):
                                                 model)[
                                        premium_output.replace("-", "_")]
 
-                # TODO instrinsic value calculations need checking!
+                # TODO intrinsic value calculations need checking!
                 if contract_type == "european-call":
                     intrinsic_values[i] = (max(spot[i] - strike[i], 0))
                 elif contract_type == "european-put":

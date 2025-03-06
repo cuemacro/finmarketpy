@@ -67,7 +67,7 @@ if run_example == 1 or run_example == 0:
                                                           cross[3:6]],
                                    cache_algo="cache_algo_return")
 
-    # In case any missing values fill down (particularly can get this for NDFs)
+    # In case any missing values fill down (particularly can get this for ANDFs)
     df_market = market.fetch_market(md_request=md_request).fillna(
         method="ffill")
 
@@ -177,7 +177,7 @@ if run_example == 2 or run_example == 0:
                                    cache_algo="cache_algo_return",
                                    abstract_curve=fx_forwards_curve)
 
-    # In case any missing values fill down (particularly can get this for NDFs)
+    # In case any missing values fill down (particularly can get this for ANDFs)
     df_cuemacro_tot_1M = market.fetch_market(md_request=md_request).fillna(
         method="ffill")
 

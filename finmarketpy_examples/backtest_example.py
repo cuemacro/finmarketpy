@@ -111,7 +111,7 @@ if run_example == 1 or run_example == 0:
     contract_value_df = None
 
     # Use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
+    backtest.calculate_trading_OnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()
@@ -195,7 +195,7 @@ if run_example == 2 or run_example == 0:
     signal_df = tech_ind.get_signal()
 
     # Use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=None, run_in_parallel=False)
+    backtest.calculate_trading_OnL(br, asset_df, signal_df, contract_value_df=None, run_in_parallel=False)
     port = backtest.portfolio_cum()
     port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()  # get final signals for each series

@@ -337,7 +337,7 @@ class TechIndicator(object):
                 x + " RSI Signal" for x in data_frame.columns.values]
 
         elif name in ["BB"]:
-            # Calcuate Bollinger bands
+            # Calculate Bollinger bands
             mid = data_frame.rolling(
                 center=False, window=tech_params.bb_period).mean()
             mid.columns = [x + " BB Mid" for x in data_frame.columns.values]

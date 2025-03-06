@@ -252,7 +252,7 @@ class FXVolSurface(AbstractVolSurface):
 
     def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor="1M"):
         """Calculates the implied_vol volatility for a given strike and tenor (or expiry date, if specified). The
-        expiry date/broken dates are intepolated linearly in variance space.
+        expiry date/broken dates are interpolated linearly in variance space.
 
         Parameters
         ----------
@@ -292,7 +292,7 @@ class FXVolSurface(AbstractVolSurface):
 
     def calculate_vol_for_delta_expiry(self, delta_call, expiry_date=None):
         """Calculates the implied_vol volatility for a given delta call and expiry date. The
-        expiry date/broken dates are intepolated linearly in variance space.
+        expiry date/broken dates are interpolated linearly in variance space.
 
         Parameters
         ----------

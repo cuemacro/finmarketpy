@@ -371,7 +371,7 @@ class TradeAnalysis(object):
 
         backtest = Backtest()
 
-        backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, False)
+        backtest.calculate_trading_OnL(br, asset_df, signal_df, contract_value_df, False)
         ret_stats = backtest.portfolio_pnl_ret_stats()
         stats = str(backtest.portfolio_pnl_desc()[0])
 
@@ -381,7 +381,7 @@ class TradeAnalysis(object):
         return port, ret_stats
 
     ###### Parameters and signal generations (need to be customised for every model)
-    ###### Plot all the output seperately
+    ###### Plot all the output separately
     def run_arbitrary_sensitivity_separately(self, trading_model, parameter_list=None,
                                              pretty_portfolio_names=None, strip=None):
 

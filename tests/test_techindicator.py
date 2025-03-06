@@ -273,7 +273,7 @@ def test_sma2():
     assert_frame_equal(df, expected_df)
     assert_frame_equal(signal_df, expected_signal_df)
 
-    # Test Case 3: Costant prices
+    # Test Case 3: Constant prices
     cols = get_cols_name(1)
     signals = ["SMA", "SMA2"]
     data_df = pd.DataFrame(index=dates, columns=cols, data=1)

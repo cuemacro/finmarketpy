@@ -15,7 +15,7 @@ jobs:
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
-          github_token: ${{ inputs.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub release without artifacts
         uses: softprops/action-gh-release@v2

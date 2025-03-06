@@ -9,7 +9,7 @@ requires-python = ">=3.9"
 dependencies = [
     "blosc>=1.11.2",
     "chartpy",
-    "financepy>=0.370",
+    "financepy==0.310",
     "findatapy",
     "matplotlib>=3.9.4",
     "numba>=0.60.0",

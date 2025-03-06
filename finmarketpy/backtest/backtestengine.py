@@ -20,7 +20,11 @@ from finmarketpy.util.marketconstants import MarketConstants
 from findatapy.util import SwimPool
 from findatapy.util import LoggerManager
 
-from typing import List
+import pickle
+# import zlib
+# import lz4framed    # conda install -c conda-forge py-lz4framed
+
+from typing import List, Dict
 
 # Make blosc optional (only when trying to run backtests in parallel)
 try:
@@ -57,7 +61,7 @@ class Backtest(object):
 
         The table is populated with asset, signal and further dataframes
         provided by the user, can be used to check signalling methodology.
-        It does not apply parameters such as transaction costs, vol adjustment
+        It does not apply parameters such as transaction costs, vol adjusment
         and so on.
 
         Parameters
@@ -947,7 +951,7 @@ from findatapy.timeseries import Calculations, RetStats, Filter
 
 
 class TradingModel(object):
-    """Abstract class which wraps around Backtest, providing convenient functions for analysis. Implement your own
+    """Abstract class which wraps around Backtest, providing convenient functions for analaysis. Implement your own
     subclasses of this for your own strategy. See tradingmodelfxtrend_example.py for a simple implementation of a
     FX trend following strategy.
     """
@@ -1365,7 +1369,7 @@ class TradingModel(object):
         else:
             desc = [key]
 
-        # For final strategy return heavyweight backtest object (contains lots of auxiliary information about trades etc)
+        # For final strategy return heavyweight backtest object (contains lots of auxilliary information about trades etc)
         if key == self.FINAL_STRATEGY and compress_output:
             logger.debug('Compressing ' + key)
 
@@ -1911,14 +1915,14 @@ class TradingModel(object):
             silent_plot=silent_plot, ret_with_df=ret_with_df,
             split_on_char=split_on_char)
 
-    def plot_strategy_components_pnlyoy(
+    def plot_strategy_components_pnl_yoy(
             self,
             strip: str = None,
             silent_plot: bool = False,
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        return self.plotyoy_helper(self._strategy_components_pnl_ret_stats,
+        return self.plot_yoy_helper(self._strategy_components_pnl_ret_stats,
                                     'Ind Component YoY', 'Ind Component (%)',
                                     strip=strip, silent_plot=silent_plot,
                                     ret_with_df=ret_with_df,
@@ -2033,21 +2037,21 @@ class TradingModel(object):
                                           ret_with_df=ret_with_df,
                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnlyoy(
+    def plot_strategy_group_benchmark_pnl_yoy(
             self,
             strip: str = None,
             silent_plot: bool = False,
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        return self.plotyoy_helper(
+        return self.plot_yoy_helper(
             self._strategy_group_benchmark_pnl_ret_stats, "",
-            "Group Benchmark OnL YoY",
+            "Group Benchmark PnL YoY",
             strip=strip,
             silent_plot=silent_plot, ret_with_df=ret_with_df,
             split_on_char=split_on_char)
 
-    def plotyoy_helper(
+    def plot_yoy_helper(
             self,
             ret_stats: dict,
             title: str,
@@ -2059,15 +2063,15 @@ class TradingModel(object):
 
         style = self._create_style(title, title)
         # keys = self._strategy_group_benchmark_ret_stats.keys()
-        you = []
+        yoy = []
 
         for key in ret_stats.keys():
-            col = ret_stats[key].you_rets()
+            col = ret_stats[key].yoy_rets()
             col.columns = [key]
-            you.append(col)
+            yoy.append(col)
 
         calculations = Calculations()
-        ret_stats = calculations.join(you, how='outer')
+        ret_stats = calculations.join(yoy, how='outer')
         ret_stats.index = ret_stats.index.year
 
         ret_stats = self._strip_dataframe(ret_stats, strip)
@@ -2580,7 +2584,7 @@ class PortfolioWeightConstruction(object):
                 portfolio = pd.DataFrame(portfolio.sum(axis=1),
                                          columns=["Portfolio"])
 
-                # Overwrite days when every asset OnL was null is NaN with nan
+                # Overwrite days when every asset PnL was null is NaN with nan
                 portfolio[is_all_na] = np.nan
         else:
             # Just assume to take the mean / ie. equal weights for each signal

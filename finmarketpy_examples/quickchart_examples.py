@@ -38,7 +38,7 @@ if run_example == 1 or run_example == 0:
     # Plot with Matplotlib - S&P 500 YoY returns
     QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(tickers={'S&P500' : 'SPX Index'},
                 title='S&P 500 YoY', chart_type='bar',
-                start_date='01 Jan 2007', you=True, source='Bloomberg')
+                start_date='01 Jan 2007', yoy=True, source='Bloomberg')
 
 
 ###### Plot with Plotly and Matplotlib

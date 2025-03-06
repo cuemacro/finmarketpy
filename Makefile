@@ -8,7 +8,9 @@ venv:
 .PHONY: install
 install: venv ## Install a virtual environment
 	@uv pip install --upgrade pip
-	@uv pip install -r requirements.txt
+	@uv sync -vv --frozen
+
+	#@uv pip install -r requirements.txt
 
 
 #.PHONY: fmt

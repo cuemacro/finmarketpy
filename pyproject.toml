@@ -1,0 +1,53 @@
+[project]
+name = 'finmarketpy'
+version = "0.0.0"
+description = "Extract market data"
+# Please add authors and correct the email...
+authors = [{name='Saeed Aman', email= 'saeed@cuemacro.com'}]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "chartpy",
+    "findatapy",
+]
+
+[project.urls]
+repository = "https://github.com/cuemacro/finmarketpy"
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=6.0.0",
+    "pytest>=8.3.3",
+    "pre-commit>=4.0.1",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+exclude = [
+    "*__init__.py"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["finmarketpy"]
+
+[tool.hatch.build]
+include = [
+    "LICENSE",    # Ensure the LICENSE file is included in your package
+    "README.md",
+    "finmarketpy"
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+
+[tool.uv.sources]
+chartpy = { git = "https://github.com/cuemacro/chartpy.git" }
+findatapy = { git = "https://github.com/cuemacro/findatapy.git" }

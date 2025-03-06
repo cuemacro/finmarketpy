@@ -1,0 +1,15 @@
+name: DEPTRY
+
+on:
+  push:
+
+jobs:
+  deptry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Build the virtual environment for ${{ github.repository }}"
+        uses: cvxgrp/.github/actions/environment@v2.2.5
+
+      - uses: cvxgrp/.github/actions/deptry@v2.2.5
+        with:
+          source-folder: finmarketpy

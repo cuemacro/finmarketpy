@@ -8,16 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Build the virtual environment for ${{ github.repository }}"
-        uses: cvxgrp/.github/actions/environment@v2.2.5
-
-      #- uses: cvxgrp/.github/actions/deptry@v2.2.5
-      #  with:
-      #    source-folder: finmarketpy
-
-      - name: Update pip
-        run: |
-          # Ensure pip is installed and up-to-date
-          python -m ensurepip --upgrade
+        uses: ./.github/actions/environment
 
       - name: Install and run deptry
         run: |

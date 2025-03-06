@@ -13,7 +13,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-Here we show how to use VolStats to calculate various volatility metrics (like realized volatility, volatility risk 
+Here we show how to use VolStats to calculate various volatility metrics (like realized volatility, volatility risk
 premium and the implied volatility addons)
 
 Note, you will need to have a Bloomberg terminal (with blpapi Python library) to download the FX market data in order
@@ -232,4 +232,3 @@ if run_example == 4 or run_example == 0:
 
     style.title = asset + 'ON implied volatility addon'
     chart.plot(implied_vol_addon, style=style)
-

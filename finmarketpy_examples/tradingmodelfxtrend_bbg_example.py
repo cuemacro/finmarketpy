@@ -22,7 +22,7 @@ from finmarketpy.backtest import TradingModel, BacktestRequest
 from finmarketpy.economics import TechIndicator
 
 class TradingModelFXTrend_BBG_Example(TradingModel):
-    """Shows how to create a simple FX CTA style strategy, using the 
+    """Shows how to create a simple FX CTA style strategy, using the
     TradingModel abstract class (backtest_examples.py
     is a lower level way of doing this). Uses BBG total returns data.
     """

@@ -61,7 +61,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_adjust = False
         self.__signal_vol_period_shift = 0
         self.__signal_vol_rebalance_freq = None
-        self.__signal_vol_resample_freq = None      
+        self.__signal_vol_resample_freq = None
         self.__signal_vol_resample_type = 'mean'
         self.__signal_vol_target = 0.1              # 10% vol target
         self.__signal_vol_max_leverage = None
@@ -72,7 +72,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_notional_size = None
         self.__portfolio_combination = None
         self.__portfolio_combination_weights = None
-        
+
         # Parameters for maximum position limits (expressed as whole portfolio)
         self.__max_net_exposure = None
         self.__max_abs_exposure = None
@@ -100,7 +100,7 @@ class BacktestRequest(MarketDataRequest):
         # either multiplicative starting a 100
         # or additive starting at 0
         self.__cum_index = 'mult' # 'mult' or 'add'
-        
+
     ##### properties for output of the backtest
     @property
     def plot_start(self): return self.__plot_start
@@ -115,13 +115,13 @@ class BacktestRequest(MarketDataRequest):
     @plot_finish.setter
     def plot_finish(self, plot_finish):
         self.__plot_finish = plot_finish
-    
+
     @property
     def calc_stats(self): return self.__calc_stats
 
     @calc_stats.setter
     def calc_stats(self, calc_stats): self.__calc_stats = calc_stats
-    
+
     @property
     def write_csv(self): return self.__write_csv
 
@@ -135,25 +135,25 @@ class BacktestRequest(MarketDataRequest):
     @write_csv_pnl.setter
     def write_csv_pnl(self, write_csv_pnl):
         self.__write_csv_pnl = write_csv_pnl
-    
+
     @property
     def plot_interim(self): return self.__plot_interim
 
     @plot_interim.setter
     def plot_interim(self, plot_interim): self.__plot_interim = plot_interim
-    
+
     @property
     def include_benchmark(self): return self.__include_benchmark
 
     @include_benchmark.setter
     def include_benchmark(self, include_benchmark): self.__include_benchmark = include_benchmark
-    
+
     @property
     def trading_field(self): return self.__trading_field
 
     @trading_field.setter
     def trading_field(self, trading_field): self.__trading_field = trading_field
-    
+
     @property
     def portfolio_weight_construction(self):
         return self.__portfolio_weight_construction
@@ -161,21 +161,21 @@ class BacktestRequest(MarketDataRequest):
     @portfolio_weight_construction.setter
     def portfolio_weight_construction(self, portfolio_weight_construction):
         self.__portfolio_weight_construction = portfolio_weight_construction
-    
+
     ##### Properties for portfolio level volatility adjustment
-    
+
     @property
     def portfolio_vol_adjust(self): return self.__portfolio_vol_adjust
 
     @portfolio_vol_adjust.setter
     def portfolio_vol_adjust(self, portfolio_vol_adjust): self.__portfolio_vol_adjust = portfolio_vol_adjust
-    
+
     @property
     def portfolio_vol_rebalance_freq(self): return self.__portfolio_vol_rebalance_freq
 
     @portfolio_vol_rebalance_freq.setter
     def portfolio_vol_rebalance_freq(self, portfolio_vol_rebalance_freq): self.__portfolio_vol_rebalance_freq = portfolio_vol_rebalance_freq
-    
+
     @property
     def portfolio_vol_resample_type(self): return self.__portfolio_vol_resample_type
 
@@ -193,25 +193,25 @@ class BacktestRequest(MarketDataRequest):
 
     @portfolio_vol_period_shift.setter
     def portfolio_vol_period_shift(self, portfolio_vol_period_shift): self.__portfolio_vol_period_shift = portfolio_vol_period_shift
-    
+
     @property
     def portfolio_vol_target(self): return self.__portfolio_vol_target
 
     @portfolio_vol_target.setter
     def portfolio_vol_target(self, portfolio_vol_target): self.__portfolio_vol_target = portfolio_vol_target
-    
+
     @property
     def portfolio_vol_max_leverage(self): return self.__portfolio_vol_max_leverage
 
     @portfolio_vol_max_leverage.setter
     def portfolio_vol_max_leverage(self, portfolio_vol_max_leverage): self.__portfolio_vol_max_leverage = portfolio_vol_max_leverage
-    
+
     @property
     def portfolio_vol_periods(self): return self.__portfolio_vol_periods
 
     @portfolio_vol_periods.setter
     def portfolio_vol_periods(self, portfolio_vol_periods): self.__portfolio_vol_periods = portfolio_vol_periods
-    
+
     @property
     def portfolio_vol_obs_in_year(self): return self.__portfolio_vol_obs_in_year
 
@@ -224,13 +224,13 @@ class BacktestRequest(MarketDataRequest):
 
     @signal_vol_adjust.setter
     def signal_vol_adjust(self, signal_vol_adjust): self.__signal_vol_adjust = signal_vol_adjust
-    
+
     @property
     def signal_vol_rebalance_freq(self): return self.__signal_vol_rebalance_freq
 
     @signal_vol_rebalance_freq.setter
     def signal_vol_rebalance_freq(self, signal_vol_rebalance_freq): self.__signal_vol_rebalance_freq = signal_vol_rebalance_freq
-    
+
     @property
     def signal_vol_resample_type(self): return self.__signal_vol_resample_type
 
@@ -272,7 +272,7 @@ class BacktestRequest(MarketDataRequest):
 
     @signal_vol_obs_in_year.setter
     def signal_vol_obs_in_year(self, signal_vol_obs_in_year): self.__signal_vol_obs_in_year = signal_vol_obs_in_year
-    
+
     ##### portfolio notional size
     @property
     def portfolio_notional_size(self): return self.__portfolio_notional_size
@@ -286,27 +286,27 @@ class BacktestRequest(MarketDataRequest):
 
     @portfolio_combination.setter
     def portfolio_combination(self, portfolio_combination): self.__portfolio_combination = portfolio_combination
-    
+
     ##### portfolio weights (sum, mean)
     @property
     def portfolio_combination_weights(self): return self.__portfolio_combination_weights
 
     @portfolio_combination_weights.setter
     def portfolio_combination_weights(self, portfolio_combination_weights): self.__portfolio_combination_weights = portfolio_combination_weights
-    
+
     ##### properties for maximum position constraints
     @property
     def max_net_exposure(self): return self.__max_net_exposure
 
     @max_net_exposure.setter
     def max_net_exposure(self, max_net_exposure): self.__max_net_exposure = max_net_exposure
-    
+
     @property
     def max_abs_exposure(self): return self.__max_abs_exposure
 
     @max_abs_exposure.setter
     def max_abs_exposure(self, max_abs_exposure): self.__max_abs_exposure = max_abs_exposure
-    
+
     @property
     def position_clip_rebalance_freq(self): return self.__position_clip_rebalance_freq
 
@@ -337,7 +337,7 @@ class BacktestRequest(MarketDataRequest):
 
     @stop_loss.setter
     def stop_loss(self, stop_loss): self.__stop_loss = stop_loss
-    
+
     @property
     def take_profit(self): return self.__take_profit
 
@@ -427,7 +427,7 @@ class BacktestRequest(MarketDataRequest):
     @signal_delay.setter
     def signal_delay(self, signal_delay):
         self.__signal_delay = signal_delay
-        
+
     @property
     def ann_factor(self):
         return self.__ann_factor
@@ -443,7 +443,7 @@ class BacktestRequest(MarketDataRequest):
     @resample_ann_factor.setter
     def resample_ann_factor(self, resample_ann_factor):
         self.__resample_ann_factor = resample_ann_factor
-        
+
     @property
     def cum_index(self):
         return self.__cum_index

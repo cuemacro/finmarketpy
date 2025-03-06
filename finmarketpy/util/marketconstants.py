@@ -21,11 +21,11 @@ class MarketConstants(object):
     ###### SETUP ENVIRONMENT VARIABLES ######
     plat = str(platform.platform()).lower()
 
-    if 'linux' in plat: 
+    if 'linux' in plat:
         generic_plat = 'linux'
-    elif 'windows' in plat: 
+    elif 'windows' in plat:
         generic_plat = 'windows'
-    elif ('darwin' in plat or 'macos' in plat): 
+    elif ('darwin' in plat or 'macos' in plat):
         generic_plat = 'mac'
 
     # "thread" or "multiprocessing" (experimental!) library to use when backtesting

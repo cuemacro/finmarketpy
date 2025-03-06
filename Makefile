@@ -13,11 +13,11 @@ install: venv ## Install a virtual environment
 	#@uv pip install -r requirements.txt
 
 
-#.PHONY: fmt
-#fmt: venv ## Run autoformatting and linting
-#	@uv pip install pre-commit
-#	@uv run pre-commit install
-#	@uv run pre-commit run --all-files
+.PHONY: fmt
+fmt: venv ## Run autoformatting and linting
+	@uv pip install pre-commit
+	@uv run pre-commit install
+	@uv run pre-commit run --all-files
 
 
 .PHONY: clean

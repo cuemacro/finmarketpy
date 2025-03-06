@@ -16,7 +16,7 @@ __author__ = "saeedamen"
 #
 
 """
-Shows how to load up FX vol surfaces from Bloomberg and then plot an animation 
+Shows how to load up FX vol surfaces from Bloomberg and then plot an animation
 of them. Note, this does not do
 any interpolation.
 """

@@ -17,7 +17,7 @@ __author__ = "saeedamen"
 
 
 """
-Shows how to use finmarketpy to create total return indices for FX spot (ie. 
+Shows how to use finmarketpy to create total return indices for FX spot (ie.
 calculates spot returns + carry returns)
 """
 
@@ -128,4 +128,3 @@ if run_example == 2 or run_example == 0:
     implied_depo_bbg_df = market.fetch_market(md_request=md_request)
 
     chart.plot(calculations.join([implied_depo_bbg_df, implied_depo_df]), how='outer')
-

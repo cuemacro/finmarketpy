@@ -316,8 +316,8 @@ class FXVolSurface(AbstractVolSurface):
 
     def extract_vol_surface(self, num_strike_intervals=60, low_K_pc=0.95,
                             high_K_pc=1.05):
-        """Creates an interpolated implied vol surface which can be plotted 
-        (in strike space), and also in delta space for key strikes (ATM, 25d 
+        """Creates an interpolated implied vol surface which can be plotted
+        (in strike space), and also in delta space for key strikes (ATM, 25d
         call and put). Also for key strikes converts from delta to strike space.
 
         Parameters

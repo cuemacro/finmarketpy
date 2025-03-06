@@ -5,20 +5,35 @@ on:
 permissions:
   contents: write
 jobs:
-  build:
+  tag:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout [${{ github.repository }}]
         uses: actions/checkout@v4
 
       - name: Bump version and tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.2
+        uses: ./.github/actions/tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create GitHub release without artifacts
-        uses: softprops/action-gh-release@v2
+  publish:
+    needs: tag
+    runs-on: ubuntu-latest
+    environment: release
+
+    permissions:
+      contents: read
+      # This permission is required for trusted publishing.
+      id-token: write
+
+    steps:
+      - name: Checkout [${{ github.repository }}]
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
         with:
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          generate_release_notes: true
+          name: dist
+          path: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

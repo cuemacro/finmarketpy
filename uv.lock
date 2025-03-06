@@ -973,19 +973,6 @@ wheels = [
 ]
 
 [[package]]
-name = "empyrical"
-version = "0.5.5"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "pandas-datareader" },
-    { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "scipy", version = "1.15.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/74/43/1b997c21411c6ab7c96dc034e160198272c7a785aeea7654c9bcf98bec83/empyrical-0.5.5.tar.gz", hash = "sha256:84320f36931496774e948d7ca9f03494ae2dd94451b320eeda378639e5eba950", size = 52787 }
-
-[[package]]
 name = "et-xmlfile"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1032,7 +1019,7 @@ wheels = [
 
 [[package]]
 name = "financepy"
-version = "0.370"
+version = "0.310"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -1050,9 +1037,9 @@ dependencies = [
     { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "scipy", version = "1.15.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/42/2a/c6b43f889b697a1f8b7a8a5ae3f0dcabc03b20bdf42056a8b2a37d664083/financepy-0.370.tar.gz", hash = "sha256:0e91d7e76a45d7f1825ff92657435f45255b1ac6da7e90909f7fde7373ed8549", size = 493421 }
+sdist = { url = "https://files.pythonhosted.org/packages/62/2c/4a78556418154bf718efa57f941b4c99fe1418d3f14f29c3bb6cab1ad6d5/financepy-0.310.tar.gz", hash = "sha256:5e78ac111cca02b2c80478878a71e1e0a319d5ba8b541956ee574803ea4676ff", size = 462848 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/f6/6f0390250fcd01667a40443285751988d1aadbdc9b91c26bb577f5a86f16/financepy-0.370-py3-none-any.whl", hash = "sha256:282fb9276c5ef23d420b1fa58f605d59a323925f54645e534891946b21b06f68", size = 678415 },
+    { url = "https://files.pythonhosted.org/packages/46/ca/a36e427ccac520e97f4d47a76639c597656f381e32267b55f935ad965024/financepy-0.310-py3-none-any.whl", hash = "sha256:6986c7ca57545aaaa045dd576335adfc66317b4200645e81d61cb18173c5c777", size = 628617 },
 ]
 
 [[package]]
@@ -1098,7 +1085,6 @@ dependencies = [
     { name = "numba", version = "0.61.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "numpy" },
     { name = "pandas" },
-    { name = "pyfolio" },
     { name = "scikit-learn" },
     { name = "seasonal" },
 ]
@@ -1114,13 +1100,12 @@ dev = [
 requires-dist = [
     { name = "blosc", specifier = ">=1.11.2" },
     { name = "chartpy", git = "https://github.com/cuemacro/chartpy.git" },
-    { name = "financepy", specifier = ">=0.370" },
+    { name = "financepy", specifier = "==0.310" },
     { name = "findatapy", git = "https://github.com/cuemacro/findatapy.git" },
     { name = "matplotlib", specifier = ">=3.9.4" },
     { name = "numba", specifier = ">=0.60.0" },
     { name = "numpy", specifier = ">=2.0.2" },
     { name = "pandas", specifier = ">=2.2.3" },
-    { name = "pyfolio", specifier = ">=0.9.2" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "seasonal", specifier = ">=0.3.1" },
 ]
@@ -3243,27 +3228,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pyfolio"
-version = "0.9.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "empyrical" },
-    { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "ipython", version = "8.33.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
-    { name = "ipython", version = "9.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "matplotlib", version = "3.9.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "matplotlib", version = "3.10.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "pytz" },
-    { name = "scikit-learn" },
-    { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "scipy", version = "1.15.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "seaborn" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/28/b4/99799b743c4619752f88b70354924132a2e9b82f4656fe7c55eaa9101392/pyfolio-0.9.2.tar.gz", hash = "sha256:6ae63e9b01034b89accfef2806f5f11bc5810f5a5b4216882b5faa89f5f2a2a9", size = 91135 }
-
-[[package]]
 name = "pygments"
 version = "2.19.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3862,21 +3826,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/03/f3/e699e19cabe96bbac5189c04aaa970718f0105cff03d458dc5e2b6bd1e8c/scipy-1.15.2-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:bae43364d600fdc3ac327db99659dcb79e6e7ecd279a75fe1266669d9a652828", size = 36545159 },
     { url = "https://files.pythonhosted.org/packages/af/f5/ab3838e56fe5cc22383d6fcf2336e48c8fe33e944b9037fbf6cbdf5a11f8/scipy-1.15.2-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:f031846580d9acccd0044efd1a90e6f4df3a6e12b4b6bd694a7bc03a89892b28", size = 39136566 },
     { url = "https://files.pythonhosted.org/packages/0a/c8/b3f566db71461cabd4b2d5b39bcc24a7e1c119535c8361f81426be39bb47/scipy-1.15.2-cp313-cp313t-win_amd64.whl", hash = "sha256:fe8a9eb875d430d81755472c5ba75e84acc980e4a8f6204d402849234d3017db", size = 40477705 },
-]
-
-[[package]]
-name = "seaborn"
-version = "0.13.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "matplotlib", version = "3.9.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "matplotlib", version = "3.10.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "numpy" },
-    { name = "pandas" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/86/59/a451d7420a77ab0b98f7affa3a1d78a313d2f7281a57afb1a34bae8ab412/seaborn-0.13.2.tar.gz", hash = "sha256:93e60a40988f4d65e9f4885df477e2fdaff6b73a9ded434c1ab356dd57eefff7", size = 1457696 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/11/00d3c3dfc25ad54e731d91449895a79e4bf2384dc3ac01809010ba88f6d5/seaborn-0.13.2-py3-none-any.whl", hash = "sha256:636f8336facf092165e27924f223d3c62ca560b1f2bb5dff7ab7fad265361987", size = 294914 },
 ]
 
 [[package]]

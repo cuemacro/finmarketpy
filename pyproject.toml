@@ -8,10 +8,13 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "chartpy",
+    "financepy>=0.370",
     "findatapy",
     "matplotlib>=3.9.4",
+    "numba>=0.60.0",
     "numpy>=2.0.2",
     "pandas>=2.2.3",
+    "seasonal>=0.3.1",
 ]
 
 [project.urls]

@@ -1036,11 +1036,15 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "chartpy" },
+    { name = "financepy" },
     { name = "findatapy" },
     { name = "matplotlib", version = "3.9.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "matplotlib", version = "3.10.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "numba", version = "0.60.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "numba", version = "0.61.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "seasonal" },
 ]
 
 [package.dev-dependencies]
@@ -1053,10 +1057,13 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "chartpy", git = "https://github.com/cuemacro/chartpy.git" },
+    { name = "financepy", specifier = ">=0.370" },
     { name = "findatapy", git = "https://github.com/cuemacro/findatapy.git" },
     { name = "matplotlib", specifier = ">=3.9.4" },
+    { name = "numba", specifier = ">=0.60.0" },
     { name = "numpy", specifier = ">=2.0.2" },
     { name = "pandas", specifier = ">=2.2.3" },
+    { name = "seasonal", specifier = ">=0.3.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -3722,6 +3729,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/03/f3/e699e19cabe96bbac5189c04aaa970718f0105cff03d458dc5e2b6bd1e8c/scipy-1.15.2-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:bae43364d600fdc3ac327db99659dcb79e6e7ecd279a75fe1266669d9a652828", size = 36545159 },
     { url = "https://files.pythonhosted.org/packages/af/f5/ab3838e56fe5cc22383d6fcf2336e48c8fe33e944b9037fbf6cbdf5a11f8/scipy-1.15.2-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:f031846580d9acccd0044efd1a90e6f4df3a6e12b4b6bd694a7bc03a89892b28", size = 39136566 },
     { url = "https://files.pythonhosted.org/packages/0a/c8/b3f566db71461cabd4b2d5b39bcc24a7e1c119535c8361f81426be39bb47/scipy-1.15.2-cp313-cp313t-win_amd64.whl", hash = "sha256:fe8a9eb875d430d81755472c5ba75e84acc980e4a8f6204d402849234d3017db", size = 40477705 },
+]
+
+[[package]]
+name = "seasonal"
+version = "0.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "scipy", version = "1.15.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/74/ec/1d6053a5bb05bf72a720772575b85a0a1599314e1ca2d6eba9000d75f4b8/seasonal-0.3.1-py2.py3-none-any.whl", hash = "sha256:d96358c7e510926ebc11a72352d8dcf6d233256da9b796c3da028190616f1d26", size = 18124 },
 ]
 
 [[package]]

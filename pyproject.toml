@@ -7,6 +7,7 @@ authors = [{name='Saeed Aman', email= 'saeed@cuemacro.com'}]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
+    "blosc>=1.11.2",
     "chartpy",
     "financepy>=0.370",
     "findatapy",
@@ -14,6 +15,8 @@ dependencies = [
     "numba>=0.60.0",
     "numpy>=2.0.2",
     "pandas>=2.2.3",
+    "pyfolio>=0.9.2",
+    "scikit-learn>=1.6.1",
     "seasonal>=0.3.1",
 ]
 

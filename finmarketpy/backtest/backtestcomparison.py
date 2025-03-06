@@ -43,7 +43,7 @@ class BacktestComparison(object):
         self.labels = labels
 
     def plot_pnl(self, diff=True, silent_plot=False, reduce_plot=True):
-        style = self.models[self.ref_index]._create_style("", "Strategy OnL", reduce_plot=reduce_plot)
+        style = self.models[self.ref_index]._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
         models = self.models
         ref = self.ref_index

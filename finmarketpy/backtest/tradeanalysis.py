@@ -371,7 +371,7 @@ class TradeAnalysis(object):
 
         backtest = Backtest()
 
-        backtest.calculate_trading_OnL(br, asset_df, signal_df, contract_value_df, False)
+        backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, False)
         ret_stats = backtest.portfolio_pnl_ret_stats()
         stats = str(backtest.portfolio_pnl_desc()[0])
 

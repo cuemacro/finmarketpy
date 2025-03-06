@@ -51,7 +51,7 @@ class Backtest(object):
         self._portfolio = None
         return
 
-    def calculate_diagnostic_trading_OnL(
+    def calculate_diagnostic_trading_PnL(
             self,
             asset_a_df: pd.DataFrame,
             signal_df: pd.DataFrame,
@@ -116,7 +116,7 @@ class Backtest(object):
 
         return calculations.join(flatten_df, how='outer')
 
-    def calculate_trading_OnL(
+    def calculate_trading_PnL(
             self,
             br: BacktestRequest,
             asset_a_df: pd.DataFrame,
@@ -568,7 +568,7 @@ class Backtest(object):
     def backtest_output(self):
         return
 
-    ### Get OnL of individual assets before portfolio constraints
+    ### Get PnL of individual assets before portfolio constraints
     def pnl(self) -> pd.DataFrame:
         """Gets P&L returns of all the individual sub_components of the model (before any portfolio level leverage is applied)
 
@@ -636,7 +636,7 @@ class Backtest(object):
 
         return self._pnl_cum
 
-    ### Get OnL of individual assets AFTER portfolio constraints
+    ### Get PnL of individual assets AFTER portfolio constraints
     def components_pnl(self) -> pd.DataFrame:
         """Gets P&L returns of all the individual subcomponents of the model (after portfolio level leverage is applied)
 
@@ -691,7 +691,7 @@ class Backtest(object):
 
         return self._components_pnl_cum
 
-    ### Get OnL of the final portfolio
+    ### Get PnL of the final portfolio
 
     def portfolio_cum(self) -> pd.DataFrame:
         """Gets P&L as a cumulative time series of portfolio
@@ -1295,7 +1295,7 @@ class TradingModel(object):
         self._strategy_signal_contracts = backtest.portfolio_signal_contracts()
         self._strategy_trade_contracts = backtest.portfolio_trade_contracts()
 
-        # Get OnL by component (before portfolio vol targeting and after)
+        # Get PnL by component (before portfolio vol targeting and after)
         self._strategy_group_pnl_trades = backtest.pnl_trades()  # get individual trades P&L before (before portfolio adjustment)
         self._strategy_pnl_trades_components = backtest.components_pnl_trades()
 
@@ -1357,7 +1357,7 @@ class TradingModel(object):
 
         logger.info("Calculated trading signals for " + key)
 
-        backtest.calculate_trading_OnL(br, asset_df, signal,
+        backtest.calculate_trading_PnL(br, asset_df, signal,
                                        contract_value_df,
                                        run_in_parallel)  # calculate P&L (and adjust signals for vol etc)
 
@@ -1691,7 +1691,7 @@ class TradingModel(object):
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        style = self._create_style("(bp)", "Individual Trade OnL",
+        style = self._create_style("(bp)", "Individual Trade PnL",
                                    reduce_plot=reduce_plot)
 
         # zero when there isn't a trade exit
@@ -1722,7 +1722,7 @@ class TradingModel(object):
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        style = self._create_style("", "Strategy OnL", reduce_plot=reduce_plot)
+        style = self._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
         try:
             df = self._strip_dataframe(self._reduce_plot(
@@ -1847,7 +1847,7 @@ class TradingModel(object):
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        style = self._create_style("Ind Components", "Strategy OnL Components",
+        style = self._create_style("Ind Components", "Strategy PnL Components",
                                    reduce_plot=reduce_plot)
 
         try:
@@ -1941,7 +1941,7 @@ class TradingModel(object):
             split_on_char: str = None):
         logger = LoggerManager().getLogger(__name__)
 
-        style = self._create_style("", "Group Benchmark OnL - cumulative")
+        style = self._create_style("", "Group Benchmark PnL - cumulative")
 
         strat_list = self._strategy_group_benchmark_pnl.columns  # .sort_values()
 

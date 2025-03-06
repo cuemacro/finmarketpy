@@ -59,3 +59,8 @@ exclude_dirs = ["tests"]
 [tool.uv.sources]
 chartpy = { git = "https://github.com/cuemacro/chartpy.git" }
 findatapy = { git = "https://github.com/cuemacro/findatapy.git" }
+
+[tool.deptry.per_rule_ignores]
+# very dated dependency!
+DEP001 = ["pyfolio"]
+DEP002 = ["finmarketpy"]

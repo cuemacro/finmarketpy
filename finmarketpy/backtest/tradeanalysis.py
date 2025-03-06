@@ -12,17 +12,14 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-pf = None
-
-try:
-    import pyfolio as pf
-except:
-    pass
+# pf = None
+#
+# try:
+#     import pyfolio as pf
+# except:
+#     pass
 
 import datetime
-
-# import matplotlib
-# import matplotlib.pyplot as plt
 import pandas
 import copy
 
@@ -51,7 +48,7 @@ class TradeAnalysis(object):
 
         return
 
-    def run_strategy_returns_stats(self, trading_model, index=None, engine='finmarketpy'):
+    def run_strategy_returns_stats(self, trading_model):
         """Plots useful statistics for the trading strategy using various backends
 
         Parameters
@@ -68,77 +65,77 @@ class TradeAnalysis(object):
 
         """
 
-        if index is None:
-            pnl = trading_model.strategy_pnl()
-        else:
-            pnl = index
+        #if index is None:
+        #    pnl = trading_model.strategy_pnl()
+        #else:
+        #    pnl = index
 
-        tz = Timezone()
-        calculations = Calculations()
+        #tz = Timezone()
+        #calculations = Calculations()
 
-        if engine == 'pyfolio':
-            # PyFolio assumes UTC time based DataFrames (so force this localisation)
-            try:
-                pnl = tz.localize_index_as_UTC(pnl)
-            except:
-                pass
+        # if engine == 'pyfolio':
+        #     # PyFolio assumes UTC time based DataFrames (so force this localisation)
+        #     try:
+        #         pnl = tz.localize_index_as_UTC(pnl)
+        #     except:
+        #         pass
+        #
+        #     # set the matplotlib style sheet & defaults
+        #     # at present this only works in Matplotlib engine
+        #     try:
+        #         import matplotlib
+        #         import matplotlib.pyplot as plt
+        #         matplotlib.rcdefaults()
+        #         plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
+        #     except:
+        #         pass
+        #
+        #     # TODO for intraday strategies, make daily
+        #
+        #     # convert DataFrame (assumed to have only one column) to Series
+        #     pnl = calculations.calculate_returns(pnl)
+        #     pnl = pnl.dropna()
+        #     pnl = pnl[pnl.columns[0]]
+        #     fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
+        #
+        #     try:
+        #         plt.savefig(trading_model.DUMP_PATH + "stats.png")
+        #     except:
+        #         pass
+        #
+        #     plt.show()
+        #elif engine == 'finmarketpy':
 
-            # set the matplotlib style sheet & defaults
-            # at present this only works in Matplotlib engine
-            try:
-                import matplotlib
-                import matplotlib.pyplot as plt
-                matplotlib.rcdefaults()
-                plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
-            except:
-                pass
+        # assume we have TradingModel
+        # to do to take in a time series
+        from chartpy import Canvas #, Chart
 
-            # TODO for intraday strategies, make daily
+        # temporarily make scale factor smaller so fits the window
+        old_scale_factor = trading_model.SCALE_FACTOR
+        trading_model.SCALE_FACTOR = 0.75
 
-            # convert DataFrame (assumed to have only one column) to Series
-            pnl = calculations.calculate_returns(pnl)
-            pnl = pnl.dropna()
-            pnl = pnl[pnl.columns[0]]
-            fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
+        pnl = trading_model.plot_strategy_pnl(silent_plot=True)  # plot the final strategy
+        individual = trading_model.plot_strategy_group_pnl_trades(
+            silent_plot=True)  # plot the individual trade P&Ls
 
-            try:
-                plt.savefig(trading_model.DUMP_PATH + "stats.png")
-            except:
-                pass
+        pnl_comp = trading_model.plot_strategy_group_benchmark_pnl(
+            silent_plot=True)  # plot all the cumulative P&Ls of each component
+        ir_comp = trading_model.plot_strategy_group_benchmark_pnl_ir(
+            silent_plot=True)  # plot all the IR of each component
 
-            plt.show()
-        elif engine == 'finmarketpy':
+        leverage = trading_model.plot_strategy_leverage(silent_plot=True)  # plot the leverage of the portfolio
+        ind_lev = trading_model.plot_strategy_group_leverage(silent_plot=True)  # plot all the individual leverages
 
-            # assume we have TradingModel
-            # to do to take in a time series
-            from chartpy import Canvas, Chart
+        canvas = Canvas([[pnl, individual],
+                         [pnl_comp, ir_comp],
+                         [leverage, ind_lev]]
+                        )
 
-            # temporarily make scale factor smaller so fits the window
-            old_scale_factor = trading_model.SCALE_FACTOR
-            trading_model.SCALE_FACTOR = 0.75
+        canvas.generate_canvas(page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
+                               silent_display=False, canvas_plotter='plain',
+                               output_filename=trading_model.FINAL_STRATEGY + ".html", render_pdf=False)
 
-            pnl = trading_model.plot_strategy_pnl(silent_plot=True)  # plot the final strategy
-            individual = trading_model.plot_strategy_group_pnl_trades(
-                silent_plot=True)  # plot the individual trade P&Ls
-
-            pnl_comp = trading_model.plot_strategy_group_benchmark_pnl(
-                silent_plot=True)  # plot all the cumulative P&Ls of each component
-            ir_comp = trading_model.plot_strategy_group_benchmark_pnl_ir(
-                silent_plot=True)  # plot all the IR of each component
-
-            leverage = trading_model.plot_strategy_leverage(silent_plot=True)  # plot the leverage of the portfolio
-            ind_lev = trading_model.plot_strategy_group_leverage(silent_plot=True)  # plot all the individual leverages
-
-            canvas = Canvas([[pnl, individual],
-                             [pnl_comp, ir_comp],
-                             [leverage, ind_lev]]
-                            )
-
-            canvas.generate_canvas(page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
-                                   silent_display=False, canvas_plotter='plain',
-                                   output_filename=trading_model.FINAL_STRATEGY + ".html", render_pdf=False)
-
-            trading_model.SCALE_FACTOR = old_scale_factor
+        trading_model.SCALE_FACTOR = old_scale_factor
 
     def run_excel_trade_report(self, trading_model, excel_file='model.xlsx'):
         """

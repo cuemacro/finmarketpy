@@ -1,7 +1,7 @@
 [project]
 name = 'finmarketpy'
 version = "0.0.0"      # do not change by hand!
-description = "Extract market data"
+description = "finmarketpy is a Python based library for backtesting trading strategies"
 # Please add authors and correct the email...
 authors = [{name='Saeed Aman', email= 'saeed@cuemacro.com'}]
 readme = "README.md"
@@ -17,6 +17,9 @@ dependencies = [
     "pandas>=2.2.3",
     "scikit-learn>=1.6.1",
     "seasonal>=0.3.1",
+]
+keywords = [
+    "trading", "markets", "currencies", "pandas", "data", "Bloomberg", "tick", "stocks", "equities"
 ]
 
 [project.urls]
@@ -63,5 +66,5 @@ chartpy = { git = "https://github.com/cuemacro/chartpy.git" }
 findatapy = { git = "https://github.com/cuemacro/findatapy.git" }
 
 [tool.deptry.per_rule_ignores]
-DEP001 = ["pyfolio"]       # very dated dependency!
+#DEP001 = ["pyfolio"]       # very dated dependency!
 DEP003 = ["finmarketpy"]

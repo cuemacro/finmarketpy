@@ -20,11 +20,7 @@ from finmarketpy.util.marketconstants import MarketConstants
 from findatapy.util import SwimPool
 from findatapy.util import LoggerManager
 
-import pickle
-# import zlib
-# import lz4framed    # conda install -c conda-forge py-lz4framed
-
-from typing import List, Dict
+from typing import List
 
 # Make blosc optional (only when trying to run backtests in parallel)
 try:
@@ -1915,14 +1911,14 @@ class TradingModel(object):
             silent_plot=silent_plot, ret_with_df=ret_with_df,
             split_on_char=split_on_char)
 
-    def plot_strategy_components_pnl_you(
+    def plot_strategy_components_pnlyoy(
             self,
             strip: str = None,
             silent_plot: bool = False,
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        return self.plot_you_helper(self._strategy_components_pnl_ret_stats,
+        return self.plotyoy_helper(self._strategy_components_pnl_ret_stats,
                                     'Ind Component YoY', 'Ind Component (%)',
                                     strip=strip, silent_plot=silent_plot,
                                     ret_with_df=ret_with_df,
@@ -2037,21 +2033,21 @@ class TradingModel(object):
                                           ret_with_df=ret_with_df,
                                           split_on_char=split_on_char)
 
-    def plot_strategy_group_benchmark_pnl_you(
+    def plot_strategy_group_benchmark_pnlyoy(
             self,
             strip: str = None,
             silent_plot: bool = False,
             ret_with_df: bool = False,
             split_on_char: str = None):
 
-        return self.plot_you_helper(
+        return self.plotyoy_helper(
             self._strategy_group_benchmark_pnl_ret_stats, "",
             "Group Benchmark OnL YoY",
             strip=strip,
             silent_plot=silent_plot, ret_with_df=ret_with_df,
             split_on_char=split_on_char)
 
-    def plot_you_helper(
+    def plotyoy_helper(
             self,
             ret_stats: dict,
             title: str,

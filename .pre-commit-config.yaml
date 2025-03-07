@@ -6,11 +6,18 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: remove-tabs
+
+        #args: [ --whitespaces-count, '2' ]  # defaults to: 4
+
 #  - repo: https://github.com/charliermarsh/ruff-pre-commit
 #    rev: 'v0.9.6'
 #    hooks:
 #      - id: ruff
-#        args: [ --fix, --exit-non-zero-on-fix ]
+#        args: [ --fix, --exit-non-zero-on-fix, --exclude=finmarketpy_examples/ ]
 #      # Run the formatter
 #      - id: ruff-format
 #        exclude: src/tests

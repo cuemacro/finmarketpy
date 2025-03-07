@@ -17,13 +17,13 @@ __author__ = "saeedamen"
 
 
 """
-Shows how to use finmarketpy to total return indices for FX vanilla options 
-(uses FinancePy underneath), so we can  see the historical P&L from for 
+Shows how to use finmarketpy to total return indices for FX vanilla options
+(uses FinancePy underneath), so we can  see the historical P&L from for
 example, rolling a 1M call option etc.
 
-Note, you will need to have a Bloomberg terminal (with blpapi Python library) 
-to download the FX market data in order to generate the FX option prices, 
-which are used underneath (FX spot, FX forwards, FX implied volatility quotes 
+Note, you will need to have a Bloomberg terminal (with blpapi Python library)
+to download the FX market data in order to generate the FX option prices,
+which are used underneath (FX spot, FX forwards, FX implied volatility quotes
 and deposit rates)
 """
 
@@ -56,9 +56,9 @@ chart = Chart(engine="plotly")
 market = Market(market_data_generator=MarketDataGenerator())
 
 # Choose run_example = 0 for everything
-# run_example = 1 - create total return index AUDUSD 1M long calls (and 
+# run_example = 1 - create total return index AUDUSD 1M long calls (and
 # separately long puts) over 2008 financial crisis and further
-# run_example = 2 - create total return index USDJPY 1W short straddles 
+# run_example = 2 - create total return index USDJPY 1W short straddles
 # over a long sample
 
 run_example = 0

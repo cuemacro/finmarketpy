@@ -1,0 +1,21 @@
+name: DEPTRY
+
+on:
+  push:
+
+jobs:
+  deptry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout [${{ github.repository }}]
+        uses: actions/checkout@v4
+
+      - name: "Build the virtual environment for ${{ github.repository }}"
+        uses: ./.github/actions/environment
+
+      - name: Run deptry
+        run: |
+          # Ensure pip is installed and up-to-date
+          # python -m ensurepip --upgrade
+          # python -m pip install --no-cache-dir deptry
+          python -m deptry finmarketpy

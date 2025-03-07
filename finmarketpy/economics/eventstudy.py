@@ -320,7 +320,7 @@ class EventsFactory(EventStudy):
         self._econ_data_frame.to_csv(path)
 
     def get_economic_event_date_time(self, name, event=None, csv=None):
-        ticker = self.create_event_desciptor_field(name, event, "release-date-time-full")
+        ticker = self.create_event_descriptor_field(name, event, "release-date-time-full")
 
         if csv is None:
             data_frame = self._econ_data_frame[ticker]
@@ -341,12 +341,12 @@ class EventsFactory(EventStudy):
         series = self.get_economic_event_date_time(name, event, csv)
 
         data_frame = pandas.DataFrame(series.values, index=series.index)
-        data_frame.columns.name = self.create_event_desciptor_field(name, event, "release-date-time-full")
+        data_frame.columns.name = self.create_event_descriptor_field(name, event, "release-date-time-full")
 
         return data_frame
 
     def get_economic_event_date_time_fields(self, fields, name, event=None):
-        ### acceptible fields
+        ### acceptable fields
         # observation-date <- observation time for the index
         # actual-release
         # survey-median
@@ -364,10 +364,10 @@ class EventsFactory(EventStudy):
 
         # construct tickers of the form USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.actual-release
         for i in range(0, len(fields)):
-            ticker.append(self.create_event_desciptor_field(name, event, fields[i]))
+            ticker.append(self.create_event_descriptor_field(name, event, fields[i]))
 
         # index on the release-dt field eg. 20101230 (we shall convert this later)
-        ticker_index = self.create_event_desciptor_field(name, event, "release-dt")
+        ticker_index = self.create_event_descriptor_field(name, event, "release-dt")
 
         ######## grab event date/times
         event_date_time = self.get_economic_event_date_time(name, event)
@@ -410,7 +410,7 @@ class EventsFactory(EventStudy):
 
         return data_frame
 
-    def create_event_desciptor_field(self, name, event, field):
+    def create_event_descriptor_field(self, name, event, field):
         if event is None:
             return name + "." + field
         else:
@@ -442,7 +442,7 @@ class EventsFactory(EventStudy):
 
     def get_economic_event_date(self, name, event=None):
         return self._econ_data_frame[
-            self.create_event_desciptor_field(name, event, ".release-dt")]
+            self.create_event_descriptor_field(name, event, ".release-dt")]
 
     def get_economic_event_ret_over_custom_event_day(self, data_frame_in, name, event, start, end, lagged=False,
                                                      NYC_cutoff=10):

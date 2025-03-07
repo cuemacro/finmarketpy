@@ -1,0 +1,74 @@
+name: "Bump version and create release"
+description: "Bumps version, creates a tag, and publishes a release."
+
+inputs:
+  github_token:
+    description: "GitHub token for authentication"
+    required: true
+
+outputs:
+  tag:
+    description: 'A new tag'
+    value: ${{ steps.tag_version.outputs.new_tag }}
+
+runs:
+  using: "composite"
+  steps:
+    # -----------------------------------------------------------------------------
+    # Step 2: Bump version and tag
+    # -----------------------------------------------------------------------------
+    - name: Bump version and tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v6.2
+      with:
+        github_token: ${{ inputs.github_token }}
+
+    # -----------------------------------------------------------------------------
+    # Step 3: Install dependencies (hatch for packaging)
+    # -----------------------------------------------------------------------------
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade hatch
+
+    # -----------------------------------------------------------------------------
+    # Step 4: Update version in pyproject.toml
+    # -----------------------------------------------------------------------------
+    - name: Update version in pyproject.toml
+      shell: bash
+      run: |
+        echo "Updating version to ${{ steps.tag_version.outputs.new_tag }}"
+        sed -i "s/0.0.0/${{ steps.tag_version.outputs.new_tag }}/" pyproject.toml
+
+    # -----------------------------------------------------------------------------
+    # Step 5: Build the package
+    # -----------------------------------------------------------------------------
+    - name: Build package
+      shell: bash
+      run: |
+        hatch build
+
+    # -----------------------------------------------------------------------------
+    # Step 6: Upload build artifacts
+    # -----------------------------------------------------------------------------
+    - name: Upload distribution artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        retention-days: 1
+
+    # -----------------------------------------------------------------------------
+    # Step 7: Create GitHub release
+    # -----------------------------------------------------------------------------
+    - name: Create GitHub release with artifacts
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        generate_release_notes: true
+        files: dist/*
+
+    - name: Debug Output Tag
+      shell: bash
+      run: |
+          echo "DEBUG: ${{ steps.tag_version.outputs.new_tag }}"

@@ -1,0 +1,28 @@
+name: "CI"
+
+on:
+- push
+
+jobs:
+  test:
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [ '3.9' ] # '3.10', '3.11', '3.12', '3.13' ]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout [${{ github.repository }}]
+        uses: actions/checkout@v4
+
+      - name: "Build the virtual environment for ${{ github.repository }}"
+        uses: ./.github/actions/environment
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: ./.github/actions/test
+        with:
+          tests-folder: tests

@@ -721,8 +721,3 @@ class FXOptionsCurve(object):
             total_return_index_df_agg.append(total_return_index_df)
 
         return self._calculations.join(total_return_index_df_agg, how='outer')
-
-
-
-
-

@@ -18,10 +18,10 @@ a simple to use API, which has prebuilt templates for you to define backtest. In
 
 # Merging with pythalesians
 I had previously written the open source PyThalesians financial library (which has been merged with this - so can focus on maintaining
-one set of libraries). This new finmarketpy library has 
+one set of libraries). This new finmarketpy library has
 * Similar functionality to the trading part of pythalesians
-* Rewritten the API to make it much cleaner and easier to use, as well as having many 
-new features. 
+* Rewritten the API to make it much cleaner and easier to use, as well as having many
+new features.
 * finmarketpy requires the libraries, which I've written chartpy (for charts) and findatapy (for loading market data) to function
 * By splitting up into smaller more specialised libraries, it should make it easier for contributors
 * Using findatapy, you can download market data easily from Bloomberg, Quandl, Yahoo etc
@@ -71,7 +71,7 @@ For detailed installation instructions for finmarketpy and its associated Python
 https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md (which includes details on how to setup your entire Python environment).
 
 Also take a look at https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb
-from my Python for finance workshop course, where I keep notes specifically about setting up your Anaconda environment 
+from my Python for finance workshop course, where I keep notes specifically about setting up your Anaconda environment
 for data science (including for findatapy/chartpy/finmarketpy), including YAML files etc.
 
 You can install the library using the below (better to get the newest version from repo, as opposed to releases).
@@ -83,11 +83,11 @@ After installation:
 pip install git+https://github.com/cuemacro/finmarketpy.git
 ```
 
-But beforehand please make sure you have already installed both chartpy, findatapy and any other dependencies. 
-In chartpy you will need to change the chartconstants.py file (to add Plotly API key) and 
-for findatapy, you will also need to change the dataconstants.py file to add the Quandl API 
-(and possibly change other configuration settings there or add a datacred.py file in the util folder, 
-alternatively you will be prompted on your first run to input the API key which will be installed). If you do pip with git 
+But beforehand please make sure you have already installed both chartpy, findatapy and any other dependencies.
+In chartpy you will need to change the chartconstants.py file (to add Plotly API key) and
+for findatapy, you will also need to change the dataconstants.py file to add the Quandl API
+(and possibly change other configuration settings there or add a datacred.py file in the util folder,
+alternatively you will be prompted on your first run to input the API key which will be installed). If you do pip with git
 you'll get the very latest commit.
 
 ```
@@ -95,7 +95,7 @@ pip install git+https://github.com/cuemacro/chartpy.git
 pip install git+https://github.com/cuemacro/findatapy.git
 ```
 
-However you can also pip install to get from PyPI (might be a slighter older verison from that on GitHub)
+However you can also pip install to get from PyPI (might be a slighter older version from that on GitHub)
 
 ```
 pip install chartpy
@@ -103,7 +103,7 @@ pip install findatapy
 ```
 
 Note that if you use the option pricing/total returns you might need to get the latest FinancePy version from GitHub
-https://github.com/domokane/FinancePy/ as opposed to PyPI 
+https://github.com/domokane/FinancePy/ as opposed to PyPI
 
 ```
 pip install git+https://github.com/domokane/FinancePy/FinancePy.git
@@ -112,7 +112,7 @@ pip install git+https://github.com/domokane/FinancePy/FinancePy.git
 
 # Binder and Jupyter - Run finmarketpy in your browser
 
-You can run some of the Jupyter notebooks in Binder interactively in your browser to play around with finmarketpy. It might take a few minutes for the 
+You can run some of the Jupyter notebooks in Binder interactively in your browser to play around with finmarketpy. It might take a few minutes for the
 Binder instance to start. We are currently working on having more notebooks in Binder, so stay tuned!
 
 Note that you will need to get a Quandl
@@ -123,7 +123,7 @@ API key to download market data to use some of these, and you can sign up for a 
 
 # Synchronizing your fork of finmarketpy with master
 
-I found this [article useful](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository) for 
+I found this [article useful](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository) for
 explaining how to update your fork to match the master changes.
 
 # Contributors
@@ -136,18 +136,18 @@ to the libriares please let us know too!
 
 We have spent many years writing finmarketpy and other open source libraries at Cuemacro, and we are keen to do so
 for many years into the future.
- 
+
 If you using our libraries and are interested in sponsoring Cuemacro's open source libraries, you can do so through the
 GitHub sponsorship page at https://github.com/sponsors/cuemacro
 
 We also offer commercial services for our Cuemacro libraries, which include:
 
-* a 2 day Python for finance workshop, which can be taught at your firm, to teach you how to use Cuemacro's libraries 
+* a 2 day Python for finance workshop, which can be taught at your firm, to teach you how to use Cuemacro's libraries
 * extensive commercial technical support for our libraries
 
 If you are interested in our commercial services please contact saeed@cuemacro.com
 
-All these sources of funding, whether it is sponsorship or our commercial services, help us to maintain Cuemacro's libraries, 
+All these sources of funding, whether it is sponsorship or our commercial services, help us to maintain Cuemacro's libraries,
 so we can improve our open source libraries for the community.
 
 # Problems with Numba and doing options pricing in finmarketpy/financepy
@@ -181,7 +181,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 * 0.11.3 - finmarketpy (04 Dec 2019)
 * 0.11.1 - finmarketpy (23 Oct 2019)
 * 0.11 - finmarketpy
-* First prerelease version 
+* First prerelease version
 
 # Coding log
 
@@ -253,7 +253,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
   * Added extra parameters for FXOptionsCurve, freezing FX implied, calendar etc.
 * 09 Jan 2021
   * Fixed dom/for rate in FX vol surface
-  * Fixed additive index  
+  * Fixed additive index
   * Still sorting issues with total return indices for FX options
 * 08 Jan 2021
   * Added total returns for straddle (with example)
@@ -261,7 +261,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 * 08 Jan 2021
   * Changed FXVolSurface to fit better with newest FinancePy
   * Added missing FXOptionsCurve class
-* 07 Jan 2021 
+* 07 Jan 2021
   * Added FX vanilla option pricing (via FinancePy)
   * Calculate total return indices for FX vanilla options
 * 26 Dec 2020
@@ -308,7 +308,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
     * Making blosc optional in BacktestEngine
 * 14 Nov 2019
     * Added network plot
-* 02 Nov 2019 
+* 02 Nov 2019
     * Fixed bug running on Mac
     * Updated installation instructions
     * Added tests for technical indicators
@@ -390,8 +390,8 @@ refactored library, spinning out chart functionality into pythalesians_graphics
 * 21 Jul 2016 - Refactor StrategyTemplate graph plotting functions
 * 20 Jul 2016 - Return of figure handle for AdapterPyThalesians
 * 08 Jun 2016 - Fix kurtosis issue, refactored vol scaling in CashBasktest, added resample wrapper in TimeSeriesFilter
-* 03 Jun 2016 - Speed up CashBacktest (construct_strategy method)  
-* 02 Jun 2016 - Fixed missing StrategyTemplate file in installation, added auto-detection of path 
+* 03 Jun 2016 - Speed up CashBacktest (construct_strategy method)
+* 02 Jun 2016 - Fixed missing StrategyTemplate file in installation, added auto-detection of path
 to simplify installation and added methods for converting between pandas and bcolz
 * 31 May 2016 - Got rid of deprecated Pandas methods in TechIndicator
 * 27 May 2016 - Added ability to plot strategy signal at point in time
@@ -428,7 +428,7 @@ to simplify installation and added methods for converting between pandas and bco
 * 02 Nov 2015 - Added easy wrapper for doing rolling correlations (and example)
 * 28 Oct 2015 - Added more sensitivity analysis for trading strategies
 * 26 Oct 2015 - Various bug fixes for Bloomberg Open API downloader
-* 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an 
+* 14 Oct 2015 - Added capability to do parallel downloading of market data (thread/multiprocessing library), with an
 example for benchmarking and bug fixes for Bloomberg downloader
 * 25 Sep 2015 - Refactored examples into different folders / more seasonality examples
 * 19 Sep 2015 - Added support for Plotly choropleth map plots & easy downloading of economic data via FRED/Bloomberg/Quandl

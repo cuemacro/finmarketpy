@@ -140,5 +140,3 @@ class QuickChart(object):
         df.columns = ret_stats.summary()
 
         return self._chart.plot(df, style=style), df
-
-

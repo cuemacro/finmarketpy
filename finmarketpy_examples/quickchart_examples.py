@@ -22,7 +22,7 @@ from finmarketpy.economics import QuickChart
 # Choose run_example = 0 for everything
 # run_example = 1 - Plot S&P 500 charts with Matplotlib
 # run_example = 2 - Plot FX chart with Plotly
-# run_example = 3 - Plot mutli-country GDP chart with Matplotlib
+# run_example = 3 - Plot multi-country GDP chart with Matplotlib
 
 run_example = 0
 
@@ -64,6 +64,6 @@ if run_example == 3 or run_example == 0:
     QuickChart(engine='matplotlib', data_source='fred').plot_chart(
         tickers={"US": "GDP", "UK": "UKNGDP", "FR": "CPMNACSCAB1GQFR", "JP": "JPNNGDP"},
         reindex=True,
-        title='Gross Domestic Product (start date=100)', 
-        start_date='01 Jan 2007', finish_date='01 Jan 2010', 
+        title='Gross Domestic Product (start date=100)',
+        start_date='01 Jan 2007', finish_date='01 Jan 2010',
         source='fred')

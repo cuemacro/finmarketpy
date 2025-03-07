@@ -1,0 +1,70 @@
+[project]
+name = 'finmarketpy'
+version = "0.0.0"      # do not change by hand!
+description = "finmarketpy is a Python based library for backtesting trading strategies"
+# Please add authors and correct the email...
+authors = [{name='Saeed Aman', email= 'saeed@cuemacro.com'}]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "blosc>=1.11.2",
+    "chartpy",
+    "financepy==0.310",
+    "findatapy",
+    "matplotlib>=3.9.4",
+    "numba>=0.60.0",
+    "numpy>=2.0.2",
+    "pandas>=2.2.3",
+    "scikit-learn>=1.6.1",
+    "seasonal>=0.3.1",
+]
+keywords = [
+    "trading", "markets", "currencies", "pandas", "data", "Bloomberg", "tick", "stocks", "equities"
+]
+
+[project.urls]
+repository = "https://github.com/cuemacro/finmarketpy"
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=6.0.0",
+    "pytest>=8.3.3",
+    "pre-commit>=4.0.1",
+    "deptry>=0.23.0",
+    "marimo>=0.11.16",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+exclude = [
+    "*__init__.py"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["finmarketpy"]
+
+[tool.hatch.build]
+include = [
+    "LICENSE",    # Ensure the LICENSE file is included in your package
+    "README.md",
+    "finmarketpy"
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+
+[tool.uv.sources]
+chartpy = { git = "https://github.com/cuemacro/chartpy.git" }
+findatapy = { git = "https://github.com/cuemacro/findatapy.git" }
+
+[tool.deptry.per_rule_ignores]
+#DEP001 = ["pyfolio"]       # very dated dependency!
+DEP003 = ["finmarketpy"]

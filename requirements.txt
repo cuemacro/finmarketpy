@@ -1,3 +1,0 @@
-chartpy
-finmarketpy
-findatapy

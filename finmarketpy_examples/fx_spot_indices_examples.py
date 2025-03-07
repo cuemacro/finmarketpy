@@ -16,7 +16,7 @@ __author__ = "saeedamen"
 #
 
 """
-Shows how to use finmarketpy to create total return indices for FX spot (ie. 
+Shows how to use finmarketpy to create total return indices for FX spot (ie.
 calculates spot returns + carry returns)
 """
 

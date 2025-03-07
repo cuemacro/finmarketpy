@@ -70,7 +70,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
 * Install finmarketpy, findatapy and chartpy the easy way...
     * You can install some Python data science conda environments that I use for teaching
     which include finmarketpy, findatapy and chartpy
-    * Instructions on how to install Anaconda and the py37class conda environment at 
+    * Instructions on how to install Anaconda and the py37class conda environment at
     [https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb](https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb)
 
 * Python libraries (open source)
@@ -80,7 +80,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
         * Also compresses data contents
     * blpapi - https://www.bloomberglabs.com/api/libraries/ (both C++ and Python libraries)
         * Interact with Bloomberg programmatically via Python to download historical and live data
-        * Note that may need requires a C++ compiler to build the Python library 
+        * Note that may need requires a C++ compiler to build the Python library
         * Follow instructions at [https://github.com/cuemacro/findatapy/blob/master/BLOOMBERG.md](https://github.com/cuemacro/findatapy/blob/master/BLOOMBERG.md) for all the steps necessary to install blpapi
     * Whilst Anaconda has most of the dependencies below and pip will install all additional ones needed by the Cuemacro Python
     libraries it is possible to install them manually via pip, below is a list of the dependencies
@@ -97,7 +97,7 @@ various Python libraries. The Cuemacro libraries will install most Python depend
             * redis - Python wrapper to access Redis, in-memory database, like a hashtable (Anaconda Linux/Mac)
                 * `brew reinstall redis` (Unix)
             * openpyxl - writing Excel spreadsheets to disk (Anaconda)
-            * pyarrow - for caching 
+            * pyarrow - for caching
             * keyring - for storing passwords
             * arctic - wrapper on MongoDB (see below for installation)
             * blpapi - Python API for Bloomberg (see below for installation)

@@ -11,8 +11,6 @@ repos:
     hooks:
       - id: remove-tabs
 
-        #args: [ --whitespaces-count, '2' ]  # defaults to: 4
-
 #  - repo: https://github.com/charliermarsh/ruff-pre-commit
 #    rev: 'v0.9.6'
 #    hooks:
@@ -25,14 +23,14 @@ repos:
 #  - repo: https://github.com/igorshubovych/markdownlint-cli
 #    rev: v0.44.0
 #    hooks:
-#      - id: markdownlint
+#     - id: markdownlint
 #        args: [ "--ignore", "book/**/*.md" ]
 #
-#  - repo: https://github.com/asottile/pyupgrade
-#    rev: v3.19.1
-#    hooks:
-#      - id: pyupgrade
-#        args: [--py311-plus]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.19.1
+    hooks:
+      - id: pyupgrade
+        args: [--py39]
 #
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.31.2

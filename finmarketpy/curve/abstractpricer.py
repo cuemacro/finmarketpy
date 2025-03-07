@@ -1,5 +1,8 @@
 __author__ = 'saeedamen'  # Saeed Amen
 
+import abc
+
+
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
@@ -12,7 +15,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-class AbstractPricer(object):
+class AbstractPricer(abc.ABC):
 
     def __init__(self, market_df=None):
         self._market_df = market_df

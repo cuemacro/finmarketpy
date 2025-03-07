@@ -20,7 +20,7 @@ from findatapy.util.dataconstants import DataConstants
 
 calculations = Calculations()
 
-class Report(object):
+class Report:
     """Creates simple statistical reports (via plots) on time series, outputting results
 
     """

@@ -17,7 +17,7 @@ from datetime import timedelta
 
 import pandas as pd
 
-class MarketUtil(object):
+class MarketUtil:
 
     def parse_date(self, date):
         if isinstance(date, str):

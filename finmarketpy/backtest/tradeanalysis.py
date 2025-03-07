@@ -12,19 +12,12 @@ __author__ = 'saeedamen'
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-# pf = None
-#
-# try:
-#     import pyfolio as pf
-# except:
-#     pass
-
 import datetime
 import pandas
 import copy
 
 from chartpy import Chart, Style, ChartConstants
-from findatapy.timeseries import Calculations, Timezone
+from findatapy.timeseries import Calculations
 from findatapy.util.loggermanager import LoggerManager
 from finmarketpy.backtest import Backtest
 
@@ -34,7 +27,7 @@ from findatapy.util.swimpool import SwimPool
 market_constants = MarketConstants()
 
 
-class TradeAnalysis(object):
+class TradeAnalysis:
     """Applies some basic trade analysis for a trading strategy (as defined by TradingModel). Use PyFolio to create some
     basic trading statistics. Also allows you test multiple parameters for a specific strategy (like TC).
 
@@ -65,50 +58,9 @@ class TradeAnalysis(object):
 
         """
 
-        #if index is None:
-        #    pnl = trading_model.strategy_pnl()
-        #else:
-        #    pnl = index
-
-        #tz = Timezone()
-        #calculations = Calculations()
-
-        # if engine == 'pyfolio':
-        #     # PyFolio assumes UTC time based DataFrames (so force this localisation)
-        #     try:
-        #         pnl = tz.localize_index_as_UTC(pnl)
-        #     except:
-        #         pass
-        #
-        #     # set the matplotlib style sheet & defaults
-        #     # at present this only works in Matplotlib engine
-        #     try:
-        #         import matplotlib
-        #         import matplotlib.pyplot as plt
-        #         matplotlib.rcdefaults()
-        #         plt.style.use(ChartConstants().chartfactory_style_sheet['chartpy-pyfolio'])
-        #     except:
-        #         pass
-        #
-        #     # TODO for intraday strategies, make daily
-        #
-        #     # convert DataFrame (assumed to have only one column) to Series
-        #     pnl = calculations.calculate_returns(pnl)
-        #     pnl = pnl.dropna()
-        #     pnl = pnl[pnl.columns[0]]
-        #     fig = pf.create_returns_tear_sheet(pnl, return_fig=True)
-        #
-        #     try:
-        #         plt.savefig(trading_model.DUMP_PATH + "stats.png")
-        #     except:
-        #         pass
-        #
-        #     plt.show()
-        #elif engine == 'finmarketpy':
-
         # assume we have TradingModel
         # to do to take in a time series
-        from chartpy import Canvas #, Chart
+        from chartpy import Canvas
 
         # temporarily make scale factor smaller so fits the window
         old_scale_factor = trading_model.SCALE_FACTOR

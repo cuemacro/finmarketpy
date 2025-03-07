@@ -29,7 +29,7 @@ from finmarketpy.util.marketconstants import MarketConstants
 data_constants = DataConstants()
 market_constants = MarketConstants()
 
-class FXOptionsCurve(object):
+class FXOptionsCurve:
     """Constructs continuous forwards time series total return indices from underlying forwards contracts.
 
     """

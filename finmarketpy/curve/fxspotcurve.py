@@ -39,7 +39,7 @@ def _spot_index_numba(spot, time_diff, base_deposit, terms_deposit, base_daycoun
 def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount):
     import numpy as np
 
-    out = np.zeros((len(spot)))
+    out = np.zeros(len(spot))
     out[0] = 100
 
     for i in range(1, len(out)):
@@ -51,7 +51,7 @@ def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, ter
 
     return out
 
-class FXSpotCurve(object):
+class FXSpotCurve:
     """Construct total return (spot) indices for FX. In future will also convert assets from local currency to foreign currency
     denomination and construct indices from forwards series.
 

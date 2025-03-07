@@ -18,7 +18,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 
 from findatapy.timeseries import Calculations, Timezone, Filter, Calendar
 
-class EventStudy(object):
+class EventStudy:
     """Provides functions for doing event studies on price action on an intraday basis and daily basis.
 
     """
@@ -450,7 +450,7 @@ class EventsFactory(EventStudy):
         # Get the times of events
         event_dates = self.get_economic_event_date_time(name, event)
 
-        return super(EventsFactory, self).get_economic_event_ret_over_custom_event_day(data_frame_in, event_dates, name,
+        return super().get_economic_event_ret_over_custom_event_day(data_frame_in, event_dates, name,
                                                                                        event, start, end,
                                                                                        lagged=lagged,
                                                                                        NYC_cutoff=NYC_cutoff)
@@ -518,7 +518,7 @@ from findatapy.market import MarketDataGenerator, MarketDataRequest
 from findatapy.util import DataConstants, LoggerManager
 
 
-class HistEconDataFactory(object):
+class HistEconDataFactory:
 
     def __init__(self, market_data_generator=None):
 

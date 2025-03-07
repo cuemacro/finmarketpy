@@ -24,7 +24,7 @@ from datetime import timedelta
 
 dataconstants = DataConstants()
 
-class QuickChart(object):
+class QuickChart:
     """Displays charts from downloaded data, in a single line code call. Ideal for quickly generating charts from sources
     including Bloomberg, Quandl, ALFRED/FRED etc.
 

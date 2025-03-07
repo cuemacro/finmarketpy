@@ -12,7 +12,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-class MarketConstants(object):
+class MarketConstants:
     """Has various constants required for the finmarketpy project. These have been defined as static variables.
 
     """

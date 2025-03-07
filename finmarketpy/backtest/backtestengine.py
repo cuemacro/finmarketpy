@@ -20,12 +20,6 @@ from finmarketpy.util.marketconstants import MarketConstants
 from findatapy.util import SwimPool
 from findatapy.util import LoggerManager
 
-import pickle
-# import zlib
-# import lz4framed    # conda install -c conda-forge py-lz4framed
-
-from typing import List, Dict
-
 # Make blosc optional (only when trying to run backtests in parallel)
 try:
     import blosc
@@ -39,7 +33,7 @@ from finmarketpy.backtest.backtestrequest import BacktestRequest
 market_constants = MarketConstants()
 
 
-class Backtest(object):
+class Backtest:
     """Conducts backtest for strategies trading assets. Assumes we have an
     input of total returns. Reports historical return statistics
     and returns time series.
@@ -56,7 +50,7 @@ class Backtest(object):
             asset_a_df: pd.DataFrame,
             signal_df: pd.DataFrame,
             further_df: pd.DataFrame = [],
-            further_df_labels: List[str] = []) -> pd.DataFrame:
+            further_df_labels: list[str] = []) -> pd.DataFrame:
         """Calculates P&L table which can be used for debugging purposes.
 
         The table is populated with asset, signal and further dataframes
@@ -528,7 +522,7 @@ class Backtest(object):
                                                      df)
 
     def calculate_exposures(self,
-                            portfolio_signal: pd.DataFrame) -> List[
+                            portfolio_signal: pd.DataFrame) -> list[
         pd.DataFrame]:
         """Calculates time series for the total longs, short, net and absolute
         exposure on an aggregated portfolio basis.
@@ -950,7 +944,7 @@ from finmarketpy.economics import TechParams
 from findatapy.timeseries import Calculations, RetStats, Filter
 
 
-class TradingModel(object):
+class TradingModel:
     """Abstract class which wraps around Backtest, providing convenient functions for analaysis. Implement your own
     subclasses of this for your own strategy. See tradingmodelfxtrend_example.py for a simple implementation of a
     FX trend following strategy.
@@ -1477,7 +1471,7 @@ class TradingModel(object):
             return filter.filter_time_series_by_date(plot_start, plot_finish,
                                                      df)
 
-    def _flatten_list(self, list_of_lists: List[str]) -> List[str]:
+    def _flatten_list(self, list_of_lists: list[str]) -> list[str]:
         """Flattens list, particularly useful for combining baskets
 
         Parameters
@@ -2505,7 +2499,7 @@ class TradingModel(object):
 
 #######################################################################################################################
 
-class PortfolioWeightConstruction(object):
+class PortfolioWeightConstruction:
     """Creates dynamics weights for signals and also the portfolio
 
     """
@@ -2519,7 +2513,7 @@ class PortfolioWeightConstruction(object):
             self,
             returns_df: pd.DataFrame,
             signal_df: pd.DataFrame,
-            signal_pnl_cols: List[str],
+            signal_pnl_cols: list[str],
             br: BacktestRequest = None) -> (
     pd.DataFrame, pd.DataFrame, pd.DataFrame,
     pd.DataFrame, pd.DataFrame, pd.DataFrame):
@@ -2717,7 +2711,7 @@ class PortfolioWeightConstruction(object):
 
 #######################################################################################################################
 
-class RiskEngine(object):
+class RiskEngine:
     """Adjusts signal weighting according to risk constraints (volatility
     targeting and position limit constraints)
 

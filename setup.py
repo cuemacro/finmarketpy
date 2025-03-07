@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 long_description = """finmarketpy is a Python based library that enables you to
 analyze market data and also to backtest trading strategies using a simple to

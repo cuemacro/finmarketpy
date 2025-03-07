@@ -14,7 +14,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 
 import abc
 
-class AbstractCurve(object):
+class AbstractCurve(abc.ABC):
     """Abstract class for creating total return indices and curves, which is for example implemented by FXSpotCurve
     and could be implemented by other asset classes.
 

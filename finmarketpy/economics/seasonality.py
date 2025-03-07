@@ -22,7 +22,7 @@ from findatapy.util.configmanager import ConfigManager
 from findatapy.util.loggermanager import LoggerManager
 
 
-class Seasonality(object):
+class Seasonality:
     """Does simple seasonality _calculations on data.
 
     """

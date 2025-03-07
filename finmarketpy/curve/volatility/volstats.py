@@ -14,13 +14,12 @@ __author__ = 'saeedamen'  # Saeed Amen
 
 import math
 import pandas as pd
-from pandas.tseries.offsets import CustomBusinessDay
 
 from findatapy.timeseries import Calculations, Filter, Timezone
 from findatapy.timeseries import Calendar
 
 
-class VolStats(object):
+class VolStats:
     """Arranging underlying volatility market in easier to read format. Also provides methods for calculating various
     volatility metrics, such as realized_vol volatility and volatility risk premium. Has extensive support for estimating
     implied_vol volatility addons.

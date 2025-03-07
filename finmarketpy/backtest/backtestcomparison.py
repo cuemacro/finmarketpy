@@ -13,14 +13,11 @@
 
 import numpy as np
 import pandas as pd
-from finmarketpy.util.marketconstants import MarketConstants
 
-from findatapy.util import SwimPool
-from findatapy.util import LoggerManager
 from finmarketpy.backtest.backtestengine import TradingModel
 from chartpy import Chart, Style, ChartConstants
 
-class BacktestComparison(object):
+class BacktestComparison:
 
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor

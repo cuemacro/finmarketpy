@@ -20,7 +20,7 @@ from findatapy.timeseries import Calculations
 from findatapy.util.loggermanager import LoggerManager
 
 
-class TechIndicator(object):
+class TechIndicator:
     """Calculates various technical indicators and associated trading signals.
 
     Signals can also be filtered to allow only longs or short and also to flip signals.
@@ -536,7 +536,7 @@ class TechIndicator(object):
 ##########################################################################
 
 
-class TechParams(object):
+class TechParams:
     """Holds parameters for calculation of technical indicators.
 
     """

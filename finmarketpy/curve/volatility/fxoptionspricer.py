@@ -15,7 +15,6 @@ __author__ = 'saeedamen'  # Saeed Amen
 import numpy as np
 import pandas as pd
 
-from numba import guvectorize
 from findatapy.timeseries import Calendar
 from findatapy.util import LoggerManager
 

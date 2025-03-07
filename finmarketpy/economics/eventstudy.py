@@ -18,7 +18,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 
 from findatapy.timeseries import Calculations, Timezone, Filter, Calendar
 
-class EventStudy(object):
+class EventStudy:
     """Provides functions for doing event studies on price action on an intraday basis and daily basis.
 
     """
@@ -246,19 +246,19 @@ class EventsFactory(EventStudy):
     these events. Note, requires a file of input of the following (transposed as columns!) - we give an example for
     NFP released on 7 Feb 2003 (note, that release-date-time-full, need not be fully aligned by row).
 
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.Date	                31/01/2003 00:00
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.close	                xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.actual-release	        143
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-median	        xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-average	        xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high	        xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-low	            xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high.1	        xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.number-observations	xyz
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision	        185
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision-date	20030307
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-dt	            20030207
-    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-date-time-full	08/01/1999 13:30
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.Date                   31/01/2003 00:00
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.close                  xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.actual-release         143
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-median          xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-average         xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high            xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-low             xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.survey-high.1          xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.number-observations    xyz
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision         185
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.first-revision-date    20030307
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-dt             20030207
+    USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-date-time-full 08/01/1999 13:30
 
     """
 
@@ -450,7 +450,7 @@ class EventsFactory(EventStudy):
         # Get the times of events
         event_dates = self.get_economic_event_date_time(name, event)
 
-        return super(EventsFactory, self).get_economic_event_ret_over_custom_event_day(data_frame_in, event_dates, name,
+        return super().get_economic_event_ret_over_custom_event_day(data_frame_in, event_dates, name,
                                                                                        event, start, end,
                                                                                        lagged=lagged,
                                                                                        NYC_cutoff=NYC_cutoff)
@@ -518,7 +518,7 @@ from findatapy.market import MarketDataGenerator, MarketDataRequest
 from findatapy.util import DataConstants, LoggerManager
 
 
-class HistEconDataFactory(object):
+class HistEconDataFactory:
 
     def __init__(self, market_data_generator=None):
 

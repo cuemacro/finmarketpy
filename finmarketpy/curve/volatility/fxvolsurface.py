@@ -19,22 +19,24 @@ __author__ = "saeedamen"
 import pandas as pd
 import numpy as np
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.date import Date
+# FinancePy is an optional dependency
+try:
+    from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+    from financepy.utils.date import Date
 
-# Tested with financepy 0.310 only
+    from financepy.market.volatility.fx_vol_surface_plus import \
+        FXVolSurfacePlus \
+            as FinFXVolSurface  # So there is no clash with FXVolSurface from finmarketpy
+    from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
+    from financepy.market.volatility.fx_vol_surface_plus import \
+        FinFXDeltaMethod
+    from financepy.market.volatility.fx_vol_surface_plus import vol_function
+    from financepy.market.volatility.fx_vol_surface_plus import \
+        VolFunctionTypes
 
-from financepy.market.volatility.fx_vol_surface_plus import \
-    FXVolSurfacePlus \
-        as FinFXVolSurface  # So there is no clash with FXVolSurface from finmarketpy
-from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
-from financepy.market.volatility.fx_vol_surface_plus import \
-    FinFXDeltaMethod
-from financepy.market.volatility.fx_vol_surface_plus import vol_function
-from financepy.market.volatility.fx_vol_surface_plus import \
-    VolFunctionTypes
-
-from financepy.utils.global_types import FinSolverTypes
+    from financepy.utils.global_types import FinSolverTypes
+except:
+    pass
 
 from findatapy.util.dataconstants import DataConstants
 

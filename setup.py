@@ -25,6 +25,5 @@ setup(name="finmarketpy",
                         "seasonal",
                         "scikit-learn",
                         "matplotlib",
-                        "numba",
-                        "financepy==0.360"],
+                        "numba"],
       zip_safe=False)

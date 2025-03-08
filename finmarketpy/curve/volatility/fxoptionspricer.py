@@ -25,10 +25,14 @@ from finmarketpy.util.marketconstants import MarketConstants
 from finmarketpy.curve.abstractpricer import AbstractPricer
 from finmarketpy.curve.rates.fxforwardspricer import FXForwardsPricer
 
-from financepy.utils.date import Date
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.utils.global_types import OptionTypes
+# FinancePy is an optional dependency
+try:
+    from financepy.utils.date import Date
+    from financepy.models.black_scholes import BlackScholes
+    from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+    from financepy.utils.global_types import OptionTypes
+except:
+    pass
 
 # from financepy.products.fx.FinFXMktConventions import *
 

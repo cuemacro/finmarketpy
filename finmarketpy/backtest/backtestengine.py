@@ -2485,8 +2485,6 @@ class TradingModel(object):
         style.plotly_plot_mode = self.PLOTLY_PLOT_MODE  # Smaller file sizes
         style.auto_scale = self.AUTO_SCALE
 
-        print(style.plotly_plot_mode)
-
         style.legend_bgcolor = 'rgba(0,0,0,0)'
 
         # When plotting many points use WebGl version of plotly if specified

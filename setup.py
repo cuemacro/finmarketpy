@@ -5,7 +5,7 @@ analyze market data and also to backtest trading strategies using a simple to
 use API, which has prebuilt templates for you to define backtest."""
 
 setup(name="finmarketpy",
-      version="0.11.15",
+      version="0.11.16",
       description="finmarketpy is a Python based library for backtesting trading strategies",
       author="Saeed Amen",
       author_email="saeed@cuemacro.com",

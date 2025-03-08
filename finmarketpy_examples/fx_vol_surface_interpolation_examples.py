@@ -73,6 +73,7 @@ if run_example == 1 or run_example == 0:
     style.title = "GBPUSD 1M Implied Vol"
     style.scale_factor = 3
     style.source = "Bloomberg"
+    style.auto_scale = True
 
     chart.plot(df["GBPUSDV1M.close"], style=style)
 
@@ -116,25 +117,25 @@ if run_example == 2 or run_example == 0:
     # z_axis = implied vol - values
     chart.plot(df_vol_dict["vol_surface_strike_space"].iloc[:, ::-1],
                chart_type="surface",
-               style=Style(title="Plotting volatility in strike space"))
+               style=Style(title="Plotting volatility in strike space", auto_scale=True))
 
     # Plot vol surface in delta space (exc market strangle strikes)
     chart.plot(df_vol_dict["vol_surface_delta_space_exc_ms"].iloc[:, ::-1],
                chart_type="surface",
-               style=Style(title="Plotting in delta space"))
+               style=Style(title="Plotting in delta space", auto_scale=True))
 
     # Plot implied PDF in strike space (all interpolated)
     # x_axis = strike - index
     # y_axis = tenor - columns
     # z_axis = implied PDF - values
     chart.plot(df_vol_dict["vol_surface_implied_pdf"], chart_type="surface",
-               style=Style(title="Plotting implied PDF in strike space"))
+               style=Style(title="Plotting implied PDF in strike space", auto_scale=True))
 
     # Plot the implied PDF for ON only versus strikes
     chart.plot(df_vol_dict["vol_surface_implied_pdf"]["ON"], chart_type="line",
                style=Style(
                    title="Plotting implied PDF in strike space ON around Brexit",
-                   x_axis_range=[1.0, 1.8]))
+                   x_axis_range=[1.0, 1.8], auto_scale=True))
 
 ###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
 ###### Do animation for vol surface
@@ -174,7 +175,7 @@ if run_example == 3 or run_example == 0:
     # y_axis = tenor - columns
     # z_axis = implied_vol vol - values
     style = Style(title="Plotting in strike space", animate_figure=True,
-                  animate_titles=animate_titles)
+                  animate_titles=animate_titles, auto_scale=True)
 
     chart.plot(list(vol_surface_dict.values()), chart_type="surface",
                style=style)
@@ -243,9 +244,9 @@ if run_example == 5 or run_example == 0:
     # z_axis = implied vol - values
     chart.plot(df_vol_dict["vol_surface_strike_space"].iloc[:, ::-1],
                chart_type="surface",
-               style=Style(title="Plotting volatility in strike space"))
+               style=Style(title="Plotting volatility in strike space", auto_scale=True))
 
     # Plot vol surface in delta space (exc market strangle strikes)
     chart.plot(df_vol_dict["vol_surface_delta_space_exc_ms"].iloc[:, ::-1],
                chart_type="surface",
-               style=Style(title="Plotting in delta space"))
+               style=Style(title="Plotting in delta space", auto_scale=True))

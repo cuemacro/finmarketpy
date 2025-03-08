@@ -149,7 +149,7 @@ class Seasonality(object):
 
         if price_index:
             data_frame = data_frame.resample(
-                'BM').mean()  # resample into month end
+                'BME').mean()  # resample into month end
             data_frame = calculations.calculate_returns(data_frame)
 
         data_frame.index = pandas.to_datetime(data_frame.index)
@@ -209,7 +209,7 @@ class Seasonality(object):
         if adjusted is None:
             return numpy.nan
 
-        return adjusted[-1]
+        return adjusted.iloc[-1]
 
 
 if __name__ == '__main__':

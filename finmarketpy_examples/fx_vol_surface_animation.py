@@ -58,7 +58,7 @@ def plot_animated_vol_market():
 
     # Do static plot for first day using Plotly
     style = Style(title="FX vol surface of " + cross[0], source="chartpy",
-                  color="Blues")
+                  color="Blues", auto_scale=True)
 
     Chart(df=df_vs[0], chart_type="surface", style=style).plot(engine="plotly")
 
@@ -66,7 +66,8 @@ def plot_animated_vol_market():
     style = Style(title="FX vol surface of " + cross[0], source="chartpy",
                   color="Blues",
                   animate_figure=True, animate_titles=df.index,
-                  animate_frame_ms=500, normalize_colormap=False)
+                  animate_frame_ms=500, normalize_colormap=False,
+                  auto_scale=True)
 
     Chart(df=df_vs, chart_type="surface", style=style).plot(engine="plotly")
 

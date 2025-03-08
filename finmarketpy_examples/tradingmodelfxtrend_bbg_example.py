@@ -66,7 +66,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
         br.signal_vol_max_leverage = 5
         br.signal_vol_periods = 20
         br.signal_vol_obs_in_year = 252
-        br.signal_vol_rebalance_freq = "BM"
+        br.signal_vol_rebalance_freq = "BME"
         br.signal_vol_resample_freq = None
 
         # Have vol target for portfolio
@@ -75,7 +75,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
         br.portfolio_vol_max_leverage = 5
         br.portfolio_vol_periods = 20
         br.portfolio_vol_obs_in_year = 252
-        br.portfolio_vol_rebalance_freq = "BM"
+        br.portfolio_vol_rebalance_freq = "BME"
         br.portfolio_vol_resample_freq = None
 
         # Tech params

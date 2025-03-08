@@ -71,13 +71,14 @@ if run_example == 1 or run_example == 0:
 
     delivery_dates = Calendar().get_delivery_date_from_horizon_date(
         market_df.index, "8D", cal=cross)
-    interpolated_forwards_df = fx_forwards_price.price_instrument(cross,
-                                                                  market_df.index,
-                                                                  delivery_dates,
-                                                                  market_df=market_df,
-                                                                  fx_forwards_tenor_for_interpolation=[
-                                                                      '1W',
-                                                                      '2W'])
+    interpolated_forwards_df = fx_forwards_price.price_instrument(
+        cross,
+        market_df.index,
+        delivery_dates,
+        market_df=market_df,
+        fx_forwards_tenor_for_interpolation=[
+          '1W',
+          '2W'])
 
     interpolated_forwards_df[cross + ".delivery"] = delivery_dates.values
 
@@ -112,10 +113,11 @@ if run_example == 2 or run_example == 0:
 
     fx_forwards_price = FXForwardsPricer()
 
-    implied_depo_df = fx_forwards_price.calculate_implied_depo(cross, 'AUD',
-                                                               market_df=market_df,
-                                                               fx_forwards_tenor=fx_forwards_tenors,
-                                                               depo_tenor='1M')
+    implied_depo_df = fx_forwards_price.calculate_implied_depo(
+        cross, 'AUD',
+        market_df=market_df,
+        fx_forwards_tenor=fx_forwards_tenors,
+        depo_tenor='1M')
 
     print(implied_depo_df)
 

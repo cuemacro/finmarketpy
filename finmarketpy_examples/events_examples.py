@@ -31,6 +31,12 @@ from findatapy.util import LoggerManager
 
 from finmarketpy.economics import EventStudy
 
+try:
+    from finaddpy.market.cachedmarketdatagenerator import \
+        CachedMarketDataGenerator as MarketDataGenerator
+except:
+    pass
+
 # choose run_example = 0 for everything
 # run_example = 1 - download recent NFP times and do event study for USD/JPY
 
@@ -108,6 +114,7 @@ if run_example == 1 or run_example == 0:
     style.color_2 = []
     style.y_axis_2_series = []
     style.display_legend = False
+    style.auto_scale = True
 
     # Last release will be in red, average move in orange
     style.color_2_series = [df_event.columns[-2], df_event.columns[-1]]

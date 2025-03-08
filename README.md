@@ -72,7 +72,7 @@ https://github.com/cuemacro/finmarketpy/blob/master/INSTALL.md (which includes d
 
 Also take a look at https://github.com/cuemacro/teaching/blob/master/pythoncourse/installation/installing_anaconda_and_pycharm.ipynb
 from my Python for finance workshop course, where I keep notes specifically about setting up your Anaconda environment
-for data science (including for findatapy/chartpy/finmarketpy), including YAML files etc.
+for data science (including for findatapy/chartpy/finmarketpy) etc.
 
 You can install the library using the below (better to get the newest version from repo, as opposed to releases).
 
@@ -102,12 +102,15 @@ pip install chartpy
 pip install findatapy
 ```
 
-Note that if you use the option pricing/total returns you might need to get the latest FinancePy version from GitHub
-https://github.com/domokane/FinancePy/ as opposed to PyPI
+FinancePy is an optional dependency for finmarketpy for option pricing. It is recommended
+to install it separately from PyPI after installing finmarketpy, and without dependencies
+otherwise it can cause clashes with other libraries (because of its strict version
+dependencies on libraries like llvmlite, which in practice can be relaxed). 
+The API changes a lot so it recommended to install the specific version listed below.
 
 ```
-pip install git+https://github.com/domokane/FinancePy/FinancePy.git
-
+pip install numba numpy scipy llvmlite ipython pandas prettytable
+pip install financepy==0.370 --no-deps
 ```
 
 # Binder and Jupyter - Run finmarketpy in your browser
@@ -158,10 +161,10 @@ You may sometimes experience Numba errors like such as `Failed in nopython mode 
 
 One possible way to fix this is to delete the `__pycache__` folders underneath wherever financepy is installed:
 
-Eg. if you are using the `py38class` environment, if you've installed Anaconda in `C:\Anaconda3`, you might find the financepy
+Eg. if you are using the `py310class` environment, if you've installed Anaconda in `C:\Anaconda3`, you might find the financepy
 folder at the below location
 
-`C:\Anaconda3\envs\py38class\Lib\site-packages\financepy`
+`C:\Anaconda3\envs\py310class\Lib\site-packages\financepy`
 
 # finmarketpy examples
 
@@ -169,6 +172,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.14 - finmarketpy (08 Mar 2025)
+* 0.11.13 - finmarketpy (01 Jan 2024)
 * 0.11.12 - finmarketpy (26 Apr 2023)
 * 0.11.11 - finmarketpy (07 Oct 2021)
 * 0.11.10 - finmarketpy (06 Oct 2021)
@@ -187,6 +192,10 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 08 Mar 2025
+  * Make FinancePy an optional dependency
+  * Fixed various deprecation messages related Pandas
+  * Made Plotly charts look nicer (autoscale with latest ChartPy)
 * 07 Mar 2025
   * Merge changes for pyproject.toml etc.
   * Formatting towards PEP8

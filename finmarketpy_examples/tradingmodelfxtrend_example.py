@@ -43,7 +43,7 @@ class TradingModelFXTrend_Example(TradingModel):
         self.DUMP_PATH = ""
         self.FINAL_STRATEGY = "FX trend"
         self.SCALE_FACTOR = 1
-        self.DEFAULT_PLOT_ENGINE = "matplotlib"
+        self.DEFAULT_PLOT_ENGINE = "plotly"
         # self.CHART_STYLE = Style(plotly_plot_mode="offline_jupyter")
 
         self.br = self.load_parameters()
@@ -75,7 +75,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.signal_vol_max_leverage = 5
         br.signal_vol_periods = 20
         br.signal_vol_obs_in_year = 252
-        br.signal_vol_rebalance_freq = "BM"
+        br.signal_vol_rebalance_freq = "BME"
         br.signal_vol_resample_freq = None
 
         # Have vol target for portfolio
@@ -84,7 +84,7 @@ class TradingModelFXTrend_Example(TradingModel):
         br.portfolio_vol_max_leverage = 5
         br.portfolio_vol_periods = 20
         br.portfolio_vol_obs_in_year = 252
-        br.portfolio_vol_rebalance_freq = "BM"
+        br.portfolio_vol_rebalance_freq = "BME"
         br.portfolio_vol_resample_freq = None
 
         # Tech params

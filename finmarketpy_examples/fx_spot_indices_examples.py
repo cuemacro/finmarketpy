@@ -90,7 +90,7 @@ if run_example == 1 or run_example == 0:
     # CAREFUL to fill down, before reindexing because 1M forwards indices are
     # likely to have different publishing dates
     df = calculations.join([df_tot, df_bbg_tot, df_spot, df_bbg_tot_forwards],
-                           how="outer").fillna(method="ffill")
+                           how="outer").ffill()
     df = calculations.create_mult_index_from_prices(df)
 
     chart.plot(df)

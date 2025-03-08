@@ -52,7 +52,7 @@ class TradeAnalysis(object):
 
         return
 
-    def run_strategy_returns_stats(self, trading_model):
+    def run_strategy_returns_stats(self, trading_model, engine="finmarketpy"):
         """Plots useful statistics for the trading strategy using various backends
 
         Parameters
@@ -335,8 +335,8 @@ class TradeAnalysis(object):
 
         style = Style()
 
-        ir = [t.inforatio()[0] for t in ret_stats_list]
-        rets = [t.ann_returns()[0] for t in ret_stats_list]
+        ir = [t.inforatio().iloc[0] for t in ret_stats_list]
+        rets = [t.ann_returns().iloc[0] for t in ret_stats_list]
 
         # if we have too many combinations remove legend and use scaled shaded colour
         # if len(port_list) > 10:

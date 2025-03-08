@@ -505,7 +505,7 @@ wheels = [
 
 [[package]]
 name = "chartpy"
-version = "0.1.14"
+version = "0.1.15"
 source = { git = "https://github.com/cuemacro/chartpy.git#4f00def8c8ae45477ad92b25dc98edd4aef171fa" }
 dependencies = [
     { name = "bokeh", version = "3.4.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -1070,7 +1070,7 @@ wheels = [
 
 [[package]]
 name = "financepy"
-version = "0.310"
+version = "0.370"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -1095,7 +1095,7 @@ wheels = [
 
 [[package]]
 name = "findatapy"
-version = "0.1.38"
+version = "0.1.39"
 source = { git = "https://github.com/cuemacro/findatapy.git#f488060129c5828fc3ad01f4b01d9e2fd56b1493" }
 dependencies = [
     { name = "alpha-vantage" },

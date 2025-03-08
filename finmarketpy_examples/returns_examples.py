@@ -39,7 +39,7 @@ chart = Chart(engine="matplotlib")
 market = Market(market_data_generator=MarketDataGenerator())
 
 # Choose run_example = 0 for everything
-# run_example = 1 - use PyFolio to analyse gold"s return properties
+# run_example = 1 - use finmarketpy to analyse gold"s return properties
 
 run_example = 0
 
@@ -56,4 +56,4 @@ if run_example == 1 or run_example == 0:
 
     df = market.fetch_market(md_request)
 
-    ta.run_strategy_returns_stats(None, index=df, engine="pyfolio")
+    ta.run_strategy_returns_stats(None, index=df)

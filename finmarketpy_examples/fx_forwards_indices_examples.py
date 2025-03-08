@@ -68,8 +68,7 @@ if run_example == 1 or run_example == 0:
                                    cache_algo="cache_algo_return")
 
     # In case any missing values fill down (particularly can get this for NDFs)
-    df_market = market.fetch_market(md_request=md_request).fillna(
-        method="ffill")
+    df_market = market.fetch_market(md_request=md_request).ffill()
 
     fx_forwards_curve = FXForwardsCurve()
 
@@ -138,11 +137,11 @@ if run_example == 1 or run_example == 0:
         pd.DataFrame(df_cuemacro_tot_3M[
                          cross + "-forward-tot-3M-cuemacro.close"]),
         df_bbg_tot, df_spot, df_bbg_tot_forwards],
-        how="outer").fillna(method="ffill")
+        how="outer").ffill()
 
     df = calculations.create_mult_index_from_prices(df)
 
-    chart.plot(df)
+    chart.plot(df, style=Style(auto_scale=True, title="USDBRL total return indices"))
 
 ###### Create total return indices plot for AUDJPY using the underlying USD
 # legs (ie. AUDUSD & JPYUSD)
@@ -178,8 +177,7 @@ if run_example == 2 or run_example == 0:
                                    abstract_curve=fx_forwards_curve)
 
     # In case any missing values fill down (particularly can get this for NDFs)
-    df_cuemacro_tot_1M = market.fetch_market(md_request=md_request).fillna(
-        method="ffill")
+    df_cuemacro_tot_1M = market.fetch_market(md_request=md_request).ffill()
 
     fx_forwards_curve = FXForwardsCurve()
 
@@ -216,8 +214,8 @@ if run_example == 2 or run_example == 0:
     df = calculations.join([pd.DataFrame(
         df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
         df_bbg_tot, df_spot, df_bbg_tot_forwards],
-        how="outer").fillna(method="ffill")
+        how="outer").ffill()
 
     df = calculations.create_mult_index_from_prices(df)
 
-    chart.plot(df)
+    chart.plot(df, style=Style(auto_scale=True, title="AUDJPY total return indices"))

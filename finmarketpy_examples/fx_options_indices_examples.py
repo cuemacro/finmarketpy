@@ -52,6 +52,7 @@ except:
 logger = LoggerManager().getLogger(__name__)
 
 chart = Chart(engine="plotly")
+style = Style(auto_scale=True)
 
 market = Market(market_data_generator=MarketDataGenerator())
 
@@ -87,7 +88,7 @@ def prepare_indices(cross, df_option_tot=None, df_option_tc=None,
     if df_spot_tot is not None:
         df_list.append(df_spot_tot)
 
-    df = calculations.join(df_list, how="outer").fillna(method="ffill")
+    df = calculations.join(df_list, how="outer").ffill()
 
     return calculations.create_mult_index_from_prices(df)
 
@@ -122,7 +123,7 @@ if __name__ == "__main__":
                                                               cross[3:6]])
 
         df_vol_market = market.fetch_market(md_request)
-        df_vol_market = df_vol_market.fillna(method="ffill")
+        df_vol_market = df_vol_market.ffill()
 
         # Remove New Year"s Day and Christmas
         df_vol_market = Filter().filter_time_series_by_holidays(df_vol_market,
@@ -141,7 +142,7 @@ if __name__ == "__main__":
         df_tot = market.fetch_market(md_request)
 
         df_vol_market = df_vol_market.join(df_tot, how="left")
-        df_vol_market = df_vol_market.fillna(method="ffill")
+        df_vol_market = df_vol_market.ffill()
 
         # We want to roll long 1M ATM call at expiry
         # We"ll mark to market the option price through the month by
@@ -195,12 +196,12 @@ if __name__ == "__main__":
              df_cuemacro_option_put_tc[
                  cross + "-option-tot-with-tc.close"].to_frame()], how="outer")
         df_hedged = df_hedged.fillna(method="ffill")
-        df_hedged = df_hedged.pct_change()
+        df_hedged = df_hedged / df_hedged.shift(1) - 1.0
+        df_hedged = df_hedged.dropna()
 
-        df_hedged["Spot + 2*option put hedge"] = df_hedged[
-                                                     cross + "-tot.close-bbg"] + \
-                                                 df_hedged[
-                                                     cross + "-option-tot-with-tc.close"]
+        df_hedged["Spot + 2*option put hedge"] = (
+                df_hedged[cross + "-tot.close-bbg"] + \
+                df_hedged[cross + "-option-tot-with-tc.close"])
 
         df_hedged.columns = RetStats(returns_df=df_hedged,
                                      ann_factor=252).summary()
@@ -212,27 +213,27 @@ if __name__ == "__main__":
             prepare_indices(cross=cross,
                             df_option_tot=df_cuemacro_option_call_tot,
                             df_option_tc=df_cuemacro_option_call_tc,
-                            df_spot_tot=df_bbg_tot)))
+                            df_spot_tot=df_bbg_tot)), style=style)
 
         # P&L from put option, put option + TC and total returns from spot
         chart.plot(calculations.create_mult_index_from_prices(
             prepare_indices(cross=cross,
                             df_option_tot=df_cuemacro_option_put_tot,
                             df_option_tc=df_cuemacro_option_put_tc,
-                            df_spot_tot=df_bbg_tot)))
+                            df_spot_tot=df_bbg_tot)), style=style)
 
         # P&L from put option + TC and total returns from spot
         chart.plot(calculations.create_mult_index_from_prices(
             prepare_indices(cross=cross,
                             df_option_tc=df_cuemacro_option_put_tc,
-                            df_spot_tot=df_bbg_tot)))
+                            df_spot_tot=df_bbg_tot)), style=style)
 
         # P&L for total returns from spot and total returns from
         # + 2*put option + TC (ie. hedged portfolio)
-        chart.plot(calculations.create_mult_index(df_hedged))
+        chart.plot(calculations.create_mult_index(df_hedged), style=style)
 
         # Plot delta from put option
-        chart.plot(df_cuemacro_option_put_tot[cross + "-delta.close"])
+        chart.plot(df_cuemacro_option_put_tot[cross + "-delta.close"], style=style)
 
     # Fetch market data for pricing EURUSD options from 2006-2020 (ie.
     # FX spot, FX forwards, FX deposits and FX vol quotes)
@@ -245,7 +246,7 @@ if __name__ == "__main__":
         # If vol points in the tenors you are looking at
         # are missing then interpolation will fail (or if eg. spot data is missing etc.)
         start_date = "08 Mar 2007";
-        finish_date = "31 Dec 2020"  # Monday
+        finish_date = "31 Dec 2024"  # Monday
         # start_date = "09 Mar 2007"; finish_date = "31 Dec 2014"
         # start_date = "04 Jan 2006"; finish_date = "31 Dec 2008"
         # start_date = "01 Jan 2007"; finish_date = "31 Dec 2007" # Use smaller window for quicker execution
@@ -271,7 +272,7 @@ if __name__ == "__main__":
         # Fill data for every workday and use weekend calendar (note: this is
         # a bit of a fudge, filling down)
         # CHECK DATA isn"t missing at start of series
-        df = df.resample("B").last().fillna(method="ffill")
+        df = df.resample("B").last().ffill()
         df = df[
             df.index >= "09 Mar 2007"]  # Try starting on a different day of
         # the week & see how it impact P&L?
@@ -333,4 +334,4 @@ if __name__ == "__main__":
         QuickChart(engine="plotly").plot_chart_with_ret_stats(
             df=df_index,
             plotly_plot_mode="offline_html",
-            scale_factor=-1.5)
+            scale_factor=-1)

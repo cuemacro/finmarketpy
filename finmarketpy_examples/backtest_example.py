@@ -16,7 +16,8 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-Gives several examples of backtesting simple trading strategies, using Backtest (a lower level class)
+Gives several examples of backtesting simple trading strategies, using 
+Backtest (a lower level class)
 """
 
 from findatapy.timeseries import Calculations
@@ -128,8 +129,9 @@ if run_example == 1 or run_example == 0:
     style = Style()
     style.title = "FX trend strategy"
     style.source = 'FRED'
-    style.scale_factor = 1
+    style.scale_factor = -1
     style.file_output = 'fx-trend-example.png'
+    style.auto_scale = True
 
     Chart().plot(port, style=style)
 
@@ -223,7 +225,8 @@ if run_example == 2 or run_example == 0:
     style = Style()
     style.title = "EUR/USD trend model"
     style.source = 'FRED'
-    style.scale_factor = 1
+    style.scale_factor = -1
     style.file_output = 'eurusd-trend-example.png'
+    style.auto_scale = True
 
     Chart(port, style=style).plot()

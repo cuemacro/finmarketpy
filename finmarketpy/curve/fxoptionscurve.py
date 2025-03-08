@@ -792,10 +792,10 @@ class FXOptionsCurve(object):
                       total_return_index_df[cross + '-delta.close'].shift(
                           1)) * spot_tc
 
-            total_return_index_df[cross + '-option-return-with-tc.close'][
-                0] = 0
-            total_return_index_df[cross + '-delta-pnl-return-with-tc.close'][
-                0] = 0
+            total_return_index_df.iloc[0,
+                total_return_index_df.columns.get_loc(cross + '-option-return-with-tc.close')] = 0
+            total_return_index_df.iloc[0,
+                total_return_index_df.columns.get_loc(cross + '-delta-pnl-return-with-tc.close')] = 0
             total_return_index_df[
                 cross + '-option-delta-return-with-tc.close'] = \
                 total_return_index_df[cross + '-option-return-with-tc.close'] + \

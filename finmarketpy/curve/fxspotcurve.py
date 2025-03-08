@@ -260,11 +260,11 @@ class FXSpotCurve(object):
 
                 # Sometimes depo data can be patchy, ok to fill down, given not
                 # very volatile (don't do this with spot!)
-                carry = carry.fillna(method='ffill') / 100.0
+                carry = carry.ffill() / 100.0
 
                 # In case there are values missing at start of list (fudge for
                 # old data!)
-                carry = carry.fillna(method='bfill')
+                carry = carry.bfill()
 
                 spot = spot[cross + "." + field].to_frame()
 
@@ -274,11 +274,12 @@ class FXSpotCurve(object):
                 terms_deposit_vals = carry[
                     cross[3:6] + depo_tenor + "." + field].values
 
-                # Calculate the time difference between each data point (flooring it to whole days, because carry
+                # Calculate the time difference between each data point (
+                # flooring it to whole days, because carry
                 # is accured when there's a new day)
                 spot['index_col'] = spot.index.floor('D')
                 time = spot['index_col'].diff()
-                spot = spot.drop('index_col', 1)
+                spot = spot.drop('index_col', axis=1)
 
                 time_diff = time.values.astype(
                     float) / 86400000000000.0  # get time difference in days

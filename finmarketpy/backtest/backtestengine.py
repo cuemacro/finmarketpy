@@ -187,7 +187,7 @@ class Backtest(object):
         # Only allow signals to change on the days when we can trade assets
         signal_df = signal_df.mask(
             non_trading_days)  # fill asset holidays with NaN signals
-        signal_df = signal_df.fillna(method='ffill')  # fill these down
+        signal_df = signal_df.ffill()  # fill these down
 
         # Transaction costs and roll costs
         tc = br.spot_tc_bp
@@ -202,8 +202,7 @@ class Backtest(object):
             pnl_cols.append(asset_df_cols[i] + " / " + signal_cols[i])
 
         # Fill down asset holidays (we won't trade on these days)
-        asset_df = asset_df.fillna(
-            method='ffill')
+        asset_df = asset_df.ffill()
         returns_df = calculations.calculate_returns(asset_df)
 
         # Apply a stop loss/take profit to every trade if this has been specified
@@ -969,6 +968,7 @@ class TradingModel(object):
     HEIGHT = ChartConstants().chartfactory_height
     CHART_SOURCE = ChartConstants().chartfactory_source
     CHART_STYLE = Style()
+    AUTO_SCALE = True
     PLOTLY_PLOT_MODE = "offline_html_exc_embed_js"
 
     DUMP_CSV = ''
@@ -1428,7 +1428,7 @@ class TradingModel(object):
             # Only calculate return statistics if this has been specified (note when different frequencies of data
             # might underrepresent vol
             # if calc_stats:
-            benchmark_df = benchmark_df.fillna(method='ffill')
+            benchmark_df = benchmark_df.ffill()
             benchmark_df = self._filter_by_plot_start_finish_date(benchmark_df,
                                                                   br)
 
@@ -1440,8 +1440,7 @@ class TradingModel(object):
 
             # Realign strategy & benchmark
             strategy_benchmark_df = strategy_df.join(benchmark_df, how='inner')
-            strategy_benchmark_df = strategy_benchmark_df.fillna(
-                method='ffill')
+            strategy_benchmark_df = strategy_benchmark_df.ffill()
 
             strategy_benchmark_df = self._filter_by_plot_start_finish_date(
                 strategy_benchmark_df, br)
@@ -1623,7 +1622,7 @@ class TradingModel(object):
             if reduce_plot and resample is not None:
                 # make plots on every business day (will downsample intraday data)
                 data_frame = data_frame.resample(resample).last()
-                data_frame = data_frame.fillna(method='pad')
+                data_frame = data_frame.ffill(method='pad')
 
             return data_frame
         except:
@@ -2017,13 +2016,13 @@ class TradingModel(object):
 
         for key in keys:
             if metric == "IR":
-                ret_metric.append(ret_stats[key].inforatio()[0])
+                ret_metric.append(ret_stats[key].inforatio().iloc[0])
             elif metric == "Returns":
-                ret_metric.append(ret_stats[key].ann_returns()[0] * 100)
+                ret_metric.append(ret_stats[key].ann_returns().iloc[0] * 100)
             elif metric == "Vol":
-                ret_metric.append(ret_stats[key].ann_vol()[0] * 100)
+                ret_metric.append(ret_stats[key].ann_vol().iloc[0] * 100)
             elif metric == "Drawdowns":
-                ret_metric.append(ret_stats[key].drawdowns()[0] * 100)
+                ret_metric.append(ret_stats[key].drawdowns().iloc[0] * 100)
 
         if strip is not None: keys = [k.replace(strip, '') for k in keys]
 
@@ -2113,7 +2112,8 @@ class TradingModel(object):
                                           ret_with_df=ret_with_df,
                                           split_on_char=split_on_char)
 
-    ###### Plot signals and trades, in terms of units, notionals and contract sizes (eg. for futures)
+    ###### Plot signals and trades, in terms of units, notionals and
+    # contract sizes (eg. for futures)
 
     def plot_strategy_all_signals(
             self,
@@ -2483,6 +2483,9 @@ class TradingModel(object):
         style.source = self.CHART_SOURCE
         style.silent_display = not (self.SHOW_CHARTS)
         style.plotly_plot_mode = self.PLOTLY_PLOT_MODE  # Smaller file sizes
+        style.auto_scale = self.AUTO_SCALE
+
+        print(style.plotly_plot_mode)
 
         style.legend_bgcolor = 'rgba(0,0,0,0)'
 

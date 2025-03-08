@@ -64,8 +64,9 @@ if run_example == 1 or run_example == 0:
 
     df_ret = calc.calculate_returns(df)
 
-    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret,
-                                                                        partition_by_month=False)
+    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(
+        df_ret,
+        partition_by_month=False)
     day_of_month_seasonality = calc.convert_month_day_to_date_time(
         day_of_month_seasonality)
 

@@ -32,7 +32,7 @@ try:
         FinFXDeltaMethod
     from financepy.market.volatility.fx_vol_surface_plus import vol_function
     from financepy.market.volatility.fx_vol_surface_plus import \
-        VolFunctionTypes
+        VolFuncTypes
 
     from financepy.utils.global_types import FinSolverTypes
 except:
@@ -142,17 +142,17 @@ class FXVolSurface(AbstractVolSurface):
             [asset + "10R" + t + field for t in tenors]].values
 
         if vol_function_type == "CLARK":
-            self._vol_function_type = VolFunctionTypes.CLARK
+            self._vol_function_type = VolFuncTypes.CLARK
         elif vol_function_type == "CLARK5":
-            self._vol_function_type = VolFunctionTypes.CLARK5
+            self._vol_function_type = VolFuncTypes.CLARK5
         elif vol_function_type == "BBG":
-            self._vol_function_type = VolFunctionTypes.BBG
+            self._vol_function_type = VolFuncTypes.BBG
 
         # Note: currently SABR isn"t fully implemented in FinancePy
         elif vol_function_type == "SABR":
-            self._vol_function_type = VolFunctionTypes.SABR
+            self._vol_function_type = VolFuncTypes.SABR
         elif vol_function_type == "SABR3":
-            self._vol_function_type = VolFunctionTypes.SABR3
+            self._vol_function_type = VolFuncTypes.SABR3
 
         # What does ATM mean? (for most
         if atm_method == "fwd-delta-neutral":  # ie. strike such that a straddle would be delta neutral
@@ -246,10 +246,10 @@ class FXVolSurface(AbstractVolSurface):
             self._risk_reversal10DeltaVols[
                 date_index][0],
             self._alpha,
-            atmMethod=self._atm_method,
-            deltaMethod=self._delta_method,
-            volatility_function_type=self._vol_function_type,
-            finSolverType=self._solver,
+            atm_method=self._atm_method,
+            delta_method=self._delta_method,
+            vol_func_type=self._vol_function_type,
+            fin_solver_type=self._solver,
             tol=self._tol)  # TODO add tol
 
     def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor="1M"):
@@ -335,21 +335,21 @@ class FXVolSurface(AbstractVolSurface):
 
         # columns = tenors
         df_vol_surface_strike_space = pd.DataFrame(
-            columns=self._fin_fx_vol_surface._tenors)
+            columns=self._fin_fx_vol_surface.tenors)
         df_vol_surface_delta_space = pd.DataFrame(
-            columns=self._fin_fx_vol_surface._tenors)
+            columns=self._fin_fx_vol_surface.tenors)
 
         # columns = tenors
         df_vol_surface_implied_pdf = pd.DataFrame(
-            columns=self._fin_fx_vol_surface._tenors)
+            columns=self._fin_fx_vol_surface.tenors)
 
         # Conversion between main deltas and strikes
         df_deltas_vs_strikes = pd.DataFrame(
-            columns=self._fin_fx_vol_surface._tenors)
+            columns=self._fin_fx_vol_surface.tenors)
 
         # ATM, 10d + 25d market strangle and 25d risk reversals
         df_vol_surface_quoted_points = pd.DataFrame(
-            columns=self._fin_fx_vol_surface._tenors)
+            columns=self._fin_fx_vol_surface.tenors)
 
         # Note, at present we"re not using 10d strikes
         quoted_strikes_names = ["ATM", "STR_25D_MS", "RR_25D_P", "STR_10D_MS",
@@ -359,8 +359,8 @@ class FXVolSurface(AbstractVolSurface):
                              "K_10D_C_MS"]
 
         # Get max/min strikes to interpolate (from the longest dated tenor)
-        low_K = self._fin_fx_vol_surface._K_25D_P[-1] * low_K_pc
-        high_K = self._fin_fx_vol_surface._K_25D_C[-1] * high_K_pc
+        low_K = self._fin_fx_vol_surface.k_25d_p[-1] * low_K_pc
+        high_K = self._fin_fx_vol_surface.k_25d_c[-1] * high_K_pc
 
         if num_strike_intervals is not None:
             # In case using old version of FinancePy
@@ -370,19 +370,19 @@ class FXVolSurface(AbstractVolSurface):
             except:
                 pass
 
-        for tenor_index in range(0, self._fin_fx_vol_surface._num_vol_curves):
+        for tenor_index in range(0, self._fin_fx_vol_surface.num_vol_curves):
 
             # Get the quoted vol points
-            tenor_label = self._fin_fx_vol_surface._tenors[tenor_index]
+            tenor_label = self._fin_fx_vol_surface.tenors[tenor_index]
 
-            atm_vol = self._fin_fx_vol_surface._atm_vols[tenor_index] * 100
-            ms_25d_vol = self._fin_fx_vol_surface._mktStrangle25DeltaVols[
+            atm_vol = self._fin_fx_vol_surface.atm_vols[tenor_index] * 100
+            ms_25d_vol = self._fin_fx_vol_surface.ms_25_delta_vols[
                              tenor_index] * 100
-            rr_25d_vol = self._fin_fx_vol_surface._riskReversal25DeltaVols[
+            rr_25d_vol = self._fin_fx_vol_surface.rr_25_delta_vols[
                              tenor_index] * 100
-            ms_10d_vol = self._fin_fx_vol_surface._mktStrangle10DeltaVols[
+            ms_10d_vol = self._fin_fx_vol_surface.ms_10_delta_vols[
                              tenor_index] * 100
-            rr_10d_vol = self._fin_fx_vol_surface._riskReversal10DeltaVols[
+            rr_10d_vol = self._fin_fx_vol_surface.rr_10_delta_vols[
                              tenor_index] * 100
 
             df_vol_surface_quoted_points[tenor_label] = pd.Series(
@@ -416,19 +416,19 @@ class FXVolSurface(AbstractVolSurface):
 
             # Extract strikes for the quoted points (ie. 10d, 25d and ATM)
             key_strikes = []
-            key_strikes.append(self._fin_fx_vol_surface._K_10D_P[tenor_index])
+            key_strikes.append(self._fin_fx_vol_surface.k_10d_p[tenor_index])
             key_strikes.append(
-                self._fin_fx_vol_surface._K_10D_P_MS[tenor_index])
-            key_strikes.append(self._fin_fx_vol_surface._K_25D_P[tenor_index])
+                self._fin_fx_vol_surface.k_10d_p_ms[tenor_index])
+            key_strikes.append(self._fin_fx_vol_surface.k_25d_p[tenor_index])
             key_strikes.append(
-                self._fin_fx_vol_surface._K_25D_P_MS[tenor_index])
-            key_strikes.append(self._fin_fx_vol_surface._K_ATM[tenor_index])
-            key_strikes.append(self._fin_fx_vol_surface._K_25D_C[tenor_index])
+                self._fin_fx_vol_surface.k_25d_p_ms[tenor_index])
+            key_strikes.append(self._fin_fx_vol_surface.k_atm[tenor_index])
+            key_strikes.append(self._fin_fx_vol_surface.k_25d_c[tenor_index])
             key_strikes.append(
-                self._fin_fx_vol_surface._K_25D_C_MS[tenor_index])
-            key_strikes.append(self._fin_fx_vol_surface._K_10D_C[tenor_index])
+                self._fin_fx_vol_surface.k_25d_c_ms[tenor_index])
+            key_strikes.append(self._fin_fx_vol_surface.k_10d_c[tenor_index])
             key_strikes.append(
-                self._fin_fx_vol_surface._K_10D_C_MS[tenor_index])
+                self._fin_fx_vol_surface.k_10d_c_ms[tenor_index])
 
             df_deltas_vs_strikes[tenor_label] = pd.Series(
                 index=key_strikes_names, data=key_strikes)
@@ -467,9 +467,9 @@ class FXVolSurface(AbstractVolSurface):
         if gaps is None:
             gaps = np.array([0.1])
 
-        params = self._fin_fx_vol_surface._parameters[tenor_index]
-        t = self._fin_fx_vol_surface._texp[tenor_index]
-        f = self._fin_fx_vol_surface._F0T[tenor_index]
+        params = self._fin_fx_vol_surface.parameters[tenor_index]
+        t = self._fin_fx_vol_surface.t_exp[tenor_index]
+        f = self._fin_fx_vol_surface.fwd[tenor_index]
 
         return vol_function(self._vol_function_type.value, params,
                             np.array([K]), gaps, f, K, t)

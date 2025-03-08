@@ -166,6 +166,10 @@ folder at the below location
 
 `C:\Anaconda3\envs\py310class\Lib\site-packages\financepy`
 
+# To upgrade only finmarketpy and other Cuemacro packages (and no dependencies)
+
+pip install -U --no-deps finmarketpy findatapy chartpy
+
 # finmarketpy examples
 
 In finmarketpy/examples you will find several examples, including some simple trading models

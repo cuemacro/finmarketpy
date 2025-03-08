@@ -60,8 +60,8 @@ Calculate event study around events for asset (see examples/events_examples.py)
 # Requirements
 
 Major requirements
-* Required: Python 3.8
-* Required: pandas 1.2.3, numpy etc.
+* Required: Python 3.10
+* Required: pandas, numpy etc.
 * Required: findatapy for downloading market data (https://github.com/cuemacro/findatapy)
 * Required: chartpy for funky interactive plots (https://github.com/cuemacro/chartpy)
 
@@ -187,6 +187,9 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 07 Mar 2025
+  * Merge changes for pyproject.toml etc.
+  * Formatting towards PEP8
 * 09 Nov 2024
   * Changed trend following example to use FRED
 * 19 May 2024

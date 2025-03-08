@@ -1,15 +1,15 @@
-__author__ = "saeedamen"
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
 # the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -135,10 +135,10 @@ if run_example == 1 or run_example == 0:
     # likely to have different publishing dates
     df = calculations.join([pd.DataFrame(
         df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
-                            pd.DataFrame(df_cuemacro_tot_3M[
-                                             cross + "-forward-tot-3M-cuemacro.close"]),
-                            df_bbg_tot, df_spot, df_bbg_tot_forwards],
-                           how="outer").fillna(method="ffill")
+        pd.DataFrame(df_cuemacro_tot_3M[
+                         cross + "-forward-tot-3M-cuemacro.close"]),
+        df_bbg_tot, df_spot, df_bbg_tot_forwards],
+        how="outer").fillna(method="ffill")
 
     df = calculations.create_mult_index_from_prices(df)
 
@@ -215,8 +215,8 @@ if run_example == 2 or run_example == 0:
     # likely to have different publishing dates
     df = calculations.join([pd.DataFrame(
         df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
-                            df_bbg_tot, df_spot, df_bbg_tot_forwards],
-                           how="outer").fillna(method="ffill")
+        df_bbg_tot, df_spot, df_bbg_tot_forwards],
+        how="outer").fillna(method="ffill")
 
     df = calculations.create_mult_index_from_prices(df)
 

@@ -1,22 +1,28 @@
-__author__ = "saeedamen"
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 """
-Shows how to use finmarketpy to process FX vol surfaces which have been interpolated (uses FinancePy underneath).
+Shows how to use finmarketpy to process FX vol surfaces which have been 
+interpolated (uses FinancePy underneath).
 
-Note, you will need to have a Bloomberg terminal (with blpapi Python library) to download the FX market data in order
-to plot these vol surface (FX spot, FX forwards, FX implied_vol volatility quotes and deposits)
+Note, you will need to have a Bloomberg terminal (with blpapi Python library) 
+to download the FX market data in order to plot these vol surface (FX spot, 
+FX forwards, FX implied_vol volatility 
+quotes and deposits)
 """
 
 # For plotting

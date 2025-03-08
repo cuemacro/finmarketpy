@@ -3,15 +3,17 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-
 
 """
 Examples for downloading economic data events from Bloomberg
@@ -36,7 +38,6 @@ run_example = 0
 
 ###### download recent NFP times and do event study for USD/JPY (using Bloomberg data)
 if run_example == 1 or run_example == 0:
-
     logger = LoggerManager().getLogger(__name__)
 
     import datetime
@@ -53,31 +54,32 @@ if run_example == 1 or run_example == 0:
 
     # Fetch NFP times from Bloomberg
     md_request = MarketDataRequest(
-        start_date=start_date,              # start date
-        finish_date=finish_date,            # finish date
+        start_date=start_date,  # start date
+        finish_date=finish_date,  # finish date
         category="events",
-        freq='daily',                       # daily data
-        data_source='bloomberg',            # use Bloomberg as data source
+        freq='daily',  # daily data
+        data_source='bloomberg',  # use Bloomberg as data source
         tickers=['NFP'],
         fields=['release-date-time-full'],  # which fields to download
-        vendor_tickers=['NFP TCH Index'],   # ticker (Bloomberg)
+        vendor_tickers=['NFP TCH Index'],  # ticker (Bloomberg)
         cache_algo='cache_algo_return')  # how to return data
 
     df_event_times = market.fetch_market(md_request)
-    df_event_times = pandas.DataFrame(index=df_event_times['NFP.release-date-time-full'])
+    df_event_times = pandas.DataFrame(
+        index=df_event_times['NFP.release-date-time-full'])
 
     # Need same timezone for event times as market data (otherwise can cause problems with Pandas)
     df_event_times = df_event_times.tz_localize('utc')
 
     # Fetch USD/JPY spot
     md_request = MarketDataRequest(
-        start_date=start_date,      # start date
-        finish_date=finish_date,    # finish date
+        start_date=start_date,  # start date
+        finish_date=finish_date,  # finish date
         category='fx',
-        freq='intraday',                # intraday
-        data_source='bloomberg',        # use Bloomberg as data source
-        tickers=['USDJPY'],             # ticker (finmarketpy)
-        fields=['close'],               # which fields to download
+        freq='intraday',  # intraday
+        data_source='bloomberg',  # use Bloomberg as data source
+        tickers=['USDJPY'],  # ticker (finmarketpy)
+        fields=['close'],  # which fields to download
         cache_algo='cache_algo_return')  # how to return data
 
     df = None

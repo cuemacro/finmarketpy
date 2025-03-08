@@ -1,15 +1,15 @@
-__author__ = "saeedamen"
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
 # the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -20,6 +20,7 @@ import datetime
 from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
 from finmarketpy.backtest import TradingModel, BacktestRequest
 from finmarketpy.economics import TechIndicator
+
 
 class TradingModelFXTrend_BBG_Example(TradingModel):
     """Shows how to create a simple FX CTA style strategy, using the
@@ -41,7 +42,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
         return
 
     ###### Parameters and signal generations (need to be customised for every model)
-    def load_parameters(self, br = None):
+    def load_parameters(self, br=None):
         if br is not None: return br
 
         ##### FILL IN WITH YOUR OWN BACKTESTING PARAMETERS
@@ -82,14 +83,14 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         return br
 
-    def load_assets(self, br = None):
+    def load_assets(self, br=None):
         ##### FILL IN WITH YOUR ASSET DATA
-        from findatapy.util.loggermanager import  LoggerManager
+        from findatapy.util.loggermanager import LoggerManager
         logger = LoggerManager().getLogger(__name__)
 
         # For FX basket
-        full_bkt    = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD",
-                       "NZDUSD", "USDCHF", "USDNOK", "USDSEK"]
+        full_bkt = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD",
+                    "NZDUSD", "USDCHF", "USDNOK", "USDSEK"]
 
         basket_dict = {}
 
@@ -98,22 +99,22 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         basket_dict["FX trend"] = full_bkt
 
-        br = self.load_parameters(br = br)
+        br = self.load_parameters(br=br)
 
         logger.info("Loading asset data...")
 
         vendor_tickers = [x + "CR CMPN Curncy" for x in full_bkt]
 
         market_data_request = MarketDataRequest(
-                    start_date=br.start_date,                     # start date
-                    finish_date=br.finish_date,                   # finish date
-                    freq="daily",                                 # daily data
-                    data_source="bloomberg",                      # use Bloomberg as data source
-                    tickers=full_bkt,                             # ticker (Cuemacro)
-                    fields=["close"],                             # which fields to download
-                    vendor_tickers=vendor_tickers,                # ticker
-                    vendor_fields=["PX_LAST"],                    # which Bloomberg fields to download
-                    cache_algo="internet_load_return")            # how to return data
+            start_date=br.start_date,  # start date
+            finish_date=br.finish_date,  # finish date
+            freq="daily",  # daily data
+            data_source="bloomberg",  # use Bloomberg as data source
+            tickers=full_bkt,  # ticker (Cuemacro)
+            fields=["close"],  # which fields to download
+            vendor_tickers=vendor_tickers,  # ticker
+            vendor_fields=["PX_LAST"],  # which Bloomberg fields to download
+            cache_algo="internet_load_return")  # how to return data
 
         asset_df = self.market.fetch_market(market_data_request)
 
@@ -123,7 +124,7 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
             asset_df = pandas.read_csv(
                 "fxcta.csv", index_col=0, parse_dates=["Date"],
-                 date_parser=lambda x: pandas.datetime.strptime(x, "%Y-%m-%d"))
+                date_parser=lambda x: pandas.datetime.strptime(x, "%Y-%m-%d"))
 
         # Signalling variables
         spot_df = asset_df
@@ -133,7 +134,8 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         return asset_df, spot_df, spot_df2, basket_dict
 
-    def construct_signal(self, spot_df, spot_df2, tech_params, br, run_in_parallel=False):
+    def construct_signal(self, spot_df, spot_df2, tech_params, br,
+                         run_in_parallel=False):
 
         ##### FILL IN WITH YOUR OWN SIGNALS
 
@@ -151,15 +153,15 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
         ###### FILL IN WITH YOUR OWN BENCHMARK
 
         tsr_indices = MarketDataRequest(
-            start_date=self.br.start_date,                # start date
-            finish_date=self.br.finish_date,              # finish date
-            freq="daily",                                 # daily data
-            data_source="bloomberg",                      # use Bloomberg as data source
-            tickers=["EURUSD"],                           # tickers to download
+            start_date=self.br.start_date,  # start date
+            finish_date=self.br.finish_date,  # finish date
+            freq="daily",  # daily data
+            data_source="bloomberg",  # use Bloomberg as data source
+            tickers=["EURUSD"],  # tickers to download
             vendor_tickers=["EURUSDCR CMPN Curncy"],
-            fields=["close"],                             # which fields to download
+            fields=["close"],  # which fields to download
             vendor_fields=["PX_LAST"],
-            cache_algo="internet_load_return")            # how to return data
+            cache_algo="internet_load_return")  # how to return data
 
         df = self.market.fetch_market(tsr_indices)
 
@@ -167,9 +169,10 @@ class TradingModelFXTrend_BBG_Example(TradingModel):
 
         return df
 
+
 if __name__ == "__main__":
 
-# Just change "False" to "True" to run any of the below examples
+    # Just change "False" to "True" to run any of the below examples
 
     # Create a FX trend strategy then chart the returns, leverage over time
     if True:
@@ -177,12 +180,12 @@ if __name__ == "__main__":
 
         model.construct_strategy()
 
-        model.plot_strategy_pnl()                        # plot the final strategy
-        model.plot_strategy_leverage()                   # plot the leverage of the portfolio
-        model.plot_strategy_group_pnl_trades()           # plot the individual trade P&Ls
-        model.plot_strategy_group_benchmark_pnl()        # plot all the cumulative P&Ls of each component
-        model.plot_strategy_group_benchmark_pnl_ir()     # plot all the IR of individual components
-        model.plot_strategy_group_leverage()             # plot all the individual leverages
+        model.plot_strategy_pnl()  # plot the final strategy
+        model.plot_strategy_leverage()  # plot the leverage of the portfolio
+        model.plot_strategy_group_pnl_trades()  # plot the individual trade P&Ls
+        model.plot_strategy_group_benchmark_pnl()  # plot all the cumulative P&Ls of each component
+        model.plot_strategy_group_benchmark_pnl_ir()  # plot all the IR of individual components
+        model.plot_strategy_group_leverage()  # plot all the individual leverages
 
         from finmarketpy.backtest import TradeAnalysis
 
@@ -208,8 +211,8 @@ if __name__ == "__main__":
         # names of the portfolio
         # broad type of parameter name
         parameter_list = [
-            {"portfolio_vol_adjust": True, "signal_vol_adjust" : True},
-            {"portfolio_vol_adjust": False, "signal_vol_adjust" : False}]
+            {"portfolio_vol_adjust": True, "signal_vol_adjust": True},
+            {"portfolio_vol_adjust": False, "signal_vol_adjust": False}]
 
         pretty_portfolio_names = \
             ["Vol target",
@@ -224,7 +227,7 @@ if __name__ == "__main__":
 
         # Now examine sensitivity to different transaction costs
         tc = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0]
-        ta.run_tc_shock(strategy, tc = tc)
+        ta.run_tc_shock(strategy, tc=tc)
 
         # How does P&L change on day of month
         ta.run_day_of_month_analysis(strategy)
@@ -232,6 +235,7 @@ if __name__ == "__main__":
     # Create a FX CTA strategy then use TradeAnalysis (via pyfolio) to analyse returns
     if False:
         from finmarketpy.backtest import TradeAnalysis
+
         model = TradingModelFXTrend_BBG_Example()
         model.construct_strategy()
 

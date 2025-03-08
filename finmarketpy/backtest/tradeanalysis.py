@@ -1,15 +1,18 @@
-__author__ = 'saeedamen'
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2016-2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied_.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 # pf = None
@@ -42,7 +45,8 @@ class TradeAnalysis(object):
 
     def __init__(self, engine=ChartConstants().chartfactory_default_engine):
         # self.logger = LoggerManager().getLogger(__name__)
-        self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime("%Y%m%d") + ' '
+        self.DUMP_PATH = 'output_data/' + datetime.date.today().strftime(
+            "%Y%m%d") + ' '
         self.DEFAULT_PLOT_ENGINE = engine
         self.chart = Chart(engine=self.DEFAULT_PLOT_ENGINE)
 
@@ -65,13 +69,13 @@ class TradeAnalysis(object):
 
         """
 
-        #if index is None:
+        # if index is None:
         #    pnl = trading_model.strategy_pnl()
-        #else:
+        # else:
         #    pnl = index
 
-        #tz = Timezone()
-        #calculations = Calculations()
+        # tz = Timezone()
+        # calculations = Calculations()
 
         # if engine == 'pyfolio':
         #     # PyFolio assumes UTC time based DataFrames (so force this localisation)
@@ -104,17 +108,18 @@ class TradeAnalysis(object):
         #         pass
         #
         #     plt.show()
-        #elif engine == 'finmarketpy':
+        # elif engine == 'finmarketpy':
 
         # assume we have TradingModel
         # to do to take in a time series
-        from chartpy import Canvas #, Chart
+        from chartpy import Canvas  # , Chart
 
         # temporarily make scale factor smaller so fits the window
         old_scale_factor = trading_model.SCALE_FACTOR
         trading_model.SCALE_FACTOR = 0.75
 
-        pnl = trading_model.plot_strategy_pnl(silent_plot=True)  # plot the final strategy
+        pnl = trading_model.plot_strategy_pnl(
+            silent_plot=True)  # plot the final strategy
         individual = trading_model.plot_strategy_group_pnl_trades(
             silent_plot=True)  # plot the individual trade P&Ls
 
@@ -123,17 +128,21 @@ class TradeAnalysis(object):
         ir_comp = trading_model.plot_strategy_group_benchmark_pnl_ir(
             silent_plot=True)  # plot all the IR of each component
 
-        leverage = trading_model.plot_strategy_leverage(silent_plot=True)  # plot the leverage of the portfolio
-        ind_lev = trading_model.plot_strategy_group_leverage(silent_plot=True)  # plot all the individual leverages
+        leverage = trading_model.plot_strategy_leverage(
+            silent_plot=True)  # plot the leverage of the portfolio
+        ind_lev = trading_model.plot_strategy_group_leverage(
+            silent_plot=True)  # plot all the individual leverages
 
         canvas = Canvas([[pnl, individual],
                          [pnl_comp, ir_comp],
                          [leverage, ind_lev]]
                         )
 
-        canvas.generate_canvas(page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
-                               silent_display=False, canvas_plotter='plain',
-                               output_filename=trading_model.FINAL_STRATEGY + ".html", render_pdf=False)
+        canvas.generate_canvas(
+            page_title=trading_model.FINAL_STRATEGY + ' Return Statistics',
+            silent_display=False, canvas_plotter='plain',
+            output_filename=trading_model.FINAL_STRATEGY + ".html",
+            render_pdf=False)
 
         trading_model.SCALE_FACTOR = old_scale_factor
 
@@ -159,10 +168,12 @@ class TradeAnalysis(object):
             strategy_name = tm.FINAL_STRATEGY
             returns = tm.strategy_group_benchmark_pnl()
 
-            returns.to_excel(writer, sheet_name=strategy_name + ' rets', engine='xlsxwriter')
+            returns.to_excel(writer, sheet_name=strategy_name + ' rets',
+                             engine='xlsxwriter')
 
             # write raw position/trade sizes
-            self.save_positions_trades(tm, tm.strategy_signal(), tm.strategy_trade(),
+            self.save_positions_trades(tm, tm.strategy_signal(),
+                                       tm.strategy_trade(),
                                        'pos', 'trades', writer)
 
             if hasattr(tm, '_strategy_signal_notional'):
@@ -173,7 +184,8 @@ class TradeAnalysis(object):
                     # write position/trade sizes scaled by notional
                     self.save_positions_trades(tm,
                                                signal_notional,
-                                               trading_notional, 'pos - Not', 'trades - Not', writer)
+                                               trading_notional, 'pos - Not',
+                                               'trades - Not', writer)
 
             if hasattr(tm, '_strategy_signal_contracts'):
                 signal_contracts = tm.strategy_signal_contracts()
@@ -183,32 +195,44 @@ class TradeAnalysis(object):
                     # write position/trade sizes in terms of contract sizes
                     self.save_positions_trades(tm,
                                                signal_contracts,
-                                               trade_contracts, 'pos - Cont', 'trades - Cont', writer)
+                                               trade_contracts, 'pos - Cont',
+                                               'trades - Cont', writer)
 
         # TODO Add summary sheet comparing return statistics for all the different models in the list
 
         writer.save()
         writer.close()
 
-    def save_positions_trades(self, tm, signals, trades, signal_caption, trade_caption, writer):
-        signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' hist ' + signal_caption, engine='xlsxwriter')
+    def save_positions_trades(self, tm, signals, trades, signal_caption,
+                              trade_caption, writer):
+        signals.to_excel(writer,
+                         sheet_name=tm.FINAL_STRATEGY + ' hist ' + signal_caption,
+                         engine='xlsxwriter')
 
         if hasattr(tm, 'STRIP'):
             strip = tm.STRIP
         else:
             strip = ''
 
-        recent_signals = tm._grab_signals(signals, date=[-1, -2, -5, -10, -20], strip=strip)
-        recent_trades = tm._grab_signals(trades, date=[-1, -2, -5, -10, -20], strip=strip)
+        recent_signals = tm._grab_signals(signals, date=[-1, -2, -5, -10, -20],
+                                          strip=strip)
+        recent_trades = tm._grab_signals(trades, date=[-1, -2, -5, -10, -20],
+                                         strip=strip)
 
-        recent_signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + signal_caption, engine='xlsxwriter')
-        recent_trades.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + ' ' + trade_caption, engine='xlsxwriter')
+        recent_signals.to_excel(writer,
+                                sheet_name=tm.FINAL_STRATEGY + ' ' + signal_caption,
+                                engine='xlsxwriter')
+        recent_trades.to_excel(writer,
+                               sheet_name=tm.FINAL_STRATEGY + ' ' + trade_caption,
+                               engine='xlsxwriter')
 
-    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False, reload_market_data=True):
+    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False,
+                     reload_market_data=True):
         if tc is None: tc = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
 
         parameter_list = [{'spot_tc_bp': x} for x in tc]
-        pretty_portfolio_names = [str(x) + 'bp' for x in tc]  # names of the portfolio
+        pretty_portfolio_names = [str(x) + 'bp' for x in
+                                  tc]  # names of the portfolio
         parameter_type = 'TC analysis'  # broad type of parameter name
 
         return self.run_arbitrary_sensitivity(strategy,
@@ -220,20 +244,26 @@ class TradeAnalysis(object):
 
     ###### Parameters and signal generations (need to be customised for every model)
     def run_arbitrary_sensitivity(self, trading_model, parameter_list=None,
-                                  pretty_portfolio_names=None, parameter_type=None, run_in_parallel=False,
+                                  pretty_portfolio_names=None,
+                                  parameter_type=None, run_in_parallel=False,
                                   reload_market_data=True, plot=True):
 
-        if not(reload_market_data):
-            asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model)
+        if not (reload_market_data):
+            asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(
+                trading_model)
 
         port_list = []
         ret_stats_list = []
 
-        if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
-            swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
+        if market_constants.backtest_thread_no[
+            market_constants.generic_plat] > 1 and run_in_parallel:
+            swim_pool = SwimPool(
+                multiprocessing_library=market_constants.multiprocessing_library)
 
-            pool = swim_pool.create_pool(thread_technique=market_constants.backtest_thread_technique,
-                                         thread_no=market_constants.backtest_thread_no[market_constants.generic_plat])
+            pool = swim_pool.create_pool(
+                thread_technique=market_constants.backtest_thread_technique,
+                thread_no=market_constants.backtest_thread_no[
+                    market_constants.generic_plat])
 
             mult_results = []
 
@@ -251,12 +281,14 @@ class TradeAnalysis(object):
 
                 # should specify reloading the data, if our parameters impact which assets we are fetching
                 if reload_market_data:
-                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model, br = br)
+                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(
+                        trading_model, br=br)
 
                 mult_results.append(
-                    pool.apply_async(self._run_strategy, args=(trading_model, asset_df, spot_df, spot_df2, br,
-                                                               contract_value_df,
-                                                               pretty_portfolio_names[i],)))
+                    pool.apply_async(self._run_strategy, args=(
+                    trading_model, asset_df, spot_df, spot_df2, br,
+                    contract_value_df,
+                    pretty_portfolio_names[i],)))
 
             for p in mult_results:
                 port, ret_stats = p.get()
@@ -283,11 +315,14 @@ class TradeAnalysis(object):
 
                 # should specify reloading the data, if our parameters impact which assets we are fetching
                 if reload_market_data:
-                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model, br = br)
+                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(
+                        trading_model, br=br)
 
                 # br = copy.copy(trading_model.br)
 
-                port, ret_stats = self._run_strategy(trading_model, asset_df, spot_df, spot_df2, br, contract_value_df,
+                port, ret_stats = self._run_strategy(trading_model, asset_df,
+                                                     spot_df, spot_df2, br,
+                                                     contract_value_df,
                                                      pretty_portfolio_names[i])
 
                 port_list.append(port)
@@ -327,7 +362,8 @@ class TradeAnalysis(object):
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' IR.html'
         style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + ' ' + parameter_type
-        summary_ir = pandas.DataFrame(index=pretty_portfolio_names, data=ir, columns=['IR'])
+        summary_ir = pandas.DataFrame(index=pretty_portfolio_names, data=ir,
+                                      columns=['IR'])
 
         if plot:
             self.chart.plot(summary_ir, chart_type='bar', style=style)
@@ -336,7 +372,8 @@ class TradeAnalysis(object):
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.png'
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + ' ' + parameter_type + ' Rets.html'
 
-        summary_rets = pandas.DataFrame(index=pretty_portfolio_names, data=rets, columns=['Rets (%)']) * 100
+        summary_rets = pandas.DataFrame(index=pretty_portfolio_names,
+                                        data=rets, columns=['Rets (%)']) * 100
 
         if plot:
             self.chart.plot(summary_rets, chart_type='bar', style=style)
@@ -358,17 +395,21 @@ class TradeAnalysis(object):
 
         return asset_df, spot_df, spot_df2, basket_dict, contract_value_df
 
-    def _run_strategy(self, trading_model, asset_df, spot_df, spot_df2, br, contract_value_df, pretty_portfolio_name):
+    def _run_strategy(self, trading_model, asset_df, spot_df, spot_df2, br,
+                      contract_value_df, pretty_portfolio_name):
 
         logger = LoggerManager().getLogger(__name__)
 
         logger.info("Calculating... " + str(pretty_portfolio_name))
 
-        signal_df = trading_model.construct_signal(spot_df, spot_df2, br.tech_params, br, run_in_parallel=False)
+        signal_df = trading_model.construct_signal(spot_df, spot_df2,
+                                                   br.tech_params, br,
+                                                   run_in_parallel=False)
 
         backtest = Backtest()
 
-        backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, False)
+        backtest.calculate_trading_PnL(br, asset_df, signal_df,
+                                       contract_value_df, False)
         ret_stats = backtest.portfolio_pnl_ret_stats()
         stats = str(backtest.portfolio_pnl_desc()[0])
 
@@ -379,8 +420,10 @@ class TradeAnalysis(object):
 
     ###### Parameters and signal generations (need to be customised for every model)
     ###### Plot all the output separately
-    def run_arbitrary_sensitivity_separately(self, trading_model, parameter_list=None,
-                                             pretty_portfolio_names=None, strip=None):
+    def run_arbitrary_sensitivity_separately(self, trading_model,
+                                             parameter_list=None,
+                                             pretty_portfolio_names=None,
+                                             strip=None):
 
         # asset_df, spot_df, spot_df2, basket_dict = strat.fill_assets()
         final_strategy = trading_model.FINAL_STRATEGY
@@ -394,7 +437,8 @@ class TradeAnalysis(object):
             for k in current_parameter.keys():
                 setattr(br, k, current_parameter[k])
 
-            trading_model.FINAL_STRATEGY = final_strategy + " " + pretty_portfolio_names[i]
+            trading_model.FINAL_STRATEGY = final_strategy + " " + \
+                                           pretty_portfolio_names[i]
 
             self.logger.info("Calculating... " + pretty_portfolio_names[i])
             trading_model.br = br
@@ -422,7 +466,8 @@ class TradeAnalysis(object):
         pnl = pnl.resample('B').mean()
         rets = calculations.calculate_returns(pnl).tz_localize(None)
 
-        bus_day = seas.bus_day_of_month_seasonality(rets, add_average=True, resample_freq=resample_freq)
+        bus_day = seas.bus_day_of_month_seasonality(rets, add_average=True,
+                                                    resample_freq=resample_freq)
 
         # Get seasonality by month
         pnl = pnl.resample('BM').mean()

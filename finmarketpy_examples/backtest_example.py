@@ -3,13 +3,16 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 """
@@ -111,9 +114,12 @@ if run_example == 1 or run_example == 0:
     contract_value_df = None
 
     # Use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
+    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df,
+                                   run_in_parallel=False)
     port = backtest.portfolio_cum()
-    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
+    port.columns = [
+        indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(
+            backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()
 
     # Print the last positions (we could also save as CSV etc.)
@@ -178,8 +184,8 @@ if run_example == 2 or run_example == 0:
         fields=['close'],  # which fields to download
         vendor_tickers=['DEXUSEU'],  # ticker
         vendor_fields=['close'],  # which Bloomberg fields to download
-        cache_algo='internet_load_return', # how to return data
-        fred_api_key=fred_api_key,)
+        cache_algo='internet_load_return',  # how to return data
+        fred_api_key=fred_api_key, )
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -195,14 +201,19 @@ if run_example == 2 or run_example == 0:
     signal_df = tech_ind.get_signal()
 
     # Use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=None, run_in_parallel=False)
+    backtest.calculate_trading_PnL(br, asset_df, signal_df,
+                                   contract_value_df=None,
+                                   run_in_parallel=False)
     port = backtest.portfolio_cum()
-    port.columns = [indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(backtest.portfolio_pnl_desc()[0])]
+    port.columns = [
+        indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(
+            backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()  # get final signals for each series
     returns = backtest.pnl()  # get P&L for each series
 
     calculations = Calculations()
-    trade_returns = calculations.calculate_individual_trade_gains(signals, returns)
+    trade_returns = calculations.calculate_individual_trade_gains(signals,
+                                                                  returns)
 
     print(trade_returns)
 

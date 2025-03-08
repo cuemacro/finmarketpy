@@ -26,5 +26,5 @@ setup(name="finmarketpy",
                         "scikit-learn",
                         "matplotlib",
                         "numba",
-                        "financepy==0.310"],
+                        "financepy==0.360"],
       zip_safe=False)

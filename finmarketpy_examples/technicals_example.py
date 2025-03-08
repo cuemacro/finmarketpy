@@ -1,20 +1,19 @@
-__author__ = "saeedamen"
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
 # the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 
 # loading data
 import datetime
@@ -39,16 +38,16 @@ run_example = 0
 
 ###### Fetch data from Bloomberg for S&P500
 if run_example == 1 or run_example == 0:
-
     # Downloaded S&P500
     md_request = MarketDataRequest(
-                start_date = "01 Jan 2000",                         # start date
-                data_source = "bloomberg",                          # use Bloomberg as data source
-                tickers = ["S&P500"],
-                fields = ["close", "open", "high", "low"],          # which fields to download
-                vendor_tickers = ["SPX Index"],                     # ticker (Bloomberg)
-                vendor_fields = ["PX_LAST", "PX_OPEN", "PX_HIGH", "PX_LOW"],   # which Bloomberg fields to download
-                cache_algo = "internet_load_return")                # how to return data
+        start_date="01 Jan 2000",  # start date
+        data_source="bloomberg",  # use Bloomberg as data source
+        tickers=["S&P500"],
+        fields=["close", "open", "high", "low"],  # which fields to download
+        vendor_tickers=["SPX Index"],  # ticker (Bloomberg)
+        vendor_fields=["PX_LAST", "PX_OPEN", "PX_HIGH", "PX_LOW"],
+        # which Bloomberg fields to download
+        cache_algo="internet_load_return")  # how to return data
 
     df = market.fetch_market(md_request)
 

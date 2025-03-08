@@ -1,15 +1,15 @@
-__author__ = "saeedamen"
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2020 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
 # the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -44,10 +44,10 @@ from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface
 from finmarketpy.curve.volatility.fxoptionspricer import FXOptionsPricer
 
 try:
-    from finaddpy.market import CachedMarketDataGenerator as MarketDataGenerator
+    from finaddpy.market import \
+        CachedMarketDataGenerator as MarketDataGenerator
 except:
     pass
-
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -331,6 +331,6 @@ if __name__ == "__main__":
         from finmarketpy.economics.quickchart import QuickChart
 
         QuickChart(engine="plotly").plot_chart_with_ret_stats(
-              df=df_index,
-              plotly_plot_mode="offline_html",
-              scale_factor=-1.5)
+            df=df_index,
+            plotly_plot_mode="offline_html",
+            scale_factor=-1.5)

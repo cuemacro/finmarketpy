@@ -1,17 +1,19 @@
-__author__ = 'saeedamen'
+__author__ = 'saeedamen'  # Saeed Amen
 
 #
-# Copyright 2016 Cuemacro
+# Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-
 import numpy as np
 import pandas as pd
 
@@ -273,7 +275,7 @@ class Backtest(object):
             # weighting each signal separately)
             portfolio_signal_before_weighting = pd.DataFrame(
                 data=(
-                            portfolio_signal_before_weighting.values * position_clip_adjustment_matrix),
+                        portfolio_signal_before_weighting.values * position_clip_adjustment_matrix),
                 index=portfolio_signal_before_weighting.index,
                 columns=portfolio_signal_before_weighting.columns)
 
@@ -281,7 +283,7 @@ class Backtest(object):
             # level positions)
             portfolio_signal = pd.DataFrame(
                 data=(
-                            portfolio_signal.values * position_clip_adjustment_matrix),
+                        portfolio_signal.values * position_clip_adjustment_matrix),
                 index=portfolio_signal.index,
                 columns=portfolio_signal.columns)
 
@@ -289,7 +291,7 @@ class Backtest(object):
             # (multiply vectors elementwise)
             portfolio_leverage_df = pd.DataFrame(
                 data=(
-                            portfolio_leverage_df.values * position_clip_adjustment.values),
+                        portfolio_leverage_df.values * position_clip_adjustment.values),
                 index=portfolio_leverage_df.index,
                 columns=portfolio_leverage_df.columns)
 
@@ -1037,7 +1039,8 @@ class TradingModel(object):
         return pkl
 
     ####### Generic functions for every backtest
-    def construct_strategy(self, br: BacktestRequest = None, run_in_parallel: bool = False) -> pd.DataFrame:
+    def construct_strategy(self, br: BacktestRequest = None,
+                           run_in_parallel: bool = False) -> pd.DataFrame:
         """Constructs the returns for all the strategies which have been specified.
 
         It gets backtesting parameters from fill_backtest_request (although
@@ -2479,7 +2482,7 @@ class TradingModel(object):
         style.height = self.HEIGHT
         style.source = self.CHART_SOURCE
         style.silent_display = not (self.SHOW_CHARTS)
-        style.plotly_plot_mode = self.PLOTLY_PLOT_MODE # Smaller file sizes
+        style.plotly_plot_mode = self.PLOTLY_PLOT_MODE  # Smaller file sizes
 
         style.legend_bgcolor = 'rgba(0,0,0,0)'
 
@@ -2521,8 +2524,8 @@ class PortfolioWeightConstruction(object):
             signal_df: pd.DataFrame,
             signal_pnl_cols: List[str],
             br: BacktestRequest = None) -> (
-    pd.DataFrame, pd.DataFrame, pd.DataFrame,
-    pd.DataFrame, pd.DataFrame, pd.DataFrame):
+            pd.DataFrame, pd.DataFrame, pd.DataFrame,
+            pd.DataFrame, pd.DataFrame, pd.DataFrame):
 
         if br is None:
             br = self._br

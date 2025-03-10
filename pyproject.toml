@@ -12,8 +12,8 @@ dependencies = [
     "findatapy",
     "matplotlib",
     "numba",
-    "numpy",
-    "pandas",
+    "numpy<2",
+    "pandas>=1.5.3",
     "scikit-learn",
     "seasonal",
 ]

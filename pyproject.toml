@@ -7,15 +7,15 @@ authors = [{name='Saeed Amen', email= 'saeed@cuemacro.com'}]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "blosc>=1.11.2",
+    "blosc",
     "chartpy",
     "findatapy",
-    "matplotlib>=3.9.4",
-    "numba>=0.60.0",
-    "numpy>=2.0.2",
-    "pandas>=2.2.3",
-    "scikit-learn>=1.6.1",
-    "seasonal>=0.3.1",
+    "matplotlib",
+    "numba",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "seasonal",
 ]
 keywords = [
     "trading", "markets", "currencies", "pandas", "data", "Bloomberg", "tick", "stocks", "equities"

@@ -176,6 +176,7 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # Release Notes
 
+* 0.11.17 - finmarketpy (09 Mar 2025)
 * 0.11.16 - finmarketpy (08 Mar 2025)
 * 0.11.15 - finmarketpy (08 Mar 2025)
 * 0.11.14 - finmarketpy (19 May 2024)
@@ -198,6 +199,8 @@ In finmarketpy/examples you will find several examples, including some simple tr
 
 # finmarketpy log
 
+* 09 Mar 2025
+  * Removed FinancePy from pyproject.toml
 * 08 Mar 2025
   * Make FinancePy an optional dependency
   * Fixed various deprecation messages related Pandas

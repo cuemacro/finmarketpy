@@ -3,7 +3,7 @@ name = 'finmarketpy'
 version = "0.0.0"      # do not change by hand!
 description = "finmarketpy is a Python based library for backtesting trading strategies"
 # Please add authors and correct the email...
-authors = [{name='Saeed Aman', email= 'saeed@cuemacro.com'}]
+authors = [{name='Saeed Amen', email= 'saeed@cuemacro.com'}]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [

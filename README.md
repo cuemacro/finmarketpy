@@ -105,7 +105,7 @@ pip install findatapy
 FinancePy is an optional dependency for finmarketpy for option pricing. It is recommended
 to install it separately from PyPI after installing finmarketpy, and without dependencies
 otherwise it can cause clashes with other libraries (because of its strict version
-dependencies on libraries like llvmlite, which in practice can be relaxed). 
+dependencies on libraries like llvmlite, which in practice can be relaxed).
 The API changes a lot so it recommended to install the specific version listed below.
 
 ```

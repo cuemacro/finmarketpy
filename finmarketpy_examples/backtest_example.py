@@ -16,7 +16,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-Gives several examples of backtesting simple trading strategies, using 
+Gives several examples of backtesting simple trading strategies, using
 Backtest (a lower level class)
 """
 

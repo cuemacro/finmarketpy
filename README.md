@@ -113,17 +113,6 @@ pip install numba numpy scipy llvmlite ipython pandas prettytable
 pip install financepy==0.370 --no-deps
 ```
 
-# Binder and Jupyter - Run finmarketpy in your browser
-
-You can run some of the Jupyter notebooks in Binder interactively in your browser to play around with finmarketpy. It might take a few minutes for the
-Binder instance to start. We are currently working on having more notebooks in Binder, so stay tuned!
-
-Note that you will need to get a Quandl
-API key to download market data to use some of these, and you can sign up for a free account at https://www.quandl.com.
-
-* [Backtesting an FX trend following strategy - backtest_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/backtest_example.ipynb)
-* [Downloading market data examples - market_data_example (Binder Link)](https://mybinder.org/v2/gh/cuemacro/finmarketpy/master?filepath=finmarketpy_examples/finmarketpy_notebooks/market_data_example.ipynb)
-
 # Synchronizing your fork of finmarketpy with master
 
 I found this [article useful](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository) for
@@ -306,7 +295,6 @@ In finmarketpy/examples you will find several examples, including some simple tr
 * 02 Dec 2020
     * Added FX vol surface interpolation (using FinancePy library underneath) + animated example
 * 12 Nov 2020
-    * Added Binder, so can run notebooks interactively
     * Edited backtest_example Jupyter notebook with more description
 * 11 Nov 2020
     * Added cumulative additive index flag for backtests

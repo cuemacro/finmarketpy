@@ -1,0 +1,52 @@
+# This file is part of the jebel-quant/rhiza repository
+# (https://github.com/jebel-quant/rhiza).
+#
+# Workflow: Pre-commit
+#
+# Purpose: This workflow runs pre-commit checks to ensure code quality
+#          and consistency across the codebase. It helps catch issues
+#          like formatting errors, linting issues, and other code quality
+#          problems before they are merged.
+#
+# Trigger: This workflow runs on every push and on pull requests to main/master
+#          branches (including from forks)
+#
+# Components:
+#   - 🔍 Run pre-commit checks using reusable action
+#   - 💾 Cache pre-commit environments to speed up runs
+
+name: "(RHIZA) PRE-COMMIT"
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      # Cache pre-commit environments and hooks
+      - name: Cache pre-commit environments
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
+
+      # Run pre-commit
+      - name: Run pre-commit
+        run: |
+          make fmt

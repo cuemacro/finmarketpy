@@ -1,0 +1,83 @@
+name: Renovate Rhiza Template Sync
+# Automatically sync rhiza template files when Renovate updates .rhiza/template.yml
+
+on:
+  push:
+    branches:
+      - 'renovate/jebel-quant-rhiza-**'
+    paths:
+      - '.rhiza/template.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-template:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.PAT_TOKEN || github.token }}
+
+      - name: Check PAT_TOKEN configuration
+        shell: bash
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          if [ -z "$PAT_TOKEN" ]; then
+            echo "::warning::PAT_TOKEN secret is not configured."
+            echo "::warning::If this sync modifies workflow files, the push will fail."
+            echo "::warning::See .rhiza/docs/TOKEN_SETUP.md for setup instructions."
+          else
+            echo "✓ PAT_TOKEN is configured."
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.0
+
+      - name: Get Rhiza version
+        id: rhiza-version
+        run: |
+          VERSION=$(cat .rhiza/.rhiza-version 2>/dev/null || echo "0.9.0")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Sync rhiza template
+        id: sync
+        run: |
+          set -euo pipefail
+
+          RHIZA_VERSION="${{ steps.rhiza-version.outputs.version }}"
+
+          echo "Running rhiza sync with version >=${RHIZA_VERSION}"
+          uvx "rhiza>=${RHIZA_VERSION}" sync .
+
+          if git diff --quiet; then
+            echo "No changes detected after template sync"
+            echo "changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Template changes detected"
+          echo "changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push changes
+        if: steps.sync.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global url."https://x-access-token:${{ secrets.PAT_TOKEN || github.token }}@github.com/".insteadOf "https://github.com/"
+
+          git add -A
+          git commit -m "$(cat <<'EOF'
+          chore: sync rhiza template files
+
+          Automatically synced template files after updating .rhiza/template.yml
+
+          Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          EOF
+          )"
+
+          git push

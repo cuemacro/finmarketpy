@@ -1,0 +1,7 @@
+# Development tool dependencies for rhiza
+pre-commit==4.5.1
+python-dotenv==1.2.1
+
+# for now needed until rhiza-tools is finished
+typer==0.21.1
+ty==0.0.18

@@ -1,0 +1,50 @@
+# This file is part of the jebel-quant/rhiza repository
+# (https://github.com/jebel-quant/rhiza).
+#
+# Workflow: Copilot Setup Steps
+#
+# Purpose: Preconfigure the development environment before the Copilot
+#          coding agent begins working. This ensures the agent always
+#          has a deterministic, fully working environment.
+#
+# Reference: https://docs.github.com/en/copilot/customizing-copilot/customizing-the-development-environment-for-copilot-coding-agent
+
+name: "(RHIZA) AGENT SETUP"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.0
+        with:
+          version: "0.10.7"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Install dependencies
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: make install
+
+      - name: Activate virtual environment
+        run: echo "${{ github.workspace }}/.venv/bin" >> "$GITHUB_PATH"

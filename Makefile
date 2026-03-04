@@ -1,41 +1,46 @@
-.DEFAULT_GOAL := help
+## Makefile (repo-owned)
+# Keep this file small. It can be edited without breaking template sync.
 
-venv:
-	@curl -LsSf https://astral.sh/uv/install.sh | sh
-	@uv venv --python '3.9'
-	@uv pip install --upgrade pip
+DOCFORMAT=google
+DEFAULT_AI_MODEL=claude-sonnet-4.5
+LOGO_FILE=.rhiza/assets/rhiza-logo.svg
+GH_AW_ENGINE ?= copilot  # Default AI engine for gh-aw workflows (copilot, claude, or codex)
 
-.PHONY: install
-install: venv ## Install a virtual environment
-	@uv sync -vv --frozen
+# Always include the Rhiza API (template-managed)
+include .rhiza/rhiza.mk
 
+# Optional: developer-local extensions (not committed)
+-include local.mk
 
-.PHONY: fmt
-fmt: venv ## Run autoformatting and linting
-	@uv run pre-commit install
-	@uv run pre-commit run --all-files
+## Custom targets
 
+.PHONY: adr
+adr: install-gh-aw ## Create a new Architecture Decision Record (ADR) using AI assistance
+	@echo "Creating a new ADR..."
+	@echo "This will trigger the adr-create workflow."
+	@echo ""
+	@read -p "Enter ADR title (e.g., 'Use PostgreSQL for data storage'): " title; \
+	echo ""; \
+	read -p "Enter brief context (optional, press Enter to skip): " context; \
+	echo ""; \
+	if [ -z "$$title" ]; then \
+		echo "Error: Title is required"; \
+		exit 1; \
+	fi; \
+	if [ -z "$$context" ]; then \
+		gh workflow run adr-create.md -f title="$$title"; \
+	else \
+		gh workflow run adr-create.md -f title="$$title" -f context="$$context"; \
+	fi; \
+	echo ""; \
+	echo "✅ ADR creation workflow triggered!"; \
+	echo ""; \
+	echo "The workflow will:"; \
+	echo "  1. Generate the next ADR number"; \
+	echo "  2. Create a comprehensive ADR document"; \
+	echo "  3. Update the ADR index"; \
+	echo "  4. Open a pull request for review"; \
+	echo ""; \
+	echo "Check workflow status: gh run list --workflow=adr-create.md"; \
+	echo "View latest run: gh run view"
 
-.PHONY: clean
-clean:  ## Clean up caches and build artifacts
-	@git clean -X -d -f
-
-
-.PHONY: help
-help:  ## Display this help screen
-	@echo -e "\033[1mAvailable commands:\033[0m"
-	@grep -E '^[a-z.A-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' | sort
-
-
-.PHONY: marimo
-marimo: install ## Install Marimo
-	@uv run marimo edit notebooks
-
-
-.PHONY: test
-test: install  ## Run pytests
-	@uv run pytest tests
-
-.PHONY: deptry
-deptry: install   ## Run deptry
-	@uv run deptry 'finmarketpy'

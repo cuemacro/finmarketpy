@@ -1,0 +1,3 @@
+# Documentation dependencies for rhiza
+pdoc>=16.0.0
+interrogate>=1.7.0

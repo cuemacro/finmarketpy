@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/session-start.sh",
+        "cwd": ".",
+        "timeoutSec": 30
+      }
+    ],
+    "sessionEnd": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/session-end.sh",
+        "cwd": ".",
+        "timeoutSec": 120
+      }
+    ]
+  }
+}

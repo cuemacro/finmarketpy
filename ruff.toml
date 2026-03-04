@@ -1,0 +1,130 @@
+# This file is part of the jebel-quant/rhiza repository
+# (https://github.com/jebel-quant/rhiza).
+#
+# Maximum line length for the entire project
+line-length = 120
+# Target Python version
+target-version = "py311"
+
+# Exclude directories with Jinja template variables in their names
+exclude = ["**/[{][{]*/", "**/*[}][}]*/"]
+
+[lint]
+# Available rule sets in Ruff:
+# A: flake8-builtins - Check for python builtins being used as variables or parameters
+# B: flake8-bugbear - Find likely bugs and design problems
+# C4: flake8-comprehensions - Helps write better list/set/dict comprehensions
+# D: pydocstyle - Check docstring style
+# E: pycodestyle errors - PEP 8 style guide
+# ERA: eradicate - Find commented out code
+# F: pyflakes - Detect logical errors
+# I: isort - Sort imports
+# N: pep8-naming - Check PEP 8 naming conventions
+# PT: flake8-pytest-style - Check pytest best practices
+# RUF: Ruff-specific rules
+# S: flake8-bandit - Find security issues
+# SIM: flake8-simplify - Simplify code
+# T10: flake8-debugger - Check for debugger imports and calls
+# UP: pyupgrade - Upgrade syntax for newer Python
+# W: pycodestyle warnings - PEP 8 style guide warnings
+# ANN: flake8-annotations - Type annotation checks
+# ARG: flake8-unused-arguments - Unused arguments
+# BLE: flake8-blind-except - Check for blind except statements
+# COM: flake8-commas - Trailing comma enforcement
+# DTZ: flake8-datetimez - Ensure timezone-aware datetime objects
+# EM: flake8-errmsg - Check error message strings
+# FBT: flake8-boolean-trap - Boolean argument checks
+# ICN: flake8-import-conventions - Import convention enforcement
+# ISC: flake8-implicit-str-concat - Implicit string concatenation
+# NPY: NumPy-specific rules
+# PD: pandas-specific rules
+# PGH: pygrep-hooks - Grep-based checks
+# PIE: flake8-pie - Miscellaneous rules
+# PL: Pylint rules
+# Q: flake8-quotes - Quotation style enforcement
+# RSE: flake8-raise - Raise statement checks
+# RET: flake8-return - Return statement checks
+# SLF: flake8-self - Check for self references
+# TCH: flake8-type-checking - Type checking imports
+# TID: flake8-tidy-imports - Import tidying
+# TRY: flake8-try-except-raise - Try/except/raise checks
+# YTT: flake8-2020 - Python 2020+ compatibility
+
+select = [
+    "D",   # pydocstyle - Check docstring style
+    "E",   # pycodestyle errors - PEP 8 style guide
+    "F",   # pyflakes - Detect logical errors
+    "I",   # isort - Sort imports
+    "N",   # pep8-naming - Check PEP 8 naming conventions
+    "W",   # pycodestyle warnings - PEP 8 style guide warnings
+    "UP",  # pyupgrade - Upgrade syntax for newer Python
+]
+
+# Ensure docstrings are required for magic methods (e.g., __init__) and
+# private/underscored modules by explicitly selecting the relevant pydocstyle
+# rules in addition to the D set. This makes the intent clear and future-proof
+# if the default pydocstyle selection changes.
+extend-select = [
+    "D105",  # pydocstyle - Require docstrings for magic methods
+    "D107",  # pydocstyle - Require docstrings for __init__
+    "B",     # flake8-bugbear - Find likely bugs and design problems
+    "C4",    # flake8-comprehensions - Better list/set/dict comprehensions
+    "SIM",   # flake8-simplify - Simplify code
+    "PT",    # flake8-pytest-style - Check pytest best practices
+    "RUF",   # Ruff-specific rules
+    "S",     # flake8-bandit - Find security issues
+    #"ERA",   # eradicate - Find commented out code
+    #"T10",   # flake8-debugger - Check for debugger imports and calls
+    "TRY",   # flake8-try-except-raise - Try/except/raise checks
+    "ICN",   # flake8-import-conventions - Import convention enforcement
+    #"PIE",   # flake8-pie - Miscellaneous rules
+    #"PL",    # Pylint rules
+]
+
+# Resolve incompatible pydocstyle rules: prefer D211 and D212 over D203 and D213
+ignore = [
+    "D203",  # one-blank-line-before-class (conflicts with D211)
+    "D213",  # multi-line-summary-second-line (conflicts with D212)
+]
+
+[lint.pydocstyle]
+convention = "google"
+
+# Formatting configuration
+[format]
+# Use double quotes for strings
+quote-style = "double"
+# Use spaces for indentation
+indent-style = "space"
+# Automatically detect and use the appropriate line ending
+line-ending = "auto"
+
+# File-specific rule exceptions
+[lint.per-file-ignores]
+# Test files - allow assert statements and subprocess calls for testing
+"**/tests/**/*.py" = [
+    "S101",     # Allow assert statements in tests
+    "S603",     # Allow subprocess calls without shell=False check
+    "S607",     # Allow starting processes with partial paths in tests
+    "PLW1510",  # Allow subprocess without explicit check parameter
+]
+"tests/**/*.py" = [
+    "ERA001",   # Allow commented out code in project tests
+    "PLR2004",  # Allow magic values in project tests
+    "RUF002",   # Allow ambiguous unicode in project tests
+    "RUF012",   # Allow mutable class attributes in project tests
+]
+# Marimo notebooks - allow flexible coding patterns for interactive exploration
+"**/marimo/**/*.py" = [
+    "N803",    # Allow non-lowercase variable names in notebooks
+    "S101",    # Allow assert statements in notebooks
+    "PLC0415", # Allow imports not at top-level in notebooks
+    "B018",    # Allow useless expressions in notebooks
+    "RUF001",  # Allow ambiguous unicode in notebooks
+    "RUF002",  # Allow ambiguous unicode in notebooks
+]
+# Internal utility scripts - specific exceptions for internal tooling
+".rhiza/utils/*.py" = [
+    "PLW2901",  # Allow loop variable overwriting in utility scripts
+    "TRY003",   # Allow long exception messages in utility scripts
+]

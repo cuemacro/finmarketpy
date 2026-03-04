@@ -1,21 +1,50 @@
+### Python template
+.idea
+.venv
+.ruff_cache
+.ty_cache
+
+### Don't expose API keys, etc.
+.env
+
+__marimo__
+
+_tests
+_book
+_pdoc
+_marimushka
+_mkdocs
+_benchmarks
+_jupyter
+_site
+
+# temp file used by Junie
+.output.txt
+
+# folder used for programs, e.g. uv, uvx, task, etc.
+bin
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-.venv
+*$py.class
+
+# Generated presentation files
+presentation.html
+presentation.pdf
+*.pptx
 
 # C extensions
 *.so
 
-# Credentials files
-*cred.py
+# .DS_Store
+.DS_Store
 
 # Distribution / packaging
-.idea/
 .Python
-env/
 build/
 develop-eggs/
-dist*/
+dist/
 downloads/
 eggs/
 .eggs/
@@ -24,20 +53,12 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-output_data
-output_files
-dash/
-dash-master/
-scrap/
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+MANIFEST
 
 # Installer logs
 pip-log.txt
@@ -46,12 +67,22 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+coverage.json
+*.cover
+*.py,cover
+.hypothesis/
+.benchmarks/
+.pytest_cache/
+cover/
+
+# Security scanning baselines (regenerate as needed)
+.bandit-baseline.json
 
 # Translations
 *.mo
@@ -59,11 +90,19 @@ coverage.xml
 
 # Django stuff:
 *.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
-# Sphinx documentation
-docs/_build/
+# Flask stuff:
+instance/
+.webassets-cache
 
-# PyBuilder
-target/
+# Cython debug symbols
+cython_debug/
 
-# Output Files
+# Makefile
+local.mk
+
+.bandit-baseline.json
+

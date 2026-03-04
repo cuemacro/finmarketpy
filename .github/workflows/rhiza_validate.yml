@@ -1,0 +1,42 @@
+name: (RHIZA) VALIDATE
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.0
+        with:
+          version: "0.10.7"
+          
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Validate Rhiza config
+        # don't run this in rhiza itself. Rhiza has no template.yml file.
+        if: ${{ github.repository != 'jebel-quant/rhiza' }}
+        shell: bash
+        run: |
+          uvx "rhiza>=0.8.0" validate .
+        
+      - name: Run Rhiza Tests
+        shell: bash
+        run: |
+          make rhiza-test

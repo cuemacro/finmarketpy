@@ -1,0 +1,454 @@
+# This file is part of the jebel-quant/rhiza repository
+# (https://github.com/jebel-quant/rhiza).
+#
+# Release Workflow for Python Packages with Optional Devcontainer Publishing
+#
+# This workflow implements a secure, maintainable release pipeline with distinct phases:
+#
+# 📋 Pipeline Phases:
+#   1. 🔍 Validate Tag - Check tag format and ensure release doesn't already exist
+#   2. 🏗️ Build - Build Python package with Hatch (if [build-system] is defined in pyproject.toml)
+#   3. 📦 Generate SBOM - Create Software Bill of Materials (CycloneDX format)
+#   4. 📝 Draft Release - Create draft GitHub release with build artifacts and SBOM
+#   5. 🚀 Publish to PyPI - Publish package using OIDC or custom feed
+#   6. 🐳 Publish Devcontainer - Build and publish devcontainer image (conditional)
+#   7. ✅ Finalize Release - Publish the GitHub release with links
+#
+# 📦 SBOM Generation:
+#   - Generated using CycloneDX format (industry standard for software supply chain security)
+#   - Creates both JSON and XML formats for maximum compatibility
+#   - SBOM attestations are created and stored (public repos only)
+#   - Attached to GitHub releases for transparency and compliance
+#   - Skipped if pyproject.toml doesn't exist
+#
+# 🐳 Devcontainer Publishing:
+#   - Only occurs when PUBLISH_DEVCONTAINER repository variable is set to "true"
+#   - Requires .devcontainer directory to exist
+#   - Uses the release tag (e.g., v1.2.3) as the image tag
+#   - Image name: {registry}/{owner}/{repository}/devcontainer
+#   - Registry defaults to ghcr.io (override with DEVCONTAINER_REGISTRY variable)
+#   - Config file: Always .devcontainer/devcontainer.json
+#   - Adds devcontainer image link to GitHub release notes
+#
+# 🚀 PyPI Publishing:
+#   - Skipped if no dist/ artifacts exist
+#   - Skipped if pyproject.toml contains "Private :: Do Not Upload"
+#   - Uses Trusted Publishing (OIDC) for PyPI (no stored credentials)
+#   - For custom feeds, use PYPI_REPOSITORY_URL and PYPI_TOKEN secrets
+#   - Adds PyPI/custom feed link to GitHub release notes
+#
+# 🔐 Security:
+#   - No PyPI credentials stored; relies on Trusted Publishing via GitHub OIDC
+#   - For custom feeds, PYPI_TOKEN secret is used with default username __token__
+#   - Container registry uses GITHUB_TOKEN for authentication
+#   - SLSA provenance attestations generated for build artifacts (public repos only)
+#   - SBOM attestations generated for supply chain transparency (public repos only)
+#
+# 📄 Requirements:
+#   - pyproject.toml with top-level version field (for Python packages)
+#   - Package registered on PyPI as Trusted Publisher (for PyPI publishing)
+#   - PUBLISH_DEVCONTAINER variable set to "true" (for devcontainer publishing)
+#   - .devcontainer/devcontainer.json file (for devcontainer publishing)
+#
+# ✅ To Trigger:
+#   Create and push a version tag:
+#     git tag v1.2.3
+#     git push origin v1.2.3
+#
+# 🎯 For repos without Python packages:
+#   The workflow gracefully skips Python-related steps if pyproject.toml doesn't exist.
+#
+# 🎯 For repos without devcontainers:
+#   The workflow gracefully skips devcontainer steps if PUBLISH_DEVCONTAINER is not
+#   set to "true" or .devcontainer directory doesn't exist.
+
+
+name: (RHIZA) RELEASE
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write       # Needed to create releases
+  id-token: write       # Needed for OIDC authentication with PyPI
+  packages: write       # Needed to publish devcontainer image
+  attestations: write   # Needed for SLSA provenance attestations (public repos only)
+
+jobs:
+  tag:
+    name: Validate Tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Set Tag Variable
+        id: set_tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.set_tag.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            DRAFT_STATUS=$(gh release view "$TAG" --json isDraft --jq '.isDraft')
+            if [ "$DRAFT_STATUS" != "true" ]; then
+              echo "::error::Release '$TAG' already exists and is not a draft. Please use a new tag."
+              exit 1
+            else
+              echo "::warning::Release '$TAG' exists as a draft. Will proceed to update it."
+            fi
+          fi
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: tag
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.0
+        with:
+          version: "0.10.7"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Verify version matches tag
+        if: hashFiles('pyproject.toml') != ''
+        run: |
+          TAG_VERSION="${{ needs.tag.outputs.tag }}"
+          TAG_VERSION=${TAG_VERSION#v}
+          PROJECT_VERSION=$(uv version --short)
+
+          # Normalize tag version to PEP 440 format for comparison.
+          # Tags use semver format (e.g., 0.11.1-beta.1) while uv version --short
+          # returns PEP 440 normalized format (e.g., 0.11.1b1).
+          NORMALIZED_TAG=$(uv run --with packaging --no-project python3 -c "from packaging.version import Version; print(Version('$TAG_VERSION'))")
+
+          if [[ "$PROJECT_VERSION" != "$NORMALIZED_TAG" ]]; then
+            echo "::error::Version mismatch: pyproject.toml has '$PROJECT_VERSION' but tag is '$NORMALIZED_TAG' (from tag '$TAG_VERSION')"
+            exit 1
+          fi
+          echo "Version verified: $PROJECT_VERSION matches tag (normalized: $NORMALIZED_TAG)"
+
+      - name: Detect buildable Python package
+        id: buildable
+        run: |
+          if [[ -f pyproject.toml ]] && grep -q '^\[build-system\]' pyproject.toml; then
+            echo "buildable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "buildable=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        if: steps.buildable.outputs.buildable == 'true'
+        run: |
+          printf "[INFO] Building package...\n"
+          uv build
+
+      - name: Install Python for SBOM generation
+        if: hashFiles('pyproject.toml') != ''
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version-file: .python-version
+
+      - name: Sync environment for SBOM generation
+        if: hashFiles('pyproject.toml') != ''
+        run: |
+          export UV_EXTRA_INDEX_URL="${{ secrets.UV_EXTRA_INDEX_URL }}"
+          uv sync --all-extras --all-groups --frozen
+
+      - name: Generate SBOM (CycloneDX)
+        if: hashFiles('pyproject.toml') != ''
+        run: |
+          printf "[INFO] Generating SBOM in CycloneDX format...\n"
+          # Note: uvx caches the tool environment, so the second call is fast
+          uvx --from 'cyclonedx-bom>=7.0.0' cyclonedx-py environment --pyproject pyproject.toml --of JSON -o sbom.cdx.json
+          uvx --from 'cyclonedx-bom>=7.0.0' cyclonedx-py environment --pyproject pyproject.toml --of XML -o sbom.cdx.xml
+          printf "[INFO] SBOM generation complete\n"
+          printf "Generated files:\n"
+          ls -lh sbom.cdx.*
+
+      - name: Attest SBOM
+        # Attest only the JSON format as it's the canonical machine-readable format.
+        # The XML format is provided for compatibility but doesn't need separate attestation.
+        if: hashFiles('pyproject.toml') != '' && github.event.repository.private == false
+        uses: actions/attest-sbom@v4
+        with:
+          subject-path: sbom.cdx.json
+          sbom-path: sbom.cdx.json
+
+      - name: Upload SBOM artifacts
+        if: hashFiles('pyproject.toml') != ''
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: sbom
+          path: |
+            sbom.cdx.json
+            sbom.cdx.xml
+
+      - name: Generate SLSA provenance attestations
+        if: steps.buildable.outputs.buildable == 'true' && github.event.repository.private == false
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*
+
+      - name: Upload dist artifact
+        if: steps.buildable.outputs.buildable == 'true'
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: dist
+          path: dist
+
+  # Don't try to upload artifacts to GitHub Release at all
+  draft-release:
+    name: Draft GitHub Release
+    runs-on: ubuntu-latest
+    needs: [tag, build]
+
+    steps:
+      - name: Download SBOM artifact
+        # Downloads sbom.cdx.json and sbom.cdx.xml into sbom/ directory
+        uses: actions/download-artifact@v8.0.0
+        with:
+          name: sbom
+          path: sbom
+        continue-on-error: true
+
+      - name: Create GitHub Release with artifacts
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: ${{ needs.tag.outputs.tag }}
+          name: ${{ needs.tag.outputs.tag }}
+          generate_release_notes: true
+          draft: true
+          files: |
+            sbom/*
+
+  # Decide at step-level whether to publish
+  pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    environment: release
+    needs: [tag, build, draft-release]
+    outputs:
+      should_publish: ${{ steps.check_dist.outputs.should_publish }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v8.0.0
+        with:
+          name: dist
+          path: dist
+        # Continue if dist folder is not found. Don't fail the job.
+        continue-on-error: true
+
+      - name: Check if dist contains artifacts and not marked as private
+        id: check_dist
+        run: |
+          if [[ ! -d dist ]]; then
+            echo "::warning::No folder dist/. Skipping PyPI publish."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            if grep -R "Private :: Do Not Upload" pyproject.toml; then
+              echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+          cat "$GITHUB_OUTPUT"
+
+      # this should not take place, as "Private :: Do Not Upload" set in pyproject.toml
+      # repository-url and password only used for custom feeds, not for PyPI with OIDC
+      - name: Publish to PyPI
+        if: ${{ steps.check_dist.outputs.should_publish == 'true' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: true
+          repository-url: ${{ vars.PYPI_REPOSITORY_URL }}
+          password: ${{ secrets.PYPI_TOKEN }}
+
+  devcontainer:
+    name: Publish Devcontainer Image
+    runs-on: ubuntu-latest
+    environment: release
+    needs: [tag, build, draft-release]
+    outputs:
+      should_publish: ${{ steps.check_publish.outputs.should_publish }}
+      image_name: ${{ steps.image_name.outputs.image_name }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Check if devcontainer should be published
+        id: check_publish
+        env:
+          PUBLISH_DEVCONTAINER: ${{ vars.PUBLISH_DEVCONTAINER }}
+        run: |
+          if [[ "$PUBLISH_DEVCONTAINER" == "true" ]] && [[ -d ".devcontainer" ]]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            echo "🚀 Will build and publish devcontainer image"
+          else
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            echo "⏭️  Skipping devcontainer publish (PUBLISH_DEVCONTAINER not true or .devcontainer missing)"
+          fi
+
+      - name: Set registry
+        if: steps.check_publish.outputs.should_publish == 'true'
+        id: registry
+        run: |
+          REGISTRY="${{ vars.DEVCONTAINER_REGISTRY }}"
+          if [ -z "$REGISTRY" ]; then
+            REGISTRY="ghcr.io"
+          fi
+          echo "registry=$REGISTRY" >> "$GITHUB_OUTPUT"
+
+      - name: Login to Container Registry
+        if: steps.check_publish.outputs.should_publish == 'true'
+        uses: docker/login-action@v3.7.0
+        with:
+          registry: ${{ steps.registry.outputs.registry }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get lowercase repository owner
+        if: steps.check_publish.outputs.should_publish == 'true'
+        id: repo_owner
+        run: echo "owner_lc=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Get Image Name
+        if: steps.check_publish.outputs.should_publish == 'true'
+        id: image_name
+        run: |
+          # Check if custom name is provided, otherwise use default
+          if [ -z "${{ vars.DEVCONTAINER_IMAGE_NAME }}" ]; then
+            REPO_NAME_LC=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+            # Sanitize repo name: replace invalid characters with hyphens
+            # Docker image names must match [a-z0-9]+([._-][a-z0-9]+)*
+            # Replace leading dots and multiple consecutive separators
+            REPO_NAME_SANITIZED=$(echo "$REPO_NAME_LC" | sed 's/^[._-]*//; s/[._-][._-]*/-/g')
+            IMAGE_NAME="$REPO_NAME_SANITIZED/devcontainer"
+            echo "Using default image name component: $IMAGE_NAME"
+          else
+            IMAGE_NAME="${{ vars.DEVCONTAINER_IMAGE_NAME }}"
+            echo "Using custom image name component: $IMAGE_NAME"
+          fi
+
+          # Validate the image component matches [a-z0-9]+([._-][a-z0-9]+)* with optional / separators
+          if ! echo "$IMAGE_NAME" | grep -qE '^[a-z0-9]+([._-][a-z0-9]+)*(/[a-z0-9]+([._-][a-z0-9]+)*)*$'; then
+            echo "::error::Invalid image name component: $IMAGE_NAME"
+            echo "::error::Each component must match [a-z0-9]+([._-][a-z0-9]+)* separated by /"
+            exit 1
+          fi
+
+          IMAGE_NAME="${{ steps.registry.outputs.registry }}/${{ steps.repo_owner.outputs.owner_lc }}/$IMAGE_NAME"
+          echo "✅ Final image name: $IMAGE_NAME"
+          echo "image_name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build and Publish Devcontainer Image
+        if: steps.check_publish.outputs.should_publish == 'true'
+        uses: devcontainers/ci@v0.3
+        with:
+          configFile: .devcontainer/devcontainer.json
+          push: always
+          imageName: ${{ steps.image_name.outputs.image_name }}
+          imageTag: ${{ needs.tag.outputs.tag }}
+
+  finalise-release:
+    name: Finalise Release
+    runs-on: ubuntu-latest
+    needs: [tag, pypi, devcontainer]
+    if: needs.pypi.result == 'success' || needs.devcontainer.result == 'success'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.0
+        with:
+          version: "0.10.7"
+
+      - name: "Sync the virtual environment for ${{ github.repository }}"
+        shell: bash
+        run: |
+          export UV_EXTRA_INDEX_URL="${{ secrets.uv_extra_index_url }}"
+          # will just use .python-version?
+          uv sync --all-extras --all-groups --frozen
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+
+      - name: Generate Devcontainer Link
+        id: devcontainer_link
+        if: needs.devcontainer.outputs.should_publish == 'true' && needs.devcontainer.result == 'success'
+        run: |
+          FULL_IMAGE="${{ needs.devcontainer.outputs.image_name }}:${{ needs.tag.outputs.tag }}"
+          {
+            echo "message<<EOF"
+            echo "### Devcontainer Image"
+            echo ""
+            echo "\`$FULL_IMAGE\`"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Generate PyPI Link
+        id: pypi_link
+        if: needs.pypi.outputs.should_publish == 'true' && needs.pypi.result == 'success'
+        run: |
+          PACKAGE_NAME=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['name'])")
+          VERSION="${{ needs.tag.outputs.tag }}"
+          VERSION=${VERSION#v}
+
+          REPO_URL="${{ vars.PYPI_REPOSITORY_URL || '' }}"
+          if [ -z "$REPO_URL" ]; then
+             LINK="https://pypi.org/project/$PACKAGE_NAME/$VERSION/"
+             NAME="PyPI Package"
+          else
+             LINK="$REPO_URL"
+             NAME="Custom Feed Package"
+          fi
+
+          {
+            echo "message<<EOF"
+            echo "### $NAME"
+            echo ""
+            echo "[$PACKAGE_NAME]($LINK)"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: ${{ needs.tag.outputs.tag }}
+          draft: false
+          append_body: true
+          body: |
+            ${{ steps.devcontainer_link.outputs.message }}
+            ${{ steps.pypi_link.outputs.message }}
+

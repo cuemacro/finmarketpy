@@ -1,0 +1,100 @@
+name: (RHIZA) SYNC
+# This workflow synchronizes the repository with its template.
+# IMPORTANT: When workflow files (.github/workflows/rhiza_*.yml) are modified,
+# a Personal Access Token (PAT) with 'workflow' scope is required.
+# The PAT_TOKEN secret must be set in repository secrets.
+# See .github/rhiza/TOKEN_SETUP.md for setup instructions.
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      create-pr:
+        description: "Create a pull request"
+        type: boolean
+        default: true
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday
+
+jobs:
+  sync:
+    if: ${{ github.repository != 'jebel-quant/rhiza' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.PAT_TOKEN || github.token }}
+          fetch-depth: 0
+
+      - name: Define sync branch name
+        id: branch
+        run: |
+          echo "name=rhiza/${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check PAT_TOKEN configuration
+        shell: bash
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          if [ -z "$PAT_TOKEN" ]; then
+            echo "::warning::PAT_TOKEN secret is not configured."
+            echo "::warning::If this sync modifies workflow files, the push will fail."
+            echo "::warning::See .github/TOKEN_SETUP.md for setup instructions."
+          else
+            echo "✓ PAT_TOKEN is configured."
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.3.0
+
+      - name: Get Rhiza version
+        id: rhiza-version
+        run: |
+          VERSION=$(cat .rhiza/.rhiza-version 2>/dev/null || echo "0.9.0")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Sync template
+        id: sync
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          RHIZA_VERSION="${{ steps.rhiza-version.outputs.version }}"
+
+          uvx "rhiza>=${RHIZA_VERSION}" sync .
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "changes_detected=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "changes_detected=true" >> "$GITHUB_OUTPUT"
+
+          # Generate PR description based on staged changes
+          uvx "rhiza>=${RHIZA_VERSION}" summarise --output "${RUNNER_TEMP}/pr-description.md"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global url."https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+          git commit -m "chore: Update via rhiza"
+          
+      - name: Create pull request
+        if: >
+          (github.event_name == 'schedule' || inputs.create-pr == true)
+          && steps.sync.outputs.changes_detected == 'true'
+        uses: peter-evans/create-pull-request@v8.1.0
+        with:
+          token: ${{ secrets.PAT_TOKEN || github.token }}
+          base: ${{ github.event.repository.default_branch }}
+          branch: ${{ steps.branch.outputs.name }}
+          delete-branch: true
+          title: "chore: Sync with rhiza"
+          body-path: ${{ runner.temp }}/pr-description.md

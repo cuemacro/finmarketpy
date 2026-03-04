@@ -4,10 +4,7 @@ permissions:
   contents: read
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  push
 
 jobs:
   validation:

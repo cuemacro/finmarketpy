@@ -1,3 +1,5 @@
+"""Module for FX volatility surface construction and interpolation."""
+
 __author__ = "saeedamen"
 
 #
@@ -16,11 +18,13 @@ __author__ = "saeedamen"
 #
 
 
+import contextlib
+
 import numpy as np
 import pandas as pd
 
 # FinancePy is an optional dependency
-try:
+with contextlib.suppress(Exception):
     from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
     from financepy.market.volatility.fx_vol_surface_plus import (
         FinFXATMMethod,
@@ -33,10 +37,6 @@ try:
     )
     from financepy.utils.date import Date
     from financepy.utils.global_types import FinSolverTypes
-except:
-    pass
-
-import contextlib
 
 from findatapy.util.dataconstants import DataConstants
 
@@ -49,9 +49,9 @@ market_constants = MarketConstants()
 
 
 class FXVolSurface(AbstractVolSurface):
-    """Holds data for an FX vol surface and also interpolates vol surface,
-    converts strikes to implied vols etc.
+    """Hold data for an FX vol surface and interpolate it.
 
+    Also converts strikes to implied vols etc.
     """
 
     def __init__(
@@ -184,9 +184,10 @@ class FXVolSurface(AbstractVolSurface):
         self._tol = tol
 
     def build_vol_surface(self, value_date):
-        """Builds the implied volatility surface for a particular value date and calculates the benchmark strikes etc.
+        """Build the implied volatility surface for a particular value date.
 
-        Before we do any sort of interpolation later, we need to build the implied_vol vol surface.
+        Calculates benchmark strikes etc. Before we do any sort of interpolation
+        later, we need to build the implied vol surface.
 
         Parameters
         ----------
@@ -243,9 +244,10 @@ class FXVolSurface(AbstractVolSurface):
             tol=self._tol,
         )  # TODO add tol
 
-    def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor="1M"):
-        """Calculates the implied_vol volatility for a given strike and tenor (or expiry date, if specified). The
-        expiry date/broken dates are interpolated linearly in variance space.
+    def calculate_vol_for_strike_expiry(self, K, expiry_date=None, tenor="1M"):  # noqa: N803
+        """Calculate implied volatility for a given strike and tenor.
+
+        Expiry date/broken dates are interpolated linearly in variance space.
 
         Parameters
         ----------
@@ -268,20 +270,19 @@ class FXVolSurface(AbstractVolSurface):
             expiry_date = self._findate(self._market_util.parse_date(expiry_date))
             try:
                 return self._fin_fx_vol_surface.vol_from_strike_dt(K, expiry_date)
-            except:
+            except Exception:
                 return self._fin_fx_vol_surface.volatility_from_strike_date(K, expiry_date)
         else:
-            try:
+            with contextlib.suppress(Exception):
                 tenor_index = self._get_tenor_index(tenor)
                 return self.get_vol_from_quoted_tenor(K, tenor_index)
-            except:
-                pass
 
         return None
 
     def calculate_vol_for_delta_expiry(self, delta_call, expiry_date=None):
-        """Calculates the implied_vol volatility for a given delta call and expiry date. The
-        expiry date/broken dates are interpolated linearly in variance space.
+        """Calculate implied volatility for a given delta call and expiry date.
+
+        Expiry date/broken dates are interpolated linearly in variance space.
 
         Parameters
         ----------
@@ -301,10 +302,11 @@ class FXVolSurface(AbstractVolSurface):
 
         return None
 
-    def extract_vol_surface(self, num_strike_intervals=60, low_K_pc=0.95, high_K_pc=1.05):
-        """Creates an interpolated implied vol surface which can be plotted
-        (in strike space), and also in delta space for key strikes (ATM, 25d
-        call and put). Also for key strikes converts from delta to strike space.
+    def extract_vol_surface(self, num_strike_intervals=60, low_K_pc=0.95, high_K_pc=1.05):  # noqa: N803
+        """Create an interpolated implied vol surface for plotting.
+
+        Interpolates in strike space and delta space for key strikes (ATM, 25d call and put).
+        Also for key strikes converts from delta to strike space.
 
         Parameters
         ----------
@@ -345,8 +347,8 @@ class FXVolSurface(AbstractVolSurface):
         ]
 
         # Get max/min strikes to interpolate (from the longest dated tenor)
-        low_K = self._fin_fx_vol_surface.k_25d_p[-1] * low_K_pc
-        high_K = self._fin_fx_vol_surface.k_25d_c[-1] * high_K_pc
+        low_K = self._fin_fx_vol_surface.k_25d_p[-1] * low_K_pc  # noqa: N806
+        high_K = self._fin_fx_vol_surface.k_25d_c[-1] * high_K_pc  # noqa: N806
 
         if num_strike_intervals is not None:
             # In case using old version of FinancePy
@@ -374,14 +376,14 @@ class FXVolSurface(AbstractVolSurface):
             vols = []
 
             if num_strike_intervals is not None:
-                K = low_K
-                dK = (high_K - low_K) / num_strike_intervals
+                K = low_K  # noqa: N806
+                dK = (high_K - low_K) / num_strike_intervals  # noqa: N806
 
                 for _i in range(0, num_strike_intervals):
                     sigma = self.get_vol_from_quoted_tenor(K, tenor_index) * 100.0
                     strikes.append(K)
                     vols.append(sigma)
-                    K = K + dK
+                    K = K + dK  # noqa: N806
 
                 df_vol_surface_strike_space[tenor_label] = pd.Series(index=strikes, data=vols)
 
@@ -405,10 +407,10 @@ class FXVolSurface(AbstractVolSurface):
 
             df_deltas_vs_strikes[tenor_label] = pd.Series(index=key_strikes_names, data=key_strikes)
 
-            # Put a conversion between quoted deltas and strikes (eg. which is ATM in strike space, 25d call/put strikes)
+            # Put a conversion between quoted deltas and strikes (eg. ATM in strike space, 25d call/put strikes)
             key_vols = []
 
-            for K, _name in zip(key_strikes, key_strikes_names, strict=False):
+            for K, _name in zip(key_strikes, key_strikes_names, strict=False):  # noqa: N806
                 sigma = self.get_vol_from_quoted_tenor(K, tenor_index) * 100.0
                 key_vols.append(sigma)
 
@@ -428,8 +430,8 @@ class FXVolSurface(AbstractVolSurface):
 
         return df_vol_dict
 
-    def get_vol_from_quoted_tenor(self, K, tenor, gaps=None):
-
+    def get_vol_from_quoted_tenor(self, K, tenor, gaps=None):  # noqa: N803
+        """Return the interpolated vol for a given strike and tenor."""
         tenor_index = self._get_tenor_index(tenor) if not isinstance(tenor, int) else tenor
 
         if gaps is None:
@@ -442,7 +444,7 @@ class FXVolSurface(AbstractVolSurface):
         return vol_function(self._vol_function_type.value, params, np.array([K]), gaps, f, K, t)
 
     def get_vol_strike_from_delta_tenor(self, call_delta, tenor=None, expiry_date=None):
-
+        """Return the vol and strike for a given delta and tenor."""
         if tenor is not None:
             tenor_index = self._get_tenor_index(tenor) if not isinstance(tenor, int) else tenor
 
@@ -451,42 +453,55 @@ class FXVolSurface(AbstractVolSurface):
         return self._fin_fx_vol_surface.volatilityFromDeltaDate(call_delta, expiryDate=expiry_date)
 
     def get_atm_method(self):
+        """Return the ATM method used in the vol surface."""
         return self._atm_method
 
     def get_delta_method(self):
+        """Return the delta method used in the vol surface."""
         return self._delta_method
 
     def get_all_market_data(self):
+        """Return all market data used in the vol surface."""
         return self._market_df
 
     def get_spot(self):
+        """Return the spot rate."""
         return self._spot
 
     def get_atm_strike(self, tenor=None):
+        """Return the ATM strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["ATM"]
 
     def get_25d_call_strike(self, tenor=None):
+        """Return the 25-delta call strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_25D_C"]
 
     def get_25d_put_strike(self, tenor=None):
+        """Return the 25-delta put strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_25D_P"]
 
     def get_10d_call_strike(self, tenor=None):
+        """Return the 10-delta call strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_10D_C"]
 
     def get_10d_put_strike(self, tenor=None):
+        """Return the 10-delta put strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_10D_P"]
 
     def get_25d_call_ms_strike(self, tenor=None):
+        """Return the 25-delta call market strangle strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_25D_C_MS"]
 
     def get_25d_put_ms_strike(self, tenor=None):
+        """Return the 25-delta put market strangle strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_25D_P_MS"]
 
     def get_10d_call_ms_strike(self, expiry_date=None, tenor=None):
+        """Return the 10-delta call market strangle strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_10D_C_MS"]
 
     def get_10d_put_ms_strike(self, expiry_date=None, tenor=None):
+        """Return the 10-delta put market strangle strike for a given tenor."""
         return self._df_vol_dict["deltas_vs_strikes"][tenor]["K_10D_P_MS"]
 
     def get_atm_quoted_vol(self, tenor):
@@ -504,39 +519,51 @@ class FXVolSurface(AbstractVolSurface):
         return self._atm_vols[self._market_df.index == self._value_date][0][self._get_tenor_index(tenor)]
 
     def get_atm_vol(self, tenor=None):
+        """Return the ATM vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["ATM"]
 
     def get_25d_call_vol(self, tenor=None):
+        """Return the 25-delta call vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_25D_C"]
 
     def get_25d_put_vol(self, tenor=None):
+        """Return the 25-delta put vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_25D_P"]
 
     def get_25d_call_ms_vol(self, tenor=None):
+        """Return the 25-delta call market strangle vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_25D_C_MS"]
 
     def get_25d_put_ms_vol(self, tenor=None):
+        """Return the 25-delta put market strangle vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_25D_P_MS"]
 
     def get_10d_call_vol(self, tenor=None):
+        """Return the 10-delta call vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_10D_C"]
 
     def get_10d_put_vol(self, tenor=None):
+        """Return the 10-delta put vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_10D_P"]
 
     def get_10d_call_ms_vol(self, tenor=None):
+        """Return the 10-delta call market strangle vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_10D_C_MS"]
 
     def get_10d_put_ms_vol(self, tenor=None):
+        """Return the 10-delta put market strangle vol for a given tenor."""
         return self._df_vol_dict["vol_surface_delta_space"][tenor]["K_10D_P_MS"]
 
     def get_dom_discount_curve(self):
+        """Return the domestic discount curve."""
         return self._dom_discount_curve
 
     def get_for_discount_curve(self):
+        """Return the foreign discount curve."""
         return self._for_discount_curve
 
     def plot_vol_curves(self):
+        """Plot the volatility curves."""
         if self._fin_fx_vol_surface is not None:
             self._fin_fx_vol_surface.plotVolCurves()
 

@@ -1,3 +1,5 @@
+"""Module for pricing FX vanilla options using FinancePy."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -14,6 +16,8 @@ __author__ = "saeedamen"  # Saeed Amen
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import contextlib
+
 import numpy as np
 import pandas as pd
 from findatapy.timeseries import Calendar
@@ -24,13 +28,11 @@ from finmarketpy.curve.rates.fxforwardspricer import FXForwardsPricer
 from finmarketpy.util.marketconstants import MarketConstants
 
 # FinancePy is an optional dependency
-try:
+with contextlib.suppress(Exception):
     from financepy.models.black_scholes import BlackScholes
     from financepy.products.fx.fx_vanilla_option import FXVanillaOption
     from financepy.utils.date import Date
     from financepy.utils.global_types import OptionTypes
-except:
-    pass
 
 # from financepy.products.fx.FinFXMktConventions import *
 
@@ -46,7 +48,7 @@ class FXOptionsPricer(AbstractPricer):
         premium_output=market_constants.fx_options_premium_output,
         delta_output=market_constants.fx_options_delta_output,
     ):
-
+        """Initialise FXOptionsPricer with vol surface and output settings."""
         self._calendar = Calendar()
         self._fx_vol_surface = fx_vol_surface
         self._fx_forwards_pricer = FXForwardsPricer()
@@ -70,8 +72,10 @@ class FXOptionsPricer(AbstractPricer):
         use_atm_quoted=False,
         return_as_df=True,
     ):
-        """Prices FX options for horizon dates/expiry dates given by the user from FX spot rates, FX volatility surface
-        and deposit rates.
+        """Price FX options for given horizon/expiry dates.
+
+        Prices FX options for horizon dates/expiry dates given by the user from FX spot rates,
+        FX volatility surface and deposit rates.
 
         Parameters
         ----------
@@ -237,7 +241,7 @@ class FXOptionsPricer(AbstractPricer):
                 if not built_vol_surface:
                     try:
                         fx_vol_surface.build_vol_surface(horizon_date[i])
-                    except:
+                    except Exception:
                         logger.warn(
                             "Failed to build vol surface for "
                             + str(horizon_date)
@@ -245,8 +249,8 @@ class FXOptionsPricer(AbstractPricer):
                         )
                     # fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
 
-                # If an implied vol hasn't been provided, interpolate that one, fit the vol surface (if hasn't already been
-                # done)
+                # If an implied vol hasn't been provided, interpolate that one,
+                # fit the vol surface (if hasn't already been done)
                 if np.isnan(vol[i]):
                     if tenor is None:
                         vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(
@@ -368,6 +372,7 @@ class FXOptionsPricer(AbstractPricer):
         return option_values, spot, strike, vol, delta, expiry_date, intrinsic_values
 
     def get_day_count_conv(self, currency):
+        """Return the day count convention (360 or 365) for a given currency."""
         if currency in market_constants.currencies_with_365_basis:
             return 365.0
 

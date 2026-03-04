@@ -1,3 +1,5 @@
+"""Module for pricing and interpolating FX forward contracts."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -58,7 +60,7 @@ def _forwards_interpolate_numba(
             elif delivery_day >= quoted_delivery_days_arr[i, j] and delivery_day <= quoted_delivery_days_arr[i, j + 1]:
                 # Alternative interpolation
                 # interpolated_forwards_arr[i] = spot_arr[i] + \
-                #                                delivery_day * (forwards_points_arr[i, j+1] - forwards_points_arr[i, j]) \
+                #                         delivery_day * (forwards_points_arr[i, j+1] - forwards_points_arr[i, j]) \
                 #                                / (quoted_delivery_days_arr[i, j+1] - quoted_delivery_days_arr[i, j])
 
                 forward_points_per_day = (forwards_points_arr[i, j + 1] - forwards_points_arr[i, j]) / (
@@ -142,7 +144,7 @@ def _forwards_interpolate(
             elif delivery_day >= quoted_delivery_days_arr[i, j] and delivery_day <= quoted_delivery_days_arr[i, j + 1]:
                 # Alternative interpolation
                 # interpolated_forwards_arr[i] = spot_arr[i] + \
-                #                                delivery_day * (forwards_points_arr[i, j+1] - forwards_points_arr[i, j]) \
+                #                         delivery_day * (forwards_points_arr[i, j+1] - forwards_points_arr[i, j]) \
                 #                                / (quoted_delivery_days_arr[i, j+1] - quoted_delivery_days_arr[i, j])
 
                 forward_points_per_day = (forwards_points_arr[i, j + 1] - forwards_points_arr[i, j]) / (
@@ -162,14 +164,14 @@ def _forwards_interpolate(
 
 
 class FXForwardsPricer(AbstractPricer):
-    """Prices forwards for odd dates which are not quoted using linear interpolation,
-    eg. if we have forward points for 1W and 1M, and spot date but we want to price a 3W forward, or any arbitrary horizon
-    date that lies in that interval.
+    """Price FX forwards for odd dates using linear interpolation.
 
+    Prices forwards for odd dates which are not quoted using linear interpolation.
     Also calculates the implied deposit rate from FX spot, FX forward points and deposit rate.
     """
 
     def __init__(self, market_df=None, quoted_delivery_df=None):
+        """Initialise FXForwardsPricer with optional market and delivery data."""
         self._calendar = Calendar()
         self._market_df = market_df
         self._quoted_delivery_df = quoted_delivery_df
@@ -185,12 +187,10 @@ class FXForwardsPricer(AbstractPricer):
         fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
         return_as_df=True,
     ):
-        """Creates an interpolated outright FX forward (and the associated points), for horizon dates/delivery dates
-        given by the user from FX spot rates and FX forward points. This can be useful when we have an odd/broken date
-        which isn't quoted.
+        """Create an interpolated outright FX forward for given horizon/delivery dates.
 
-        Uses linear interpolation between quoted dates to calculate the appropriate interpolated forward. Eg. if we
-        ask for a delivery date in between 1W and 1M, we will interpolate between those.
+        Uses linear interpolation between quoted dates to calculate the appropriate interpolated forward.
+        Eg. if we ask for a delivery date in between 1W and 1M, we will interpolate between those.
 
         Parameters
         ----------
@@ -276,12 +276,14 @@ class FXForwardsPricer(AbstractPricer):
         return interpolated_outright_forwards_arr
 
     def get_day_count_conv(self, currency):
+        """Return the day count convention (360 or 365) for a given currency."""
         if currency in market_constants.currencies_with_365_basis:
             return 365.0
 
         return 360.0
 
     def get_forwards_divisor(self, currency):
+        """Return the forward points divisor for a given currency."""
         # Typically most divisors of forward points are 10000.0
         divisor = 10000.0
 
@@ -321,7 +323,7 @@ class FXForwardsPricer(AbstractPricer):
         return quoted_delivery_df, quoted_delivery_days_arr, forwards_points_arr, divisor
 
     def generate_quoted_delivery(self, cross, market_df, quoted_delivery_df, fx_forwards_tenor, cal):
-
+        """Generate quoted delivery dates for each forward tenor."""
         if not (isinstance(fx_forwards_tenor, list)):
             fx_forwards_tenor = [fx_forwards_tenor]
 
@@ -348,11 +350,13 @@ class FXForwardsPricer(AbstractPricer):
         fx_forwards_tenor=market_constants.fx_forwards_trading_tenor,
         depo_tenor=None,
     ):
-        """Calculates implied deposit rates for a particular currency from spot, forward points and deposit rate
-        for the other currency. Uses the theory of covered interest rate parity.
+        """Calculate implied deposit rates using covered interest rate parity.
 
-        See BIS publication from 2016, Covered interest parity lost: understanding the cross-currency basis downloadable from
-        https://www.bis.org/publ/qtrpdf/r_qt1609e.pdf for an explanation
+        Calculates implied deposit rates for a particular currency from spot, forward points
+        and deposit rate for the other currency.
+
+        See BIS publication from 2016, "Covered interest parity lost" at
+        https://www.bis.org/publ/qtrpdf/r_qt1609e.pdf for an explanation.
 
         Eg. using EURUSD spot, EURUSD 1W forward points and USDON deposit rate, we can calculate the implied deposit
         for EUR 1W

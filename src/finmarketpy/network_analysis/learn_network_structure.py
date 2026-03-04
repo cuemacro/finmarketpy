@@ -1,3 +1,5 @@
+"""Module for learning network structure from asset return time series data."""
+
 # Project: finmarketpy project
 # Filename: learn_network_structure
 # Objective: compute a network graph for a group of asset return time series
@@ -10,13 +12,16 @@ __author__ = "fs"
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations
+# under the License.
 #
 
 import numpy as np
@@ -39,7 +44,9 @@ def learn_network_structure(
     n_jobs=None,
     standardise=False,
 ):
-    """Parameters
+    """Learn graphical network structure from asset return time series.
+
+    Parameters
     ----------
     ts_returns_data : array-like of shape [n_samples, n_instruments]
                       time series matrix of returns
@@ -77,7 +84,7 @@ def learn_network_structure(
                    If int, random_state is the seed used by the random number generator.
                    If RandomState instance, random_state is the random number generator.
                    If None, the random number generator is the RandomState instance used by np.random.
-                   Used when eigen_solver == ‘arpack’
+                   Used when eigen_solver == ``arpack``
 
     n_jobs : int or None, optional
              number of parallel jobs to run
@@ -85,22 +92,12 @@ def learn_network_structure(
     standardise : bool
                   standardise data if True
 
-    Returns : sklearn.covariance.graph_lasso_.GraphicalLassoCV
-
-                 sklearn.manifold.locally_linear.LocallyLinearEmbedding
-
-                 array-like of shape [n_components, n_instruments]
-                 Transformed embedding vectors
-
-                 array-like of shape [n_instruments, 1]
-                 numeric identifier of each cluster
-
-
-
+    Returns:
     -------
+    tuple of (GraphicalLassoCV, LocallyLinearEmbedding, embedding array, labels array)
     """
     if not isinstance(ts_returns_data, (np.ndarray, np.generic)):
-        raise TypeError("ts_returns_data must be of class ndarray")
+        raise TypeError("ts_returns_data must be of class ndarray")  # noqa: TRY003
 
     # learn graphical structure
     edge_model = covariance.GraphicalLassoCV(alphas=alphas, cv=cv, mode=mode, assume_centered=assume_centered)
@@ -110,7 +107,7 @@ def learn_network_structure(
     _, labels = cluster.affinity_propagation(edge_model.covariance_)
     n_labels = labels.max()
     for i in range(n_labels + 1):
-        print("Cluster %i: %s" % ((i + 1), ", ".join(names[labels == i])))
+        print(f"Cluster {i + 1}: {', '.join(names[labels == i])}")
 
     # find low-dimension embedding - useful for 2D plane visualisation
     node_position_model = manifold.LocallyLinearEmbedding(
@@ -136,7 +133,7 @@ def learn_network_structure(
         _, labels = cluster.affinity_propagation(edge_model.covariance_)
         n_labels = labels.max()
         for i in range(n_labels + 1):
-            print("Cluster %i: %s" % ((i + 1), ", ".join(names[labels == i])))
+            print(f"Cluster {i + 1}: {', '.join(names[labels == i])}")
 
         # find low-dimension embedding - useful for 2D plane visualisation
         node_position_model = manifold.LocallyLinearEmbedding(

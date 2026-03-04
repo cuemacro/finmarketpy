@@ -1,3 +1,5 @@
+"""Module for constructing FX options curve total return indices."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -136,6 +138,7 @@ class FXOptionsCurve:
         self._output_calculation_fields = output_calculation_fields
 
     def generate_key(self):
+        """Generate a cache key for this curve instance."""
         from findatapy.market.ioengine import SpeedCache
 
         # Don't include any "large" objects in the key
@@ -165,7 +168,7 @@ class FXOptionsCurve:
         cal=None,
         output_calculation_fields=None,
     ):
-
+        """Fetch a continuous FX options time series total return index."""
         if fx_vol_surface is None:
             fx_vol_surface = self._fx_vol_surface
         if enter_trading_dates is None:
@@ -210,7 +213,7 @@ class FXOptionsCurve:
         if output_calculation_fields is None:
             output_calculation_fields = self._output_calculation_fields
 
-        # Eg. we construct EURJPY via EURJPY directly (note: would need to have sufficient options/forward data for this)
+        # Eg. we construct EURJPY via EURJPY directly (need sufficient options/forward data for this)
         if construct_via_currency == "no":
             if fx_vol_surface is None:
                 # Download FX spot, FX forwards points and base depos etc.
@@ -344,14 +347,17 @@ class FXOptionsCurve:
             return self._calculations.join(total_return_indices, how="outer")
 
     def unhedged_asset_fx(self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None):
+        """Return unhedged asset FX total return (placeholder)."""
         pass
 
     def hedged_asset_fx(
         self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None, total_return_indices_df=None
     ):
+        """Return hedged asset FX total return (placeholder)."""
         pass
 
     def get_day_count_conv(self, currency):
+        """Return the day count convention (360 or 365) for a given currency."""
         if currency in market_constants.currencies_with_365_basis:
             return 365.0
 
@@ -379,7 +385,7 @@ class FXOptionsCurve:
         cal=None,
         output_calculation_fields=None,
     ):
-
+        """Construct a total return index from FX options market data."""
         if fx_vol_surface is None:
             fx_vol_surface = self._fx_vol_surface
         if enter_trading_dates is None:
@@ -513,7 +519,7 @@ class FXOptionsCurve:
                         else:
                             new_trade[i] = False
 
-                        # If we're entering a new trade/contract (and exiting an old trade) we need to get new expiry and roll dates
+                        # If entering a new trade/contract (and exiting an old trade) get new expiry and roll dates
                         if new_trade[i]:
                             exp = self._calendar.get_expiry_date_from_horizon_date(
                                 pd.DatetimeIndex([horizon_date[i]]),
@@ -538,7 +544,7 @@ class FXOptionsCurve:
                             exit_trade[i] = True
                         else:
                             if horizon_date[i] <= expiry_date[i - 1]:
-                                # Otherwise use previous expiry and roll dates, because we're still holding same contract
+                                # Use previous expiry and roll dates (still holding same contract)
                                 expiry_date[i] = expiry_date[i - 1]
                                 roll_date[i] = roll_date[i - 1]
                                 exit_trade[i] = False
@@ -565,7 +571,7 @@ class FXOptionsCurve:
                     # Get all the expiry dates and roll dates
                     # At each "roll/trade" day we need to reset them for the new contract
                     for i in range(0, len(horizon_date)):
-                        # If we're entering a new trade/contract (and exiting an old trade) we need to get new expiry and roll dates
+                        # If entering a new trade/contract (and exiting an old trade) get new expiry and roll dates
                         if new_trade[i]:
                             exp = self._calendar.get_expiry_date_from_horizon_date(
                                 pd.DatetimeIndex([horizon_date[i]]),
@@ -592,12 +598,12 @@ class FXOptionsCurve:
                             exit_trade[i] = False
                         else:
                             if i > 0:
-                                # Check there's valid expiry on previous day (if not then we're not in an option trade here!)
+                                # Check valid expiry on previous day (if not, we're not in an option trade here)
                                 if expiry_date[i - 1] == 0:
                                     has_position[i] = False
                                 else:
                                     if horizon_date[i] <= expiry_date[i - 1]:
-                                        # Otherwise use previous expiry and roll dates, because we're still holding same contract
+                                        # Use previous expiry and roll dates (still holding same contract)
                                         expiry_date[i] = expiry_date[i - 1]
                                         # roll_date[i] = roll_date[i - 1]
                                         has_position[i] = True
@@ -627,7 +633,7 @@ class FXOptionsCurve:
 
                 if has_position[0]:
                     # Special case: for first day of history (given have no previous positions)
-                    option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = (
+                    option_values_, _spot0, strike_, vol_, delta_, _expiry_date0, _intrinsic_values0 = (
                         fx_options_pricer.price_instrument(
                             cross,
                             horizon_date[0],
@@ -652,7 +658,7 @@ class FXOptionsCurve:
                 for i in range(1, len(horizon_date)):
                     if exit_trade[i]:
                         # Price option trade being exited
-                        option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = (
+                        option_values_, _spot, strike_, vol_, delta_, _expiry_date, _intrinsic_values = (
                             fx_options_pricer.price_instrument(
                                 cross,
                                 horizon_date[i],
@@ -674,7 +680,7 @@ class FXOptionsCurve:
 
                     if new_trade[i]:
                         # Price new option trade being entered
-                        option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = (
+                        option_values_, _spot2, strike_, vol_, delta_, _expiry_date2, _intrinsic_values2 = (
                             fx_options_pricer.price_instrument(
                                 cross,
                                 horizon_date[i],
@@ -700,7 +706,7 @@ class FXOptionsCurve:
 
                         frozen_vol = implied_vol[i - 1] if freeze_implied_vol else None
 
-                        option_values_, spot_, strike_, vol_, delta_, expiry_date_, intrinsic_values_ = (
+                        option_values_, _spot3, strike_, vol_, delta_, _expiry_date3, _intrinsic_values3 = (
                             fx_options_pricer.price_instrument(
                                 cross,
                                 horizon_date[i],
@@ -783,7 +789,7 @@ class FXOptionsCurve:
     def apply_tc_signals_to_total_return_index(
         self, cross_fx, total_return_index_orig_df, option_tc_bp, spot_tc_bp, signal_df=None, cum_index=None
     ):
-
+        """Apply transaction cost adjustments to a total return index."""
         # TODO signal not implemented yet
         if cum_index is None:
             cum_index = self._cum_index
@@ -800,7 +806,8 @@ class FXOptionsCurve:
 
         for cross in cross_fx:
             # p = abs(total_return_index_df[cross + '-roll.close'].shift(1)) * option_tc
-            # q = abs(total_return_index_df[cross + '-delta.close'] - total_return_index_df[cross + '-delta.close'].shift(1)) * spot_tc
+            # q = abs(total_return_index_df[cross + '-delta.close']
+            #         - total_return_index_df[cross + '-delta.close'].shift(1)) * spot_tc
 
             # Additional columns to include P&L with transaction costs
             total_return_index_df[cross + "-option-return-with-tc.close"] = (

@@ -241,7 +241,7 @@ class TradeAnalysis:
     ):
         """Run sensitivity analysis across arbitrary strategy parameters."""
         if not (reload_market_data):
-            asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(trading_model)
+            asset_df, spot_df, spot_df2, _basket_dict, contract_value_df = self._load_assets(trading_model)
 
         port_list = []
         ret_stats_list = []
@@ -270,7 +270,7 @@ class TradeAnalysis:
 
                 # should specify reloading the data, if our parameters impact which assets we are fetching
                 if reload_market_data:
-                    asset_df, spot_df, spot_df2, basket_dict, contract_value_df = self._load_assets(
+                    asset_df, spot_df, spot_df2, _basket_dict, contract_value_df = self._load_assets(
                         trading_model, br=br
                     )
 
@@ -414,7 +414,7 @@ class TradeAnalysis:
     def run_arbitrary_sensitivity_separately(
         self, trading_model, parameter_list=None, pretty_portfolio_names=None, strip=None
     ):
-
+        """Run sensitivity analysis, plotting each parameter variation separately."""
         # asset_df, spot_df, spot_df2, basket_dict = strat.fill_assets()
         final_strategy = trading_model.FINAL_STRATEGY
 
@@ -442,6 +442,7 @@ class TradeAnalysis:
         trading_model.FINAL_STRATEGY = final_strategy
 
     def run_day_of_month_analysis(self, trading_model, resample_freq="B"):
+        """Run day-of-month and month-of-year seasonality analysis."""
         from finmarketpy.economics.seasonality import Seasonality
 
         logger = LoggerManager().getLogger(__name__)

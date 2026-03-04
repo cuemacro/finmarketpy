@@ -1,3 +1,5 @@
+"""Module for constructing FX forwards curve total return indices."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -104,6 +106,7 @@ class FXForwardsCurve:
         self._field = field
 
     def generate_key(self):
+        """Generate a cache key for this curve instance."""
         from findatapy.market.ioengine import SpeedCache
 
         # Don't include any "large" objects in the key
@@ -124,7 +127,7 @@ class FXForwardsCurve:
         output_calculation_fields=False,
         field=None,
     ):
-
+        """Fetch a continuous FX forwards time series total return index."""
         if market_data_generator is None:
             market_data_generator = self._market_data_generator
         if fx_forwards_trading_tenor is None:
@@ -252,14 +255,17 @@ class FXForwardsCurve:
             return self._calculations.join(total_return_indices, how="outer")
 
     def unhedged_asset_fx(self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None):
+        """Return unhedged asset FX total return (placeholder)."""
         pass
 
     def hedged_asset_fx(
         self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None, total_return_indices_df=None
     ):
+        """Return hedged asset FX total return (placeholder)."""
         pass
 
     def get_day_count_conv(self, currency):
+        """Return the day count convention (360 or 365) for a given currency."""
         if currency in market_constants.currencies_with_365_basis:
             return 365.0
 
@@ -278,7 +284,7 @@ class FXForwardsCurve:
         output_calculation_fields=None,
         field=None,
     ):
-
+        """Construct a total return index from FX forwards market data."""
         if not (isinstance(cross_fx, list)):
             cross_fx = [cross_fx]
 

@@ -1,3 +1,5 @@
+"""Utility functions for market data processing and date parsing."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -15,6 +17,7 @@ __author__ = "saeedamen"  # Saeed Amen
 # limitations under the License.
 #
 
+import contextlib
 import datetime
 from datetime import timedelta
 
@@ -22,7 +25,15 @@ import pandas as pd
 
 
 class MarketUtil:
+    """Utility class for common market data operations."""
+
     def parse_date(self, date):
+        """Parse a date string or object into a pandas Timestamp.
+
+        Supports various string formats including relative dates such as
+        'decade', 'year', 'month', 'week', 'day', 'hour', and 'midnight',
+        as well as absolute date strings in common formats.
+        """
         if isinstance(date, str):
             date1 = datetime.datetime.utcnow()
 
@@ -42,30 +53,18 @@ class MarketUtil:
                 date1 = date1 - timedelta(hours=1)
             else:
                 # format expected 'Jun 1 2005 01:33', '%b %d %Y %H:%M'
-                try:
+                with contextlib.suppress(Exception):
                     date1 = datetime.datetime.strptime(date, "%b %d %Y %H:%M")
-                except:
-                    # ogger.warning("Attempted to parse date")
-                    pass
 
                 # format expected '1 Jun 2005 01:33', '%d %b %Y %H:%M'
-                try:
+                with contextlib.suppress(Exception):
                     date1 = datetime.datetime.strptime(date, "%d %b %Y %H:%M")
-                except:
-                    # logger.warning("Attempted to parse date")
-                    pass
 
-                try:
+                with contextlib.suppress(Exception):
                     date1 = datetime.datetime.strptime(date, "%b %d %Y")
-                except:
-                    # logger.warning("Attempted to parse date")
-                    pass
 
-                try:
+                with contextlib.suppress(Exception):
                     date1 = datetime.datetime.strptime(date, "%d %b %Y")
-                except:
-                    # logger.warning("Attempted to parse date")
-                    pass
         else:
             date1 = pd.Timestamp(date)
 

@@ -1,3 +1,5 @@
+"""Abstract base class for instrument pricers."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 
@@ -15,9 +17,15 @@ __author__ = "saeedamen"  # Saeed Amen
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+
 class AbstractPricer:
+    """Abstract base class for instrument pricers."""
+
     def __init__(self, market_df=None):
+        """Initialise AbstractPricer with optional market data."""
         self._market_df = market_df
 
     def price_instrument(self):
+        """Price the instrument."""
         pass

@@ -1,3 +1,5 @@
+"""Abstract base class for curve construction and total return index generation."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -19,19 +21,22 @@ import abc
 
 
 class AbstractCurve:
-    """Abstract class for creating total return indices and curves, which is for example implemented by FXSpotCurve
-    and could be implemented by other asset classes.
+    """Abstract class for creating total return indices and curves.
 
+    Implemented by FXSpotCurve and can be implemented by other asset classes.
     """
 
     @abc.abstractmethod
     def generate_key(self):
+        """Generate a cache key for this curve instance."""
         return
 
     @abc.abstractmethod
     def fetch_continuous_time_series(self, md_request, market_data_generator):
+        """Fetch a continuous time series for the given market data request."""
         return
 
     @abc.abstractmethod
     def construct_total_returns_index(self):
+        """Construct the total returns index."""
         return

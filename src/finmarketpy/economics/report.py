@@ -1,3 +1,5 @@
+"""Module for creating statistical reports and regression plots on time series data."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -25,7 +27,7 @@ class Report:
     """Creates simple statistical reports (via plots) on time series, outputting results."""
 
     def report_single_var_regression(self, y, x, y_variable_names, x_variable_names, statistic, pretty_index=None):
-
+        """Run single variable linear regressions and return statistics."""
         if not (isinstance(statistic, list)):
             statistic = [statistic]
 
@@ -56,7 +58,7 @@ class Report:
         silent_plot=False,
         shift=None,
     ):
-
+        """Plot single variable linear regression statistics as charts."""
         if shift is None:
             shift = [0]
         if not (isinstance(statistic, list)):

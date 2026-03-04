@@ -1,15 +1,22 @@
+"""Module for event study analysis around economic data releases."""
+
+from typing import ClassVar
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations
+# under the License.
 #
 
 import math
@@ -23,12 +30,21 @@ class EventStudy:
     """Provides functions for doing event studies on price action on an intraday basis and daily basis."""
 
     def __init__(self):
+        """Initialise EventStudy."""
         pass
 
     def get_economic_event_ret_over_custom_event_day(
-        self, data_frame_in, event_dates, name, event, start, end, lagged=False, NYC_cutoff=10
+        self,
+        data_frame_in,
+        event_dates,
+        name,
+        event,
+        start,
+        end,
+        lagged=False,
+        NYC_cutoff=10,  # noqa: N803
     ):
-
+        """Return market data filtered to align with custom economic event dates."""
         filter = Filter()
         event_dates = filter.filter_time_series_by_date(start, end, event_dates)
 
@@ -40,7 +56,7 @@ class EventStudy:
         bday = CustomBusinessDay(weekmask="Mon Tue Wed Thu Fri")
 
         event_dates_nyc = timezone.convert_index_from_UTC_to_new_york_time(event_dates)
-        average_hour_nyc = numpy.average(event_dates_nyc.index.hour)
+        average_hour_nyc = np.average(event_dates_nyc.index.hour)
 
         event_dates = calendar.floor_date(event_dates)
 
@@ -74,7 +90,7 @@ class EventStudy:
         adj_cumsum_zero_point=False,
         adj_zero_point=2,
     ):
-
+        """Calculate daily moves for a custom event window by delegating to get_intraday_moves_over_custom_event."""
         return self.get_intraday_moves_over_custom_event(
             data_frame_rets,
             ef_time_frame,
@@ -104,7 +120,7 @@ class EventStudy:
         adj_cumsum_zero_point=False,
         adj_zero_point=2,
     ):
-
+        """Calculate weekly moves for a custom event window by delegating to get_intraday_moves_over_custom_event."""
         return self.get_intraday_moves_over_custom_event(
             data_frame_rets,
             ef_time_frame,
@@ -135,6 +151,10 @@ class EventStudy:
         adj_cumsum_zero_point=False,
         adj_zero_point=2,
     ):
+        """Calculate intraday moves around a custom event time frame.
+
+        Supports minute, day and week frequencies.
+        """
         filter = Filter()
 
         ef_time_frame = filter.filter_time_series_by_date(
@@ -190,13 +210,7 @@ class EventStudy:
             if len(vals) < len(lst_ords):
                 extend = np.zeros((len(lst_ords) - len(vals), 1)) * np.nan
 
-                # If start window date is before we have data
-                if st < data_frame_rets.index[0]:
-                    vals = np.append(extend, vals)
-
-                # If end date window is after we have data
-                else:
-                    vals = np.append(vals, extend)
+                vals = np.append(extend, vals) if st < data_frame_rets.index[0] else np.append(vals, extend)
 
             data_frame[ef_time_frame.index[i]] = vals
 
@@ -204,7 +218,7 @@ class EventStudy:
 
         if create_index:
             calculations = Calculations()
-            data_frame.iloc[-minute_start + min_offset] = numpy.nan
+            data_frame.iloc[-minute_start + min_offset] = np.nan
             data_frame = calculations.create_mult_index(data_frame)
         else:
             if vol is True:
@@ -217,7 +231,7 @@ class EventStudy:
                 if adj_cumsum_zero_point:
                     ind = abs(minute_start) - adj_zero_point
 
-                    for i, c in enumerate(data_frame.columns):
+                    for _i, c in enumerate(data_frame.columns):
                         data_frame[c] = data_frame[c] - data_frame[c].values[ind]
 
         return data_frame
@@ -236,7 +250,10 @@ class EventStudy:
         surprise_field="survey-average",
         freq="minutes",
     ):
+        """Calculate the surprise factor against intraday moves around a custom event.
 
+        Aggregates market moves over various time offsets relative to the event.
+        """
         if offset_list is None:
             offset_list = [1, 5, 30, 60]
         ticker = event_fx + "-" + event_name + ".release-date-time-full"
@@ -290,20 +307,21 @@ class EventStudy:
 
 ########################################################################################################################
 
-import datetime
-from datetime import timedelta
+import datetime  # noqa: E402
+from datetime import timedelta  # noqa: E402
 
-import numpy
-from findatapy.market import IOEngine, SpeedCache
-from findatapy.util import ConfigManager
+from findatapy.market import IOEngine, SpeedCache  # noqa: E402
+from findatapy.util import ConfigManager  # noqa: E402
 
-from finmarketpy.util.marketconstants import MarketConstants
+from finmarketpy.util.marketconstants import MarketConstants  # noqa: E402
 
 marketconstants = MarketConstants()
 
 
 class EventsFactory(EventStudy):
-    """Provides methods to fetch data on economic data events and to perform basic event studies for market data around
+    """Provides methods to fetch data on economic data events and perform basic event studies.
+
+    Provides methods to fetch data on economic data events and to perform basic event studies for market data around
     these events. Note, requires a file of input of the following (transposed as columns!) - we give an example for
     NFP released on 7 Feb 2003 (note, that release-date-time-full, need not be fully aligned by row).
 
@@ -330,11 +348,15 @@ class EventsFactory(EventStudy):
     _hdf5_file_econ_file = MarketConstants().hdf5_file_econ_file
     _db_database_econ_file = MarketConstants().db_database_econ_file
 
-    ### Manual offset for certain events where Bloomberg/data vendor displays the wrong date (usually because of time differences)
-    # You may need to add to this list
-    _offset_events = {"AUD-Australia Labor Force Employment Change SA.release-dt": 1}
+    ### Manual offset for certain events where Bloomberg/data vendor displays the wrong date
+    # (usually because of time differences). You may need to add to this list.
+    _offset_events: ClassVar[dict] = {"AUD-Australia Labor Force Employment Change SA.release-dt": 1}
 
     def __init__(self, df=None):
+        """Initialise EventsFactory by loading economic event data.
+
+        If df is provided it is used directly; otherwise data is loaded from disk.
+        """
         super(EventStudy, self).__init__()
 
         self.config = ConfigManager()
@@ -350,6 +372,7 @@ class EventsFactory(EventStudy):
         return
 
     def load_economic_events(self):
+        """Load economic event data from the cache or disk storage."""
         self._econ_data_frame = self.speed_cache.get_dataframe(self._db_database_econ_file)
 
         if self._econ_data_frame is None:
@@ -366,6 +389,10 @@ class EventsFactory(EventStudy):
             self.speed_cache.put_dataframe(self._db_database_econ_file, self._econ_data_frame)
 
     def harvest_category(self, category_name):
+        """Fetch market data for all tickers in a given category.
+
+        Returns the fetched data DataFrame.
+        """
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)
 
         for k in cat:
@@ -377,12 +404,15 @@ class EventsFactory(EventStudy):
         return data_frame
 
     def get_economic_events(self):
+        """Return the loaded economic events DataFrame."""
         return self._econ_data_frame
 
     def dump_economic_events_csv(self, path):
+        """Write the economic events DataFrame to a CSV file at the given path."""
         self._econ_data_frame.to_csv(path)
 
     def get_economic_event_date_time(self, name, event=None, csv=None):
+        """Return the release date-time series for a given economic event."""
         ticker = self.create_event_descriptor_field(name, event, "release-date-time-full")
 
         if csv is None:
@@ -403,6 +433,7 @@ class EventsFactory(EventStudy):
         return data_frame
 
     def get_economic_event_date_time_dataframe(self, name, event=None, csv=None):
+        """Return the release date-time data as a DataFrame for a given economic event."""
         series = self.get_economic_event_date_time(name, event, csv)
 
         data_frame = pd.DataFrame(series.values, index=series.index)
@@ -411,6 +442,10 @@ class EventsFactory(EventStudy):
         return data_frame
 
     def get_economic_event_date_time_fields(self, fields, name, event=None):
+        """Return a DataFrame of multiple fields aligned to the economic event dates.
+
+        Joins event date-times with the requested data fields.
+        """
         ### acceptable fields
         # observation-date <- observation time for the index
         # actual-release
@@ -479,16 +514,21 @@ class EventsFactory(EventStudy):
         return data_frame
 
     def create_event_descriptor_field(self, name, event, field):
+        """Build a column name string for an economic event field.
+
+        Returns a ticker of the form ``name.field`` or ``name-event.field``.
+        """
         if event is None:
             return name + "." + field
         else:
             return name + "-" + event + "." + field
 
     def get_all_economic_events_date_time(self):
+        """Return a DataFrame of all economic event names and release date-times."""
         event_names = self.get_all_economic_events()
         columns = ["event-name", "release-date-time-full"]
 
-        data_frame = pd.DataFrame(data=numpy.zeros((0, len(columns))), columns=columns)
+        data_frame = pd.DataFrame(data=np.zeros((0, len(columns))), columns=columns)
 
         for event in event_names:
             event_times = self.get_economic_event_date_time(event)
@@ -499,6 +539,7 @@ class EventsFactory(EventStudy):
         return data_frame
 
     def get_all_economic_events(self):
+        """Return a sorted, deduplicated list of all economic event names."""
         field_names = self._econ_data_frame.columns.values
 
         event_names = [x.split(".")[0] for x in field_names if ".Date" in x]
@@ -509,12 +550,23 @@ class EventsFactory(EventStudy):
         return list(set(event_names_filtered))
 
     def get_economic_event_date(self, name, event=None):
+        """Return the release date series for a given economic event."""
         return self._econ_data_frame[self.create_event_descriptor_field(name, event, ".release-dt")]
 
     def get_economic_event_ret_over_custom_event_day(
-        self, data_frame_in, name, event, start, end, lagged=False, NYC_cutoff=10
+        self,
+        data_frame_in,
+        name,
+        event,
+        start,
+        end,
+        lagged=False,
+        NYC_cutoff=10,  # noqa: N803
     ):
+        """Return market data aligned to economic event dates for this factory.
 
+        Delegates to the parent class implementation after fetching event dates.
+        """
         # Get the times of events
         event_dates = self.get_economic_event_date_time(name, event)
 
@@ -523,12 +575,14 @@ class EventsFactory(EventStudy):
         )
 
     def get_economic_event_vol_over_event_day(self, vol_in, name, event, start, end, realised=False):
-
+        """Return volatility data aligned to economic event dates."""
         return self.get_economic_event_ret_over_custom_event_day(vol_in, name, event, start, end, lagged=realised)
 
-        # return super(EventsFactory, self).get_economic_event_ret_over_event_day(vol_in, name, event, start, end, lagged = realised)
+        # return super(EventsFactory, self).get_economic_event_ret_over_event_day(
+        #     vol_in, name, event, start, end, lagged=realised)
 
     def get_daily_moves_over_event(self):
+        """Calculate daily moves over an event (not yet implemented)."""
         # TODO
         pass
 
@@ -548,7 +602,10 @@ class EventsFactory(EventStudy):
         resample=False,
         freq="minutes",
     ):
+        """Calculate intraday moves around economic event releases.
 
+        Fetches event date-times then delegates to get_intraday_moves_over_custom_event.
+        """
         ef_time_frame = self.get_economic_event_date_time_dataframe(event_fx, event_name)
         ef_time_frame = self.filter.filter_time_series_by_date(start, end, ef_time_frame)
 
@@ -575,7 +632,10 @@ class EventsFactory(EventStudy):
         add_surprise=False,
         surprise_field="survey-average",
     ):
+        """Calculate the surprise factor against intraday market moves around event releases.
 
+        Fetches event fields and delegates to get_surprise_against_intraday_moves_over_custom_event.
+        """
         if offset_list is None:
             offset_list = [1, 5, 30, 60]
         fields = ["actual-release", "survey-median", "survey-average", "survey-high", "survey-low"]
@@ -614,17 +674,22 @@ These can be automatically generated via conf/econ_tickers.xlsm
 
 """
 
-import functools
-import operator
+import functools  # noqa: E402
+import operator  # noqa: E402
 
-import pandas as pd
-from findatapy.market import MarketDataGenerator, MarketDataRequest
-from findatapy.util import DataConstants, LoggerManager
+import pandas as pd  # noqa: E402
+from findatapy.market import MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.util import DataConstants, LoggerManager  # noqa: E402
 
 
 class HistEconDataFactory:
-    def __init__(self, market_data_generator=None):
+    """Provides access to historical economic data from multiple sources.
 
+    Uses aliases for tickers and supports alfred, quandl and bloomberg.
+    """
+
+    def __init__(self, market_data_generator=None):
+        """Initialise HistEconDataFactory loading country code and ticker config files."""
         self._all_econ_tickers = pd.read_csv(DataConstants().all_econ_tickers)
         self._econ_country_codes = pd.read_csv(DataConstants().econ_country_codes)
         self._econ_country_groups = pd.read_csv(DataConstants().econ_country_groups)
@@ -637,7 +702,10 @@ class HistEconDataFactory:
     def get_economic_data_history(
         self, start_date, finish_date, country_group, data_type, source="alfred", cache_algo="internet_load_return"
     ):
+        """Fetch historical economic data for a given country group and data type.
 
+        Returns a DataFrame of the requested economic data series.
+        """
         logger = LoggerManager().getLogger(__name__)
 
         # vendor_country_codes = self.fred_country_codes[country_group]
@@ -692,6 +760,10 @@ class HistEconDataFactory:
         return self.market_data_generator.fetch_market_data(md_request)
 
     def grasp_coded_entry(self, df, index):
+        """Extract and reformat entries from a DataFrame starting at a given index.
+
+        Returns a DataFrame with columns Date, Name, Val and Code.
+        """
         df = df[index:].stack()
         df = df.reset_index()
         df.columns = ["Date", "Name", "Val"]

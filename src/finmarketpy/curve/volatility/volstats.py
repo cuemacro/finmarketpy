@@ -1,3 +1,5 @@
+"""Module for calculating volatility statistics such as realized vol and vol risk premium."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -22,13 +24,15 @@ from findatapy.timeseries import Calculations, Calendar, Filter, Timezone
 
 
 class VolStats:
-    """Arranging underlying volatility market in easier to read format.
+    """Arrange underlying volatility market data in easier to read format.
+
     Also provides methods for calculating various volatility metrics, such as
-    realized_vol volatility and volatility risk  premium. Has extensive support
-    for estimating implied_vol volatility addons.
+    realized volatility and volatility risk premium. Has extensive support
+    for estimating implied volatility addons.
     """
 
     def __init__(self, market_df=None, intraday_spot_df=None):
+        """Initialise VolStats with optional market data DataFrames."""
         self._market_df = market_df
         self._intraday_spot_df = intraday_spot_df
 
@@ -50,9 +54,9 @@ class VolStats:
         returns_calc="simple",
         timezone_hour_minute="America/New_York",
     ):
-        """Calculates rolling realized vol with daily cutoffs either using
-        daily spot data or intraday spot data (which is assumed to be in UTC
-        timezone).
+        """Calculate rolling realized vol with daily cutoffs.
+
+        Uses either daily spot data or intraday spot data (assumed to be in UTC timezone).
 
         Parameters
         ----------
@@ -130,9 +134,17 @@ class VolStats:
         return realized_vol
 
     def calculate_vol_risk_premium(
-        self, asset, tenor_label="ON", implied_vol=None, realized_vol=None, field="close", adj_ON_friday=False
+        self,
+        asset,
+        tenor_label="ON",
+        implied_vol=None,
+        realized_vol=None,
+        field="close",
+        adj_ON_friday=False,  # noqa: N803
     ):
-        """Calculates volatility risk premium given implied and realized quotes (ie. implied - realized) and tenor.
+        """Calculate volatility risk premium given implied and realized quotes.
+
+        Calculates implied minus realized volatility for a given tenor.
 
         Calculates both a version which is aligned (VRP), where the implied and realized volatilities cover
         the same period (note: you will have a gap for recent points, where you can't grab future implied volatilities),
@@ -212,10 +224,11 @@ class VolStats:
         model_window=20,
         model_algo="weighted-median-model",
         field="close",
-        adj_ON_friday=True,
+        adj_ON_friday=True,  # noqa: N803
     ):
-        """Calculates the implied volatility add on for specific tenors. The
-        implied volatility addon can be seen as a proxy for the event weights
+        """Calculate the implied volatility addon for specific tenors.
+
+        The implied volatility addon can be seen as a proxy for the event weights
         of large scheduled events for that day, such as the US employment report.
 
         If there are multiple large events in the same period covered by the
@@ -247,7 +260,9 @@ class VolStats:
 
         implied_vol = implied_vol.dropna()  # otherwise the moving averages get corrupted
 
-        # vol_data_avg_by_weekday = vol_data.groupby(vol_data.index.weekday).transform(lambda x: pandas.rolling_mean(x, window=10))
+        # vol_data_avg_by_weekday = (
+        #     vol_data.groupby(vol_data.index.weekday).transform(lambda x: pandas.rolling_mean(x, window=10))
+        # )
 
         # Create a simple estimate for recent implied_vol volatility using multiple tenors
         # vol_data_20D_avg = time_series_calcs.rolling_average(vol_data,window1)
@@ -255,18 +270,18 @@ class VolStats:
         # vol_data_5D_avg = time_series_calcs.rolling_average(vol_data, window1)
 
         if model_algo == "weighted-median-model":
-            vol_data_20D_avg = self._calculations.rolling_median(implied_vol, model_window)
-            vol_data_10D_avg = self._calculations.rolling_median(implied_vol, model_window)
-            vol_data_5D_avg = self._calculations.rolling_median(implied_vol, model_window)
+            vol_data_20d_avg = self._calculations.rolling_median(implied_vol, model_window)
+            vol_data_10d_avg = self._calculations.rolling_median(implied_vol, model_window)
+            vol_data_5d_avg = self._calculations.rolling_median(implied_vol, model_window)
 
-            vol_data_avg = (vol_data_20D_avg + vol_data_10D_avg + vol_data_5D_avg) / 3
+            vol_data_avg = (vol_data_20d_avg + vol_data_10d_avg + vol_data_5d_avg) / 3
             vol_data_addon = implied_vol - vol_data_avg
         elif model_algo == "weighted-mean-model":
-            vol_data_20D_avg = self._calculations.rolling_average(implied_vol, model_window)
-            vol_data_10D_avg = self._calculations.rolling_average(implied_vol, model_window)
-            vol_data_5D_avg = self._calculations.rolling_average(implied_vol, model_window)
+            vol_data_20d_avg = self._calculations.rolling_average(implied_vol, model_window)
+            vol_data_10d_avg = self._calculations.rolling_average(implied_vol, model_window)
+            vol_data_5d_avg = self._calculations.rolling_average(implied_vol, model_window)
 
-            vol_data_avg = (vol_data_20D_avg + vol_data_10D_avg + vol_data_5D_avg) / 3
+            vol_data_avg = (vol_data_20d_avg + vol_data_10d_avg + vol_data_5d_avg) / 3
             vol_data_addon = implied_vol - vol_data_avg
 
         # TODO add other implied vol addon models
@@ -282,9 +297,9 @@ class VolStats:
 
         return vol_data_addon
 
-    def adjust_implied_ON_fri_vol(self, data_frame):
-
-        cols_ON = [x for x in data_frame.columns if "VON" in x]
+    def adjust_implied_ON_fri_vol(self, data_frame):  # noqa: N802
+        """Adjust ON Friday implied vol by multiplying by sqrt(3) to account for weekend."""
+        cols_ON = [x for x in data_frame.columns if "VON" in x]  # noqa: N806
 
         for c in cols_ON:
             data_frame[c][data_frame.index.dayofweek == 4] = data_frame[c][data_frame.index.dayofweek == 4] * math.sqrt(

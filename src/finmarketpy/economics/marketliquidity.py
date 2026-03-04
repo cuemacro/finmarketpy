@@ -1,3 +1,5 @@
+"""Module for calculating market liquidity metrics such as bid-ask spreads and tick counts."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -23,10 +25,12 @@ class MarketLiquidity:
     """Calculates spread between bid/ask and also tick count."""
 
     def __init__(self):
+        """Initialise MarketLiquidity with a logger."""
         self.logger = LoggerManager().getLogger(__name__)
         return
 
     def calculate_spreads(self, data_frame, asset, bid_field="bid", ask_field="ask"):
+        """Calculate bid-ask spreads for each asset."""
         if isinstance(asset, str):
             asset = [asset]
 
@@ -40,6 +44,7 @@ class MarketLiquidity:
         return data_frame_spreads
 
     def calculate_tick_count(self, data_frame, asset, freq="1h"):
+        """Calculate tick count for each asset at the given frequency."""
         if isinstance(asset, str):
             asset = [asset]
 

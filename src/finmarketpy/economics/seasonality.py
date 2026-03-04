@@ -1,3 +1,5 @@
+"""Module for calculating and visualising seasonality patterns in time series data."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -28,12 +30,13 @@ class Seasonality:
     """Does simple seasonality _calculations on data."""
 
     def __init__(self):
+        """Initialise Seasonality with config and logger."""
         self.config = ConfigManager()
         self.logger = LoggerManager().getLogger(__name__)
         return
 
     def time_of_day_seasonality(self, data_frame, years=False, seconds=False):
-
+        """Calculate intraday seasonality by time of day."""
         calculations = Calculations()
 
         if years is False:
@@ -78,7 +81,7 @@ class Seasonality:
         add_average=False,
         resample_freq="B",
     ):
-
+        """Calculate business day of month seasonality from price data."""
         if month_list is None:
             month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         return self.bus_day_of_month_seasonality(
@@ -104,7 +107,7 @@ class Seasonality:
         price_index=False,
         resample_freq="B",
     ):
-
+        """Calculate business day of month seasonality from returns data."""
         if month_list is None:
             month_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         calculations = Calculations()
@@ -141,10 +144,11 @@ class Seasonality:
         return monthly_seasonality
 
     def monthly_seasonality_from_prices(self, data_frame, cum=True, add_average=False):
+        """Calculate monthly seasonality from price data."""
         return self.monthly_seasonality(data_frame, cum, add_average, price_index=True)
 
     def monthly_seasonality(self, data_frame, cum=True, add_average=False, price_index=False):
-
+        """Calculate monthly seasonality from returns data."""
         calculations = Calculations()
 
         if price_index:
@@ -167,8 +171,9 @@ class Seasonality:
         return monthly_seasonality
 
     def adjust_rolling_seasonality(self, data_frame, window=None, likely_period=None):
-        """Adjusted time series which exhibit strong seasonality. If time series do not exhibit any seasonality will return
-        NaN values.
+        """Adjust time series which exhibit strong seasonality.
+
+        If time series do not exhibit any seasonality will return NaN values.
 
         Parameters
         ----------

@@ -1,15 +1,20 @@
+"""Module for calculating technical indicators and associated trading signals."""
+
 __author__ = "saeedamen & mhockenberger"  # Saeed Amen & Marcel Hockenberger
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
-# License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.
 #
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations
+# under the License.
 #
 
 from collections import OrderedDict
@@ -42,11 +47,32 @@ class TechIndicator:
     """
 
     def __init__(self):
+        """Initialise TechIndicator with empty techind and signal."""
         self._techind = None
         self._signal = None
 
     def create_tech_ind(self, data_frame_non_nan, name, tech_params, data_frame_non_nan_early=None):
+        """Calculate the specified technical indicator and its associated signal.
 
+        Parameters
+        ----------
+        data_frame_non_nan : pd.DataFrame
+            Input price/data DataFrame (may contain NaNs which will be forward-filled).
+
+        name : str
+            Name of the technical indicator to compute (e.g. 'SMA', 'EMA', 'RSI', 'BB').
+
+        tech_params : TechParams
+            Parameters controlling the technical indicator calculation.
+
+        data_frame_non_nan_early : pd.DataFrame, optional
+            Early (intraday) data to blend with daily data for some indicators.
+
+        Returns:
+        -------
+        tuple of (pd.DataFrame, pd.DataFrame)
+            The technical indicator values and corresponding signal values.
+        """
         LoggerManager().getLogger(__name__)
 
         self._signal = None
@@ -241,18 +267,18 @@ class TechIndicator:
             roll_down1 = pd.stats.moments.ewma(down.abs(), tech_params.rsi_period)
 
             # Calculate the RSI based on EWMA
-            RS1 = roll_up1 / roll_down1
-            100.0 - (100.0 / (1.0 + RS1))
+            rs1 = roll_up1 / roll_down1
+            100.0 - (100.0 / (1.0 + rs1))
 
             # Calculate the SMA
             roll_up2 = up.rolling(window=tech_params.rsi_period, center=False).mean()
             roll_down2 = down.abs().rolling(window=tech_params.rsi_period, center=False).mean()
 
             # Calculate the RSI based on SMA
-            RS2 = roll_up2 / roll_down2
-            RSI2 = 100.0 - (100.0 / (1.0 + RS2))
+            rs2 = roll_up2 / roll_down2
+            rsi2 = 100.0 - (100.0 / (1.0 + rs2))
 
-            self._techind = RSI2
+            self._techind = rsi2
             self._techind.columns = [x + " RSI" for x in data_frame.columns.values]
 
             signal = data_frame.copy()
@@ -278,11 +304,11 @@ class TechIndicator:
             mid = data_frame.rolling(center=False, window=tech_params.bb_period).mean()
             mid.columns = [x + " BB Mid" for x in data_frame.columns.values]
             std_dev = data_frame.rolling(center=False, window=tech_params.bb_period).std()
-            BB_std = tech_params.bb_mult * std_dev
+            bb_std = tech_params.bb_mult * std_dev
 
-            lower = pd.DataFrame(data=mid.values - BB_std.values, index=mid.index, columns=data_frame.columns)
+            lower = pd.DataFrame(data=mid.values - bb_std.values, index=mid.index, columns=data_frame.columns)
 
-            upper = pd.DataFrame(data=mid.values + BB_std.values, index=mid.index, columns=data_frame.columns)
+            upper = pd.DataFrame(data=mid.values + bb_std.values, index=mid.index, columns=data_frame.columns)
 
             # Calculate signals (buy/sell)
             signal = data_frame.copy()
@@ -368,7 +394,8 @@ class TechIndicator:
             true_range = calc.join(df, how="outer")
 
             self._techind = true_range.rolling(window=tech_params.atr_period, center=False).mean()
-            # self._techind = true_range.ewm(ignore_na=False, span=tech_params.atr_period, min_periods=0, adjust=True).mean()
+            # self._techind = true_range.ewm(
+            #     ignore_na=False, span=tech_params.atr_period, min_periods=0, adjust=True).mean()
 
             self._techind.columns = [x + ".close ATR" for x in asset_name]
 
@@ -389,12 +416,12 @@ class TechIndicator:
                 else:
                     df_mod = data_frame
 
-                l = df_mod[low].values
+                low_val = df_mod[low].values
                 h = df_mod[high].values
                 c = df_mod[close].values
                 v = df_mod[volume].values
 
-                vwap = np.cumsum(((h + l + c) / 3) * v) / np.cumsum(v)
+                vwap = np.cumsum(((h + low_val + c) / 3) * v) / np.cumsum(v)
                 vwap = pd.DataFrame(index=df_mod.index, data=vwap, columns=[close[0] + " VWAP"])
                 print(vwap.columns)
 
@@ -430,12 +457,15 @@ class TechIndicator:
         return self._techind, self._signal
 
     def create_custom_tech_ind(self, data_frame_non_nan, name, tech_params, data_frame_non_nan_early):
+        """Override in subclasses to implement custom technical indicators."""
         return
 
     def get_techind(self):
+        """Return the most recently computed technical indicator DataFrame."""
         return self._techind
 
     def get_signal(self):
+        """Return the most recently computed signal DataFrame."""
         return self._signal
 
 
@@ -446,6 +476,7 @@ class TechParams:
     """Holds parameters for calculation of technical indicators."""
 
     def __init__(self, fillna=True, atr_period=14, sma_period=20, green_n=4, green_count=9, red_n=2, red_count=13):
+        """Initialise TechParams with indicator calculation parameters."""
         self.fillna = fillna
         self.atr_period = atr_period
         self.sma_period = sma_period
@@ -457,84 +488,96 @@ class TechParams:
 
     @property
     def fillna(self):
+        """Whether to forward-fill NaN values before computing indicators."""
         return self.__fillna
 
     @fillna.setter
     def fillna(self, fillna):
+        """Set the fillna flag."""
         self.__fillna = fillna
 
     @property
     def atr_period(self):
+        """Lookback period for the Average True Range indicator."""
         return self.__atr_period
 
     @atr_period.setter
     def atr_period(self, atr_period):
+        """Set the ATR lookback period."""
         self.__atr_period = atr_period
 
     @property
     def sma_period(self):
+        """Lookback period for the Simple Moving Average indicator."""
         return self.__sma_period
 
     @sma_period.setter
     def sma_period(self, sma_period):
+        """Set the SMA lookback period."""
         self.__sma_period = sma_period
 
     @property
     def green_n(self):
+        """Number of consecutive green bars parameter."""
         return self.__green_n
 
     @green_n.setter
     def green_n(self, green_n):
+        """Set the green_n parameter."""
         self.__green_n = green_n
 
     @property
     def green_count(self):
+        """Total green bar count threshold parameter."""
         return self.__green_count
 
     @green_count.setter
     def green_count(self, green_count):
+        """Set the green_count parameter."""
         self.__green_count = green_count
 
     @property
     def red_n(self):
+        """Number of consecutive red bars parameter."""
         return self.__red_n
 
     @red_n.setter
     def red_n(self, red_n):
+        """Set the red_n parameter."""
         self.__red_n = red_n
 
     @property
     def red_count(self):
+        """Total red bar count threshold parameter."""
         return self.__red_count
 
     @property
     def only_allow_shorts(self):
+        """Flag to allow only short signals."""
         return self.__only_allow_shorts
 
     @property
     def only_allow_longs(self):
+        """Flag to allow only long signals."""
         return self.__only_allow_longs
 
     @red_count.setter
     def red_count(self, red_count):
+        """Set the red_count parameter."""
         self.__red_count = red_count
 
     @only_allow_longs.setter
     def only_allow_longs(self, only_allow_longs):
+        """Set the only_allow_longs flag, raising an error if only_allow_shorts is already set."""
         if hasattr(self, "only_allow_shorts"):
-            raise Exception(
-                "Attribute only_allow_shorts is already defined and it is not compatible with attribute "
-                "only_allow_longs"
-            )
+            raise ValueError("only_allow_shorts conflicts with only_allow_longs")  # noqa: TRY003
         self.__only_allow_longs = only_allow_longs
 
     @only_allow_shorts.setter
     def only_allow_shorts(self, only_allow_shorts):
+        """Set the only_allow_shorts flag, raising an error if only_allow_longs is already set."""
         if hasattr(self, "only_allow_longs"):
-            raise Exception(
-                "Attribute only_allow_longs is already defined and it is not compatible with attribute "
-                "only_allow_shorts"
-            )
+            raise ValueError("only_allow_longs conflicts with only_allow_shorts")  # noqa: TRY003
         self.__only_allow_shorts = only_allow_shorts
 
     # TODO add specific fields so can error check fields

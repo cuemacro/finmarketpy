@@ -1,3 +1,5 @@
+"""Module for quickly generating charts from market data sources."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -27,12 +29,15 @@ dataconstants = DataConstants()
 
 
 class QuickChart:
-    """Displays charts from downloaded data, in a single line code call. Ideal for quickly generating charts from sources
-    including Bloomberg, Quandl, ALFRED/FRED etc.
+    """Display charts from downloaded market data in a single line code call.
 
+    Ideal for quickly generating charts from sources including Bloomberg, Quandl, ALFRED/FRED etc.
     """
 
-    def __init__(self, engine="plotly", data_source="bloomberg", market_data_generator=MarketDataGenerator()):
+    def __init__(self, engine="plotly", data_source="bloomberg", market_data_generator=None):
+        """Initialise QuickChart with chart engine and data source."""
+        if market_data_generator is None:
+            market_data_generator = MarketDataGenerator()
         self._chart = Chart(engine=engine)
         self._market = Market(market_data_generator=market_data_generator)
         self._data_source = data_source
@@ -63,7 +68,7 @@ class QuickChart:
         alpha_vantage_api_key=dataconstants.alpha_vantage_api_key,
         df=None,
     ):
-
+        """Download market data and plot as a chart."""
         if fields is None:
             fields = {"close": "PX_LAST"}
         if start_date is None:
@@ -173,7 +178,7 @@ class QuickChart:
         display_brand_label=True,
         plotly_plot_mode="offline_png",
     ):
-
+        """Plot a chart with return statistics in the column labels."""
         style = Style(
             title=title,
             chart_type=chart_type,

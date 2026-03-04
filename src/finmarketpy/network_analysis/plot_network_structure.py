@@ -1,3 +1,5 @@
+"""Module for plotting network structure of correlated financial instruments."""
+
 # Project: finmarketpy project
 # Filename: plot_network_structure
 # Objective:
@@ -28,7 +30,9 @@ def plot_network_structure(
     cmap_lc=plt.cm.hot_r,
     edgecolor=plt.cm.nipy_spectral,
 ):
-    """Parameters
+    """Plot the correlation network structure of financial instruments.
+
+    Parameters
     ----------
     edge_model: sklearn.covariance.graph_lasso_.GraphicalLassoCV
                 The model specifications to build the graph
@@ -71,17 +75,16 @@ def plot_network_structure(
                name
 
     Returns:
-    A plot representing the correlation network of the financial instruments
     -------
-
+    A plot representing the correlation network of the financial instruments
     """
     if ax is None:
         ax = [0.0, 0.0, 1.0, 1.0]
     if not isinstance(edge_model, covariance.graph_lasso_.GraphicalLassoCV):
-        raise TypeError("edge_model must be of class covariance.graph_lasso_.GraphicalLassoCV ")
+        raise TypeError("edge_model must be of class covariance.graph_lasso_.GraphicalLassoCV ")  # noqa: TRY003
 
     if not isinstance(embedding, (np.ndarray, np.generic)):
-        raise TypeError("embedding must be of class ndarray.")
+        raise TypeError("embedding must be of class ndarray.")  # noqa: TRY003
 
     plt.figure(1, facecolor="w", figsize=figsize)
     plt.clf()

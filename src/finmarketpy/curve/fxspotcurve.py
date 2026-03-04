@@ -1,3 +1,5 @@
+"""Module for constructing FX spot curve total return indices."""
+
 __author__ = "saeedamen"  # Saeed Amen
 
 #
@@ -63,9 +65,10 @@ def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, ter
 
 
 class FXSpotCurve:
-    """Construct total return (spot) indices for FX. In future will also convert assets from local currency to foreign currency
-    denomination and construct indices from forwards series.
+    """Construct total return (spot) indices for FX.
 
+    In future will also convert assets from local currency to foreign currency
+    denomination and construct indices from forwards series.
     """
 
     def __init__(
@@ -76,6 +79,7 @@ class FXSpotCurve:
         output_calculation_fields=market_constants.output_calculation_fields,
         field="close",
     ):
+        """Initialise FXSpotCurve with market data generator and configuration."""
         self._market_data_generator = market_data_generator
         self._calculations = Calculations()
 
@@ -85,6 +89,7 @@ class FXSpotCurve:
         self._field = field
 
     def generate_key(self):
+        """Generate a cache key for this curve instance."""
         from findatapy.market.ioengine import SpeedCache
 
         # Don't include any "large" objects in the key
@@ -99,7 +104,7 @@ class FXSpotCurve:
         output_calculation_fields=None,
         field=None,
     ):
-
+        """Fetch a continuous FX spot time series total return index."""
         if market_data_generator is None:
             market_data_generator = self._market_data_generator
         if depo_tenor is None:
@@ -192,14 +197,17 @@ class FXSpotCurve:
             return self._calculations.join(total_return_indices, how="outer")
 
     def unhedged_asset_fx(self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None):
+        """Return unhedged asset FX total return (placeholder)."""
         pass
 
     def hedged_asset_fx(
         self, assets_df, asset_currency, home_curr, start_date, finish_date, spot_df=None, total_return_indices_df=None
     ):
+        """Return hedged asset FX total return (placeholder)."""
         pass
 
     def get_day_count_conv(self, currency):
+        """Return the day count convention (360 or 365) for a given currency."""
         if currency in market_constants.currencies_with_365_basis:
             return 365.0
 
@@ -208,8 +216,9 @@ class FXSpotCurve:
     def construct_total_return_index(
         self, cross_fx, market_df, depo_tenor=None, output_calculation_fields=None, field=None
     ):
-        """Creates total return index for selected FX crosses from spot and
-        deposit data.
+        """Create total return index for selected FX crosses from spot and deposit data.
+
+        Creates total return index for selected FX crosses from spot and deposit data.
 
         Parameters
         ----------

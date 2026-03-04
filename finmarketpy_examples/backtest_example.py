@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -16,18 +16,18 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-Gives several examples of backtesting simple trading strategies, using 
+Gives several examples of backtesting simple trading strategies, using
 Backtest (a lower level class)
 """
 
-from findatapy.timeseries import Calculations
+from findatapy.timeseries import Calculations  # noqa: E402
 
 # choose run_example = 0 for everything
 # run_example = 1 - do a backtest of a FX basket with trend following
 # run_example = 2 - do a backtest of EURUSD traded with trend following
 run_example = 0
 
-from findatapy.util.dataconstants import DataConstants
+from findatapy.util.dataconstants import DataConstants  # noqa: E402
 
 # You will likely need to change this!
 # Get an API key from the FRED website https://fred.stlouisfed.org/docs/api/api_key.html
@@ -36,18 +36,18 @@ fred_api_key = DataConstants().fred_api_key
 ###### backtest simple trend following strategy for FX spot basket
 if run_example == 1 or run_example == 0:
     # For backtest and loading data
-    from finmarketpy.backtest import BacktestRequest, Backtest
-    from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
+    # For plotting
+    from chartpy import Chart, Style
+    from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
     from findatapy.util.fxconv import FXConv
 
     # For logging
     from findatapy.util.loggermanager import LoggerManager
 
+    from finmarketpy.backtest import Backtest, BacktestRequest
+
     # For signal generation
     from finmarketpy.economics import TechIndicator, TechParams
-
-    # For plotting
-    from chartpy import Chart, Style
 
     logger = LoggerManager().getLogger(__name__)
 
@@ -69,35 +69,34 @@ if run_example == 1 or run_example == 0:
     br.signal_vol_max_leverage = 3
     br.signal_vol_periods = 60
     br.signal_vol_obs_in_year = 252
-    br.signal_vol_rebalance_freq = 'BM'
+    br.signal_vol_rebalance_freq = "BM"
     br.signal_vol_resample_freq = None
 
-    tech_params = TechParams();
-    tech_params.sma_period = 200;
-    indicator = 'SMA'
+    tech_params = TechParams()
+    tech_params.sma_period = 200
+    indicator = "SMA"
 
     # Pick USD crosses in G10 FX
     # Note: we are calculating returns from spot (it is much better to use to total return
     # indices for FX, which include carry)
     logger.info("Loading asset data...")
 
-    tickers = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD',
-               'NZDUSD', 'USDCHF', 'USDNOK', 'USDSEK']
+    tickers = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD", "NZDUSD", "USDCHF", "USDNOK", "USDSEK"]
 
-    vendor_tickers = ['DEXUSEU', 'DEXJPUS', 'DEXUSUK', 'DEXUSAL', 'DEXCAUS',
-                      'DEXUSNZ', 'DEXSZUS', 'DEXNOUS', 'DEXSDUS']
+    vendor_tickers = ["DEXUSEU", "DEXJPUS", "DEXUSUK", "DEXUSAL", "DEXCAUS", "DEXUSNZ", "DEXSZUS", "DEXNOUS", "DEXSDUS"]
 
     md_request = MarketDataRequest(
         start_date="01 Jan 1989",  # start date
         finish_date=datetime.date.today(),  # finish date
-        freq='daily',  # daily data
-        data_source='alfred',  # use FRED as data source
+        freq="daily",  # daily data
+        data_source="alfred",  # use FRED as data source
         tickers=tickers,  # ticker (findatapy)
-        fields=['close'],  # which fields to download
+        fields=["close"],  # which fields to download
         vendor_tickers=vendor_tickers,  # ticker
-        vendor_fields=['close'],  # which Bloomberg fields to download
-        cache_algo='internet_load_return',
-        fred_api_key=fred_api_key)  # how to return data
+        vendor_fields=["close"],  # which Bloomberg fields to download
+        cache_algo="internet_load_return",
+        fred_api_key=fred_api_key,
+    )  # how to return data
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -109,18 +108,15 @@ if run_example == 1 or run_example == 0:
     # Use technical indicator to create signals
     # (we could obviously create whatever function we wanted for generating the signal dataframe)
     tech_ind = TechIndicator()
-    tech_ind.create_tech_ind(spot_df, indicator, tech_params);
+    tech_ind.create_tech_ind(spot_df, indicator, tech_params)
     signal_df = tech_ind.get_signal()
 
     contract_value_df = None
 
     # Use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df,
-                                   run_in_parallel=False)
+    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df, run_in_parallel=False)
     port = backtest.portfolio_cum()
-    port.columns = [
-        indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(
-            backtest.portfolio_pnl_desc()[0])]
+    port.columns = [indicator + " = " + str(tech_params.sma_period) + " " + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()
 
     # Print the last positions (we could also save as CSV etc.)
@@ -128,9 +124,9 @@ if run_example == 1 or run_example == 0:
 
     style = Style()
     style.title = "FX trend strategy"
-    style.source = 'FRED'
+    style.source = "FRED"
     style.scale_factor = -1
-    style.file_output = 'fx-trend-example.png'
+    style.file_output = "fx-trend-example.png"
     style.auto_scale = True
 
     Chart().plot(port, style=style)
@@ -138,19 +134,19 @@ if run_example == 1 or run_example == 0:
 ###### backtest simple trend following strategy for FX spot basket
 if run_example == 2 or run_example == 0:
     # For backtest and loading data
-    from finmarketpy.backtest import Backtest, BacktestRequest
-    from findatapy.market import Market, MarketDataRequest, MarketDataGenerator
-    from findatapy.util.fxconv import FXConv
+    # For plotting
+    from chartpy import Chart, Style
+    from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
     from findatapy.timeseries import Calculations
 
     # For logging
     from findatapy.util import LoggerManager
+    from findatapy.util.fxconv import FXConv
+
+    from finmarketpy.backtest import Backtest, BacktestRequest
 
     # For signal generation
     from finmarketpy.economics import TechIndicator, TechParams
-
-    # For plotting
-    from chartpy import Chart, Style
 
     logger = LoggerManager().getLogger(__name__)
 
@@ -166,9 +162,9 @@ if run_example == 2 or run_example == 0:
     br.spot_tc_bp = 2.5  # 2.5 bps bid/ask spread
     br.ann_factor = 252
 
-    tech_params = TechParams();
-    tech_params.sma_period = 200;
-    indicator = 'SMA'
+    tech_params = TechParams()
+    tech_params.sma_period = 200
+    indicator = "SMA"
     tech_params.only_allow_longs = True
     # tech_params.only_allow_shorts = True
 
@@ -180,14 +176,15 @@ if run_example == 2 or run_example == 0:
     md_request = MarketDataRequest(
         start_date="01 Jan 1989",  # start date
         finish_date=datetime.date.today(),  # finish date
-        freq='daily',  # daily data
-        data_source='alfred',  # use FRED as data source
-        tickers=['EURUSD'],  # ticker (findatapy)
-        fields=['close'],  # which fields to download
-        vendor_tickers=['DEXUSEU'],  # ticker
-        vendor_fields=['close'],  # which Bloomberg fields to download
-        cache_algo='internet_load_return',  # how to return data
-        fred_api_key=fred_api_key, )
+        freq="daily",  # daily data
+        data_source="alfred",  # use FRED as data source
+        tickers=["EURUSD"],  # ticker (findatapy)
+        fields=["close"],  # which fields to download
+        vendor_tickers=["DEXUSEU"],  # ticker
+        vendor_fields=["close"],  # which Bloomberg fields to download
+        cache_algo="internet_load_return",  # how to return data
+        fred_api_key=fred_api_key,
+    )
 
     market = Market(market_data_generator=MarketDataGenerator())
 
@@ -199,23 +196,18 @@ if run_example == 2 or run_example == 0:
     # Use technical indicator to create signals
     # (we could obviously create whatever function we wanted for generating the signal dataframe)
     tech_ind = TechIndicator()
-    tech_ind.create_tech_ind(spot_df, indicator, tech_params);
+    tech_ind.create_tech_ind(spot_df, indicator, tech_params)
     signal_df = tech_ind.get_signal()
 
     # Use the same data for generating signals
-    backtest.calculate_trading_PnL(br, asset_df, signal_df,
-                                   contract_value_df=None,
-                                   run_in_parallel=False)
+    backtest.calculate_trading_PnL(br, asset_df, signal_df, contract_value_df=None, run_in_parallel=False)
     port = backtest.portfolio_cum()
-    port.columns = [
-        indicator + ' = ' + str(tech_params.sma_period) + ' ' + str(
-            backtest.portfolio_pnl_desc()[0])]
+    port.columns = [indicator + " = " + str(tech_params.sma_period) + " " + str(backtest.portfolio_pnl_desc()[0])]
     signals = backtest.portfolio_signal()  # get final signals for each series
     returns = backtest.pnl()  # get P&L for each series
 
     calculations = Calculations()
-    trade_returns = calculations.calculate_individual_trade_gains(signals,
-                                                                  returns)
+    trade_returns = calculations.calculate_individual_trade_gains(signals, returns)
 
     print(trade_returns)
 
@@ -224,9 +216,9 @@ if run_example == 2 or run_example == 0:
 
     style = Style()
     style.title = "EUR/USD trend model"
-    style.source = 'FRED'
+    style.source = "FRED"
     style.scale_factor = -1
-    style.file_output = 'eurusd-trend-example.png'
+    style.file_output = "eurusd-trend-example.png"
     style.auto_scale = True
 
     Chart(port, style=style).plot()

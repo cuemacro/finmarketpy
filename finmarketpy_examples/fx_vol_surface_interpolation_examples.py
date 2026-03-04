@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -16,30 +16,28 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-Shows how to use finmarketpy to process FX vol surfaces which have been 
+Shows how to use finmarketpy to process FX vol surfaces which have been
 interpolated (uses FinancePy underneath).
 
-Note, you will need to have a Bloomberg terminal (with blpapi Python library) 
-to download the FX market data in order to plot these vol surface (FX spot, 
-FX forwards, FX implied_vol volatility 
+Note, you will need to have a Bloomberg terminal (with blpapi Python library)
+to download the FX market data in order to plot these vol surface (FX spot,
+FX forwards, FX implied_vol volatility
 quotes and deposits)
 """
 
 # For plotting
-from chartpy import Chart, Style
+import contextlib  # noqa: E402
+
+from chartpy import Chart, Style  # noqa: E402
 
 # For loading market data
-from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
+from findatapy.market import Market, MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.util.loggermanager import LoggerManager  # noqa: E402
 
-from findatapy.util.loggermanager import LoggerManager
+from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface  # noqa: E402
 
-from finmarketpy.curve.volatility.fxvolsurface import FXVolSurface
-
-try:
-    from finaddpy.market.cachedmarketdatagenerator import \
-        CachedMarketDataGenerator as MarketDataGenerator
-except:
-    pass
+with contextlib.suppress(BaseException):
+    from finaddpy.market.cachedmarketdatagenerator import CachedMarketDataGenerator as MarketDataGenerator
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -55,16 +53,19 @@ market = Market(market_data_generator=MarketDataGenerator())
 
 run_example = 0
 
-###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
+###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)  # noqa: E501
 ###### Show how to plot ATM 1M implied_vol vol time series
 if run_example == 1 or run_example == 0:
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
-    md_request = MarketDataRequest(start_date="01 May 2016",
-                                   finish_date="01 Aug 2016",
-                                   data_source="bloomberg", cut="LDN",
-                                   category="fx-vol-market",
-                                   tickers=["GBPUSD"],
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date="01 May 2016",
+        finish_date="01 Aug 2016",
+        data_source="bloomberg",
+        cut="LDN",
+        category="fx-vol-market",
+        tickers=["GBPUSD"],
+        cache_algo="cache_algo_return",
+    )
 
     df = market.fetch_market(md_request)
 
@@ -77,31 +78,32 @@ if run_example == 1 or run_example == 0:
 
     chart.plot(df["GBPUSDV1M.close"], style=style)
 
-###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
+###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)  # noqa: E501
 ###### Construct volatility surface using FinancePy library underneath, using polynomial interpolation
 if run_example == 2 or run_example == 0:
     horizon_date = "23 Jun 2016"
     cross = "GBPUSD"
 
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
-    md_request = MarketDataRequest(start_date=horizon_date,
-                                   finish_date=horizon_date,
-                                   data_source="bloomberg", cut="LDN",
-                                   category="fx-vol-market",
-                                   tickers=cross,
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date=horizon_date,
+        finish_date=horizon_date,
+        data_source="bloomberg",
+        cut="LDN",
+        category="fx-vol-market",
+        tickers=cross,
+        cache_algo="cache_algo_return",
+    )
 
     df = market.fetch_market(md_request)
 
-    fx_vol_surface = FXVolSurface(market_df=df, vol_function_type="BBG",
-                                  asset=cross)
+    fx_vol_surface = FXVolSurface(market_df=df, vol_function_type="BBG", asset=cross)
 
     fx_vol_surface.build_vol_surface(horizon_date)
 
     # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance in FinancePy
     # FinFXVolSurface.buildVolSurface method to get it to fill, or choose different vol_function_type (eg. "CLARK5")
-    df_vol_dict = fx_vol_surface.extract_vol_surface(low_K_pc=0.80,
-                                                     high_K_pc=1.1)
+    df_vol_dict = fx_vol_surface.extract_vol_surface(low_K_pc=0.80, high_K_pc=1.1)
 
     # Print out the various vol surface and data produced
     print(df_vol_dict["vol_surface_implied_pdf"])
@@ -115,39 +117,52 @@ if run_example == 2 or run_example == 0:
     # x_axis = strike - index
     # y_axis = tenor - columns
     # z_axis = implied vol - values
-    chart.plot(df_vol_dict["vol_surface_strike_space"].iloc[:, ::-1],
-               chart_type="surface",
-               style=Style(title="Plotting volatility in strike space", auto_scale=True))
+    chart.plot(
+        df_vol_dict["vol_surface_strike_space"].iloc[:, ::-1],
+        chart_type="surface",
+        style=Style(title="Plotting volatility in strike space", auto_scale=True),
+    )
 
     # Plot vol surface in delta space (exc market strangle strikes)
-    chart.plot(df_vol_dict["vol_surface_delta_space_exc_ms"].iloc[:, ::-1],
-               chart_type="surface",
-               style=Style(title="Plotting in delta space", auto_scale=True))
+    chart.plot(
+        df_vol_dict["vol_surface_delta_space_exc_ms"].iloc[:, ::-1],
+        chart_type="surface",
+        style=Style(title="Plotting in delta space", auto_scale=True),
+    )
 
     # Plot implied PDF in strike space (all interpolated)
     # x_axis = strike - index
     # y_axis = tenor - columns
     # z_axis = implied PDF - values
-    chart.plot(df_vol_dict["vol_surface_implied_pdf"], chart_type="surface",
-               style=Style(title="Plotting implied PDF in strike space", auto_scale=True))
+    chart.plot(
+        df_vol_dict["vol_surface_implied_pdf"],
+        chart_type="surface",
+        style=Style(title="Plotting implied PDF in strike space", auto_scale=True),
+    )
 
     # Plot the implied PDF for ON only versus strikes
-    chart.plot(df_vol_dict["vol_surface_implied_pdf"]["ON"], chart_type="line",
-               style=Style(
-                   title="Plotting implied PDF in strike space ON around Brexit",
-                   x_axis_range=[1.0, 1.8], auto_scale=True))
+    chart.plot(
+        df_vol_dict["vol_surface_implied_pdf"]["ON"],
+        chart_type="line",
+        style=Style(
+            title="Plotting implied PDF in strike space ON around Brexit", x_axis_range=[1.0, 1.8], auto_scale=True
+        ),
+    )
 
-###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
+###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)  # noqa: E501
 ###### Do animation for vol surface
 if run_example == 3 or run_example == 0:
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
     # Using LDN close data (CMPL)
-    md_request = MarketDataRequest(start_date="01 Jun 2016",
-                                   finish_date="30 Jul 2016",
-                                   data_source="bloomberg", cut="LDN",
-                                   category="fx-vol-market",
-                                   tickers=["GBPUSD"],
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date="01 Jun 2016",
+        finish_date="30 Jul 2016",
+        data_source="bloomberg",
+        cut="LDN",
+        category="fx-vol-market",
+        tickers=["GBPUSD"],
+        cache_algo="cache_algo_return",
+    )
     # 01 Jun 2016, 30 Jun 2016
     # 20 Jun 2016, 24 Jun 2016
 
@@ -163,10 +178,10 @@ if run_example == 3 or run_example == 0:
     # Note this does take a few minutes, given it's fitting the vol surface for every date
     # TODO explore speeding up using Numba or similar
     vol_surface_dict, extremes_dict = fx_vol_surface.extract_vol_surface_across_dates(
-        df.index,
-        vol_surface_type="vol_surface_strike_space")
+        df.index, vol_surface_type="vol_surface_strike_space"
+    )
 
-    animate_titles = [x.strftime("%d %b %Y") for x in vol_surface_dict.keys()]
+    animate_titles = [x.strftime("%d %b %Y") for x in vol_surface_dict]
 
     print(extremes_dict)
 
@@ -174,22 +189,23 @@ if run_example == 3 or run_example == 0:
     # x_axis = strike - index
     # y_axis = tenor - columns
     # z_axis = implied_vol vol - values
-    style = Style(title="Plotting in strike space", animate_figure=True,
-                  animate_titles=animate_titles, auto_scale=True)
+    style = Style(title="Plotting in strike space", animate_figure=True, animate_titles=animate_titles, auto_scale=True)
 
-    chart.plot(list(vol_surface_dict.values()), chart_type="surface",
-               style=style)
+    chart.plot(list(vol_surface_dict.values()), chart_type="surface", style=style)
 
-###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)
+###### Fetch market data for pricing GBPUSD FX options over Brexit vote (ie. FX spot, FX forwards, FX deposits and FX vol quotes)  # noqa: E501
 ###### Get implied_vol vol for specific strikes interpolating across surface
 if run_example == 4 or run_example == 0:
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
-    md_request = MarketDataRequest(start_date="20 Jun 2016",
-                                   finish_date="25 Jun 2016",
-                                   data_source="bloomberg", cut="LDN",
-                                   category="fx-vol-market",
-                                   tickers=["GBPUSD"],
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date="20 Jun 2016",
+        finish_date="25 Jun 2016",
+        data_source="bloomberg",
+        cut="LDN",
+        category="fx-vol-market",
+        tickers=["GBPUSD"],
+        cache_algo="cache_algo_return",
+    )
 
     df = market.fetch_market(md_request)
 
@@ -201,14 +217,12 @@ if run_example == 4 or run_example == 0:
     fx_vol_surface.build_vol_surface("20 Jun 2016")
 
     # Get the implied_vol volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 20 Jun 2016
-    vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000,
-                                                                   tenor="1W")
+    vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000, tenor="1W")
 
     fx_vol_surface.build_vol_surface("23 Jun 2016")
 
     # Get the implied_vol volatility for a specific strike (GBPUSD=1.4000 in the 1W tenor) for 23 Jun 2016
-    vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000,
-                                                                   tenor="1W")
+    vol_at_strike = fx_vol_surface.calculate_vol_for_strike_expiry(1.4000, tenor="1W")
 
     print(vol_at_strike)
 
@@ -219,12 +233,15 @@ if run_example == 5 or run_example == 0:
     horizon_date = "03 Nov 2020"
 
     # Download the whole all market data for GBPUSD for pricing options (vol surface)
-    md_request = MarketDataRequest(start_date=horizon_date,
-                                   finish_date=horizon_date,
-                                   data_source="bloomberg", cut="NYC",
-                                   category="fx-vol-market",
-                                   tickers=["USDJPY"],
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date=horizon_date,
+        finish_date=horizon_date,
+        data_source="bloomberg",
+        cut="NYC",
+        category="fx-vol-market",
+        tickers=["USDJPY"],
+        cache_algo="cache_algo_return",
+    )
 
     df = market.fetch_market(md_request)
 
@@ -242,11 +259,15 @@ if run_example == 5 or run_example == 0:
     # x_axis = strike - index
     # y_axis = tenor - columns
     # z_axis = implied vol - values
-    chart.plot(df_vol_dict["vol_surface_strike_space"].iloc[:, ::-1],
-               chart_type="surface",
-               style=Style(title="Plotting volatility in strike space", auto_scale=True))
+    chart.plot(
+        df_vol_dict["vol_surface_strike_space"].iloc[:, ::-1],
+        chart_type="surface",
+        style=Style(title="Plotting volatility in strike space", auto_scale=True),
+    )
 
     # Plot vol surface in delta space (exc market strangle strikes)
-    chart.plot(df_vol_dict["vol_surface_delta_space_exc_ms"].iloc[:, ::-1],
-               chart_type="surface",
-               style=Style(title="Plotting in delta space", auto_scale=True))
+    chart.plot(
+        df_vol_dict["vol_surface_delta_space_exc_ms"].iloc[:, ::-1],
+        chart_type="surface",
+        style=Style(title="Plotting in delta space", auto_scale=True),
+    )

@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -20,15 +20,13 @@ Shows how to calculate returns of an asset
 """
 
 # Loading data
-import datetime
 
-from chartpy import Chart, Style
-from finmarketpy.backtest import TradeAnalysis
-from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
+from chartpy import Chart  # noqa: E402
+from findatapy.market import Market, MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.timeseries import Calculations  # noqa: E402
+from findatapy.util.loggermanager import LoggerManager  # noqa: E402
 
-from chartpy.style import Style
-from findatapy.timeseries import Calculations
-from findatapy.util.loggermanager import LoggerManager
+from finmarketpy.backtest import TradeAnalysis  # noqa: E402
 
 ta = TradeAnalysis()
 calc = Calculations()
@@ -52,7 +50,8 @@ if run_example == 1 or run_example == 0:
         field=["close"],  # which fields to download
         vendor_tickers=["XAUUSD Curncy"],  # ticker (Bloomberg)
         vendor_fields=["PX_LAST"],  # which Bloomberg fields to download
-        cache_algo="internet_load_return")  # how to return data
+        cache_algo="internet_load_return",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 

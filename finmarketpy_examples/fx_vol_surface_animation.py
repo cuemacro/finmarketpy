@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -21,53 +21,59 @@ of them. Note, this does not do
 any interpolation.
 """
 
-from findatapy.market import Market, MarketDataRequest, MarketDataGenerator, \
-    FXVolFactory
-from chartpy import Chart, Style
+import contextlib  # noqa: E402
 
-try:
-    from finaddpy.market import \
-        CachedMarketDataGenerator as MarketDataGenerator
-except:
-    pass
+from chartpy import Chart, Style  # noqa: E402
+from findatapy.market import FXVolFactory, Market, MarketDataGenerator, MarketDataRequest  # noqa: E402
+
+with contextlib.suppress(BaseException):
+    from finaddpy.market import CachedMarketDataGenerator as MarketDataGenerator
 
 
-def plot_animated_vol_market():
+def plot_animated_vol_market():  # noqa: D103
     market = Market(market_data_generator=MarketDataGenerator())
 
-    cross = ["EURUSD"];
-    start_date = "01 Mar 2017";
-    finish_date = "21 Apr 2017";
+    cross = ["EURUSD"]
+    start_date = "01 Mar 2017"
+    finish_date = "21 Apr 2017"
     sampling = "no"
 
-    md_request = MarketDataRequest(start_date=start_date,
-                                   finish_date=finish_date,
-                                   data_source="bloomberg", cut="NYC",
-                                   category="fx-implied-vol",
-                                   tickers=cross,
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date=start_date,
+        finish_date=finish_date,
+        data_source="bloomberg",
+        cut="NYC",
+        category="fx-implied-vol",
+        tickers=cross,
+        cache_algo="cache_algo_return",
+    )
 
     df = market.fetch_market(md_request)
-    if sampling != "no": df = df.resample(sampling).mean()
+    if sampling != "no":
+        df = df.resample(sampling).mean()
     fxvf = FXVolFactory()
     df_vs = []
 
     # Grab the vol surface for each date and create a dataframe for each date (could have used a panel)
-    for i in range(0, len(df.index)): df_vs.append(
-        fxvf.extract_vol_surface_for_date(df, cross[0], i))
+    for i in range(0, len(df.index)):
+        df_vs.append(fxvf.extract_vol_surface_for_date(df, cross[0], i))
 
     # Do static plot for first day using Plotly
-    style = Style(title="FX vol surface of " + cross[0], source="chartpy",
-                  color="Blues", auto_scale=True)
+    style = Style(title="FX vol surface of " + cross[0], source="chartpy", color="Blues", auto_scale=True)
 
     Chart(df=df_vs[0], chart_type="surface", style=style).plot(engine="plotly")
 
     # Now do animation (TODO: need to fix animation in chartpy for matplotlib)
-    style = Style(title="FX vol surface of " + cross[0], source="chartpy",
-                  color="Blues",
-                  animate_figure=True, animate_titles=df.index,
-                  animate_frame_ms=500, normalize_colormap=False,
-                  auto_scale=True)
+    style = Style(
+        title="FX vol surface of " + cross[0],
+        source="chartpy",
+        color="Blues",
+        animate_figure=True,
+        animate_titles=df.index,
+        animate_frame_ms=500,
+        normalize_colormap=False,
+        auto_scale=True,
+    )
 
     Chart(df=df_vs, chart_type="surface", style=style).plot(engine="plotly")
 

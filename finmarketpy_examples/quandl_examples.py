@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -22,12 +22,10 @@ Note: that many of the free tickers have been removed from Nasdaq Data Link.
 """
 
 # loading data
-import datetime
 
-from chartpy import Chart, Style
-from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
-
-from findatapy.util.loggermanager import LoggerManager
+from chartpy import Chart, Style  # noqa: E402
+from findatapy.market import Market, MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.util.loggermanager import LoggerManager  # noqa: E402
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -58,7 +56,8 @@ if run_example == 1 or run_example == 0:
         vendor_tickers=["BOE/CFMBJ84"],  # ticker (Bloomberg)
         vendor_fields=["close"],  # which Bloomberg fields to download
         cache_algo="internet_load_return",
-        quandl_api_key="TYPE YOUR KEY HERE")  # how to return data
+        quandl_api_key="TYPE YOUR KEY HERE",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 

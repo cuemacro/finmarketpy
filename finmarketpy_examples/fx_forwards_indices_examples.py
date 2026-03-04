@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -20,16 +20,15 @@ Shows how to use finmarketpy to create total return indices for FX forwards
 with appropriate roll rules
 """
 
-import pandas as pd
+import pandas as pd  # noqa: E402
 
 # For plotting
-from chartpy import Chart, Style
+from chartpy import Chart, Style  # noqa: E402
 
 # For loading market data
-from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
-from findatapy.timeseries import Calculations
-
-from findatapy.util.loggermanager import LoggerManager
+from findatapy.market import Market, MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.timeseries import Calculations  # noqa: E402
+from findatapy.util.loggermanager import LoggerManager  # noqa: E402
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -45,7 +44,7 @@ calculations = Calculations()
 
 run_example = 0
 
-from finmarketpy.curve.fxforwardscurve import FXForwardsCurve
+from finmarketpy.curve.fxforwardscurve import FXForwardsCurve  # noqa: E402
 
 ###### Create total return indices plot for USDBRL using forwards
 # We shall be using USDBRL 1M forward contracts and rolling them 5 business
@@ -57,15 +56,17 @@ if run_example == 1 or run_example == 0:
     fx_forwards_tenors = ["1W", "1M", "2M", "3M"]
 
     # Get USDBRL data for spot, forwards + depos
-    md_request = MarketDataRequest(start_date="02 Jan 2007",
-                                   finish_date="01 Jun 2007",
-                                   data_source="bloomberg", cut="NYC",
-                                   category="fx-forwards-market",
-                                   tickers=cross,
-                                   fx_forwards_tenor=fx_forwards_tenors,
-                                   base_depos_currencies=[cross[0:3],
-                                                          cross[3:6]],
-                                   cache_algo="cache_algo_return")
+    md_request = MarketDataRequest(
+        start_date="02 Jan 2007",
+        finish_date="01 Jun 2007",
+        data_source="bloomberg",
+        cut="NYC",
+        category="fx-forwards-market",
+        tickers=cross,
+        fx_forwards_tenor=fx_forwards_tenors,
+        base_depos_currencies=[cross[0:3], cross[3:6]],
+        cache_algo="cache_algo_return",
+    )
 
     # In case any missing values fill down (particularly can get this for NDFs)
     df_market = market.fetch_market(md_request=md_request).ffill()
@@ -75,7 +76,7 @@ if run_example == 1 or run_example == 0:
     # Let"s trade a 1M forward, and we roll 5 business days (based on both
     # base + terms currency holidays)
     # before month end
-    df_cuemacro_tot_1M = fx_forwards_curve.construct_total_return_index(
+    df_cuemacro_tot_1M = fx_forwards_curve.construct_total_return_index(  # noqa: N816
         cross,
         df_market,
         fx_forwards_trading_tenor="1M",
@@ -83,16 +84,17 @@ if run_example == 1 or run_example == 0:
         roll_event="month-end",
         roll_months=1,
         fx_forwards_tenor_for_interpolation=fx_forwards_tenors,
-        output_calculation_fields=True)
+        output_calculation_fields=True,
+    )
 
     df_cuemacro_tot_1M.columns = [
-        x.replace("forward-tot", "forward-tot-1M-cuemacro") for x in
-        df_cuemacro_tot_1M.columns]
+        x.replace("forward-tot", "forward-tot-1M-cuemacro") for x in df_cuemacro_tot_1M.columns
+    ]
 
     # Now do a 3M forward, and we roll 5 business days before end of quarter(
     # based on both base + terms currency holidays)
     # before month end
-    df_cuemacro_tot_3M = fx_forwards_curve.construct_total_return_index(
+    df_cuemacro_tot_3M = fx_forwards_curve.construct_total_return_index(  # noqa: N816
         cross,
         df_market,
         fx_forwards_trading_tenor="3M",
@@ -100,11 +102,12 @@ if run_example == 1 or run_example == 0:
         roll_event="month-end",
         roll_months=3,
         fx_forwards_tenor_for_interpolation=fx_forwards_tenors,
-        output_calculation_fields=True)
+        output_calculation_fields=True,
+    )
 
     df_cuemacro_tot_3M.columns = [
-        x.replace("forward-tot", "forward-tot-3M-cuemacro") for x in
-        df_cuemacro_tot_3M.columns]
+        x.replace("forward-tot", "forward-tot-3M-cuemacro") for x in df_cuemacro_tot_3M.columns
+    ]
 
     # Get spot data
     md_request.abstract_curve = None
@@ -123,8 +126,7 @@ if run_example == 1 or run_example == 0:
     md_request.category = "fx-tot-forwards"
 
     df_bbg_tot_forwards = market.fetch_market(md_request)
-    df_bbg_tot_forwards.columns = [x + "-bbg" for x in
-                                   df_bbg_tot_forwards.columns]
+    df_bbg_tot_forwards.columns = [x + "-bbg" for x in df_bbg_tot_forwards.columns]
 
     # Combine into a single data frame and plot, we note that the Cuemacro
     # constructed indices track the Bloomberg
@@ -132,12 +134,16 @@ if run_example == 1 or run_example == 0:
     # difference with spot indices
     # CAREFUL to fill down, before reindexing because forwards indices are
     # likely to have different publishing dates
-    df = calculations.join([pd.DataFrame(
-        df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
-        pd.DataFrame(df_cuemacro_tot_3M[
-                         cross + "-forward-tot-3M-cuemacro.close"]),
-        df_bbg_tot, df_spot, df_bbg_tot_forwards],
-        how="outer").ffill()
+    df = calculations.join(
+        [
+            pd.DataFrame(df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
+            pd.DataFrame(df_cuemacro_tot_3M[cross + "-forward-tot-3M-cuemacro.close"]),
+            df_bbg_tot,
+            df_spot,
+            df_bbg_tot_forwards,
+        ],
+        how="outer",
+    ).ffill()
 
     df = calculations.create_mult_index_from_prices(df)
 
@@ -161,29 +167,32 @@ if run_example == 2 or run_example == 0:
         construct_via_currency="USD",
         fx_forwards_tenor_for_interpolation=fx_forwards_tenors,
         roll_months=1,
-        output_calculation_fields=True)
+        output_calculation_fields=True,
+    )
 
     # Get AUDJPY (AUDUSD and JPYUSD) data for spot, forwards + depos and also
     # construct the total returns forward index
-    md_request = MarketDataRequest(start_date="02 Jan 2007",
-                                   finish_date="01 Jun 2007",
-                                   data_source="bloomberg", cut="NYC",
-                                   category="fx",
-                                   tickers=cross,
-                                   fx_forwards_tenor=fx_forwards_tenors,
-                                   base_depos_currencies=[cross[0:3],
-                                                          cross[3:6]],
-                                   cache_algo="cache_algo_return",
-                                   abstract_curve=fx_forwards_curve)
+    md_request = MarketDataRequest(
+        start_date="02 Jan 2007",
+        finish_date="01 Jun 2007",
+        data_source="bloomberg",
+        cut="NYC",
+        category="fx",
+        tickers=cross,
+        fx_forwards_tenor=fx_forwards_tenors,
+        base_depos_currencies=[cross[0:3], cross[3:6]],
+        cache_algo="cache_algo_return",
+        abstract_curve=fx_forwards_curve,
+    )
 
     # In case any missing values fill down (particularly can get this for NDFs)
-    df_cuemacro_tot_1M = market.fetch_market(md_request=md_request).ffill()
+    df_cuemacro_tot_1M = market.fetch_market(md_request=md_request).ffill()  # noqa: N816
 
     fx_forwards_curve = FXForwardsCurve()
 
     df_cuemacro_tot_1M.columns = [
-        x.replace("forward-tot", "forward-tot-1M-cuemacro") for x in
-        df_cuemacro_tot_1M.columns]
+        x.replace("forward-tot", "forward-tot-1M-cuemacro") for x in df_cuemacro_tot_1M.columns
+    ]
 
     # Get spot data
     md_request.abstract_curve = None
@@ -202,8 +211,7 @@ if run_example == 2 or run_example == 0:
     md_request.category = "fx-tot-forwards"
 
     df_bbg_tot_forwards = market.fetch_market(md_request)
-    df_bbg_tot_forwards.columns = [x + "-bbg" for x in
-                                   df_bbg_tot_forwards.columns]
+    df_bbg_tot_forwards.columns = [x + "-bbg" for x in df_bbg_tot_forwards.columns]
 
     # Combine into a single data frame and plot, we note that the Cuemacro
     # constructed indices track the Bloomberg
@@ -211,10 +219,15 @@ if run_example == 2 or run_example == 0:
     # large difference with spot indices
     # CAREFUL to fill down, before reindexing because forwards indices are
     # likely to have different publishing dates
-    df = calculations.join([pd.DataFrame(
-        df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
-        df_bbg_tot, df_spot, df_bbg_tot_forwards],
-        how="outer").ffill()
+    df = calculations.join(
+        [
+            pd.DataFrame(df_cuemacro_tot_1M[cross + "-forward-tot-1M-cuemacro.close"]),
+            df_bbg_tot,
+            df_spot,
+            df_bbg_tot_forwards,
+        ],
+        how="outer",
+    ).ffill()
 
     df = calculations.create_mult_index_from_prices(df)
 

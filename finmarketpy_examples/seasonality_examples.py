@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -20,17 +20,15 @@ Shows how to calculate seasonality
 """
 
 # Loading data
-import datetime
 
-import pandas
+import pandas as pd  # noqa: E402
+from chartpy import Chart, Style  # noqa: E402
+from chartpy.style import Style  # noqa: E402, F811
+from findatapy.market import Market, MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.timeseries import Calculations  # noqa: E402
+from findatapy.util.loggermanager import LoggerManager  # noqa: E402
 
-from chartpy import Chart, Style
-from finmarketpy.economics import Seasonality
-from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
-
-from chartpy.style import Style
-from findatapy.timeseries import Calculations
-from findatapy.util.loggermanager import LoggerManager
+from finmarketpy.economics import Seasonality  # noqa: E402
 
 seasonality = Seasonality()
 calc = Calculations()
@@ -58,17 +56,15 @@ if run_example == 1 or run_example == 0:
         fields=["close"],  # which fields to download
         vendor_tickers=["XAUUSD Curncy"],  # ticker (Bloomberg)
         vendor_fields=["PX_LAST"],  # which Bloomberg fields to download
-        cache_algo="internet_load_return")  # how to return data
+        cache_algo="internet_load_return",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 
     df_ret = calc.calculate_returns(df)
 
-    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(
-        df_ret,
-        partition_by_month=False)
-    day_of_month_seasonality = calc.convert_month_day_to_date_time(
-        day_of_month_seasonality)
+    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret, partition_by_month=False)
+    day_of_month_seasonality = calc.convert_month_day_to_date_time(day_of_month_seasonality)
 
     style = Style()
     style.date_formatter = "%b"
@@ -89,16 +85,15 @@ if run_example == 2 or run_example == 0:
         fields=["close"],  # which fields to download
         vendor_tickers=[x + " Curncy" for x in tickers],  # ticker (Bloomberg)
         vendor_fields=["PX_LAST"],  # which Bloomberg fields to download
-        cache_algo="internet_load_return")  # how to return data
+        cache_algo="internet_load_return",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 
     df_ret = calc.calculate_returns(df)
 
-    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret,
-                                                                        partition_by_month=False)
-    day_of_month_seasonality = calc.convert_month_day_to_date_time(
-        day_of_month_seasonality)
+    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret, partition_by_month=False)
+    day_of_month_seasonality = calc.convert_month_day_to_date_time(day_of_month_seasonality)
 
     style = Style()
     style.date_formatter = "%b"
@@ -118,16 +113,15 @@ if run_example == 3 or run_example == 0:
         fields=["close"],  # which fields to download
         vendor_tickers=["XB1 Comdty"],  # ticker (Bloomberg)
         vendor_fields=["PX_LAST"],  # which Bloomberg fields to download
-        cache_algo="internet_load_return")  # how to return data
+        cache_algo="internet_load_return",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 
     df_ret = calc.calculate_returns(df)
 
-    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret,
-                                                                        partition_by_month=False)
-    day_of_month_seasonality = calc.convert_month_day_to_date_time(
-        day_of_month_seasonality)
+    day_of_month_seasonality = seasonality.bus_day_of_month_seasonality(df_ret, partition_by_month=False)
+    day_of_month_seasonality = calc.convert_month_day_to_date_time(day_of_month_seasonality)
 
     style = Style()
     style.date_formatter = "%b"
@@ -147,7 +141,8 @@ if run_example == 4 or run_example == 0:
         tickers=["US NFP"],  # ticker
         fields=["actual-release"],  # which fields to download
         vendor_tickers=["PAYNSA"],  # ticker (FRED)  PAYEMS (NSA)
-        vendor_fields=["actual-release"])  # which FRED fields to download
+        vendor_fields=["actual-release"],
+    )  # which FRED fields to download
 
     df = market.fetch_market(md_request)
 
@@ -174,7 +169,8 @@ if run_example == 5 or run_example == 0:
         fields=["actual-release"],  # which fields to download
         vendor_tickers=["PAYNSA", "PAYEMS"],
         # ticker (FRED) PAYEMS (SA) PAYNSA (NSA)
-        vendor_fields=["actual-release"])  # which FRED fields to download
+        vendor_fields=["actual-release"],
+    )  # which FRED fields to download
 
     df = market.fetch_market(md_request)
 
@@ -182,11 +178,10 @@ if run_example == 5 or run_example == 0:
     df = df - df.shift(1)
 
     df_seasonal_adjusted = seasonality.adjust_rolling_seasonality(
-        pandas.DataFrame(df["US NFP (NSA).actual-release"]),
-        window=12 * 20, likely_period=12)
+        pd.DataFrame(df["US NFP (NSA).actual-release"]), window=12 * 20, likely_period=12
+    )
 
-    df_seasonal_adjusted.columns = [x + " SA finmarketpy" for x in
-                                    df_seasonal_adjusted.columns]
+    df_seasonal_adjusted.columns = [x + " SA finmarketpy" for x in df_seasonal_adjusted.columns]
 
     # Compare not seasonally adjusted vs seasonally adjusted
     df = df.join(df_seasonal_adjusted)

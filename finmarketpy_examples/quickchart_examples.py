@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -18,7 +18,7 @@ __author__ = 'saeedamen'  # Saeed Amen
 """
 Shows how to use QuickChart to quickly download data and plot it
 """
-from finmarketpy.economics import QuickChart
+from finmarketpy.economics import QuickChart  # noqa: E402
 
 # Choose run_example = 0 for everything
 # run_example = 1 - Plot S&P 500 charts with Matplotlib
@@ -30,40 +30,53 @@ run_example = 0
 ###### Plot with Matplotlib
 if run_example == 1 or run_example == 0:
     # Plot with Matplotlib - S&P 500 on LHS y-axis and S&P 500 net long spec positioning on RHS y-axis
-    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(
-        tickers={'S&P500': 'SPX Index'},
-        tickers_rhs={'Net long spec S&P 500 futures': 'IMM0ENCN Index'},
-        title='S&P500 vs. net spec pos RHS (2008-2010)',
-        start_date='01 Jan 2007', finish_date='01 Jan 2010',
-        source='Bloomberg')
+    QuickChart(engine="matplotlib", data_source="bloomberg").plot_chart(
+        tickers={"S&P500": "SPX Index"},
+        tickers_rhs={"Net long spec S&P 500 futures": "IMM0ENCN Index"},
+        title="S&P500 vs. net spec pos RHS (2008-2010)",
+        start_date="01 Jan 2007",
+        finish_date="01 Jan 2010",
+        source="Bloomberg",
+    )
 
     # Plot with Matplotlib - S&P 500 YoY returns
-    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(
-        tickers={'S&P500': 'SPX Index'},
-        title='S&P 500 YoY', chart_type='bar',
-        start_date='01 Jan 2007', yoy=True, source='Bloomberg')
+    QuickChart(engine="matplotlib", data_source="bloomberg").plot_chart(
+        tickers={"S&P500": "SPX Index"},
+        title="S&P 500 YoY",
+        chart_type="bar",
+        start_date="01 Jan 2007",
+        yoy=True,
+        source="Bloomberg",
+    )
 
 ###### Plot with Plotly and Matplotlib
 if run_example == 2 or run_example == 0:
     # Plot with matplotlib - Major USD crosses reindexed from 100 in 2020
-    QuickChart(engine='matplotlib', data_source='bloomberg').plot_chart(
-        tickers=['EURUSD Curncy', 'GBPUSD Curncy', 'AUDUSD Curncy'],
-        title='USD crosses in 2020',
-        start_date='01 Jan 2020', reindex=True, source='Bloomberg')
+    QuickChart(engine="matplotlib", data_source="bloomberg").plot_chart(
+        tickers=["EURUSD Curncy", "GBPUSD Curncy", "AUDUSD Curncy"],
+        title="USD crosses in 2020",
+        start_date="01 Jan 2020",
+        reindex=True,
+        source="Bloomberg",
+    )
 
     # Plot with Plotly - Major USD crosses reindexed from 100 in 2020
-    QuickChart(engine='plotly', data_source='bloomberg').plot_chart(
-        tickers=['EURUSD Curncy', 'GBPUSD Curncy', 'AUDUSD Curncy'],
-        title='USD crosses in 2020 (Plotly)',
-        start_date='01 Jan 2020', reindex=True, source='Bloomberg')
+    QuickChart(engine="plotly", data_source="bloomberg").plot_chart(
+        tickers=["EURUSD Curncy", "GBPUSD Curncy", "AUDUSD Curncy"],
+        title="USD crosses in 2020 (Plotly)",
+        start_date="01 Jan 2020",
+        reindex=True,
+        source="Bloomberg",
+    )
 
 ###### Plot with Matplotlib
 if run_example == 3 or run_example == 0:
     # Plot with matplotlib - Multiple reindexed GDP from FRED
-    QuickChart(engine='matplotlib', data_source='fred').plot_chart(
-        tickers={"US": "GDP", "UK": "UKNGDP", "FR": "CPMNACSCAB1GQFR",
-                 "JP": "JPNNGDP"},
+    QuickChart(engine="matplotlib", data_source="fred").plot_chart(
+        tickers={"US": "GDP", "UK": "UKNGDP", "FR": "CPMNACSCAB1GQFR", "JP": "JPNNGDP"},
         reindex=True,
-        title='Gross Domestic Product (start date=100)',
-        start_date='01 Jan 2007', finish_date='01 Jan 2010',
-        source='fred')
+        title="Gross Domestic Product (start date=100)",
+        start_date="01 Jan 2007",
+        finish_date="01 Jan 2010",
+        source="fred",
+    )

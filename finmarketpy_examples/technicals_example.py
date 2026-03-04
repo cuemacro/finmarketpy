@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -16,13 +16,12 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 # loading data
-import datetime
 
 from chartpy import Chart, Style
 from findatapy.market import Market, MarketDataGenerator, MarketDataRequest
-from finmarketpy.economics import TechIndicator, TechParams
-
 from findatapy.util.loggermanager import LoggerManager
+
+from finmarketpy.economics import TechIndicator, TechParams
 
 logger = LoggerManager().getLogger(__name__)
 
@@ -47,7 +46,8 @@ if run_example == 1 or run_example == 0:
         vendor_tickers=["SPX Index"],  # ticker (Bloomberg)
         vendor_fields=["PX_LAST", "PX_OPEN", "PX_HIGH", "PX_LOW"],
         # which Bloomberg fields to download
-        cache_algo="internet_load_return")  # how to return data
+        cache_algo="internet_load_return",
+    )  # how to return data
 
     df = market.fetch_market(md_request)
 

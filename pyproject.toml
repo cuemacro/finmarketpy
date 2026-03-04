@@ -21,6 +21,11 @@ keywords = [
     "trading", "markets", "currencies", "pandas", "data", "Bloomberg", "tick", "stocks", "equities"
 ]
 
+[project.optional-dependencies]
+options = [
+    "financepy",
+]
+
 [project.urls]
 repository = "https://github.com/cuemacro/finmarketpy"
 
@@ -61,6 +66,23 @@ include = [
 exclude_dirs = ["tests"]
 skips = ["B105", "B110", "B301", "B403"]
 
+[tool.deptry.package_module_name_map]
+"scikit-learn" = "sklearn"
+"blosc" = "blosc"
+"chartpy" = "chartpy"
+"findatapy" = "findatapy"
+"matplotlib" = "matplotlib"
+"numba" = "numba"
+"numpy" = "numpy"
+"pandas" = "pandas"
+"seasonal" = "seasonal"
+"financepy" = "financepy"
+"pytest-cov" = "pytest_cov"
+"pytest" = "pytest"
+"pre-commit" = "pre_commit"
+"marimo" = "marimo"
+
 [tool.deptry.per_rule_ignores]
 #DEP001 = ["pyfolio"]       # very dated dependency!
+DEP001 = ["finmarketpy"]
 DEP003 = ["finmarketpy"]

@@ -1,4 +1,4 @@
-# Project: finmarketpy project
+# Project: finmarketpy project  # noqa: D100
 # Filename: plot_network_structure
 # Objective:
 # Created: 2019-11-02 17:38
@@ -6,10 +6,10 @@
 # Author: FS
 
 # importing packages
-import numpy as np
-from sklearn import covariance
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.collections import LineCollection
+from sklearn import covariance
 
 
 def plot_network_structure(
@@ -17,7 +17,7 @@ def plot_network_structure(
     embedding,
     names,
     labels,
-    ax=[0.0, 0.0, 1.0, 1.0],
+    ax=None,
     figsize=None,
     corr_threshold=0.02,
     vmin=0,
@@ -28,9 +28,7 @@ def plot_network_structure(
     cmap_lc=plt.cm.hot_r,
     edgecolor=plt.cm.nipy_spectral,
 ):
-    """
-
-    Parameters
+    """Parameters
     ----------
     edge_model: sklearn.covariance.graph_lasso_.GraphicalLassoCV
                 The model specifications to build the graph
@@ -72,20 +70,18 @@ def plot_network_structure(
                colour of the borders of the box containing each financial instrument
                name
 
-    Returns
+    Returns:
     A plot representing the correlation network of the financial instruments
     -------
 
-    """
+    """  # noqa: D205
+    if ax is None:
+        ax = [0.0, 0.0, 1.0, 1.0]
     if not isinstance(edge_model, covariance.graph_lasso_.GraphicalLassoCV):
-        raise TypeError(
-            "edge_model must be of class "
-            "covariance.graph_lasso_"
-            ".GraphicalLassoCV "
-        )
+        raise TypeError("edge_model must be of class covariance.graph_lasso_.GraphicalLassoCV ")  # noqa: TRY003
 
     if not isinstance(embedding, (np.ndarray, np.generic)):
-        raise TypeError("embedding must be of class ndarray.")
+        raise TypeError("embedding must be of class ndarray.")  # noqa: TRY003
 
     plt.figure(1, facecolor="w", figsize=figsize)
     plt.clf()
@@ -100,14 +96,11 @@ def plot_network_structure(
     non_zero = np.abs(np.triu(partial_correlations, k=1)) > corr_threshold
 
     # plot the nodes using the coordinates in embedding
-    plt.scatter(embedding[0], embedding[1], s=100 * d ** 2, c=labels, cmap=cmap_scatter)
+    plt.scatter(embedding[0], embedding[1], s=100 * d**2, c=labels, cmap=cmap_scatter)
 
     # plot the edges
     start_idx, end_idx = np.where(non_zero)
-    segments = [
-        [embedding[:, start], embedding[:, stop]]
-        for start, stop in zip(start_idx, end_idx)
-    ]
+    segments = [[embedding[:, start], embedding[:, stop]] for start, stop in zip(start_idx, end_idx, strict=False)]
     corr_values = np.abs(partial_correlations[non_zero])
     lc = LineCollection(
         segments,
@@ -121,8 +114,7 @@ def plot_network_structure(
 
     # add a label to each node
     n_labels = labels.max()
-    for index, (name, label, (x, y)) in enumerate(zip(names, labels, embedding.T)):
-
+    for index, (name, label, (x, y)) in enumerate(zip(names, labels, embedding.T, strict=False)):
         dx = x - embedding[0]
         dx[index] = 1
         dy = y - embedding[1]
@@ -148,9 +140,7 @@ def plot_network_structure(
             size=10,
             horizontalalignment=horizontalalignment,
             verticalalignment=verticalalignment,
-            bbox=dict(
-                facecolor="w", edgecolor=edgecolor(label / float(n_labels)), alpha=alpha
-            ),
+            bbox={"facecolor": "w", "edgecolor": edgecolor(label / float(n_labels)), "alpha": alpha},
         )
 
         plt.xlim(

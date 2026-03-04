@@ -1,4 +1,5 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
+
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -14,10 +15,9 @@ __author__ = 'saeedamen'  # Saeed Amen
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-class AbstractPricer(object):
-
-    def __init__(self, market_df=None):
+class AbstractPricer:  # noqa: D101
+    def __init__(self, market_df=None):  # noqa: D107
         self._market_df = market_df
 
-    def price_instrument(self):
+    def price_instrument(self):  # noqa: D102
         pass

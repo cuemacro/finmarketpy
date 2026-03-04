@@ -1,9 +1,9 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
 #
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the  # noqa: E501
 # License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
@@ -13,21 +13,29 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 import math
+
 import numpy as np
+from findatapy.timeseries import Calculations, Calendar, Filter, Timezone
 from pandas.tseries.offsets import CustomBusinessDay
 
-from findatapy.timeseries import Calculations, Timezone, Filter, Calendar
 
-class EventStudy(object):
-    """Provides functions for doing event studies on price action on an intraday basis and daily basis.
+class EventStudy:
+    """Provides functions for doing event studies on price action on an intraday basis and daily basis."""
 
-    """
-
-    def __init__(self):
+    def __init__(self):  # noqa: D107
         pass
 
-    def get_economic_event_ret_over_custom_event_day(self, data_frame_in, event_dates, name, event, start, end,
-                                                     lagged=False, NYC_cutoff=10):
+    def get_economic_event_ret_over_custom_event_day(  # noqa: D102
+        self,
+        data_frame_in,
+        event_dates,
+        name,
+        event,
+        start,
+        end,
+        lagged=False,
+        NYC_cutoff=10,  # noqa: N803
+    ):
 
         filter = Filter()
         event_dates = filter.filter_time_series_by_date(start, end, event_dates)
@@ -37,7 +45,7 @@ class EventStudy(object):
         timezone = Timezone()
         calendar = Calendar()
 
-        bday = CustomBusinessDay(weekmask='Mon Tue Wed Thu Fri')
+        bday = CustomBusinessDay(weekmask="Mon Tue Wed Thu Fri")
 
         event_dates_nyc = timezone.convert_index_from_UTC_to_new_york_time(event_dates)
         average_hour_nyc = numpy.average(event_dates_nyc.index.hour)
@@ -49,62 +57,112 @@ class EventStudy(object):
         # implied_vol expires on next day eg. 3rd Jan implied_vol ON is 3rd-4th Jan implied_vol
 
         # TODO smarter way of adjusting dates, as sometimes events can be before/after 10am NY cut
-        if (lagged and average_hour_nyc >= NYC_cutoff):
+        if lagged and average_hour_nyc >= NYC_cutoff:
             data_frame.index = data_frame.index - bday
-        elif (not lagged and average_hour_nyc < NYC_cutoff):  # ie. implied_vol
+        elif not lagged and average_hour_nyc < NYC_cutoff:  # ie. implied_vol
             data_frame.index = data_frame.index + bday
 
         # set as New York time and select only those ON vols at the 10am NY cut just before the event
         data_frame_events = data_frame[event_dates.index]
-        data_frame_events.columns = data_frame.columns.values + '-' + name + ' ' + event
+        data_frame_events.columns = data_frame.columns.values + "-" + name + " " + event
 
         return data_frame_events
 
-    def get_daily_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
-                                             day_start=20, days=20, day_offset=0, create_index=False,
-                                             resample=False, cumsum=True, adj_cumsum_zero_point=False,
-                                             adj_zero_point=2):
+    def get_daily_moves_over_custom_event(  # noqa: D102
+        self,
+        data_frame_rets,
+        ef_time_frame,
+        vol=False,
+        day_start=20,
+        days=20,
+        day_offset=0,
+        create_index=False,
+        resample=False,
+        cumsum=True,
+        adj_cumsum_zero_point=False,
+        adj_zero_point=2,
+    ):
 
-        return self.get_intraday_moves_over_custom_event(data_frame_rets, ef_time_frame, vol=vol,
-                                                         minute_start=day_start, mins=days, min_offset=day_offset,
-                                                         create_index=create_index, resample=resample, freq='days',
-                                                         cumsum=cumsum, adj_cumsum_zero_point=adj_cumsum_zero_point,
-                                                         adj_zero_point=adj_zero_point)
+        return self.get_intraday_moves_over_custom_event(
+            data_frame_rets,
+            ef_time_frame,
+            vol=vol,
+            minute_start=day_start,
+            mins=days,
+            min_offset=day_offset,
+            create_index=create_index,
+            resample=resample,
+            freq="days",
+            cumsum=cumsum,
+            adj_cumsum_zero_point=adj_cumsum_zero_point,
+            adj_zero_point=adj_zero_point,
+        )
 
-    def get_weekly_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
-                                             day_start=20, days=20, day_offset=0, create_index=False,
-                                             resample=False, cumsum=True, adj_cumsum_zero_point=False,
-                                             adj_zero_point=2):
+    def get_weekly_moves_over_custom_event(  # noqa: D102
+        self,
+        data_frame_rets,
+        ef_time_frame,
+        vol=False,
+        day_start=20,
+        days=20,
+        day_offset=0,
+        create_index=False,
+        resample=False,
+        cumsum=True,
+        adj_cumsum_zero_point=False,
+        adj_zero_point=2,
+    ):
 
-        return self.get_intraday_moves_over_custom_event(data_frame_rets, ef_time_frame, vol=vol,
-                                                         minute_start=day_start, mins=days, min_offset=day_offset,
-                                                         create_index=create_index, resample=resample, freq='weeks',
-                                                         cumsum=cumsum, adj_cumsum_zero_point=adj_cumsum_zero_point,
-                                                         adj_zero_point=adj_zero_point)
+        return self.get_intraday_moves_over_custom_event(
+            data_frame_rets,
+            ef_time_frame,
+            vol=vol,
+            minute_start=day_start,
+            mins=days,
+            min_offset=day_offset,
+            create_index=create_index,
+            resample=resample,
+            freq="weeks",
+            cumsum=cumsum,
+            adj_cumsum_zero_point=adj_cumsum_zero_point,
+            adj_zero_point=adj_zero_point,
+        )
 
-    def get_intraday_moves_over_custom_event(self, data_frame_rets, ef_time_frame, vol=False,
-                                             minute_start=5, mins=3 * 60, min_offset=0, create_index=False,
-                                             resample=False, freq='minutes', cumsum=True, adj_cumsum_zero_point=False,
-                                             adj_zero_point=2):
+    def get_intraday_moves_over_custom_event(  # noqa: D102
+        self,
+        data_frame_rets,
+        ef_time_frame,
+        vol=False,
+        minute_start=5,
+        mins=3 * 60,
+        min_offset=0,
+        create_index=False,
+        resample=False,
+        freq="minutes",
+        cumsum=True,
+        adj_cumsum_zero_point=False,
+        adj_zero_point=2,
+    ):
         filter = Filter()
 
-        ef_time_frame = filter.filter_time_series_by_date(data_frame_rets.index[0], data_frame_rets.index[-1],
-                                                          ef_time_frame)
+        ef_time_frame = filter.filter_time_series_by_date(
+            data_frame_rets.index[0], data_frame_rets.index[-1], ef_time_frame
+        )
         ef_time = ef_time_frame.index
 
-        if freq == 'minutes':
+        if freq == "minutes":
             ef_time_start = ef_time - timedelta(minutes=minute_start)
             ef_time_end = ef_time + timedelta(minutes=mins)
             ann_factor = 252 * 1440
-        elif freq == 'days':
+        elif freq == "days":
             ef_time = ef_time_frame.index.normalize()
-            ef_time_start = ef_time - pandas.tseries.offsets.BusinessDay() * minute_start
-            ef_time_end = ef_time + pandas.tseries.offsets.BusinessDay() * mins
+            ef_time_start = ef_time - pd.tseries.offsets.BusinessDay() * minute_start
+            ef_time_end = ef_time + pd.tseries.offsets.BusinessDay() * mins
             ann_factor = 252
-        elif freq == 'weeks':
+        elif freq == "weeks":
             ef_time = ef_time_frame.index.normalize()
-            ef_time_start = ef_time - pandas.tseries.offsets.Week() * minute_start
-            ef_time_end = ef_time + pandas.tseries.offsets.Week() * mins
+            ef_time_start = ef_time - pd.tseries.offsets.Week() * minute_start
+            ef_time_end = ef_time + pd.tseries.offsets.Week() * mins
             ann_factor = 52
 
         ords = list(range(-minute_start + min_offset, mins + min_offset))
@@ -113,28 +171,27 @@ class EventStudy(object):
         # All data needs to be equally spaced
         if resample:
             # Make sure time series is properly sampled at 1 min intervals
-            if freq == 'minutes':
-                data_frame_rets = data_frame_rets.resample('1min').last()
+            if freq == "minutes":
+                data_frame_rets = data_frame_rets.resample("1min").last()
                 data_frame_rets = data_frame_rets.fillna(value=0)
                 data_frame_rets = filter.remove_out_FX_out_of_hours(data_frame_rets)
-            elif freq == 'daily':
-                data_frame_rets = data_frame_rets.resample('B').last()
+            elif freq == "daily":
+                data_frame_rets = data_frame_rets.resample("B").last()
                 data_frame_rets = data_frame_rets.fillna(value=0)
-            elif freq == 'weekly':
-                data_frame_rets = data_frame_rets.resample('W').last()
+            elif freq == "weekly":
+                data_frame_rets = data_frame_rets.resample("W").last()
                 data_frame_rets = data_frame_rets.fillna(value=0)
 
         start_index = data_frame_rets.index.searchsorted(ef_time_start)
         finish_index = data_frame_rets.index.searchsorted(ef_time_end)
 
-        data_frame = pandas.DataFrame(index=ords, columns=ef_time_frame.index)
+        data_frame = pd.DataFrame(index=ords, columns=ef_time_frame.index)
 
         for i in range(0, len(ef_time_frame.index)):
-
-            vals = data_frame_rets.iloc[start_index[i]:finish_index[i]].values
+            vals = data_frame_rets.iloc[start_index[i] : finish_index[i]].values
 
             st = ef_time_start[i]
-            en = ef_time_end[i]
+            ef_time_end[i]
 
             # Add extra "future" history in case we are doing an event study which goes outside our data window
             # (will just be filled with NaN)
@@ -142,7 +199,7 @@ class EventStudy(object):
                 extend = np.zeros((len(lst_ords) - len(vals), 1)) * np.nan
 
                 # If start window date is before we have data
-                if st < data_frame_rets.index[0]:
+                if st < data_frame_rets.index[0]:  # noqa: SIM108
                     vals = np.append(extend, vals)
 
                 # If end date window is after we have data
@@ -162,27 +219,40 @@ class EventStudy(object):
                 # Annualise (if vol)
                 data_frame = data_frame.rolling(center=False, window=5).std() * math.sqrt(ann_factor)
             elif cumsum:
-
                 data_frame = data_frame.cumsum()
 
                 # Adjust DataFrame so zero point shows zero returns
                 if adj_cumsum_zero_point:
                     ind = abs(minute_start) - adj_zero_point
 
-                    for i, c in enumerate(data_frame.columns):
+                    for i, c in enumerate(data_frame.columns):  # noqa: B007
                         data_frame[c] = data_frame[c] - data_frame[c].values[ind]
 
         return data_frame
 
-    def get_surprise_against_intraday_moves_over_custom_event(
-            self, data_frame_cross_orig, ef_time_frame, cross, event_fx, event_name, start, end,
-            offset_list=[1, 5, 30, 60], add_surprise=False, surprise_field='survey-average', freq='minutes'):
+    def get_surprise_against_intraday_moves_over_custom_event(  # noqa: D102
+        self,
+        data_frame_cross_orig,
+        ef_time_frame,
+        cross,
+        event_fx,
+        event_name,
+        start,
+        end,
+        offset_list=None,
+        add_surprise=False,
+        surprise_field="survey-average",
+        freq="minutes",
+    ):
 
+        if offset_list is None:
+            offset_list = [1, 5, 30, 60]
         ticker = event_fx + "-" + event_name + ".release-date-time-full"
 
         data_frame_agg = None
         data_frame_cross_orig = data_frame_cross_orig.resample(
-            'T').mean()  # resample to minute freq - in case there are missing values
+            "T"
+        ).mean()  # resample to minute freq - in case there are missing values
 
         ef_time_start = ef_time_frame[ticker] - timedelta(minutes=1)  # start time
         indices_start = data_frame_cross_orig.index.isin(ef_time_start)
@@ -196,10 +266,9 @@ class EventStudy(object):
             indices = data_frame_cross.index.isin(ef_time)
             col_dates = data_frame_cross.index[indices]
 
-            col_rets = (data_frame_cross.iloc[indices].values) \
-                       / (data_frame_cross.iloc[indices_start].values) - 1
+            col_rets = (data_frame_cross.iloc[indices].values) / (data_frame_cross.iloc[indices_start].values) - 1
 
-            mkt_moves = pandas.DataFrame(index=col_dates)
+            mkt_moves = pd.DataFrame(index=col_dates)
             mkt_moves[cross + " " + str(offset) + "m move"] = col_rets
             mkt_moves.index.name = ticker
             mkt_moves.index = col_dates - timedelta(minutes=offset - 1)
@@ -218,28 +287,28 @@ class EventStudy(object):
                 data_frame.index = temp_index
                 data_frame_agg = data_frame_agg.join(data_frame, on=ticker, how="inner")
 
-        if add_surprise == True:
-            data_frame_agg[event_fx + "-" + event_name + ".surprise"] = data_frame_agg[
-                                                                            event_fx + "-" + event_name + ".actual-release"] \
-                                                                        - data_frame_agg[
-                                                                            event_fx + "-" + event_name + "." + surprise_field]
+        if add_surprise:
+            data_frame_agg[event_fx + "-" + event_name + ".surprise"] = (
+                data_frame_agg[event_fx + "-" + event_name + ".actual-release"]
+                - data_frame_agg[event_fx + "-" + event_name + "." + surprise_field]
+            )
 
         return data_frame_agg
 
 
 ########################################################################################################################
 
-import datetime
-from datetime import timedelta
+import datetime  # noqa: E402
+from datetime import timedelta  # noqa: E402
 
-import numpy
+import numpy  # noqa: E402, ICN001
+from findatapy.market import IOEngine, SpeedCache  # noqa: E402
+from findatapy.util import ConfigManager  # noqa: E402
 
-from finmarketpy.util.marketconstants import MarketConstants
-from findatapy.market import IOEngine
-from findatapy.util import ConfigManager
-from findatapy.market import SpeedCache
+from finmarketpy.util.marketconstants import MarketConstants  # noqa: E402
 
 marketconstants = MarketConstants()
+
 
 class EventsFactory(EventStudy):
     """Provides methods to fetch data on economic data events and to perform basic event studies for market data around
@@ -260,7 +329,7 @@ class EventsFactory(EventStudy):
     USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-dt	            20030207
     USD-US Employees on Nonfarm Payrolls Total MoM Net Change SA.release-date-time-full	08/01/1999 13:30
 
-    """
+    """  # noqa: D205
 
     # _econ_data_frame = None
 
@@ -269,11 +338,11 @@ class EventsFactory(EventStudy):
     _hdf5_file_econ_file = MarketConstants().hdf5_file_econ_file
     _db_database_econ_file = MarketConstants().db_database_econ_file
 
-    ### Manual offset for certain events where Bloomberg/data vendor displays the wrong date (usually because of time differences)
+    ### Manual offset for certain events where Bloomberg/data vendor displays the wrong date (usually because of time differences)  # noqa: E501
     # You may need to add to this list
-    _offset_events = {'AUD-Australia Labor Force Employment Change SA.release-dt': 1}
+    _offset_events = {"AUD-Australia Labor Force Employment Change SA.release-dt": 1}  # noqa: RUF012
 
-    def __init__(self, df=None):
+    def __init__(self, df=None):  # noqa: D107
         super(EventStudy, self).__init__()
 
         self.config = ConfigManager()
@@ -288,21 +357,23 @@ class EventsFactory(EventStudy):
 
         return
 
-    def load_economic_events(self):
+    def load_economic_events(self):  # noqa: D102
         self._econ_data_frame = self.speed_cache.get_dataframe(self._db_database_econ_file)
 
         if self._econ_data_frame is None:
             # self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(self._hdf5_file_econ_file)
             self._econ_data_frame = self.io_engine.read_time_series_cache_from_disk(
-                self._db_database_econ_file, engine=marketconstants.write_engine,
+                self._db_database_econ_file,
+                engine=marketconstants.write_engine,
                 db_server=marketconstants.db_server,
                 db_port=marketconstants.db_port,
                 username=marketconstants.db_username,
-                password=marketconstants.db_password)
+                password=marketconstants.db_password,
+            )
 
             self.speed_cache.put_dataframe(self._db_database_econ_file, self._econ_data_frame)
 
-    def harvest_category(self, category_name):
+    def harvest_category(self, category_name):  # noqa: D102
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)
 
         for k in cat:
@@ -313,39 +384,41 @@ class EventsFactory(EventStudy):
 
         return data_frame
 
-    def get_economic_events(self):
+    def get_economic_events(self):  # noqa: D102
         return self._econ_data_frame
 
-    def dump_economic_events_csv(self, path):
+    def dump_economic_events_csv(self, path):  # noqa: D102
         self._econ_data_frame.to_csv(path)
 
-    def get_economic_event_date_time(self, name, event=None, csv=None):
+    def get_economic_event_date_time(self, name, event=None, csv=None):  # noqa: D102
         ticker = self.create_event_descriptor_field(name, event, "release-date-time-full")
 
         if csv is None:
             data_frame = self._econ_data_frame[ticker]
             data_frame.index = self._econ_data_frame[ticker]
         else:
-            dateparse = lambda x: datetime.datetime.strptime(x, '%d/%m/%Y %H:%M')
 
-            data_frame = pandas.read_csv(csv, index_col=0, parse_dates=True, date_parser=dateparse)
+            def dateparse(x):
+                return datetime.datetime.strptime(x, "%d/%m/%Y %H:%M")
 
-        data_frame = data_frame[pandas.notnull(data_frame.index)]
+            data_frame = pd.read_csv(csv, index_col=0, parse_dates=True, date_parser=dateparse)
+
+        data_frame = data_frame[pd.notnull(data_frame.index)]
 
         start_date = datetime.datetime.strptime("01-Jan-1971", "%d-%b-%Y")
         self.filter.filter_time_series_by_date(start_date, None, data_frame)
 
         return data_frame
 
-    def get_economic_event_date_time_dataframe(self, name, event=None, csv=None):
+    def get_economic_event_date_time_dataframe(self, name, event=None, csv=None):  # noqa: D102
         series = self.get_economic_event_date_time(name, event, csv)
 
-        data_frame = pandas.DataFrame(series.values, index=series.index)
+        data_frame = pd.DataFrame(series.values, index=series.index)
         data_frame.columns.name = self.create_event_descriptor_field(name, event, "release-date-time-full")
 
         return data_frame
 
-    def get_economic_event_date_time_fields(self, fields, name, event=None):
+    def get_economic_event_date_time_fields(self, fields, name, event=None):  # noqa: D102
         ### acceptable fields
         # observation-date <- observation time for the index
         # actual-release
@@ -374,13 +447,12 @@ class EventsFactory(EventStudy):
         date_time_fore = event_date_time.index
 
         # create dates for join later
-        date_time_dt = [datetime.datetime(
-            date_time_fore[x].year,
-            date_time_fore[x].month,
-            date_time_fore[x].day)
-            for x in range(len(date_time_fore))]
+        date_time_dt = [
+            datetime.datetime(date_time_fore[x].year, date_time_fore[x].month, date_time_fore[x].day)
+            for x in range(len(date_time_fore))
+        ]
 
-        event_date_time_frame = pandas.DataFrame(event_date_time.index, date_time_dt)
+        event_date_time_frame = pd.DataFrame(event_date_time.index, date_time_dt)
         event_date_time_frame.index = date_time_dt
 
         ######## grab event date/fields
@@ -390,109 +462,154 @@ class EventsFactory(EventStudy):
         data_frame.index = self._econ_data_frame[ticker_index]
 
         data_frame = data_frame[data_frame.index != 0]  # eliminate any 0 dates (artifact of Excel)
-        data_frame = data_frame[pandas.notnull(data_frame.index)]  # eliminate any NaN dates (artifact of Excel)
+        data_frame = data_frame[pd.notnull(data_frame.index)]  # eliminate any NaN dates (artifact of Excel)
         ind_dt = data_frame.index
 
         # Convert yyyymmdd format to datetime
-        data_frame.index = [datetime.datetime(
-            int((ind_dt[x] - (ind_dt[x] % 10000)) / 10000),
-            int(((ind_dt[x] % 10000) - (ind_dt[x] % 100)) / 100),
-            int(ind_dt[x] % 100)) for x in range(len(ind_dt))]
+        data_frame.index = [
+            datetime.datetime(
+                int((ind_dt[x] - (ind_dt[x] % 10000)) / 10000),
+                int(((ind_dt[x] % 10000) - (ind_dt[x] % 100)) / 100),
+                int(ind_dt[x] % 100),
+            )
+            for x in range(len(ind_dt))
+        ]
 
         # HACK! certain events need an offset because BBG have invalid dates
         if ticker_index in self._offset_events:
             data_frame.index = data_frame.index + timedelta(days=self._offset_events[ticker_index])
 
         ######## join together event dates/date-time/fields in one data frame
-        data_frame = event_date_time_frame.join(data_frame, how='inner')
-        data_frame.index = pandas.to_datetime(data_frame.index)
+        data_frame = event_date_time_frame.join(data_frame, how="inner")
+        data_frame.index = pd.to_datetime(data_frame.index)
         data_frame.index.name = ticker_index
 
         return data_frame
 
-    def create_event_descriptor_field(self, name, event, field):
+    def create_event_descriptor_field(self, name, event, field):  # noqa: D102
         if event is None:
             return name + "." + field
         else:
             return name + "-" + event + "." + field
 
-    def get_all_economic_events_date_time(self):
+    def get_all_economic_events_date_time(self):  # noqa: D102
         event_names = self.get_all_economic_events()
-        columns = ['event-name', 'release-date-time-full']
+        columns = ["event-name", "release-date-time-full"]
 
-        data_frame = pandas.DataFrame(data=numpy.zeros((0, len(columns))), columns=columns)
+        data_frame = pd.DataFrame(data=numpy.zeros((0, len(columns))), columns=columns)
 
         for event in event_names:
             event_times = self.get_economic_event_date_time(event)
 
             for time in event_times:
-                data_frame.append({'event-name': event, 'release-date-time-full': time}, ignore_index=True)
+                data_frame.append({"event-name": event, "release-date-time-full": time}, ignore_index=True)
 
         return data_frame
 
-    def get_all_economic_events(self):
+    def get_all_economic_events(self):  # noqa: D102
         field_names = self._econ_data_frame.columns.values
 
-        event_names = [x.split('.')[0] for x in field_names if '.Date' in x]
+        event_names = [x.split(".")[0] for x in field_names if ".Date" in x]
 
         event_names_filtered = [x for x in event_names if len(x) > 4]
 
         # sort list alphabetically (and remove any duplicates)
         return list(set(event_names_filtered))
 
-    def get_economic_event_date(self, name, event=None):
-        return self._econ_data_frame[
-            self.create_event_descriptor_field(name, event, ".release-dt")]
+    def get_economic_event_date(self, name, event=None):  # noqa: D102
+        return self._econ_data_frame[self.create_event_descriptor_field(name, event, ".release-dt")]
 
-    def get_economic_event_ret_over_custom_event_day(self, data_frame_in, name, event, start, end, lagged=False,
-                                                     NYC_cutoff=10):
+    def get_economic_event_ret_over_custom_event_day(  # noqa: D102
+        self,
+        data_frame_in,
+        name,
+        event,
+        start,
+        end,
+        lagged=False,
+        NYC_cutoff=10,  # noqa: N803
+    ):
 
         # Get the times of events
         event_dates = self.get_economic_event_date_time(name, event)
 
-        return super(EventsFactory, self).get_economic_event_ret_over_custom_event_day(data_frame_in, event_dates, name,
-                                                                                       event, start, end,
-                                                                                       lagged=lagged,
-                                                                                       NYC_cutoff=NYC_cutoff)
+        return super().get_economic_event_ret_over_custom_event_day(
+            data_frame_in, event_dates, name, event, start, end, lagged=lagged, NYC_cutoff=NYC_cutoff
+        )
 
-    def get_economic_event_vol_over_event_day(self, vol_in, name, event, start, end, realised=False):
+    def get_economic_event_vol_over_event_day(self, vol_in, name, event, start, end, realised=False):  # noqa: D102
 
-        return self.get_economic_event_ret_over_custom_event_day(vol_in, name, event, start, end,
-                                                                 lagged=realised)
+        return self.get_economic_event_ret_over_custom_event_day(vol_in, name, event, start, end, lagged=realised)
 
-        # return super(EventsFactory, self).get_economic_event_ret_over_event_day(vol_in, name, event, start, end, lagged = realised)
+        # return super(EventsFactory, self).get_economic_event_ret_over_event_day(vol_in, name, event, start, end, lagged = realised)  # noqa: E501
 
-    def get_daily_moves_over_event(self):
+    def get_daily_moves_over_event(self):  # noqa: D102
         # TODO
         pass
 
     # Return only US events etc. by dates
-    def get_intraday_moves_over_event(self, data_frame_rets, cross, event_fx, event_name, start, end, vol, mins=3 * 60,
-                                      min_offset=0, create_index=False, resample=False, freq='minutes'):
+    def get_intraday_moves_over_event(  # noqa: D102
+        self,
+        data_frame_rets,
+        cross,
+        event_fx,
+        event_name,
+        start,
+        end,
+        vol,
+        mins=3 * 60,
+        min_offset=0,
+        create_index=False,
+        resample=False,
+        freq="minutes",
+    ):
 
         ef_time_frame = self.get_economic_event_date_time_dataframe(event_fx, event_name)
         ef_time_frame = self.filter.filter_time_series_by_date(start, end, ef_time_frame)
 
-        return self.get_intraday_moves_over_custom_event(data_frame_rets, ef_time_frame,
-                                                         vol, mins=mins, min_offset=min_offset,
-                                                         create_index=create_index, resample=resample,
-                                                         freq=freq)  # , start, end)
+        return self.get_intraday_moves_over_custom_event(
+            data_frame_rets,
+            ef_time_frame,
+            vol,
+            mins=mins,
+            min_offset=min_offset,
+            create_index=create_index,
+            resample=resample,
+            freq=freq,
+        )  # , start, end)
 
-    def get_surprise_against_intraday_moves_over_event(self, data_frame_cross_orig, cross, event_fx, event_name, start,
-                                                       end,
-                                                       offset_list=[1, 5, 30, 60], add_surprise=False,
-                                                       surprise_field='survey-average'):
+    def get_surprise_against_intraday_moves_over_event(  # noqa: D102
+        self,
+        data_frame_cross_orig,
+        cross,
+        event_fx,
+        event_name,
+        start,
+        end,
+        offset_list=None,
+        add_surprise=False,
+        surprise_field="survey-average",
+    ):
 
-        fields = ['actual-release', 'survey-median', 'survey-average', 'survey-high', 'survey-low']
+        if offset_list is None:
+            offset_list = [1, 5, 30, 60]
+        fields = ["actual-release", "survey-median", "survey-average", "survey-high", "survey-low"]
 
         ef_time_frame = self.get_economic_event_date_time_fields(fields, event_fx, event_name)
         ef_time_frame = self.filter.filter_time_series_by_date(start, end, ef_time_frame)
 
-        return self.get_surprise_against_intraday_moves_over_custom_event(data_frame_cross_orig, ef_time_frame, cross,
-                                                                          event_fx, event_name, start, end,
-                                                                          offset_list=offset_list,
-                                                                          add_surprise=add_surprise,
-                                                                          surprise_field=surprise_field)
+        return self.get_surprise_against_intraday_moves_over_custom_event(
+            data_frame_cross_orig,
+            ef_time_frame,
+            cross,
+            event_fx,
+            event_name,
+            start,
+            end,
+            offset_list=offset_list,
+            add_surprise=add_surprise,
+            surprise_field=surprise_field,
+        )
 
 
 ########################################################################################################################
@@ -512,27 +629,29 @@ These can be automatically generated via conf/econ_tickers.xlsm
 
 """
 
-import pandas
+import functools  # noqa: E402
+import operator  # noqa: E402
 
-from findatapy.market import MarketDataGenerator, MarketDataRequest
-from findatapy.util import DataConstants, LoggerManager
+import pandas as pd  # noqa: E402
+from findatapy.market import MarketDataGenerator, MarketDataRequest  # noqa: E402
+from findatapy.util import DataConstants, LoggerManager  # noqa: E402
 
 
-class HistEconDataFactory(object):
+class HistEconDataFactory:  # noqa: D101
+    def __init__(self, market_data_generator=None):  # noqa: D107
 
-    def __init__(self, market_data_generator=None):
-
-        self._all_econ_tickers = pandas.read_csv(DataConstants().all_econ_tickers)
-        self._econ_country_codes = pandas.read_csv(DataConstants().econ_country_codes)
-        self._econ_country_groups = pandas.read_csv(DataConstants().econ_country_groups)
+        self._all_econ_tickers = pd.read_csv(DataConstants().all_econ_tickers)
+        self._econ_country_codes = pd.read_csv(DataConstants().econ_country_codes)
+        self._econ_country_groups = pd.read_csv(DataConstants().econ_country_groups)
 
         if market_data_generator is None:
             self.market_data_generator = MarketDataGenerator()
         else:
             self.market_data_generator = market_data_generator
 
-    def get_economic_data_history(self, start_date, finish_date, country_group, data_type,
-                                  source='alfred', cache_algo="internet_load_return"):
+    def get_economic_data_history(  # noqa: D102
+        self, start_date, finish_date, country_group, data_type, source="alfred", cache_algo="internet_load_return"
+    ):
 
         logger = LoggerManager().getLogger(__name__)
 
@@ -543,57 +662,63 @@ class HistEconDataFactory(object):
             pretty_country_names = country_group
         else:
             # Get all the country names in the country_group
-            pretty_country_names = list(self._econ_country_groups[
-                                            self._econ_country_groups["Country Group"] == country_group]['Country'])
+            pretty_country_names = list(
+                self._econ_country_groups[self._econ_country_groups["Country Group"] == country_group]["Country"]
+            )
 
         # Construct the pretty tickers
-        pretty_tickers = [x + '-' + data_type for x in pretty_country_names]
+        pretty_tickers = [x + "-" + data_type for x in pretty_country_names]
 
         # Get vendor tickers
         vendor_tickers = []
 
         for pretty_ticker in pretty_tickers:
-            vendor_ticker = list(self._all_econ_tickers[
-                                     self._all_econ_tickers["Full Code"] == pretty_ticker][source].values)
+            vendor_ticker = list(
+                self._all_econ_tickers[self._all_econ_tickers["Full Code"] == pretty_ticker][source].values
+            )
 
             if vendor_ticker == []:
                 vendor_ticker = None
-                logger.error('Could not find match for ' + pretty_ticker)
+                logger.error("Could not find match for " + pretty_ticker)
             else:
                 vendor_ticker = vendor_ticker[0]
 
             vendor_tickers.append(vendor_ticker)
 
-        vendor_fields = ['close']
+        vendor_fields = ["close"]
 
-        if source == 'bloomberg': vendor_fields = ['PX_LAST']
+        if source == "bloomberg":
+            vendor_fields = ["PX_LAST"]
 
         md_request = MarketDataRequest(
-            start_date=start_date,      # start date
-            finish_date=finish_date,    # finish date
-            category='economic',
-            freq='daily',               # daily data
-            data_source=source,         # use Bloomberg as data source
-            cut='LOC',
+            start_date=start_date,  # start date
+            finish_date=finish_date,  # finish date
+            category="economic",
+            freq="daily",  # daily data
+            data_source=source,  # use Bloomberg as data source
+            cut="LOC",
             tickers=pretty_tickers,
-            fields=['close'],           # which fields to download
+            fields=["close"],  # which fields to download
             vendor_tickers=vendor_tickers,
             vendor_fields=vendor_fields,  # which Bloomberg/data vendor fields to download
-            cache_algo=cache_algo)      # how to return data
+            cache_algo=cache_algo,
+        )  # how to return data
 
         return self.market_data_generator.fetch_market_data(md_request)
 
-    def grasp_coded_entry(self, df, index):
+    def grasp_coded_entry(self, df, index):  # noqa: D102
         df = df[index:].stack()
         df = df.reset_index()
-        df.columns = ['Date', 'Name', 'Val']
+        df.columns = ["Date", "Name", "Val"]
 
-        countries = df['Name']
+        countries = df["Name"]
 
-        countries = [x.split('-', 1)[0] for x in countries]
+        countries = [x.split("-", 1)[0] for x in countries]
 
-        df['Code'] = sum(
-            [list(self._econ_country_codes[self._econ_country_codes["Country"] == x]['Code']) for x in countries],
-            [])
+        df["Code"] = functools.reduce(
+            operator.iadd,
+            [list(self._econ_country_codes[self._econ_country_codes["Country"] == x]["Code"]) for x in countries],
+            [],
+        )
 
         return df

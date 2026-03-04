@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -16,21 +16,20 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 from findatapy.market import MarketDataRequest
+from findatapy.util.loggermanager import LoggerManager
+from pandas import DataFrame
 
 from finmarketpy.economics import TechParams
-from findatapy.util.loggermanager import LoggerManager
-
-from pandas import DataFrame
 
 
 class BacktestRequest(MarketDataRequest):
-    """Contains parameters necessary to define a backtest, including start date, finish date, transaction cost, etc
+    """Contains parameters necessary to define a backtest, including start date, finish date, transaction cost, etc.
 
     Used by TradingModel and Backtest to construct backtested returns for trading strategies
 
     """
 
-    def __init__(self):
+    def __init__(self):  # noqa: D107
         super(MarketDataRequest, self).__init__()
 
         self.__signal_name = None
@@ -44,7 +43,7 @@ class BacktestRequest(MarketDataRequest):
         self.__plot_interim = False
         self.__include_benchmark = False
 
-        self.__trading_field = 'close'
+        self.__trading_field = "close"
 
         self.__tech_params = TechParams()
 
@@ -55,7 +54,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_period_shift = 0
         self.__portfolio_vol_rebalance_freq = None
         self.__portfolio_vol_resample_freq = None
-        self.__portfolio_vol_resample_type = 'mean'
+        self.__portfolio_vol_resample_type = "mean"
         self.__portfolio_vol_target = 0.1  # 10% vol target
         self.__portfolio_vol_max_leverage = None
         self.__portfolio_vol_periods = 20
@@ -66,7 +65,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_period_shift = 0
         self.__signal_vol_rebalance_freq = None
         self.__signal_vol_resample_freq = None
-        self.__signal_vol_resample_type = 'mean'
+        self.__signal_vol_resample_type = "mean"
         self.__signal_vol_target = 0.1  # 10% vol target
         self.__signal_vol_max_leverage = None
         self.__signal_vol_periods = 20
@@ -82,8 +81,10 @@ class BacktestRequest(MarketDataRequest):
         self.__max_abs_exposure = None
 
         self.__position_clip_rebalance_freq = None
-        self.__position_clip_resample_freq = None  # by default apply max position criterion on last business day of month
-        self.__position_clip_resample_type = 'mean'
+        self.__position_clip_resample_freq = (
+            None  # by default apply max position criterion on last business day of month
+        )
+        self.__position_clip_resample_type = "mean"
         self.__position_clip_period_shift = 0
 
         # Take profit and stop loss parameters
@@ -102,11 +103,11 @@ class BacktestRequest(MarketDataRequest):
         # How do we create a cumulative index of strategy returns
         # either multiplicative starting a 100
         # or additive starting at 0
-        self.__cum_index = 'mult'  # 'mult' or 'add'
+        self.__cum_index = "mult"  # 'mult' or 'add'
 
     ##### properties for output of the backtest
     @property
-    def plot_start(self):
+    def plot_start(self):  # noqa: D102
         return self.__plot_start
 
     @plot_start.setter
@@ -114,7 +115,7 @@ class BacktestRequest(MarketDataRequest):
         self.__plot_start = plot_start
 
     @property
-    def plot_finish(self):
+    def plot_finish(self):  # noqa: D102
         return self.__plot_finish
 
     @plot_finish.setter
@@ -122,7 +123,7 @@ class BacktestRequest(MarketDataRequest):
         self.__plot_finish = plot_finish
 
     @property
-    def calc_stats(self):
+    def calc_stats(self):  # noqa: D102
         return self.__calc_stats
 
     @calc_stats.setter
@@ -130,7 +131,7 @@ class BacktestRequest(MarketDataRequest):
         self.__calc_stats = calc_stats
 
     @property
-    def write_csv(self):
+    def write_csv(self):  # noqa: D102
         return self.__write_csv
 
     @write_csv.setter
@@ -138,7 +139,7 @@ class BacktestRequest(MarketDataRequest):
         self.__write_csv = write_csv
 
     @property
-    def write_csv_pnl(self):
+    def write_csv_pnl(self):  # noqa: D102
         return self.__write_csv_pnl
 
     @write_csv_pnl.setter
@@ -146,7 +147,7 @@ class BacktestRequest(MarketDataRequest):
         self.__write_csv_pnl = write_csv_pnl
 
     @property
-    def plot_interim(self):
+    def plot_interim(self):  # noqa: D102
         return self.__plot_interim
 
     @plot_interim.setter
@@ -154,7 +155,7 @@ class BacktestRequest(MarketDataRequest):
         self.__plot_interim = plot_interim
 
     @property
-    def include_benchmark(self):
+    def include_benchmark(self):  # noqa: D102
         return self.__include_benchmark
 
     @include_benchmark.setter
@@ -162,7 +163,7 @@ class BacktestRequest(MarketDataRequest):
         self.__include_benchmark = include_benchmark
 
     @property
-    def trading_field(self):
+    def trading_field(self):  # noqa: D102
         return self.__trading_field
 
     @trading_field.setter
@@ -170,7 +171,7 @@ class BacktestRequest(MarketDataRequest):
         self.__trading_field = trading_field
 
     @property
-    def portfolio_weight_construction(self):
+    def portfolio_weight_construction(self):  # noqa: D102
         return self.__portfolio_weight_construction
 
     @portfolio_weight_construction.setter
@@ -180,7 +181,7 @@ class BacktestRequest(MarketDataRequest):
     ##### Properties for portfolio level volatility adjustment
 
     @property
-    def portfolio_vol_adjust(self):
+    def portfolio_vol_adjust(self):  # noqa: D102
         return self.__portfolio_vol_adjust
 
     @portfolio_vol_adjust.setter
@@ -188,7 +189,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_adjust = portfolio_vol_adjust
 
     @property
-    def portfolio_vol_rebalance_freq(self):
+    def portfolio_vol_rebalance_freq(self):  # noqa: D102
         return self.__portfolio_vol_rebalance_freq
 
     @portfolio_vol_rebalance_freq.setter
@@ -196,7 +197,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_rebalance_freq = portfolio_vol_rebalance_freq
 
     @property
-    def portfolio_vol_resample_type(self):
+    def portfolio_vol_resample_type(self):  # noqa: D102
         return self.__portfolio_vol_resample_type
 
     @portfolio_vol_resample_type.setter
@@ -204,7 +205,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_resample_type = portfolio_vol_resample_type
 
     @property
-    def portfolio_vol_resample_freq(self):
+    def portfolio_vol_resample_freq(self):  # noqa: D102
         return self.__portfolio_vol_resample_freq
 
     @portfolio_vol_resample_freq.setter
@@ -212,7 +213,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_resample_freq = portfolio_vol_resample_freq
 
     @property
-    def portfolio_vol_period_shift(self):
+    def portfolio_vol_period_shift(self):  # noqa: D102
         return self.__portfolio_vol_period_shift
 
     @portfolio_vol_period_shift.setter
@@ -220,7 +221,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_period_shift = portfolio_vol_period_shift
 
     @property
-    def portfolio_vol_target(self):
+    def portfolio_vol_target(self):  # noqa: D102
         return self.__portfolio_vol_target
 
     @portfolio_vol_target.setter
@@ -228,7 +229,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_target = portfolio_vol_target
 
     @property
-    def portfolio_vol_max_leverage(self):
+    def portfolio_vol_max_leverage(self):  # noqa: D102
         return self.__portfolio_vol_max_leverage
 
     @portfolio_vol_max_leverage.setter
@@ -236,7 +237,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_max_leverage = portfolio_vol_max_leverage
 
     @property
-    def portfolio_vol_periods(self):
+    def portfolio_vol_periods(self):  # noqa: D102
         return self.__portfolio_vol_periods
 
     @portfolio_vol_periods.setter
@@ -244,7 +245,7 @@ class BacktestRequest(MarketDataRequest):
         self.__portfolio_vol_periods = portfolio_vol_periods
 
     @property
-    def portfolio_vol_obs_in_year(self):
+    def portfolio_vol_obs_in_year(self):  # noqa: D102
         return self.__portfolio_vol_obs_in_year
 
     @portfolio_vol_obs_in_year.setter
@@ -253,7 +254,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### properties for signal level vol adjustment
     @property
-    def signal_vol_adjust(self):
+    def signal_vol_adjust(self):  # noqa: D102
         return self.__signal_vol_adjust
 
     @signal_vol_adjust.setter
@@ -261,7 +262,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_adjust = signal_vol_adjust
 
     @property
-    def signal_vol_rebalance_freq(self):
+    def signal_vol_rebalance_freq(self):  # noqa: D102
         return self.__signal_vol_rebalance_freq
 
     @signal_vol_rebalance_freq.setter
@@ -269,7 +270,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_rebalance_freq = signal_vol_rebalance_freq
 
     @property
-    def signal_vol_resample_type(self):
+    def signal_vol_resample_type(self):  # noqa: D102
         return self.__signal_vol_resample_type
 
     @signal_vol_resample_type.setter
@@ -277,7 +278,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_resample_type = signal_vol_resample_type
 
     @property
-    def signal_vol_resample_freq(self):
+    def signal_vol_resample_freq(self):  # noqa: D102
         return self.__signal_vol_resample_freq
 
     @signal_vol_resample_freq.setter
@@ -285,7 +286,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_resample_freq = signal_vol_resample_freq
 
     @property
-    def signal_vol_period_shift(self):
+    def signal_vol_period_shift(self):  # noqa: D102
         return self.__signal_vol_period_shift
 
     @signal_vol_period_shift.setter
@@ -293,7 +294,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_period_shift = signal_vol_period_shift
 
     @property
-    def signal_vol_target(self):
+    def signal_vol_target(self):  # noqa: D102
         return self.__signal_vol_target
 
     @signal_vol_target.setter
@@ -301,7 +302,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_target = signal_vol_target
 
     @property
-    def signal_vol_max_leverage(self):
+    def signal_vol_max_leverage(self):  # noqa: D102
         return self.__signal_vol_max_leverage
 
     @signal_vol_max_leverage.setter
@@ -309,7 +310,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_max_leverage = signal_vol_max_leverage
 
     @property
-    def signal_vol_periods(self):
+    def signal_vol_periods(self):  # noqa: D102
         return self.__signal_vol_periods
 
     @signal_vol_periods.setter
@@ -317,7 +318,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_vol_periods = signal_vol_periods
 
     @property
-    def signal_vol_obs_in_year(self):
+    def signal_vol_obs_in_year(self):  # noqa: D102
         return self.__signal_vol_obs_in_year
 
     @signal_vol_obs_in_year.setter
@@ -326,7 +327,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### portfolio notional size
     @property
-    def portfolio_notional_size(self):
+    def portfolio_notional_size(self):  # noqa: D102
         return self.__portfolio_notional_size
 
     @portfolio_notional_size.setter
@@ -335,7 +336,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### portfolio combination style (sum, mean, weighted, weighted-sum)
     @property
-    def portfolio_combination(self):
+    def portfolio_combination(self):  # noqa: D102
         return self.__portfolio_combination
 
     @portfolio_combination.setter
@@ -344,7 +345,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### portfolio weights (sum, mean)
     @property
-    def portfolio_combination_weights(self):
+    def portfolio_combination_weights(self):  # noqa: D102
         return self.__portfolio_combination_weights
 
     @portfolio_combination_weights.setter
@@ -353,7 +354,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### properties for maximum position constraints
     @property
-    def max_net_exposure(self):
+    def max_net_exposure(self):  # noqa: D102
         return self.__max_net_exposure
 
     @max_net_exposure.setter
@@ -361,7 +362,7 @@ class BacktestRequest(MarketDataRequest):
         self.__max_net_exposure = max_net_exposure
 
     @property
-    def max_abs_exposure(self):
+    def max_abs_exposure(self):  # noqa: D102
         return self.__max_abs_exposure
 
     @max_abs_exposure.setter
@@ -369,7 +370,7 @@ class BacktestRequest(MarketDataRequest):
         self.__max_abs_exposure = max_abs_exposure
 
     @property
-    def position_clip_rebalance_freq(self):
+    def position_clip_rebalance_freq(self):  # noqa: D102
         return self.__position_clip_rebalance_freq
 
     @position_clip_rebalance_freq.setter
@@ -377,7 +378,7 @@ class BacktestRequest(MarketDataRequest):
         self.__position_clip_rebalance_freq = position_clip_rebalance_freq
 
     @property
-    def position_clip_resample_type(self):
+    def position_clip_resample_type(self):  # noqa: D102
         return self.__position_clip_resample_type
 
     @position_clip_resample_type.setter
@@ -385,7 +386,7 @@ class BacktestRequest(MarketDataRequest):
         self.__position_clip_resample_type = position_clip_resample_type
 
     @property
-    def position_clip_resample_freq(self):
+    def position_clip_resample_freq(self):  # noqa: D102
         return self.__position_clip_resample_freq
 
     @position_clip_resample_freq.setter
@@ -393,7 +394,7 @@ class BacktestRequest(MarketDataRequest):
         self.__position_clip_resample_freq = position_clip_resample_freq
 
     @property
-    def position_clip_period_shift(self):
+    def position_clip_period_shift(self):  # noqa: D102
         return self.__position_clip_period_shift
 
     @position_clip_period_shift.setter
@@ -402,7 +403,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### stop loss and take profit
     @property
-    def stop_loss(self):
+    def stop_loss(self):  # noqa: D102
         return self.__stop_loss
 
     @stop_loss.setter
@@ -410,7 +411,7 @@ class BacktestRequest(MarketDataRequest):
         self.__stop_loss = stop_loss
 
     @property
-    def take_profit(self):
+    def take_profit(self):  # noqa: D102
         return self.__take_profit
 
     @take_profit.setter
@@ -419,7 +420,7 @@ class BacktestRequest(MarketDataRequest):
 
     ##### tech indicators and spot bp tc
     @property
-    def tech_params(self):
+    def tech_params(self):  # noqa: D102
         return self.__tech_params
 
     @tech_params.setter
@@ -427,7 +428,7 @@ class BacktestRequest(MarketDataRequest):
         self.__tech_params = tech_params
 
     @property
-    def spot_tc_bp(self):
+    def spot_tc_bp(self):  # noqa: D102
         return self.__spot_tc_bp
 
     @spot_tc_bp.setter
@@ -435,7 +436,7 @@ class BacktestRequest(MarketDataRequest):
         if isinstance(spot_tc_bp, dict):
             spot_tc_bp = spot_tc_bp.copy()
 
-            for k in spot_tc_bp.keys():
+            for k in spot_tc_bp:
                 spot_tc_bp[k] = float(spot_tc_bp[k]) / (2.0 * 100.0 * 100.0)
 
             self.__spot_tc_bp = spot_tc_bp
@@ -446,7 +447,7 @@ class BacktestRequest(MarketDataRequest):
             self.__spot_tc_bp = float(spot_tc_bp) / (2.0 * 100.0 * 100.0)
 
     @property
-    def spot_rc_bp(self):
+    def spot_rc_bp(self):  # noqa: D102
         return self.__spot_rc_bp
 
     @spot_rc_bp.setter
@@ -454,7 +455,7 @@ class BacktestRequest(MarketDataRequest):
         if isinstance(spot_rc_bp, dict):
             spot_rc_bp = spot_rc_bp.copy()
 
-            for k in spot_rc_bp.keys():
+            for k in spot_rc_bp:
                 spot_rc_bp[k] = float(spot_rc_bp[k]) / (100.0 * 100.0)
 
             self.__spot_rc_bp = spot_rc_bp
@@ -467,7 +468,7 @@ class BacktestRequest(MarketDataRequest):
     #### FOR FUTURE USE ###
 
     @property
-    def signal_name(self):
+    def signal_name(self):  # noqa: D102
         return self.__signal_name
 
     @signal_name.setter
@@ -475,35 +476,33 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_name = signal_name
 
     @property
-    def asset(self):
+    def asset(self):  # noqa: D102
         return self.__asset
 
     @asset.setter
     def asset(self, asset):
-        valid_asset = ['fx', 'multi-asset']
+        valid_asset = ["fx", "multi-asset"]
 
-        if not asset in valid_asset:
-            LoggerManager().getLogger(__name__).warning(
-                asset & " is not a defined asset.")
+        if asset not in valid_asset:
+            LoggerManager().getLogger(__name__).warning(asset & " is not a defined asset.")
 
         self.__asset = asset
 
     @property
-    def instrument(self):
+    def instrument(self):  # noqa: D102
         return self.__instrument
 
     @instrument.setter
     def instrument(self, instrument):
-        valid_instrument = ['spot', 'futures', 'options']
+        valid_instrument = ["spot", "futures", "options"]
 
-        if not instrument in valid_instrument:
-            LoggerManager().getLogger(__name__).warning(
-                instrument & " is not a defined trading instrument.")
+        if instrument not in valid_instrument:
+            LoggerManager().getLogger(__name__).warning(instrument & " is not a defined trading instrument.")
 
         self.__instrument = instrument
 
     @property
-    def signal_delay(self):
+    def signal_delay(self):  # noqa: D102
         return self.__signal_delay
 
     @signal_delay.setter
@@ -511,7 +510,7 @@ class BacktestRequest(MarketDataRequest):
         self.__signal_delay = signal_delay
 
     @property
-    def ann_factor(self):
+    def ann_factor(self):  # noqa: D102
         return self.__ann_factor
 
     @ann_factor.setter
@@ -519,7 +518,7 @@ class BacktestRequest(MarketDataRequest):
         self.__ann_factor = ann_factor
 
     @property
-    def resample_ann_factor(self):
+    def resample_ann_factor(self):  # noqa: D102
         return self.__resample_ann_factor
 
     @resample_ann_factor.setter
@@ -527,7 +526,7 @@ class BacktestRequest(MarketDataRequest):
         self.__resample_ann_factor = resample_ann_factor
 
     @property
-    def cum_index(self):
+    def cum_index(self):  # noqa: D102
         return self.__cum_index
 
     @cum_index.setter

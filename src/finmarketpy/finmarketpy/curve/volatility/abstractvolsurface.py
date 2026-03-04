@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -19,22 +19,20 @@ import abc
 
 import numpy as np
 
-ABC = abc.ABCMeta('ABC', (object,), {'__slots__': ()})
+ABC = abc.ABCMeta("ABC", (object,), {"__slots__": ()})
 
-from financepy.utils.date import Date
+from financepy.utils.date import Date  # noqa: E402
 
 
 class AbstractVolSurface(ABC):
-    """Holds data for an asset class vol surface
-
-    """
+    """Holds data for an asset class vol surface."""
 
     @abc.abstractmethod
-    def build_vol_surface(self):
+    def build_vol_surface(self):  # noqa: D102
         return
 
     @abc.abstractmethod
-    def extract_vol_surface(self):
+    def extract_vol_surface(self):  # noqa: D102
         return
 
     def _extremes(self, min, max, data):
@@ -56,10 +54,9 @@ class AbstractVolSurface(ABC):
 
         return min, max
 
-    def extract_vol_surface_across_dates(self, dates,
-                                         num_strike_intervals=60,
-                                         vol_surface_type='vol_surface_strike_space',
-                                         reverse_plot=True):
+    def extract_vol_surface_across_dates(  # noqa: D102
+        self, dates, num_strike_intervals=60, vol_surface_type="vol_surface_strike_space", reverse_plot=True
+    ):
 
         vol_surface_dict = {}
 
@@ -69,14 +66,12 @@ class AbstractVolSurface(ABC):
         max_z = None
 
         for i in range(0, len(dates)):
-
             self.build_vol_surface(dates[i])
 
             # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance
             # in FinancePy
             # in FinFXVolSurface.buildVolSurface method
-            df_vol_surface = self.extract_vol_surface(
-                num_strike_intervals=num_strike_intervals)[vol_surface_type]
+            df_vol_surface = self.extract_vol_surface(num_strike_intervals=num_strike_intervals)[vol_surface_type]
 
             if reverse_plot:
                 # Reverse order of tenors to match the way BBG plots it
@@ -87,12 +82,10 @@ class AbstractVolSurface(ABC):
             # x_axis = strike - index
             # y_axis = tenor - columns
             # z_axis = implied_vol vol - values
-            min_x, max_x = self._extremes(min_x, max_x,
-                                          df_vol_surface.index.values)
+            min_x, max_x = self._extremes(min_x, max_x, df_vol_surface.index.values)
             min_z, max_z = self._extremes(min_z, max_z, df_vol_surface.values)
 
-        extremes_dict = {'min_x': min_x, 'max_x': max_x, 'min_z': min_z,
-                         'max_z': max_z}
+        extremes_dict = {"min_x": min_x, "max_x": max_x, "min_z": min_z, "max_z": max_z}
 
         return vol_surface_dict, extremes_dict
 

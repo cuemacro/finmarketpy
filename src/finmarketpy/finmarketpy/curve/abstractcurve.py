@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -17,20 +17,21 @@ __author__ = 'saeedamen'  # Saeed Amen
 
 import abc
 
-class AbstractCurve(object):
+
+class AbstractCurve:
     """Abstract class for creating total return indices and curves, which is for example implemented by FXSpotCurve
     and could be implemented by other asset classes.
 
-    """
+    """  # noqa: D205
 
     @abc.abstractmethod
-    def generate_key(self):
+    def generate_key(self):  # noqa: D102
         return
 
     @abc.abstractmethod
-    def fetch_continuous_time_series(self, md_request, market_data_generator):
+    def fetch_continuous_time_series(self, md_request, market_data_generator):  # noqa: D102
         return
 
     @abc.abstractmethod
-    def construct_total_returns_index(self):
+    def construct_total_returns_index(self):  # noqa: D102
         return

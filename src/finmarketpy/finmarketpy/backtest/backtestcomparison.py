@@ -1,4 +1,4 @@
-__author__ = 'saeedamen'  # Saeed Amen
+__author__ = "saeedamen"  # Saeed Amen  # noqa: D100
 
 #
 # Copyright 2016-2020 Cuemacro - https://www.cuemacro.com / @cuemacro
@@ -17,40 +17,31 @@ __author__ = 'saeedamen'  # Saeed Amen
 
 import numpy as np
 import pandas as pd
-from finmarketpy.util.marketconstants import MarketConstants
+from chartpy import Chart, ChartConstants, Style
 
-from findatapy.util import SwimPool
-from findatapy.util import LoggerManager
 from finmarketpy.backtest.backtestengine import TradingModel
-from chartpy import Chart, Style, ChartConstants
 
 
-class BacktestComparison(object):
+class BacktestComparison:  # noqa: D101
     DEFAULT_PLOT_ENGINE = ChartConstants().chartfactory_default_engine
     SCALE_FACTOR = ChartConstants().chartfactory_scale_factor
     CHART_SOURCE = ChartConstants().chartfactory_source
     CHART_STYLE = Style()
 
-    def __init__(self, models, ref_index=0,
-                 labels=None):
-        """
-
-        :param models: iterable of TradingModel instances.
+    def __init__(self, models, ref_index=0, labels=None):
+        """:param models: iterable of TradingModel instances.
         :param ref_index: index of the reference model in the list (for difference).
-        """
-        if hasattr(models, "__iter__") and all(
-                [isinstance(x, TradingModel) for x in models]):
+        """  # noqa: D205
+        if hasattr(models, "__iter__") and all(isinstance(x, TradingModel) for x in models):
             self.models = models
             self.ref_index = ref_index
         else:
-            raise AttributeError(
-                "Models need to be an iterable of TradingModel instances.")
+            raise AttributeError("Models need to be an iterable of TradingModel instances.")  # noqa: TRY003
 
         self.labels = labels
 
-    def plot_pnl(self, diff=True, silent_plot=False, reduce_plot=True):
-        style = self.models[self.ref_index]._create_style("", "Strategy PnL",
-                                                          reduce_plot=reduce_plot)
+    def plot_pnl(self, diff=True, silent_plot=False, reduce_plot=True):  # noqa: D102
+        style = self.models[self.ref_index]._create_style("", "Strategy PnL", reduce_plot=reduce_plot)
 
         models = self.models
         ref = self.ref_index
@@ -60,23 +51,20 @@ class BacktestComparison(object):
         df = pd.concat(pnls, axis=1)
 
         if diff:
-            df = df.subtract(pnls[ref], axis='index')
+            df = df.subtract(pnls[ref], axis="index")
         if self.labels is not None:
             df.columns = self.labels
 
-        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='line',
-                      style=style)
+        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type="line", style=style)
         if not silent_plot:
             chart.plot()
 
         return chart
 
-    def plot_sharpe(self, silent_plot=False, reduce_plot=True):
-        style = self.models[self.ref_index]._create_style("", "Sharpe Curve",
-                                                          reduce_plot=reduce_plot)
+    def plot_sharpe(self, silent_plot=False, reduce_plot=True):  # noqa: D102
+        style = self.models[self.ref_index]._create_style("", "Sharpe Curve", reduce_plot=reduce_plot)
 
         models = self.models
-        ref = self.ref_index
 
         returns = [model._strategy_pnl.pct_change() for model in models]
         stdev_of_returns = np.std(returns)
@@ -85,33 +73,27 @@ class BacktestComparison(object):
 
         df = pd.concat(annualized_sharpe, axis=1)
 
-        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar',
-                      style=style)
+        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type="bar", style=style)
         if not silent_plot:
             chart.plot()
         return chart
 
-    def plot_strategy_trade_notional(self, diff=True, silent_plot=False,
-                                     reduce_plot=True):
-        style = self.models[self.ref_index]._create_style("",
-                                                          "Trades (Scaled by Notional)",
-                                                          reduce_plot=reduce_plot)
+    def plot_strategy_trade_notional(self, diff=True, silent_plot=False, reduce_plot=True):  # noqa: D102
+        style = self.models[self.ref_index]._create_style("", "Trades (Scaled by Notional)", reduce_plot=reduce_plot)
 
         models = self.models
         ref = self.ref_index
 
-        strategy_trade_notional = [model._strategy_trade_notional for model in
-                                   models]
+        strategy_trade_notional = [model._strategy_trade_notional for model in models]
 
         df = pd.concat(strategy_trade_notional, axis=1)
 
         if diff:
-            df = df.subtract(strategy_trade_notional[ref], axis='index')
+            df = df.subtract(strategy_trade_notional[ref], axis="index")
         if self.labels is not None:
             df.columns = self.labels
 
-        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type='bar',
-                      style=style)
+        chart = Chart(df, engine=self.DEFAULT_PLOT_ENGINE, chart_type="bar", style=style)
         if not silent_plot:
             chart.plot()
 

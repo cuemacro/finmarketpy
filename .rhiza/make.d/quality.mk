@@ -49,7 +49,7 @@ suppression-audit: ## scan codebase for inline suppressions and report (grade, d
 semgrep: install ## run Semgrep static analysis
 	@printf "${BLUE}[INFO] Running Semgrep...${RESET}\n"
 	@if [ -d ${SOURCE_FOLDER} ]; then \
-		${UVX_BIN} semgrep --config .github/semgrep.yml ${SOURCE_FOLDER}; \
+		${UVX_BIN} semgrep --config .rhiza/semgrep.yml ${SOURCE_FOLDER}; \
 	else \
 		printf "${YELLOW}[WARN] SOURCE_FOLDER '${SOURCE_FOLDER}' not found, skipping semgrep.${RESET}\n"; \
 	fi

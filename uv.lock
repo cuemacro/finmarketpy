@@ -1131,6 +1131,7 @@ options = [
 dev = [
     { name = "deptry" },
     { name = "marimo" },
+    { name = "plotly" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1155,6 +1156,7 @@ provides-extras = ["options"]
 dev = [
     { name = "deptry", specifier = ">=0.23.0" },
     { name = "marimo", specifier = ">=0.11.16" },
+    { name = "plotly" },
     { name = "pre-commit", specifier = ">=4.0.1" },
     { name = "pytest", specifier = ">=8.3.3" },
     { name = "pytest-cov", specifier = ">=6.0.0" },

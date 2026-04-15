@@ -7,7 +7,7 @@ authors = [{name='Saeed Amen', email= 'saeed@cuemacro.com'}]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "blosc",
+    "blosc>=1.11.4",
     "chartpy",
     "findatapy",
     "matplotlib",

@@ -103,4 +103,5 @@ exclude_lines = [
 [tool.deptry.per_rule_ignores]
 #DEP001 = ["pyfolio"]       # very dated dependency!
 DEP001 = ["finmarketpy"]
+DEP002 = ["xlsxwriter"]  # used as pd.ExcelWriter engine string, not imported directly
 DEP003 = ["finmarketpy"]

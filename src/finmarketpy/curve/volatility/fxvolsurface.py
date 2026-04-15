@@ -130,11 +130,11 @@ class FXVolSurface(AbstractVolSurface):
 
         # CAREFUL: need to divide by 100 for depo rate, ie. 0.0346 = 3.46%
         self._forCCRate = (
-            market_df[for_name_base + depo_tenor + field].values / 100.0
-        )  # 0.03460  # EUR  # ty:ignore[not-subscriptable]
+            market_df[for_name_base + depo_tenor + field].values / 100.0  # ty:ignore[not-subscriptable]
+        )  # 0.03460  # EUR
         self._domCCRate = (
-            market_df[dom_name_terms + depo_tenor + field].values / 100.0
-        )  # 0.02940  # USD  # ty:ignore[not-subscriptable]
+            market_df[dom_name_terms + depo_tenor + field].values / 100.0  # ty:ignore[not-subscriptable]
+        )  # 0.02940  # USD
 
         self._spot_history = market_df[asset + field].values  # ty:ignore[not-subscriptable, unsupported-operator]
         self._atm_vols = market_df[[asset + "V" + t + field for t in tenors]].values  # ty:ignore[not-subscriptable, unsupported-operator]

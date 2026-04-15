@@ -1157,13 +1157,13 @@ class TradingModel:
                 desc, results, leverage, ret_stats, key, backtest = self.construct_individual_strategy(
                     br,
                     spot_cut_df,
-                    spot_df2,
+                    spot_df2,  # ty:ignore[invalid-argument-type]
                     asset_cut_df,
                     tech_params,
                     key,
-                    contract_value_df,
+                    contract_value_df,  # ty:ignore[invalid-argument-type]
                     False,
-                    False,  # ty:ignore[invalid-argument-type]
+                    False,
                 )
 
                 # results = backtest.portfolio_cum()
@@ -1682,8 +1682,8 @@ class TradingModel:
 
             if hasattr(self, "br") and self.br.write_csv_pnl:
                 df.to_csv(
-                    self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv"
-                )  # pragma: no cover  # ty:ignore[unresolved-attribute]
+                    self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv"  # ty:ignore[unresolved-attribute]
+                )  # pragma: no cover
 
             return self._chart_return_with_df(
                 df, style, silent_plot, chart_type="line", ret_with_df=ret_with_df, split_on_char=split_on_char
@@ -2583,9 +2583,9 @@ class PortfolioWeightConstruction:
             elif "weighted" in br.portfolio_combination and isinstance(br.portfolio_combination_weights, dict):
                 # Get the weights for each asset
                 adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(
-                    br,
+                    br,  # ty:ignore[invalid-argument-type]
                     signal_pnl,
-                    method=br.portfolio_combination,  # ty:ignore[invalid-argument-type]
+                    method=br.portfolio_combination,
                 )
 
                 portfolio = pd.DataFrame(data=(signal_pnl.values * adjusted_weights_matrix), index=signal_pnl.index)

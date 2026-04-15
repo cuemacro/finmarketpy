@@ -209,17 +209,15 @@ class FXOptionsPricer(AbstractPricer):
                             vol[i] = fx_vol_surface.get_atm_quoted_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
                         else:
                             vol[i] = (
-                                fx_vol_surface.get_atm_vol(tenor) / 100.0
-                            )  # interpolated  # ty:ignore[unresolved-attribute]
+                                fx_vol_surface.get_atm_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
+                            )  # interpolated
                     elif strike[i] == "atms":
-                        strike[i] = (
-                            fx_vol_surface.get_spot()
-                        )  # Interpolate vol later  # ty:ignore[unresolved-attribute]
+                        strike[i] = fx_vol_surface.get_spot()  # ty:ignore[unresolved-attribute]  # Interpolate vol later
                     elif strike[i] == "atmf":
                         # Quoted tenor, no need to interpolate
                         strike[i] = (
-                            float(fx_vol_surface.get_all_market_data()[cross + ".close"][horizon_date[i]])
-                            + (  # ty:ignore[unresolved-attribute]
+                            float(fx_vol_surface.get_all_market_data()[cross + ".close"][horizon_date[i]])  # ty:ignore[unresolved-attribute]
+                            + (
                                 float(fx_vol_surface.get_all_market_data()[cross + tenor + ".close"][horizon_date[i]])  # ty:ignore[unresolved-attribute]
                                 / self._fx_forwards_pricer.get_forwards_divisor(cross[3:6])
                             )

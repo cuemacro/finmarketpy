@@ -177,7 +177,7 @@ class MarketConstants:
         if override_fields is None:
             override_fields = {}
         with contextlib.suppress(Exception):
-            from finmarketpy.util.marketcred import MarketCred  # pragma: no cover
+            from finmarketpy.util.marketcred import MarketCred  # pragma: no cover  # ty:ignore[unresolved-import]
 
             cred_keys = MarketCred.__dict__.keys()  # pragma: no cover
 

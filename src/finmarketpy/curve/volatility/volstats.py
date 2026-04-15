@@ -96,9 +96,11 @@ class VolStats:
         if returns_df is None:
             if spot_df is None:
                 if freq == "daily":
-                    spot_df = self._market_df[asset + "." + field]
+                    spot_df = self._market_df[asset + "." + field]  # ty:ignore[not-subscriptable]
                 else:
-                    spot_df = self._intraday_spot_df[asset + "." + field]  # pragma: no cover
+                    spot_df = self._intraday_spot_df[
+                        asset + "." + field
+                    ]  # pragma: no cover  # ty:ignore[not-subscriptable]
 
             if returns_calc == "simple":
                 returns_df = self._calculations.calculate_returns(spot_df)
@@ -180,7 +182,7 @@ class VolStats:
         # Add x business days to implied_vol to make it equivalent to realized_vol (better than "shift")
         # approximation for options which are not ON or 1W
         # bday = CustomBusinessDay(weekmask='Mon Tue Wed Thu Fri')
-        implied_vol = implied_vol.copy(deep=True)
+        implied_vol = implied_vol.copy(deep=True)  # ty:ignore[unresolved-attribute]
 
         implied_unaligned = implied_vol.copy(deep=True)
         cols_to_change = implied_vol.columns.values
@@ -249,7 +251,7 @@ class VolStats:
         part = "V"
 
         if implied_vol is None:
-            implied_vol = self._market_df[asset + "V" + tenor_label + "." + field]
+            implied_vol = self._market_df[asset + "V" + tenor_label + "." + field]  # ty:ignore[not-subscriptable]
 
         implied_vol = implied_vol.copy(deep=True)
         implied_vol = pd.DataFrame(implied_vol)

@@ -197,7 +197,7 @@ class EventStudy:
         start_index = data_frame_rets.index.searchsorted(ef_time_start)
         finish_index = data_frame_rets.index.searchsorted(ef_time_end)
 
-        data_frame = pd.DataFrame(index=ords, columns=ef_time_frame.index)
+        data_frame = pd.DataFrame(index=ords, columns=ef_time_frame.index)  # ty:ignore[invalid-argument-type]
 
         for i in range(0, len(ef_time_frame.index)):
             vals = data_frame_rets.iloc[start_index[i] : finish_index[i]].values
@@ -297,9 +297,9 @@ class EventStudy:
                 data_frame_agg = data_frame_agg.join(data_frame, on=ticker, how="inner")
 
         if add_surprise:
-            data_frame_agg[event_fx + "-" + event_name + ".surprise"] = (
-                data_frame_agg[event_fx + "-" + event_name + ".actual-release"]
-                - data_frame_agg[event_fx + "-" + event_name + "." + surprise_field]
+            data_frame_agg[event_fx + "-" + event_name + ".surprise"] = (  # ty:ignore[invalid-assignment]
+                data_frame_agg[event_fx + "-" + event_name + ".actual-release"]  # ty:ignore[not-subscriptable]
+                - data_frame_agg[event_fx + "-" + event_name + "." + surprise_field]  # ty:ignore[not-subscriptable]
             )
 
         return data_frame_agg
@@ -381,7 +381,7 @@ class EventsFactory(EventStudy):
                 self._db_database_econ_file,
                 engine=marketconstants.write_engine,
                 db_server=marketconstants.db_server,
-                db_port=marketconstants.db_port,
+                db_port=marketconstants.db_port,  # ty:ignore[invalid-argument-type]
                 username=marketconstants.db_username,
                 password=marketconstants.db_password,
             )
@@ -396,8 +396,8 @@ class EventsFactory(EventStudy):
         cat = self.config.get_categories_from_tickers_selective_filter(category_name)
 
         for k in cat:
-            md_request = self.market_data_generator.populate_md_request(k)
-            data_frame = self.market_data_generator.fetch_market_data(md_request)
+            md_request = self.market_data_generator.populate_md_request(k)  # ty:ignore[unresolved-attribute]
+            data_frame = self.market_data_generator.fetch_market_data(md_request)  # ty:ignore[unresolved-attribute]
 
             # TODO allow merge of multiple sources
 
@@ -479,7 +479,7 @@ class EventsFactory(EventStudy):
             for x in range(len(date_time_fore))
         ]
 
-        event_date_time_frame = pd.DataFrame(event_date_time.index, date_time_dt)
+        event_date_time_frame = pd.DataFrame(event_date_time.index, date_time_dt)  # ty:ignore[invalid-argument-type]
         event_date_time_frame.index = date_time_dt
 
         ######## grab event date/fields
@@ -504,7 +504,7 @@ class EventsFactory(EventStudy):
 
         # HACK! certain events need an offset because BBG have invalid dates
         if ticker_index in self._offset_events:
-            data_frame.index = data_frame.index + timedelta(days=self._offset_events[ticker_index])
+            data_frame.index = data_frame.index + timedelta(days=self._offset_events[ticker_index])  # ty:ignore[unsupported-operator]
 
         ######## join together event dates/date-time/fields in one data frame
         data_frame = event_date_time_frame.join(data_frame, how="inner")
@@ -528,7 +528,7 @@ class EventsFactory(EventStudy):
         event_names = self.get_all_economic_events()
         columns = ["event-name", "release-date-time-full"]
 
-        data_frame = pd.DataFrame(data=np.zeros((0, len(columns))), columns=columns)
+        data_frame = pd.DataFrame(data=np.zeros((0, len(columns))), columns=columns)  # ty:ignore[invalid-argument-type]
 
         for event in event_names:
             event_times = self.get_economic_event_date_time(event)
@@ -562,7 +562,7 @@ class EventsFactory(EventStudy):
         end,
         lagged=False,
         NYC_cutoff=10,  # noqa: N803
-    ):
+    ):  # ty:ignore[invalid-method-override]
         """Return market data aligned to economic event dates for this factory.
 
         Delegates to the parent class implementation after fetching event dates.
@@ -752,7 +752,7 @@ class HistEconDataFactory:
             freq="daily",  # daily data
             data_source=source,  # use Bloomberg as data source
             cut="LOC",
-            tickers=pretty_tickers,
+            tickers=pretty_tickers,  # ty:ignore[invalid-argument-type]
             fields=["close"],  # which fields to download
             vendor_tickers=vendor_tickers,
             vendor_fields=vendor_fields,  # which Bloomberg/data vendor fields to download

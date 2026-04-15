@@ -34,13 +34,13 @@ class Report:
             statistic = [statistic]
 
         # conduct the regression
-        stats = Calculations.linear_regression_single_vars(y, x, y_variable_names, x_variable_names)
+        stats = Calculations.linear_regression_single_vars(y, x, y_variable_names, x_variable_names)  # ty:ignore[missing-argument]
 
         if pretty_index is None:
             pretty_index = x_variable_names
 
         # strip out the field(s) from the regression output which we want
-        stats_df = Calculations.strip_linear_regression_output(pretty_index, stats, statistic)
+        stats_df = Calculations.strip_linear_regression_output(pretty_index, stats, statistic)  # ty:ignore[missing-argument]
         # stats_df = stats_df.sort_index()
 
         return stats_df

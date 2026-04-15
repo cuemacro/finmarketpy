@@ -35,7 +35,7 @@ class MarketUtil:
         as well as absolute date strings in common formats.
         """
         if isinstance(date, str):
-            date1 = datetime.datetime.utcnow()
+            date1 = datetime.datetime.utcnow()  # ty:ignore[deprecated]
 
             if date == "midnight":
                 date1 = datetime.datetime(date1.year, date1.month, date1.day, 0, 0, 0)

@@ -26,7 +26,7 @@ ABC = abc.ABCMeta("ABC", (object,), {"__slots__": ()})
 from financepy.utils.date import Date  # noqa: E402
 
 
-class AbstractVolSurface(ABC):
+class AbstractVolSurface(ABC):  # ty:ignore[unsupported-base]
     """Holds data for an asset class vol surface."""
 
     @abc.abstractmethod
@@ -70,12 +70,12 @@ class AbstractVolSurface(ABC):
         max_z = None
 
         for i in range(0, len(dates)):
-            self.build_vol_surface(dates[i])
+            self.build_vol_surface(dates[i])  # ty:ignore[too-many-positional-arguments]
 
             # Note for unstable vol surface dates (eg. over Brexit date) you may need to increase tolerance
             # in FinancePy
             # in FinFXVolSurface.buildVolSurface method
-            df_vol_surface = self.extract_vol_surface(num_strike_intervals=num_strike_intervals)[vol_surface_type]
+            df_vol_surface = self.extract_vol_surface(num_strike_intervals=num_strike_intervals)[vol_surface_type]  # ty:ignore[unknown-argument]
 
             if reverse_plot:
                 # Reverse order of tenors to match the way BBG plots it

@@ -72,9 +72,9 @@ class QuickChart:
         if fields is None:
             fields = {"close": "PX_LAST"}
         if start_date is None:
-            start_date = datetime.datetime.utcnow().date() - timedelta(days=60)
+            start_date = datetime.datetime.utcnow().date() - timedelta(days=60)  # ty:ignore[deprecated]
         if finish_date is None:
-            finish_date = datetime.datetime.utcnow()
+            finish_date = datetime.datetime.utcnow()  # ty:ignore[deprecated]
 
         if isinstance(tickers, str):
             tickers = {tickers: tickers}
@@ -97,7 +97,7 @@ class QuickChart:
 
                 tickers_rhs = tickers_rhs_dict
 
-            tickers.update(tickers_rhs)
+            tickers.update(tickers_rhs)  # ty:ignore[unresolved-attribute]
         else:
             tickers_rhs = {}
 
@@ -107,8 +107,8 @@ class QuickChart:
                 finish_date=finish_date,
                 freq=freq,
                 data_source=self._data_source,
-                tickers=list(tickers.keys()),
-                vendor_tickers=list(tickers.values()),
+                tickers=list(tickers.keys()),  # ty:ignore[invalid-argument-type, unresolved-attribute]
+                vendor_tickers=list(tickers.values()),  # ty:ignore[unresolved-attribute]
                 fields=list(fields.keys()),
                 vendor_fields=list(fields.values()),
                 quandl_api_key=quandl_api_key,
@@ -193,10 +193,10 @@ class QuickChart:
             display_brand_label=display_brand_label,
         )
 
-        returns_df = df / df.shift(1) - 1.0
+        returns_df = df / df.shift(1) - 1.0  # ty:ignore[unresolved-attribute]
 
         ret_stats = RetStats(returns_df=returns_df, ann_factor=ann_factor)
 
-        df.columns = ret_stats.summary()
+        df.columns = ret_stats.summary()  # ty:ignore[invalid-assignment]
 
         return self._chart.plot(df, style=style), df

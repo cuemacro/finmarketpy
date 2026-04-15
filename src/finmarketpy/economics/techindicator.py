@@ -87,7 +87,7 @@ class TechIndicator:
             if data_frame_non_nan_early is not None:
                 # Calculate the lagged sum of the n-1 point
                 if pd.__version__ < "0.17":  # pragma: no cover
-                    rolling_sum = pd.rolling_sum(data_frame.shift(1).rolling, window=tech_params.sma_period - 1)
+                    rolling_sum = pd.rolling_sum(data_frame.shift(1).rolling, window=tech_params.sma_period - 1)  # ty:ignore[unresolved-attribute]
                 else:
                     rolling_sum = data_frame.shift(1).rolling(center=False, window=tech_params.sma_period - 1).sum()
 
@@ -100,7 +100,7 @@ class TechIndicator:
                 narray = np.where(data_frame_early > self._techind, 1, -1)
             else:
                 if pd.__version__ < "0.17":  # pragma: no cover
-                    self._techind = pd.rolling_sum(data_frame, window=tech_params.sma_period)
+                    self._techind = pd.rolling_sum(data_frame, window=tech_params.sma_period)  # ty:ignore[unresolved-attribute]
                 else:
                     self._techind = data_frame.rolling(window=tech_params.sma_period, center=False).mean()
 
@@ -381,7 +381,9 @@ class TechIndicator:
 
                 true_range = np.max((c1, c2, c3), axis=0)
                 true_range = pd.DataFrame(
-                    index=data_frame_short.index, data=true_range, columns=[close[0] + " True Range"]
+                    index=data_frame_short.index,
+                    data=true_range,
+                    columns=[close[0] + " True Range"],  # ty:ignore[invalid-argument-type]
                 )
 
                 # put back NaNs into ATR if necessary
@@ -422,7 +424,7 @@ class TechIndicator:
                 v = df_mod[volume].values
 
                 vwap = np.cumsum(((h + low_val + c) / 3) * v) / np.cumsum(v)
-                vwap = pd.DataFrame(index=df_mod.index, data=vwap, columns=[close[0] + " VWAP"])
+                vwap = pd.DataFrame(index=df_mod.index, data=vwap, columns=[close[0] + " VWAP"])  # ty:ignore[invalid-argument-type]
                 print(vwap.columns)
 
                 if not tech_params.fillna:
@@ -441,18 +443,18 @@ class TechIndicator:
 
         # TODO create other indicators
         if hasattr(tech_params, "only_allow_longs"):
-            self._signal[self._signal < 0] = 0
+            self._signal[self._signal < 0] = 0  # ty:ignore[invalid-assignment, unsupported-operator]
 
         # TODO create other indicators
         if hasattr(tech_params, "only_allow_shorts"):
-            self._signal[self._signal > 0] = 0
+            self._signal[self._signal > 0] = 0  # ty:ignore[invalid-assignment, unsupported-operator]
 
         # apply signal multiplier (typically to flip signals)
         if hasattr(tech_params, "signal_mult"):
             self._signal = self._signal * tech_params.signal_mult
 
         if hasattr(tech_params, "strip_signal_name") and tech_params.strip_signal_name:
-            self._signal.columns = data_frame.columns
+            self._signal.columns = data_frame.columns  # ty:ignore[invalid-assignment]
 
         return self._techind, self._signal
 

@@ -257,7 +257,7 @@ class FXSpotCurve:
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
                 total_return_index_df_agg.append(
-                    pd.DataFrame(100, index=base_deposit.index, columns=[cross + "-tot.close"])
+                    pd.DataFrame(100, index=base_deposit.index, columns=[cross + "-tot.close"])  # ty:ignore[invalid-argument-type]
                 )
             else:
                 carry = base_deposit.join(terms_deposit, how="inner")
@@ -298,7 +298,7 @@ class FXSpotCurve:
                 # Use Numba to do total return index calculation given has many loops
                 total_return_index_df = pd.DataFrame(
                     index=spot.index,
-                    columns=[cross + "-tot.close"],
+                    columns=[cross + "-tot.close"],  # ty:ignore[invalid-argument-type]
                     data=_spot_index_numba(
                         spot_vals, time_diff, base_deposit_vals, terms_deposit_vals, base_daycount, terms_daycount
                     ),

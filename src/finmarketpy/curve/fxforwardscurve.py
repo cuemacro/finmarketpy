@@ -322,7 +322,7 @@ class FXForwardsCurve:
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
                 total_return_index_df_agg.append(
-                    pd.DataFrame(100, index=forwards_market_df.index, columns=[cross + "-forward-tot.close"])
+                    pd.DataFrame(100, index=forwards_market_df.index, columns=[cross + "-forward-tot.close"])  # ty:ignore[invalid-argument-type]
                 )
             else:
                 # Is the FX cross in the correct convention
@@ -419,7 +419,7 @@ class FXForwardsCurve:
                 elif cum_index == "add":
                     cum_rets = 100 + 100 * np.cumsum(forward_rets)
 
-                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot." + field])
+                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-forward-tot." + field])  # ty:ignore[invalid-argument-type]
                 total_return_index_df[cross + "-forward-tot." + field] = cum_rets
 
                 if output_calculation_fields:

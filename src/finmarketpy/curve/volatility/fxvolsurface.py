@@ -123,21 +123,25 @@ class FXVolSurface(AbstractVolSurface):
         self._fin_fx_vol_surface = None
         self._df_vol_dict = None
 
-        for_name_base = asset[0:3]
-        dom_name_terms = asset[3:6]
+        for_name_base = asset[0:3]  # ty:ignore[not-subscriptable]
+        dom_name_terms = asset[3:6]  # ty:ignore[not-subscriptable]
 
         field = "." + field
 
         # CAREFUL: need to divide by 100 for depo rate, ie. 0.0346 = 3.46%
-        self._forCCRate = market_df[for_name_base + depo_tenor + field].values / 100.0  # 0.03460  # EUR
-        self._domCCRate = market_df[dom_name_terms + depo_tenor + field].values / 100.0  # 0.02940  # USD
+        self._forCCRate = (
+            market_df[for_name_base + depo_tenor + field].values / 100.0
+        )  # 0.03460  # EUR  # ty:ignore[not-subscriptable]
+        self._domCCRate = (
+            market_df[dom_name_terms + depo_tenor + field].values / 100.0
+        )  # 0.02940  # USD  # ty:ignore[not-subscriptable]
 
-        self._spot_history = market_df[asset + field].values
-        self._atm_vols = market_df[[asset + "V" + t + field for t in tenors]].values
-        self._market_strangle25DeltaVols = market_df[[asset + "25B" + t + field for t in tenors]].values
-        self._risk_reversal25DeltaVols = market_df[[asset + "25R" + t + field for t in tenors]].values
-        self._market_strangle10DeltaVols = market_df[[asset + "10B" + t + field for t in tenors]].values
-        self._risk_reversal10DeltaVols = market_df[[asset + "10R" + t + field for t in tenors]].values
+        self._spot_history = market_df[asset + field].values  # ty:ignore[not-subscriptable, unsupported-operator]
+        self._atm_vols = market_df[[asset + "V" + t + field for t in tenors]].values  # ty:ignore[not-subscriptable, unsupported-operator]
+        self._market_strangle25DeltaVols = market_df[[asset + "25B" + t + field for t in tenors]].values  # ty:ignore[not-subscriptable, unsupported-operator]
+        self._risk_reversal25DeltaVols = market_df[[asset + "25R" + t + field for t in tenors]].values  # ty:ignore[not-subscriptable, unsupported-operator]
+        self._market_strangle10DeltaVols = market_df[[asset + "10B" + t + field for t in tenors]].values  # ty:ignore[not-subscriptable, unsupported-operator]
+        self._risk_reversal10DeltaVols = market_df[[asset + "10R" + t + field for t in tenors]].values  # ty:ignore[not-subscriptable, unsupported-operator]
 
         if vol_function_type == "CLARK":
             self._vol_function_type = VolFuncTypes.CLARK
@@ -150,7 +154,7 @@ class FXVolSurface(AbstractVolSurface):
         elif vol_function_type == "SABR":
             self._vol_function_type = VolFuncTypes.SABR
         elif vol_function_type == "SABR3":
-            self._vol_function_type = VolFuncTypes.SABR3
+            self._vol_function_type = VolFuncTypes.SABR3  # ty:ignore[unresolved-attribute]
 
         # What does ATM mean? (for most
         if atm_method == "fwd-delta-neutral":  # ie. strike such that a straddle would be delta neutral
@@ -183,7 +187,7 @@ class FXVolSurface(AbstractVolSurface):
         self._alpha = alpha
         self._tol = tol
 
-    def build_vol_surface(self, value_date):
+    def build_vol_surface(self, value_date):  # ty:ignore[invalid-method-override]
         """Build the implied volatility surface for a particular value date.
 
         Calculates benchmark strikes etc. Before we do any sort of interpolation
@@ -410,7 +414,7 @@ class FXVolSurface(AbstractVolSurface):
             # Put a conversion between quoted deltas and strikes (eg. ATM in strike space, 25d call/put strikes)
             key_vols = []
 
-            for K, _name in zip(key_strikes, key_strikes_names, strict=False):  # noqa: N806
+            for K, _name in zip(key_strikes, key_strikes_names, strict=False):  # noqa: N806  # ty:ignore[no-matching-overload]  # noqa: E501
                 sigma = self.get_vol_from_quoted_tenor(K, tenor_index) * 100.0
                 key_vols.append(sigma)
 
@@ -567,7 +571,7 @@ class FXVolSurface(AbstractVolSurface):
         if self._fin_fx_vol_surface is not None:
             self._fin_fx_vol_surface.plotVolCurves()
 
-    def _findate(self, timestamp):
+    def _findate(self, timestamp):  # ty:ignore[invalid-method-override]
 
         return Date(
             timestamp.day, timestamp.month, timestamp.year, hh=timestamp.hour, mm=timestamp.minute, ss=timestamp.second

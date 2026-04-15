@@ -87,7 +87,7 @@ class Seasonality:
         return self.bus_day_of_month_seasonality(
             self,
             data_frame,
-            month_list=month_list,
+            month_list=month_list,  # ty:ignore[parameter-already-assigned]
             cum=cum,
             cal=cal,
             partition_by_month=partition_by_month,

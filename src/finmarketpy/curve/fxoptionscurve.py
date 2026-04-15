@@ -229,7 +229,7 @@ class FXOptionsCurve:
                 md_request_download.category = "fx-vol-market"
                 md_request_download.fields = "close"
                 md_request_download.abstract_curve = None
-                md_request_download.fx_options_tenor = fx_options_tenor_for_interpolation
+                md_request_download.fx_options_tenor = fx_options_tenor_for_interpolation  # ty:ignore[unresolved-attribute]
                 md_request_download.base_depos_tenor = base_depos_tenor
                 # md_request_download.base_depos_currencies = []
 
@@ -459,7 +459,7 @@ class FXOptionsCurve:
             # Eg. if we specify USDUSD
             if cross[0:3] == cross[3:6]:
                 total_return_index_df_agg.append(
-                    pd.DataFrame(100, index=market_df.index, columns=[cross + "-option-tot.close"])
+                    pd.DataFrame(100, index=market_df.index, columns=[cross + "-option-tot.close"])  # ty:ignore[invalid-argument-type]
                 )
             else:
                 # Is the FX cross in the correct convention
@@ -760,7 +760,7 @@ class FXOptionsCurve:
                     cum_delta_rets = 100 + 100 * np.cumsum(delta_hedging_pnl)
                     cum_option_delta_rets = 100 + 100 * np.cumsum(option_delta_rets)
 
-                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-option-tot.close"])
+                total_return_index_df = pd.DataFrame(index=horizon_date, columns=[cross + "-option-tot.close"])  # ty:ignore[invalid-argument-type]
                 total_return_index_df[cross + "-option-tot.close"] = cum_rets
 
                 if output_calculation_fields:

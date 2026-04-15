@@ -36,7 +36,7 @@ class MarketLiquidity:
 
         cols = [x + ".spread" for x in asset]
 
-        data_frame_spreads = pd.DataFrame(index=data_frame.index, columns=cols)
+        data_frame_spreads = pd.DataFrame(index=data_frame.index, columns=cols)  # ty:ignore[invalid-argument-type]
 
         for a in asset:
             data_frame_spreads[a + ".spread"] = data_frame[a + "." + ask_field] - data_frame[a + "." + bid_field]

@@ -26,9 +26,9 @@ def plot_network_structure(
     vmax=0.5,
     lw=1,
     alpha=None,
-    cmap_scatter=plt.cm.nipy_spectral,
-    cmap_lc=plt.cm.hot_r,
-    edgecolor=plt.cm.nipy_spectral,
+    cmap_scatter=plt.cm.nipy_spectral,  # ty:ignore[unresolved-attribute]
+    cmap_lc=plt.cm.hot_r,  # ty:ignore[unresolved-attribute]
+    edgecolor=plt.cm.nipy_spectral,  # ty:ignore[unresolved-attribute]
 ):
     """Plot the correlation network structure of financial instruments.
 
@@ -83,12 +83,12 @@ def plot_network_structure(
     if not isinstance(edge_model, covariance.GraphicalLassoCV):
         raise TypeError("edge_model must be of class covariance.GraphicalLassoCV")  # noqa: TRY003
 
-    if not isinstance(embedding, np.ndarray | np.generic):
+    if not isinstance(embedding, np.ndarray | np.generic):  # ty:ignore[unsupported-operator]
         raise TypeError("embedding must be of class ndarray.")  # noqa: TRY003
 
     plt.figure(1, facecolor="w", figsize=figsize)
     plt.clf()
-    ax = plt.axes(ax)
+    ax = plt.axes(ax)  # ty:ignore[invalid-argument-type]
     plt.axis("off")
 
     # display a graph of the partial correlations
@@ -103,7 +103,7 @@ def plot_network_structure(
 
     # plot the edges
     start_idx, end_idx = np.where(non_zero)
-    segments = [[embedding[:, start], embedding[:, stop]] for start, stop in zip(start_idx, end_idx, strict=False)]
+    segments = [[embedding[:, start], embedding[:, stop]] for start, stop in zip(start_idx, end_idx, strict=False)]  # ty:ignore[no-matching-overload]
     corr_values = np.abs(partial_correlations[non_zero])
     lc = LineCollection(
         segments,
@@ -117,7 +117,7 @@ def plot_network_structure(
 
     # add a label to each node
     n_labels = labels.max()
-    for index, (name, label, (x, y)) in enumerate(zip(names, labels, embedding.T, strict=False)):
+    for index, (name, label, (x, y)) in enumerate(zip(names, labels, embedding.T, strict=False)):  # ty:ignore[no-matching-overload]
         dx = x - embedding[0]
         dx[index] = 1
         dy = y - embedding[1]

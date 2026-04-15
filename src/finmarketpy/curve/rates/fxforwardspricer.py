@@ -186,7 +186,7 @@ class FXForwardsPricer(AbstractPricer):
         quoted_delivery_df=None,
         fx_forwards_tenor_for_interpolation=market_constants.fx_forwards_tenor_for_interpolation,
         return_as_df=True,
-    ):
+    ):  # ty:ignore[invalid-method-override]
         """Create an interpolated outright FX forward for given horizon/delivery dates.
 
         Uses linear interpolation between quoted dates to calculate the appropriate interpolated forward.
@@ -235,7 +235,7 @@ class FXForwardsPricer(AbstractPricer):
             delivery_date = pd.DatetimeIndex(delivery_date)
 
         # Truncate the market data so covers only the dates where we want to price the forwards
-        market_df = market_df[market_df.index.isin(horizon_date)]
+        market_df = market_df[market_df.index.isin(horizon_date)]  # ty:ignore[not-subscriptable, unresolved-attribute]
         quoted_delivery_df = quoted_delivery_df[quoted_delivery_df.index.isin(horizon_date)]
 
         cal = cross
@@ -263,7 +263,7 @@ class FXForwardsPricer(AbstractPricer):
         if return_as_df:
             interpolated_df = pd.DataFrame(
                 index=market_df.index,
-                columns=[cross + "-interpolated-outright-forward.close", cross + "-interpolated-forward-points.close"],
+                columns=[cross + "-interpolated-outright-forward.close", cross + "-interpolated-forward-points.close"],  # ty:ignore[invalid-argument-type]
             )
 
             interpolated_df[cross + "-interpolated-outright-forward.close"] = interpolated_outright_forwards_arr
@@ -331,7 +331,8 @@ class FXForwardsPricer(AbstractPricer):
         # Eg. what's the delivery date for EURUSD SN, 1W etc.
         if quoted_delivery_df is None:
             quoted_delivery_df = pd.DataFrame(
-                index=market_df.index, columns=[cross + tenor + ".delivery" for tenor in fx_forwards_tenor]
+                index=market_df.index,
+                columns=[cross + tenor + ".delivery" for tenor in fx_forwards_tenor],  # ty:ignore[invalid-argument-type]
             )
 
             for tenor in fx_forwards_tenor:
@@ -398,13 +399,13 @@ class FXForwardsPricer(AbstractPricer):
         cal = cross
 
         # Get the spot date (different currency pairs have different conventions for this!)
-        spot_date = self._calendar.get_spot_date_from_horizon_date(market_df.index, cal)
+        spot_date = self._calendar.get_spot_date_from_horizon_date(market_df.index, cal)  # ty:ignore[unresolved-attribute]
 
         quoted_delivery_df, quoted_delivery_days_arr, forwards_points_arr, _divisor = self._setup_forwards_calculation(
             cross, spot_date, market_df, quoted_delivery_df, fx_forwards_tenor
         )
 
-        spot_arr = market_df[cross + ".close"].values
+        spot_arr = market_df[cross + ".close"].values  # ty:ignore[not-subscriptable]
 
         outright_forwards_arr = np.vstack([spot_arr] * len(fx_forwards_tenor)).T + forwards_points_arr
 
@@ -415,7 +416,7 @@ class FXForwardsPricer(AbstractPricer):
         if implied_currency == cross[0:3]:
             original_currency = cross[3:6]
 
-            depo_arr = market_df[[original_currency + d + ".close" for d in depo_tenor]].values / 100.0
+            depo_arr = market_df[[original_currency + d + ".close" for d in depo_tenor]].values / 100.0  # ty:ignore[not-subscriptable]
 
             implied_depo_arr = _infer_base_currency_depo_numba(
                 spot_arr,
@@ -437,7 +438,7 @@ class FXForwardsPricer(AbstractPricer):
         if implied_currency == cross[3:6]:
             original_currency = cross[0:3]
 
-            depo_arr = market_df[[original_currency + d + ".close" for d in depo_tenor]].values / 100.0
+            depo_arr = market_df[[original_currency + d + ".close" for d in depo_tenor]].values / 100.0  # ty:ignore[not-subscriptable]
 
             implied_depo_arr = _infer_terms_currency_depo_numba(
                 spot_arr,
@@ -456,7 +457,7 @@ class FXForwardsPricer(AbstractPricer):
             #                                 / (quoted_delivery_days_arr[i,j] / terms_conv)
 
         return pd.DataFrame(
-            index=market_df.index,
-            columns=[implied_currency + x + "-implied-depo.close" for x in fx_forwards_tenor],
+            index=market_df.index,  # ty:ignore[unresolved-attribute]
+            columns=[implied_currency + x + "-implied-depo.close" for x in fx_forwards_tenor],  # ty:ignore[invalid-argument-type]
             data=implied_depo_arr * 100.0,
         )

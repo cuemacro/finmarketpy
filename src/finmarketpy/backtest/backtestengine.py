@@ -54,7 +54,7 @@ class Backtest:
         self,
         asset_a_df: pd.DataFrame,
         signal_df: pd.DataFrame,
-        further_df: pd.DataFrame = None,
+        further_df: pd.DataFrame = None,  # ty:ignore[invalid-parameter-default]
         further_df_labels: list[str] | None = None,
     ) -> pd.DataFrame:
         """Calculates P&L table which can be used for debugging purposes.
@@ -482,7 +482,7 @@ class Backtest:
         if br.plot_start is None and br.plot_finish is None:
             return df
         elif df is None:
-            return None
+            return None  # ty:ignore[invalid-return-type]
         else:
             filter = Filter()
             plot_start = br.start_date
@@ -520,17 +520,17 @@ class Backtest:
         # NOTE: careful usage of signs (portfolio_total_shorts are NEGATIVE)
         portfolio_net_exposure = pd.DataFrame(
             index=portfolio_signal.index,
-            columns=["Net Exposure"],
+            columns=["Net Exposure"],  # ty:ignore[invalid-argument-type]
             data=portfolio_total_longs.values + portfolio_total_shorts.values,
         )
 
         portfolio_total_exposure = pd.DataFrame(
             index=portfolio_signal.index,
-            columns=["Total Exposure"],
+            columns=["Total Exposure"],  # ty:ignore[invalid-argument-type]
             data=portfolio_total_longs.values - portfolio_total_shorts.values,
         )
 
-        return portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure
+        return portfolio_total_longs, portfolio_total_shorts, portfolio_net_exposure, portfolio_total_exposure  # ty:ignore[invalid-return-type]
 
     def backtest_output(self):
         """Output the backtest results (placeholder method)."""
@@ -544,7 +544,7 @@ class Backtest:
         -------
         pd.Dataframe
         """
-        return self._pnl
+        return self._pnl  # ty:ignore[invalid-return-type]
 
     def trade_no(self) -> pd.DataFrame:
         """Gets number of trades for each signal in the backtest (before.
@@ -579,7 +579,7 @@ class Backtest:
         -------
         str
         """
-        return self._ret_stats_signals.summary()
+        return self._ret_stats_signals.summary()  # ty:ignore[unresolved-attribute]
 
     def pnl_ret_stats(self) -> pd.DataFrame:
         """Gets P&L return statistics of individual strategies as class to be queried.
@@ -588,7 +588,7 @@ class Backtest:
         -------
         TimeSeriesDesc
         """
-        return self._pnl_ret_stats
+        return self._pnl_ret_stats  # ty:ignore[invalid-return-type]
 
     def pnl_cum(self) -> pd.DataFrame:
         """Gets P&L as a cumulative time series of individual assets.
@@ -624,7 +624,7 @@ class Backtest:
 
         return self._components_pnl_trades
 
-    def components_pnl_desc(self) -> pd.DataFrame:
+    def components_pnl_desc(self) -> pd.DataFrame:  # ty:ignore[empty-body]
         """Gets P&L of individual components as return statistics in a string format.
 
         Returns:
@@ -640,7 +640,7 @@ class Backtest:
         -------
         TimeSeriesDesc
         """
-        return self._components_pnl_ret_stats
+        return self._components_pnl_ret_stats  # ty:ignore[invalid-return-type]
 
     def components_pnl_cum(self) -> pd.DataFrame:
         """Gets P&L as a cumulative time series of individual assets (after portfolio level leverage adjustments).
@@ -669,7 +669,7 @@ class Backtest:
         -------
         pd.DataFrame
         """
-        return self._portfolio
+        return self._portfolio  # ty:ignore[invalid-return-type]
 
     def portfolio_pnl_desc(self) -> pd.DataFrame:
         """Gets P&L return statistics of portfolio as string.
@@ -687,7 +687,7 @@ class Backtest:
         -------
         RetStats
         """
-        return self._portfolio_ret_stats
+        return self._portfolio_ret_stats  # ty:ignore[invalid-return-type]
 
     def individual_leverage(self) -> pd.DataFrame:
         """Gets leverage for each asset historically.
@@ -772,7 +772,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_total_longs_notional
+        return self._portfolio_total_longs_notional  # ty:ignore[invalid-return-type]
 
     def portfolio_total_shorts_notional(self) -> pd.DataFrame:
         """Gets the total short exposure in the portfolio scaled by notional.
@@ -781,7 +781,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_total_shorts_notional
+        return self._portfolio_total_shorts_notional  # ty:ignore[invalid-return-type]
 
     def portfolio_net_exposure_notional(self) -> pd.DataFrame:
         """Gets the total net exposure of the portfolio scaled by notional.
@@ -790,7 +790,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_net_exposure_notional
+        return self._portfolio_net_exposure_notional  # ty:ignore[invalid-return-type]
 
     def portfolio_total_exposure_notional(self) -> pd.DataFrame:
         """Gets the total absolute exposure of the portfolio scaled by notional.
@@ -799,7 +799,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_total_exposure_notional
+        return self._portfolio_total_exposure_notional  # ty:ignore[invalid-return-type]
 
     def portfolio_trade(self) -> pd.DataFrame:
         """Get the trades (with individual leverage and portfolio leverage) for each asset to execute.
@@ -817,7 +817,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_signal_notional
+        return self._portfolio_signal_notional  # ty:ignore[invalid-return-type]
 
     def portfolio_trade_notional(self) -> pd.DataFrame:
         """Get the trades (with individual leverage and portfolio leverage) for each asset, scaled by a notional amount.
@@ -826,7 +826,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_signal_trade_notional
+        return self._portfolio_signal_trade_notional  # ty:ignore[invalid-return-type]
 
     def portfolio_trade_notional_sizes(self) -> pd.DataFrame:
         """Get the number of trades (with leverage) for each asset, scaled by a notional amount.
@@ -835,7 +835,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_signal_trade_notional_sizes
+        return self._portfolio_signal_trade_notional_sizes  # ty:ignore[invalid-return-type]
 
     def portfolio_signal_contracts(self) -> pd.DataFrame:
         """Get signals (with leverage) for each asset scaled into contract sizes (e.g. for futures).
@@ -844,7 +844,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_signal_contracts
+        return self._portfolio_signal_contracts  # ty:ignore[invalid-return-type]
 
     def portfolio_trade_contracts(self) -> pd.DataFrame:
         """Get trades (with leverage) for each asset scaled by notional into contract sizes (e.g. for futures).
@@ -853,7 +853,7 @@ class Backtest:
         -------
         DataFrame
         """
-        return self._portfolio_signal_trade_contracts
+        return self._portfolio_signal_trade_contracts  # ty:ignore[invalid-return-type]
 
     def signal(self) -> pd.DataFrame:
         """Get signal for each asset with individual leverage but excluding portfolio leverage constraints.
@@ -910,7 +910,7 @@ class TradingModel:
 
     # To be implemented by every trading strategy
     @abc.abstractmethod
-    def load_parameters(self, br: BacktestRequest = None):
+    def load_parameters(self, br: BacktestRequest = None):  # ty:ignore[invalid-parameter-default]
         """Fill backtest parameters such as start/end dates and transaction costs.
 
         To be implemented by subclass. Can overwrite it with our own BacktestRequest.
@@ -928,10 +928,10 @@ class TradingModel:
     @abc.abstractmethod
     def construct_signal(
         self,
-        spot_df: pd.DataFrame = None,
-        spot_df2: pd.DataFrame = None,
-        tech_params: TechParams = None,
-        br: BacktestRequest = None,
+        spot_df: pd.DataFrame = None,  # ty:ignore[invalid-parameter-default]
+        spot_df2: pd.DataFrame = None,  # ty:ignore[invalid-parameter-default]
+        tech_params: TechParams = None,  # ty:ignore[invalid-parameter-default]
+        br: BacktestRequest = None,  # ty:ignore[invalid-parameter-default]
         run_in_parallel: bool = False,
     ) -> pd.DataFrame:
         """Constructs signal from pre-loaded time series.
@@ -950,7 +950,7 @@ class TradingModel:
         run_in_parallel : bool
             Allow signal calculation in parallel
         """
-        return  # pragma: no cover
+        return  # pragma: no cover  # ty:ignore[invalid-return-type]
 
     def save_model(self, path):
         """Save the model instance as as pickle.
@@ -974,7 +974,7 @@ class TradingModel:
         return pkl
 
     ####### Generic functions for every backtest
-    def construct_strategy(self, br: BacktestRequest = None, run_in_parallel: bool = False) -> pd.DataFrame:
+    def construct_strategy(self, br: BacktestRequest = None, run_in_parallel: bool = False) -> pd.DataFrame:  # ty:ignore[invalid-parameter-default, invalid-return-type]
         """Construct the returns for all the strategies which have been specified.
 
         Gets backtesting parameters from fill_backtest_request (although
@@ -1008,7 +1008,7 @@ class TradingModel:
         basket_dict = {}
         contract_value_df = None
 
-        if isinstance(market_data, tuple | list):
+        if isinstance(market_data, tuple | list):  # ty:ignore[unsupported-operator]
             asset_df = market_data[0]
             spot_df = market_data[1]
             spot_df2 = market_data[2]
@@ -1032,13 +1032,13 @@ class TradingModel:
                 basket_dict = market_data["basket_dict"]
             else:
                 try:
-                    final_strategy = self.FINAL_STRATEGY
+                    final_strategy = self.FINAL_STRATEGY  # ty:ignore[unresolved-attribute]
                 except Exception:
                     final_strategy = "Basket"
 
                 tickers = []
 
-                for tick in asset_df.columns:
+                for tick in asset_df.columns:  # ty:ignore[unresolved-attribute]
                     if "." in tick:
                         tick = tick.split(".")[0]
 
@@ -1052,8 +1052,8 @@ class TradingModel:
 
         tech_params = br.tech_params if hasattr(br, "tech_params") else TechParams()
 
-        cum_results = pd.DataFrame(index=asset_df.index)
-        port_leverage = pd.DataFrame(index=asset_df.index)
+        cum_results = pd.DataFrame(index=asset_df.index)  # ty:ignore[unresolved-attribute]
+        port_leverage = pd.DataFrame(index=asset_df.index)  # ty:ignore[unresolved-attribute]
 
         from collections import OrderedDict
 
@@ -1063,13 +1063,13 @@ class TradingModel:
 
         # Each portfolio key calculate returns - can put parts of the portfolio in the key
         if (
-            market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel
+            market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel  # ty:ignore[possibly-missing-attribute]
         ):  # pragma: no cover
             swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
 
             pool = swim_pool.create_pool(
                 thread_technique=market_constants.backtest_thread_technique,
-                thread_no=market_constants.backtest_thread_no[market_constants.generic_plat],
+                thread_no=market_constants.backtest_thread_no[market_constants.generic_plat],  # ty:ignore[possibly-missing-attribute]
             )
 
             mult_results = []
@@ -1080,11 +1080,11 @@ class TradingModel:
             # calculate sub substrategies in sub-processes
             # TODO cut up in time chunks
             for key in bask_keys:
-                if key != self.FINAL_STRATEGY:
+                if key != self.FINAL_STRATEGY:  # ty:ignore[unresolved-attribute]
                     logger.info("Calculating (parallel) " + key)
 
-                    asset_cut_df = asset_df[[x + "." + br.trading_field for x in basket_dict[key]]]
-                    spot_cut_df = spot_df[[x + "." + br.trading_field for x in basket_dict[key]]]
+                    asset_cut_df = asset_df[[x + "." + br.trading_field for x in basket_dict[key]]]  # ty:ignore[not-subscriptable]
+                    spot_cut_df = spot_df[[x + "." + br.trading_field for x in basket_dict[key]]]  # ty:ignore[not-subscriptable]
 
                     mult_results.append(
                         pool.apply_async(
@@ -1106,20 +1106,20 @@ class TradingModel:
                     # Calculate final strategy separately in my main process
                     # (so don't have issues with pickling back large output)
 
-            logger.info("Calculating final strategy " + self.FINAL_STRATEGY)
+            logger.info("Calculating final strategy " + self.FINAL_STRATEGY)  # ty:ignore[unresolved-attribute]
 
             # Calculate the final strategy separately (can often be a lot larger)
-            asset_cut_df = asset_df[[x + "." + br.trading_field for x in basket_dict[self.FINAL_STRATEGY]]]
-            spot_cut_df = spot_df[[x + "." + br.trading_field for x in basket_dict[self.FINAL_STRATEGY]]]
+            asset_cut_df = asset_df[[x + "." + br.trading_field for x in basket_dict[self.FINAL_STRATEGY]]]  # ty:ignore[not-subscriptable, unresolved-attribute]
+            spot_cut_df = spot_df[[x + "." + br.trading_field for x in basket_dict[self.FINAL_STRATEGY]]]  # ty:ignore[not-subscriptable, unresolved-attribute]
 
             desc, results, leverage, stats, key, backtest = self.construct_individual_strategy(
                 br,
                 spot_cut_df,
-                spot_df2,
+                spot_df2,  # ty:ignore[invalid-argument-type]
                 asset_cut_df,
                 tech_params,
-                self.FINAL_STRATEGY,
-                contract_value_df,
+                self.FINAL_STRATEGY,  # ty:ignore[unresolved-attribute]
+                contract_value_df,  # ty:ignore[invalid-argument-type]
                 True,
                 False,
             )
@@ -1141,7 +1141,7 @@ class TradingModel:
                 port_leverage[results.columns[0]] = leverage
                 ret_stats_results[key] = stats
 
-                if key == self.FINAL_STRATEGY:
+                if key == self.FINAL_STRATEGY:  # ty:ignore[unresolved-attribute]
                     self._assign_final_strategy_results(results, backtest)
 
             with contextlib.suppress(BaseException):
@@ -1151,11 +1151,19 @@ class TradingModel:
             for key in bask_keys:
                 logger.info("Calculating (single thread) " + key)
 
-                asset_cut_df = asset_df[[x + "." + br.trading_field for x in basket_dict[key]]]
-                spot_cut_df = spot_df[[x + "." + br.trading_field for x in basket_dict[key]]]
+                asset_cut_df = asset_df[[x + "." + br.trading_field for x in basket_dict[key]]]  # ty:ignore[not-subscriptable]
+                spot_cut_df = spot_df[[x + "." + br.trading_field for x in basket_dict[key]]]  # ty:ignore[not-subscriptable]
 
                 desc, results, leverage, ret_stats, key, backtest = self.construct_individual_strategy(
-                    br, spot_cut_df, spot_df2, asset_cut_df, tech_params, key, contract_value_df, False, False
+                    br,
+                    spot_cut_df,
+                    spot_df2,
+                    asset_cut_df,
+                    tech_params,
+                    key,
+                    contract_value_df,
+                    False,
+                    False,  # ty:ignore[invalid-argument-type]
                 )
 
                 # results = backtest.portfolio_cum()
@@ -1165,11 +1173,11 @@ class TradingModel:
                 port_leverage[results.columns[0]] = leverage
                 ret_stats_results[key] = ret_stats
 
-                if key == self.FINAL_STRATEGY:
+                if key == self.FINAL_STRATEGY:  # ty:ignore[unresolved-attribute]
                     self._assign_final_strategy_results(results, backtest)
 
         # Get benchmark for comparison
-        benchmark = self.construct_strategy_benchmark()
+        benchmark = self.construct_strategy_benchmark()  # ty:ignore[unresolved-attribute]
 
         cum_results_benchmark = self.compare_strategy_vs_benchmark(br, cum_results, benchmark)
 
@@ -1298,7 +1306,7 @@ class TradingModel:
 
         # For final strategy return heavyweight backtest object
         # (contains lots of auxiliary information about trades etc)
-        if key == self.FINAL_STRATEGY and compress_output:  # pragma: no cover
+        if key == self.FINAL_STRATEGY and compress_output:  # pragma: no cover  # ty:ignore[unresolved-attribute]
             logger.debug("Compressing " + key)
 
             backtest = blosc.compress(pickle.dumps(backtest))
@@ -1307,7 +1315,7 @@ class TradingModel:
 
         logger.info("Calculated for " + key)
 
-        if key != self.FINAL_STRATEGY:
+        if key != self.FINAL_STRATEGY:  # ty:ignore[unresolved-attribute]
             # return desc, backtest.portfolio_cum(), backtest.portfolio_leverage(), backtest.pnl_ret_stats(), key, None
             return (
                 desc,
@@ -1429,7 +1437,7 @@ class TradingModel:
 
     def strategy_name(self) -> str:
         """Return the name of the final strategy."""
-        return self.FINAL_STRATEGY
+        return self.FINAL_STRATEGY  # ty:ignore[unresolved-attribute]
 
     def individual_leverage(self) -> pd.DataFrame:
         """Return the historical leverage for each individual asset signal."""
@@ -1468,7 +1476,7 @@ class TradingModel:
 
     def strategy_benchmark_pnl_ret_stats(self) -> pd.DataFrame:
         """Return return statistics for the benchmark."""
-        return self._strategy_benchmark_pnl_ret_stats
+        return self._strategy_benchmark_pnl_ret_stats  # ty:ignore[invalid-return-type]
 
     ### Final PNL + group
     def strategy_group_pnl(self) -> pd.DataFrame:
@@ -1477,7 +1485,7 @@ class TradingModel:
 
     def strategy_group_pnl_ret_stats(self) -> pd.DataFrame:
         """Return return statistics for all strategy groups."""
-        return self._strategy_group_pnl_ret_stats
+        return self._strategy_group_pnl_ret_stats  # ty:ignore[invalid-return-type]
 
     ### Final P&L + group + benchmark
     def strategy_group_benchmark_pnl(self) -> pd.DataFrame:
@@ -1486,7 +1494,7 @@ class TradingModel:
 
     def strategy_group_benchmark_pnl_ret_stats(self) -> pd.DataFrame:
         """Return return statistics for all strategy groups including benchmark."""
-        return self._strategy_group_benchmark_pnl_ret_stats
+        return self._strategy_group_benchmark_pnl_ret_stats  # ty:ignore[invalid-return-type]
 
     def strategy_group_leverage(self) -> pd.DataFrame:
         """Return the leverage time series for all strategy groups."""
@@ -1673,7 +1681,9 @@ class TradingModel:
             )
 
             if hasattr(self, "br") and self.br.write_csv_pnl:
-                df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")  # pragma: no cover
+                df.to_csv(
+                    self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv"
+                )  # pragma: no cover  # ty:ignore[unresolved-attribute]
 
             return self._chart_return_with_df(
                 df, style, silent_plot, chart_type="line", ret_with_df=ret_with_df, split_on_char=split_on_char
@@ -1699,8 +1709,8 @@ class TradingModel:
         style = self._create_style("", "", reduce_plot=reduce_plot)
 
         with contextlib.suppress(Exception):
-            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade no).png"
-            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade no).html"
+            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade no).png"  # ty:ignore[unresolved-attribute]
+            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade no).html"  # ty:ignore[unresolved-attribute]
 
             df = self._strip_dataframe(self._reduce_plot(df_trades, reduce_plot=reduce_plot, resample=resample), strip)
 
@@ -1725,7 +1735,7 @@ class TradingModel:
         short = signal[signal < 0].count()
         flat = signal[signal == 0].count()
 
-        df = pd.DataFrame(index=long.index, columns=["Long", "Short", "Flat"])
+        df = pd.DataFrame(index=long.index, columns=["Long", "Short", "Flat"])  # ty:ignore[invalid-argument-type]
 
         df["Long"] = long
         df["Short"] = short
@@ -1737,10 +1747,10 @@ class TradingModel:
         style = self._create_style("", "")
 
         with contextlib.suppress(Exception):
-            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy signal proportion).png"
-            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy signal proportion).html"
+            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy signal proportion).png"  # ty:ignore[unresolved-attribute]
+            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy signal proportion).html"  # ty:ignore[unresolved-attribute]
 
-            df = self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot=reduce_plot, resample=resample)
+            df = self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot=reduce_plot, resample=resample)  # ty:ignore[unknown-argument]
 
             return self._chart_return_with_df(  # pragma: no cover
                 df, style, silent_plot, chart_type="bar", ret_with_df=ret_with_df, split_on_char=split_on_char
@@ -2013,13 +2023,13 @@ class TradingModel:
         if strip is not None:
             keys = [k.replace(strip, "") for k in keys]
 
-        ret_stats = pd.DataFrame(index=keys, data=ret_metric, columns=[metric])
+        ret_stats = pd.DataFrame(index=keys, data=ret_metric, columns=[metric])  # ty:ignore[invalid-argument-type]
         # ret_stats = ret_stats.sort_index()
         style.file_output = (
-            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".png"
+            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".png"  # ty:ignore[unresolved-attribute]
         )
         style.html_file_output = (
-            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".html"
+            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".html"  # ty:ignore[unresolved-attribute]
         )
         style.display_brand_label = False
 
@@ -2073,10 +2083,10 @@ class TradingModel:
 
         # ret_stats = ret_stats.sort_index()
         style.file_output = (
-            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".png"
+            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".png"  # ty:ignore[unresolved-attribute]
         )
         style.html_file_output = (
-            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".html"
+            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_tag + ") " + str(style.scale_factor) + ".html"  # ty:ignore[unresolved-attribute]
         )
         style.display_brand_label = False
         style.date_formatter = "%Y"
@@ -2249,8 +2259,8 @@ class TradingModel:
         style = self._create_style("", "", reduce_plot=False)
 
         with contextlib.suppress(Exception):
-            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade notional size).png"
-            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade notional size).html"
+            style.file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade notional size).png"  # ty:ignore[unresolved-attribute]
+            style.html_file_output = self.DUMP_PATH + self.FINAL_STRATEGY + " (Strategy trade notional size).html"  # ty:ignore[unresolved-attribute]
 
             df = self._strip_dataframe(self._strategy_trade_notional_sizes, strip)
 
@@ -2476,7 +2486,7 @@ class TradingModel:
         style = copy.deepcopy(self.CHART_STYLE)
 
         if self.SHOW_TITLES:
-            style.title = self.FINAL_STRATEGY + " " + title
+            style.title = self.FINAL_STRATEGY + " " + title  # ty:ignore[unresolved-attribute]
 
         style.display_legend = True
         style.scale_factor = self.SCALE_FACTOR
@@ -2495,15 +2505,15 @@ class TradingModel:
 
         if self.DEFAULT_PLOT_ENGINE not in ["plotly", "cufflinks"] and self.SAVE_FIGURES:
             style.file_output = (
-                self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_add + ") " + str(style.scale_factor) + ".png"
+                self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_add + ") " + str(style.scale_factor) + ".png"  # ty:ignore[unresolved-attribute]
             )
 
         style.html_file_output = (
-            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_add + ") " + str(style.scale_factor) + ".html"
+            self.DUMP_PATH + self.FINAL_STRATEGY + " (" + file_add + ") " + str(style.scale_factor) + ".html"  # ty:ignore[unresolved-attribute]
         )
 
         with contextlib.suppress(BaseException):
-            style.silent_display = self.SILENT_DISPLAY
+            style.silent_display = self.SILENT_DISPLAY  # ty:ignore[unresolved-attribute]
 
         return style
 
@@ -2521,8 +2531,12 @@ class PortfolioWeightConstruction:
         self._calculations = Calculations()
 
     def optimize_portfolio_weights(
-        self, returns_df: pd.DataFrame, signal_df: pd.DataFrame, signal_pnl_cols: list[str], br: BacktestRequest = None
-    ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        self,
+        returns_df: pd.DataFrame,
+        signal_df: pd.DataFrame,
+        signal_pnl_cols: list[str],
+        br: BacktestRequest = None,  # ty:ignore[invalid-parameter-default]
+    ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame):  # ty:ignore[invalid-type-form]
         """Compute and apply signal and portfolio weights, optionally vol-adjusting both."""
         if br is None:
             br = self._br
@@ -2561,31 +2575,35 @@ class PortfolioWeightConstruction:
         # weighting scheme?
         if br.portfolio_combination is not None:
             if br.portfolio_combination == "sum" and br.portfolio_combination_weights is None:
-                portfolio = pd.DataFrame(data=signal_pnl.sum(axis=1), index=signal_pnl.index, columns=["Portfolio"])
+                portfolio = pd.DataFrame(data=signal_pnl.sum(axis=1), index=signal_pnl.index, columns=["Portfolio"])  # ty:ignore[invalid-argument-type]
             elif br.portfolio_combination == "mean" and br.portfolio_combination_weights is None:
-                portfolio = pd.DataFrame(data=signal_pnl.mean(axis=1), index=signal_pnl.index, columns=["Portfolio"])
+                portfolio = pd.DataFrame(data=signal_pnl.mean(axis=1), index=signal_pnl.index, columns=["Portfolio"])  # ty:ignore[invalid-argument-type]
 
-                adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method="mean")
+                adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method="mean")  # ty:ignore[invalid-argument-type]
             elif "weighted" in br.portfolio_combination and isinstance(br.portfolio_combination_weights, dict):
                 # Get the weights for each asset
                 adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(
-                    br, signal_pnl, method=br.portfolio_combination
+                    br,
+                    signal_pnl,
+                    method=br.portfolio_combination,  # ty:ignore[invalid-argument-type]
                 )
 
                 portfolio = pd.DataFrame(data=(signal_pnl.values * adjusted_weights_matrix), index=signal_pnl.index)
                 is_all_na = pd.isnull(portfolio).all(axis=1)
-                portfolio = pd.DataFrame(portfolio.sum(axis=1), columns=["Portfolio"])
+                portfolio = pd.DataFrame(portfolio.sum(axis=1), columns=["Portfolio"])  # ty:ignore[invalid-argument-type]
 
                 # Overwrite days when every asset PnL was null is NaN with nan
                 portfolio[is_all_na] = np.nan
         else:
             # Just assume to take the mean / ie. equal weights for each signal
-            portfolio = pd.DataFrame(data=signal_pnl.mean(axis=1), index=signal_pnl.index, columns=["Portfolio"])
+            portfolio = pd.DataFrame(data=signal_pnl.mean(axis=1), index=signal_pnl.index, columns=["Portfolio"])  # ty:ignore[invalid-argument-type]
 
-            adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method="mean")
+            adjusted_weights_matrix = self.calculate_signal_weights_for_portfolio(br, signal_pnl, method="mean")  # ty:ignore[invalid-argument-type]
 
         portfolio_leverage_df = pd.DataFrame(
-            data=np.ones(len(signal_pnl.index)), index=signal_pnl.index, columns=["Portfolio"]
+            data=np.ones(len(signal_pnl.index)),
+            index=signal_pnl.index,
+            columns=["Portfolio"],  # ty:ignore[invalid-argument-type]
         )
 
         # Should we apply vol target on a portfolio level basis?
@@ -2677,7 +2695,7 @@ class PortfolioWeightConstruction:
             weights_vector = np.ones(len(signal_pnl.columns))
         elif True:
             # Get the weights for each asset
-            weights_vector = np.array([float(br.portfolio_combination_weights[col]) for col in signal_pnl.columns])
+            weights_vector = np.array([float(br.portfolio_combination_weights[col]) for col in signal_pnl.columns])  # ty:ignore[unresolved-attribute]
 
         # Repeat this down for every day
         weights_matrix = np.repeat(weights_vector[np.newaxis, :], len(signal_pnl.index), 0)
@@ -2701,7 +2719,7 @@ class PortfolioWeightConstruction:
 
             return adjusted_weights_matrix
 
-        return weights_matrix
+        return weights_matrix  # ty:ignore[invalid-return-type]
 
 
 #######################################################################################################################
@@ -2710,7 +2728,7 @@ class PortfolioWeightConstruction:
 class RiskEngine:
     """Adjusts signal weighting according to risk constraints (volatility targeting and position limit constraints)."""
 
-    def calculate_vol_adjusted_index_from_prices(self, prices_df: pd.DataFrame, br: BacktestRequest) -> pd.DataFrame:
+    def calculate_vol_adjusted_index_from_prices(self, prices_df: pd.DataFrame, br: BacktestRequest) -> pd.DataFrame:  # ty:ignore[invalid-return-type]
         """Adjusts an index of prices for a vol target.
 
         Parameters
@@ -2736,7 +2754,7 @@ class RiskEngine:
 
     def calculate_vol_adjusted_returns(
         self, returns_df: pd.DataFrame, br: BacktestRequest, returns: bool = True
-    ) -> (pd.DataFrame, pd.DataFrame):
+    ) -> (pd.DataFrame, pd.DataFrame):  # ty:ignore[invalid-type-form]
         """Adjusts returns for a vol target.
 
         Parameters
@@ -2817,7 +2835,7 @@ class RiskEngine:
         filter = Filter()
 
         if resample_freq is not None:
-            return
+            return  # ty:ignore[invalid-return-type]
             # TODO not implemented yet
 
         if not returns:
@@ -2878,7 +2896,7 @@ class RiskEngine:
             position_clip_adjustment = pd.DataFrame(
                 data=np.ones(len(portfolio_net_exposure.index)),
                 index=portfolio_net_exposure.index,
-                columns=["Portfolio"],
+                columns=["Portfolio"],  # ty:ignore[invalid-argument-type]
             )
 
             portfolio_abs_exposure = portfolio_net_exposure.abs()
@@ -2898,7 +2916,7 @@ class RiskEngine:
             position_clip_adjustment = pd.DataFrame(
                 data=np.ones(len(portfolio_abs_exposure.index)),
                 index=portfolio_abs_exposure.index,
-                columns=["Portfolio"],
+                columns=["Portfolio"],  # ty:ignore[invalid-argument-type]
             )
 
             # For those periods when the absolute TOTAL positioning is
@@ -2921,4 +2939,4 @@ class RiskEngine:
                 portfolio_net_exposure, position_clip_adjustment
             )
 
-        return position_clip_adjustment
+        return position_clip_adjustment  # ty:ignore[invalid-return-type]

@@ -196,7 +196,7 @@ class TradeAnalysis:
         # TODO Add summary sheet comparing return statistics for all the different models in the list
 
         with contextlib.suppress(AttributeError):  # pragma: no cover
-            writer.save()  # removed in newer xlsxwriter
+            writer.save()  # removed in newer xlsxwriter  # ty:ignore[unresolved-attribute]
         writer.close()
 
     def save_positions_trades(self, tm, signals, trades, signal_caption, trade_caption, writer):
@@ -242,27 +242,27 @@ class TradeAnalysis:
     ):
         """Run sensitivity analysis across arbitrary strategy parameters."""
         if not (reload_market_data):
-            asset_df, spot_df, spot_df2, _basket_dict, contract_value_df = self._load_assets(trading_model)
+            asset_df, spot_df, spot_df2, _basket_dict, contract_value_df = self._load_assets(trading_model)  # ty:ignore[missing-argument]
 
         port_list = []
         ret_stats_list = []
 
-        if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
+        if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:  # ty:ignore[possibly-missing-attribute]
             swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
 
             pool = swim_pool.create_pool(
                 thread_technique=market_constants.backtest_thread_technique,
-                thread_no=market_constants.backtest_thread_no[market_constants.generic_plat],
+                thread_no=market_constants.backtest_thread_no[market_constants.generic_plat],  # ty:ignore[possibly-missing-attribute]
             )
 
             mult_results = []
 
-            for i in range(0, len(parameter_list)):
+            for i in range(0, len(parameter_list)):  # ty:ignore[invalid-argument-type]
                 # br = copy.copy(trading_model.load_parameters())
                 # reset all parameters
                 br = copy.copy(trading_model.load_parameters())
 
-                current_parameter = parameter_list[i]
+                current_parameter = parameter_list[i]  # ty:ignore[not-subscriptable]
 
                 # for calculating P&L, change the assets
                 for k in current_parameter:
@@ -285,7 +285,7 @@ class TradeAnalysis:
                             spot_df2,
                             br,
                             contract_value_df,
-                            pretty_portfolio_names[i],
+                            pretty_portfolio_names[i],  # ty:ignore[not-subscriptable]
                         ),
                     )
                 )
@@ -300,11 +300,11 @@ class TradeAnalysis:
                 swim_pool.close_pool(pool)
 
         else:
-            for i in range(0, len(parameter_list)):
+            for i in range(0, len(parameter_list)):  # ty:ignore[invalid-argument-type]
                 # reset all parameters
                 br = copy.copy(trading_model.load_parameters())
 
-                current_parameter = parameter_list[i]
+                current_parameter = parameter_list[i]  # ty:ignore[not-subscriptable]
 
                 # for calculating P&L
                 for k in current_parameter:
@@ -320,7 +320,13 @@ class TradeAnalysis:
                 # br = copy.copy(trading_model.br)
 
                 port, ret_stats = self._run_strategy(
-                    trading_model, asset_df, spot_df, spot_df2, br, contract_value_df, pretty_portfolio_names[i]
+                    trading_model,
+                    asset_df,
+                    spot_df,
+                    spot_df2,
+                    br,
+                    contract_value_df,
+                    pretty_portfolio_names[i],  # ty:ignore[not-subscriptable]
                 )
 
                 port_list.append(port)
@@ -342,7 +348,7 @@ class TradeAnalysis:
         # style.display_legend = False
 
         # careful with plotting labels, may need to convert to strings
-        pretty_portfolio_names = [str(p) for p in pretty_portfolio_names]
+        pretty_portfolio_names = [str(p) for p in pretty_portfolio_names]  # ty:ignore[not-iterable]
 
         # plot all the variations
         style.resample = "B"
@@ -360,7 +366,7 @@ class TradeAnalysis:
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + " " + parameter_type + " IR.html"
         style.scale_factor = trading_model.SCALE_FACTOR
         style.title = trading_model.FINAL_STRATEGY + " " + parameter_type
-        summary_ir = pd.DataFrame(index=pretty_portfolio_names, data=ir, columns=["IR"])
+        summary_ir = pd.DataFrame(index=pretty_portfolio_names, data=ir, columns=["IR"])  # ty:ignore[invalid-argument-type]
 
         if plot:
             self.chart.plot(summary_ir, chart_type="bar", style=style)
@@ -369,7 +375,7 @@ class TradeAnalysis:
         style.file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + " " + parameter_type + " Rets.png"
         style.html_file_output = self.DUMP_PATH + trading_model.FINAL_STRATEGY + " " + parameter_type + " Rets.html"
 
-        summary_rets = pd.DataFrame(index=pretty_portfolio_names, data=rets, columns=["Rets (%)"]) * 100
+        summary_rets = pd.DataFrame(index=pretty_portfolio_names, data=rets, columns=["Rets (%)"]) * 100  # ty:ignore[invalid-argument-type]
 
         if plot:
             self.chart.plot(summary_rets, chart_type="bar", style=style)
@@ -421,18 +427,18 @@ class TradeAnalysis:
         # asset_df, spot_df, spot_df2, basket_dict = strat.fill_assets()
         final_strategy = trading_model.FINAL_STRATEGY
 
-        for i in range(0, len(parameter_list)):
+        for i in range(0, len(parameter_list)):  # ty:ignore[invalid-argument-type]
             br = trading_model.fill_backtest_request()
 
-            current_parameter = parameter_list[i]
+            current_parameter = parameter_list[i]  # ty:ignore[not-subscriptable]
 
             # for calculating P&L
             for k in current_parameter:
                 setattr(br, k, current_parameter[k])
 
-            trading_model.FINAL_STRATEGY = final_strategy + " " + pretty_portfolio_names[i]
+            trading_model.FINAL_STRATEGY = final_strategy + " " + pretty_portfolio_names[i]  # ty:ignore[not-subscriptable]
 
-            self.logger.info("Calculating... " + pretty_portfolio_names[i])
+            self.logger.info("Calculating... " + pretty_portfolio_names[i])  # ty:ignore[not-subscriptable, unresolved-attribute]
             trading_model.br = br
             trading_model.construct_strategy(br=br)
 

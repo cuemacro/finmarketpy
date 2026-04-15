@@ -71,7 +71,7 @@ class FXOptionsPricer(AbstractPricer):
         depo_tenor=None,
         use_atm_quoted=False,
         return_as_df=True,
-    ):
+    ):  # ty:ignore[invalid-method-override]
         """Price FX options for given horizon/expiry dates.
 
         Prices FX options for horizon dates/expiry dates given by the user from FX spot rates,
@@ -145,7 +145,7 @@ class FXOptionsPricer(AbstractPricer):
 
         logger = LoggerManager().getLogger(__name__)
 
-        field = fx_vol_surface._field
+        field = fx_vol_surface._field  # ty:ignore[unresolved-attribute]
 
         # Make horizon date and expiry date pandas DatetimeIndex
         if isinstance(horizon_date, pd.Timestamp):
@@ -194,8 +194,8 @@ class FXOptionsPricer(AbstractPricer):
                 # If we have a "key strike" need to fit the vol surface
                 if isinstance(strike[i], str):
                     if not (built_vol_surface):
-                        fx_vol_surface.build_vol_surface(horizon_date[i])
-                        fx_vol_surface.extract_vol_surface(num_strike_intervals=None)
+                        fx_vol_surface.build_vol_surface(horizon_date[i])  # ty:ignore[unresolved-attribute]
+                        fx_vol_surface.extract_vol_surface(num_strike_intervals=None)  # ty:ignore[unresolved-attribute]
 
                         built_vol_surface = True
 
@@ -203,19 +203,26 @@ class FXOptionsPricer(AbstractPricer):
                     # usually this is ATM delta neutral strike, but can sometimes be ATMF for some Latam
                     # Take the vol directly quoted, rather than getting it from building vol surface
                     if strike[i] == "atm":
-                        strike[i] = fx_vol_surface.get_atm_strike(tenor)
+                        strike[i] = fx_vol_surface.get_atm_strike(tenor)  # ty:ignore[unresolved-attribute]
 
                         if use_atm_quoted:
-                            vol[i] = fx_vol_surface.get_atm_quoted_vol(tenor) / 100.0
+                            vol[i] = fx_vol_surface.get_atm_quoted_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
                         else:
-                            vol[i] = fx_vol_surface.get_atm_vol(tenor) / 100.0  # interpolated
+                            vol[i] = (
+                                fx_vol_surface.get_atm_vol(tenor) / 100.0
+                            )  # interpolated  # ty:ignore[unresolved-attribute]
                     elif strike[i] == "atms":
-                        strike[i] = fx_vol_surface.get_spot()  # Interpolate vol later
+                        strike[i] = (
+                            fx_vol_surface.get_spot()
+                        )  # Interpolate vol later  # ty:ignore[unresolved-attribute]
                     elif strike[i] == "atmf":
                         # Quoted tenor, no need to interpolate
-                        strike[i] = float(fx_vol_surface.get_all_market_data()[cross + ".close"][horizon_date[i]]) + (
-                            float(fx_vol_surface.get_all_market_data()[cross + tenor + ".close"][horizon_date[i]])
-                            / self._fx_forwards_pricer.get_forwards_divisor(cross[3:6])
+                        strike[i] = (
+                            float(fx_vol_surface.get_all_market_data()[cross + ".close"][horizon_date[i]])
+                            + (  # ty:ignore[unresolved-attribute]
+                                float(fx_vol_surface.get_all_market_data()[cross + tenor + ".close"][horizon_date[i]])  # ty:ignore[unresolved-attribute]
+                                / self._fx_forwards_pricer.get_forwards_divisor(cross[3:6])
+                            )
                         )
 
                         # Interpolate vol later
@@ -223,24 +230,24 @@ class FXOptionsPricer(AbstractPricer):
                     # TODO: work on 25d and 10d strikes
                     elif strike[i] == "25d-otm":
                         if "call" in contract_type_:
-                            strike[i] = fx_vol_surface.get_25d_call_strike(tenor)
+                            strike[i] = fx_vol_surface.get_25d_call_strike(tenor)  # ty:ignore[unresolved-attribute]
 
-                            vol[i] = fx_vol_surface.get_25d_call_vol(tenor) / 100.0
+                            vol[i] = fx_vol_surface.get_25d_call_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
                         elif "put" in contract_type_:
-                            strike[i] = fx_vol_surface.get_25d_put_strike(tenor)
-                            vol[i] = fx_vol_surface.get_25d_put_vol(tenor) / 100.0
+                            strike[i] = fx_vol_surface.get_25d_put_strike(tenor)  # ty:ignore[unresolved-attribute]
+                            vol[i] = fx_vol_surface.get_25d_put_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
 
                     elif strike[i] == "10d-otm":
                         if "call" in contract_type_:
-                            strike[i] = fx_vol_surface.get_10d_call_strike(tenor)
-                            vol[i] = fx_vol_surface.get_10d_call_vol(tenor) / 100.0
+                            strike[i] = fx_vol_surface.get_10d_call_strike(tenor)  # ty:ignore[unresolved-attribute]
+                            vol[i] = fx_vol_surface.get_10d_call_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
                         elif "put" in contract_type_:
-                            strike[i] = fx_vol_surface.get_10d_put_strike(tenor)
-                            vol[i] = fx_vol_surface.get_10d_put_vol(tenor) / 100.0
+                            strike[i] = fx_vol_surface.get_10d_put_strike(tenor)  # ty:ignore[unresolved-attribute]
+                            vol[i] = fx_vol_surface.get_10d_put_vol(tenor) / 100.0  # ty:ignore[unresolved-attribute]
 
                 if not built_vol_surface:
                     try:
-                        fx_vol_surface.build_vol_surface(horizon_date[i])
+                        fx_vol_surface.build_vol_surface(horizon_date[i])  # ty:ignore[unresolved-attribute]
                     except Exception:
                         logger.warn(
                             "Failed to build vol surface for "
@@ -253,11 +260,11 @@ class FXOptionsPricer(AbstractPricer):
                 # fit the vol surface (if hasn't already been done)
                 if np.isnan(vol[i]):
                     if tenor is None:
-                        vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(
+                        vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(  # ty:ignore[unresolved-attribute]
                             strike[i], expiry_date=expiry_date[i], tenor=None
                         )
                     else:
-                        vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(
+                        vol[i] = fx_vol_surface.calculate_vol_for_strike_expiry(  # ty:ignore[unresolved-attribute]
                             strike[i], expiry_date=None, tenor=tenor
                         )
 
@@ -276,7 +283,7 @@ class FXOptionsPricer(AbstractPricer):
                     self._findate(expiry_date[i]), strike[i], cross, contract_type_fin_, notional, cross[0:3]
                 )
 
-                spot[i] = fx_vol_surface.get_spot()
+                spot[i] = fx_vol_surface.get_spot()  # ty:ignore[unresolved-attribute]
 
                 """ FinancePy will return the value in the following dictionary for values
                     {"v": vdf,
@@ -297,8 +304,8 @@ class FXOptionsPricer(AbstractPricer):
                     + option.value(
                         self._findate(horizon_date[i]),
                         spot[i],
-                        fx_vol_surface.get_dom_discount_curve(),
-                        fx_vol_surface.get_for_discount_curve(),
+                        fx_vol_surface.get_dom_discount_curve(),  # ty:ignore[unresolved-attribute]
+                        fx_vol_surface.get_for_discount_curve(),  # ty:ignore[unresolved-attribute]
                         model,
                     )[premium_output.replace("-", "_")]
                 )
@@ -331,8 +338,8 @@ class FXOptionsPricer(AbstractPricer):
                     + option.delta(
                         self._findate(horizon_date[i]),
                         spot[i],
-                        fx_vol_surface.get_dom_discount_curve(),
-                        fx_vol_surface.get_for_discount_curve(),
+                        fx_vol_surface.get_dom_discount_curve(),  # ty:ignore[unresolved-attribute]
+                        fx_vol_surface.get_for_discount_curve(),  # ty:ignore[unresolved-attribute]
                         model,
                     )[delta_output.replace("-", "_")]
                 )

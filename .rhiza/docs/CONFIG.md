@@ -29,7 +29,6 @@ The repository uses several automated workflows (located in `.github/workflows/`
 - **Pre-commit** (`rhiza_pre-commit.yml`) - Code quality checks
 - **Book** (`rhiza_book.yml`) - Documentation deployment
 - **Release** (`rhiza_release.yml`) - Package publishing
-- **Deptry** (`rhiza_deptry.yml`) - Dependency checks
 - **Marimo** (`rhiza_marimo.yml`) - Interactive notebooks
 
 ## Template Synchronization

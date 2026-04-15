@@ -1,0 +1,25 @@
+title: "[Question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Welcome! Use this space to ask questions, share how your use-case, or explore ideas with the community.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question or Topic
+      description: What would you like to discuss?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Any relevant code, configuration, or background that helps frame your question.
+      placeholder: |
+        ```python
+        # your code snippet here
+        ```

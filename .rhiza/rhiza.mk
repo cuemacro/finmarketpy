@@ -1,7 +1,7 @@
 ## Makefile for jebel-quant/rhiza
 # (https://github.com/jebel-quant/rhiza)
 #
-# Purpose: Developer tasks using uv/uvx (install, test, docs, marimushka, book).
+# Purpose: Developer tasks using uv/uvx (install, test, book).
 # Lines with `##` after a target are parsed into help text,
 # and lines starting with `##@` create section headers in the help output.
 #
@@ -33,7 +33,6 @@ RESET := \033[0m
 	readme \
 	summarise-sync \
 	sync \
-	sync-experimental \
 	validate \
 	version-matrix
 
@@ -77,7 +76,7 @@ endef
 export RHIZA_LOGO
 
 # Declare phony targets for Rhiza Core
-.PHONY: print-logo sync sync-experimental validate readme pre-sync post-sync pre-validate post-validate
+.PHONY: print-logo sync sync-experimental materialize validate readme pre-sync post-sync pre-validate post-validate
 
 # Hook targets (double-colon rules allow multiple definitions)
 # Note: pre-install/post-install are defined in bootstrap.mk
@@ -98,26 +97,21 @@ sync: pre-sync ## sync with template repository as defined in .rhiza/template.ym
 		printf "${BLUE}[INFO] Skipping sync in rhiza repository (no template.yml by design)${RESET}\n"; \
 	else \
 		$(MAKE) install-uv; \
-		${UVX_BIN} "rhiza>=$(RHIZA_VERSION)" sync .; \
+		${UVX_BIN} "rhiza==$(RHIZA_VERSION)" sync .; \
 	fi
 	@$(MAKE) post-sync
 
-sync-experimental: pre-sync ## sync with template repository using cruft-based merge (experimental, requires rhiza-cli >= 0.11.1-beta.1)
-	@printf "${YELLOW}[WARN] sync-experimental uses a beta version of rhiza-cli (>= 0.11.1-beta.1) and is not yet stable${RESET}\n"
-	@if git remote get-url origin 2>/dev/null | grep -iqE 'jebel-quant/rhiza(\.git)?$$'; then \
-		printf "${BLUE}[INFO] Skipping sync-experimental in rhiza repository (no template.yml by design)${RESET}\n"; \
-	else \
-		$(MAKE) install-uv; \
-		${UVX_BIN} "rhiza>=0.11.1b1" sync .; \
-	fi
-	@$(MAKE) post-sync
+materialize: ## [DEPRECATED] use 'make sync' instead — materialize --force is now sync
+	@printf "${YELLOW}[WARN] 'make materialize' is deprecated and will be removed in a future release.${RESET}\n"
+	@printf "${YELLOW}[WARN] Please use 'make sync' instead (e.g. 'materialize --force' is now 'make sync').${RESET}\n"
+	@$(MAKE) sync
 
 summarise-sync: install-uv ## summarise differences created by sync with template repository
 	@if git remote get-url origin 2>/dev/null | grep -iqE 'jebel-quant/rhiza(\.git)?$$'; then \
 		printf "${BLUE}[INFO] Skipping summarise-sync in rhiza repository (no template.yml by design)${RESET}\n"; \
 	else \
 		$(MAKE) install-uv; \
-		${UVX_BIN} "rhiza>=$(RHIZA_VERSION)" summarise .; \
+		${UVX_BIN} "rhiza==$(RHIZA_VERSION)" summarise .; \
 	fi
 
 rhiza-test: install ## run rhiza's own tests (if any)
@@ -132,7 +126,7 @@ validate: pre-validate rhiza-test ## validate project structure against template
 		printf "${BLUE}[INFO] Skipping validate in rhiza repository (no template.yml by design)${RESET}\n"; \
 	else \
 		$(MAKE) install-uv; \
-		${UVX_BIN} "rhiza>=$(RHIZA_VERSION)" validate .; \
+		${UVX_BIN} "rhiza==$(RHIZA_VERSION)" validate .; \
 	fi
 	@$(MAKE) post-validate
 

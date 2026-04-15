@@ -91,7 +91,6 @@ pre-install::
 | `custom-env.mk` | Example environment customizations |
 | `custom-task.mk` | Example custom tasks |
 | `docker.mk` | Docker build and run targets |
-| `docs.mk` | Documentation generation (pdoc) |
 | `github.mk` | GitHub CLI integrations |
 | `lfs.mk` | Git LFS management |
 | `marimo.mk` | Marimo notebook support |
@@ -114,8 +113,6 @@ Files prefixed with `custom-` are **examples** showing how to customize Rhiza. D
 
 **Section Headers**: Title Case with `##@`
 - `##@ Bootstrap`, `##@ GitHub Helpers`
-
-See [docs/ARCHITECTURE.md](../../docs/ARCHITECTURE.md#naming-conventions-and-organization-patterns) for comprehensive naming guidelines.
 
 ### Available Hooks
 Add these to your root `Makefile` using double-colon syntax (`::`):

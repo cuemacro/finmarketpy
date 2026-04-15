@@ -8,9 +8,10 @@ repos:
       - id: check-toml
       - id: check-yaml
         args: ['--unsafe']
+        exclude: ^recipe/meta\.yaml$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.15.4'
+    rev: 'v0.15.10'
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix, --unsafe-fixes ]
@@ -19,13 +20,13 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
         args: ["--disable", "MD013"]
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.0
+    rev: 0.37.1
     hooks:
       - id: check-renovate
         args: [ "--verbose" ]
@@ -34,7 +35,7 @@ repos:
         args: ["--verbose"]
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.11
+    rev: v1.7.12
     hooks:
       - id: actionlint
 
@@ -50,12 +51,12 @@ repos:
         args: ["--skip", "B101", "--exclude", ".venv,tests,.rhiza/tests,.git,.pytest_cache", "-c", "pyproject.toml"]
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.10.6
+    rev: 0.11.6
     hooks:
       - id: uv-lock
 
   - repo: https://github.com/Jebel-Quant/rhiza-hooks
-    rev: v0.3.0  # Use the latest release
+    rev: v0.3.2  # Use the latest release
     hooks:
       # Migrated from rhiza
       - id: check-rhiza-workflow-names

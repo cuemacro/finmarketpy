@@ -36,12 +36,21 @@ Bullet points with concrete evidence.
 ### Risks / Technical Debt
 Items that could affect maintainability, correctness, or scalability.
 
-### Score
-Give an overall score between **1 and 10**, where:
-- 9–10: exemplary, production-grade, well-maintained
-- 7–8: solid, minor issues
-- 5–6: mixed quality, notable concerns
-- 3–4: fragile or poorly structured
-- 1–2: critically deficient
+### Scores
 
-Be honest. If information is missing or unclear, state that explicitly.
+Rate each subcategory from **1 (critically deficient) to 10 (exemplary)**:
+
+| Subcategory | Score | Rationale |
+|---|---|---|
+| Code Quality | X/10 | ... |
+| Test Coverage | X/10 | ... |
+| Documentation | X/10 | ... |
+| Architecture | X/10 | ... |
+| Security | X/10 | ... |
+| Dependency Management | X/10 | ... |
+| CI/CD & Tooling | X/10 | ... |
+| **Overall** | **X/10** | ... |
+
+Scale: 9–10 exemplary · 7–8 solid · 5–6 mixed · 3–4 fragile · 1–2 critical
+
+Be honest. If information is missing or unclear, state that explicitly. Omit subcategories that are not applicable.

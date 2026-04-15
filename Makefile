@@ -12,6 +12,10 @@ include .rhiza/rhiza.mk
 # Optional: developer-local extensions (not committed)
 -include local.mk
 
+# Wire typecheck into make validate
+post-validate::
+	@$(MAKE) typecheck
+
 ## Custom targets
 
 .PHONY: adr

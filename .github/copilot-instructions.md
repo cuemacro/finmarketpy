@@ -124,7 +124,7 @@ The Copilot coding agent environment is automatically configured via official Gi
 
 These files must exist on the default branch. The agent does not need to run any setup commands manually.
 
-For DevContainers and Codespaces, the `.devcontainer/` configuration and `bootstrap.sh` handle setup automatically. See `docs/DEVCONTAINER.md` for details.
+For DevContainers and Codespaces, the `.devcontainer/` configuration and `bootstrap.sh` handle setup automatically.
 
 ## Project Structure
 
@@ -133,7 +133,6 @@ For DevContainers and Codespaces, the `.devcontainer/` configuration and `bootst
 - `assets/`: Static assets
 - `book/`: Documentation source
 - `docker/`: Docker configuration
-- `presentation/`: Presentation slides
 - `.rhiza/`: Rhiza-specific scripts and configurations
 
 ## Coding Standards
@@ -172,8 +171,6 @@ Agentic workflow files are Markdown files in `.github/workflows/` with
 - `daily-repo-status.md` — Daily repository health reports
 - `ci-doctor.md` — Automatic CI failure diagnosis
 - `issue-triage.md` — Automatic issue classification and labeling
-
-For more details, see `docs/GH_AW.md`.
 
 ## Key Files
 

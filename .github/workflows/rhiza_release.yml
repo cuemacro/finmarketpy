@@ -120,9 +120,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.3.0
+        uses: astral-sh/setup-uv@v8.0.0
         with:
-          version: "0.10.7"
+          version: "0.11.6"
 
       - name: Configure git auth for private packages
         uses: ./.github/actions/configure-git-auth
@@ -189,14 +189,14 @@ jobs:
         # Attest only the JSON format as it's the canonical machine-readable format.
         # The XML format is provided for compatibility but doesn't need separate attestation.
         if: hashFiles('pyproject.toml') != '' && github.event.repository.private == false
-        uses: actions/attest-sbom@v4
+        uses: actions/attest@v4.1.0
         with:
           subject-path: sbom.cdx.json
           sbom-path: sbom.cdx.json
 
       - name: Upload SBOM artifacts
         if: hashFiles('pyproject.toml') != ''
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: sbom
           path: |
@@ -211,7 +211,7 @@ jobs:
 
       - name: Upload dist artifact
         if: steps.buildable.outputs.buildable == 'true'
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: dist
           path: dist
@@ -223,23 +223,34 @@ jobs:
     needs: [tag, build]
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+
+      - name: Generate release notes with git-cliff
+        run: uvx git-cliff --latest --output RELEASE_NOTES.md
+
       - name: Download SBOM artifact
         # Downloads sbom.cdx.json and sbom.cdx.xml into sbom/ directory
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: sbom
           path: sbom
         continue-on-error: true
 
       - name: Create GitHub Release with artifacts
-        uses: softprops/action-gh-release@v2.5.0
+        uses: ncipollo/release-action@v1.21.0
         with:
-          tag_name: ${{ needs.tag.outputs.tag }}
+          tag: ${{ needs.tag.outputs.tag }}
           name: ${{ needs.tag.outputs.tag }}
-          generate_release_notes: true
+          bodyFile: RELEASE_NOTES.md
           draft: true
-          files: |
-            sbom/*
+          allowUpdates: true
+          artifacts: "sbom/*"
 
   # Decide at step-level whether to publish
   pypi:
@@ -257,7 +268,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download dist artifact
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: dist
           path: dist
@@ -329,7 +340,7 @@ jobs:
 
       - name: Login to Container Registry
         if: steps.check_publish.outputs.should_publish == 'true'
-        uses: docker/login-action@v3.7.0
+        uses: docker/login-action@v4.1.0
         with:
           registry: ${{ steps.registry.outputs.registry }}
           username: ${{ github.repository_owner }}
@@ -390,9 +401,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7.3.0
+        uses: astral-sh/setup-uv@v8.0.0
         with:
-          version: "0.10.7"
+          version: "0.11.6"
 
       - name: "Sync the virtual environment for ${{ github.repository }}"
         shell: bash
@@ -443,12 +454,21 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Publish Release
-        uses: softprops/action-gh-release@v2.5.0
-        with:
-          tag_name: ${{ needs.tag.outputs.tag }}
-          draft: false
-          append_body: true
-          body: |
-            ${{ steps.devcontainer_link.outputs.message }}
-            ${{ steps.pypi_link.outputs.message }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.tag.outputs.tag }}
+          DEVCONTAINER_MSG: ${{ steps.devcontainer_link.outputs.message }}
+          PYPI_MSG: ${{ steps.pypi_link.outputs.message }}
+        run: |
+          # Get existing auto-generated release notes (gracefully handle missing release)
+          EXISTING=$(gh release view "$TAG" --json body --jq '.body // ""' 2>/dev/null || echo "")
+
+          # Append links to release body
+          {
+            printf '%s' "$EXISTING"
+            [ -n "$DEVCONTAINER_MSG" ] && printf '\n\n%s' "$DEVCONTAINER_MSG"
+            [ -n "$PYPI_MSG" ] && printf '\n\n%s' "$PYPI_MSG"
+          } > /tmp/notes.md
+
+          gh release edit "$TAG" --draft=false --notes-file /tmp/notes.md
 

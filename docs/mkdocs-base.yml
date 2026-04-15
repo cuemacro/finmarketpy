@@ -1,0 +1,71 @@
+# docs/mkdocs-base.yml — Base MkDocs configuration for rhiza-based projects.
+#
+# USAGE (standalone)
+#   Build or serve this file directly if you have no root-level mkdocs.yml:
+#     uvx --with mkdocs-material mkdocs serve -f docs/mkdocs-base.yml
+#   The rhiza build system (make book) will pick this file up automatically
+#   as a fallback when no root-level mkdocs.yml is found.
+#
+# USAGE (with INHERIT)
+#   To extend this config from a root-level mkdocs.yml, add the following
+#   at the top of your mkdocs.yml and override only what you need:
+#
+#     INHERIT: docs/mkdocs-base.yml
+#
+#     site_name: My Project
+#     site_url: https://example.github.io/my-project/
+#     repo_url: https://github.com/example/my-project
+#     repo_name: example/my-project
+#
+#     docs_dir: docs   # always set this explicitly — base uses docs_dir: . which
+#                      # resolves relative to docs/mkdocs-base.yml, not mkdocs.yml
+#
+#     nav:             # nav is fully replaced — not merged — by the child config
+#       - Home: index.md
+#       - Guide: guide.md
+#
+#   Any key you omit in mkdocs.yml is inherited from this file.
+#   The 'nav' key is always fully replaced when defined in the child.
+
+site_name: Rhiza
+docs_dir: .
+site_dir: _mkdocs
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+  logo: assets/rhiza-logo.svg
+  favicon: assets/rhiza-logo.svg
+
+plugins:
+  - search
+
+markdown_extensions:
+  - md_in_html
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.snippets:
+      base_path: ["."]
+  - admonition
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+extra_javascript:
+  - https://unpkg.com/mermaid@11.4.0/dist/mermaid.esm.min.mjs
+
+# nav is overwritten completely in mkdocs.yml
+nav:
+  - Home: index.md
+  - Notebooks: notebooks.md
+  - Reports: reports.md
+  - Paper: paper/rhiza.pdf

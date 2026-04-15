@@ -1,4 +1,0 @@
-recursive-include src/finmarketpy/ *.*
-recursive-include finmarketpy_examples/ *.*
-
-global-exclude *.py[cod] __pycache__ *.so *.pdf

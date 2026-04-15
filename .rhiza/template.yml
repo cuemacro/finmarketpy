@@ -4,3 +4,5 @@ template-branch: "v0.9.5"
 templates:
   - core
   - github
+  - tests
+

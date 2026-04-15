@@ -18,4 +18,4 @@ jobs:
           # Ensure pip is installed and up-to-date
           # python -m ensurepip --upgrade
           # python -m pip install --no-cache-dir deptry
-          python -m deptry finmarketpy
+          python -m deptry src

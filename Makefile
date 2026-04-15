@@ -38,4 +38,4 @@ test: install  ## Run pytests
 
 .PHONY: deptry
 deptry: install   ## Run deptry
-	@uv run deptry 'finmarketpy'
+	@uv run deptry src

@@ -5,7 +5,7 @@ description = "finmarketpy is a Python based library for backtesting trading str
 # Please add authors and correct the email...
 authors = [{name='Saeed Amen', email= 'saeed@cuemacro.com'}]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.14"
 dependencies = [
     "blosc>=1.11.4",
     "chartpy",

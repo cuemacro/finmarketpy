@@ -16,12 +16,12 @@ __author__ = 'saeedamen'  # Saeed Amen
 #
 
 """
-Shows how to use finmarketpy to process FX vol surfaces which have been 
+Shows how to use finmarketpy to process FX vol surfaces which have been
 interpolated (uses FinancePy underneath).
 
-Note, you will need to have a Bloomberg terminal (with blpapi Python library) 
-to download the FX market data in order to plot these vol surface (FX spot, 
-FX forwards, FX implied_vol volatility 
+Note, you will need to have a Bloomberg terminal (with blpapi Python library)
+to download the FX market data in order to plot these vol surface (FX spot,
+FX forwards, FX implied_vol volatility
 quotes and deposits)
 """
 

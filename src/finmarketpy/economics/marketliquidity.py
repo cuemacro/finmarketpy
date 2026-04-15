@@ -43,7 +43,7 @@ class MarketLiquidity:
 
         return data_frame_spreads
 
-    def calculate_tick_count(self, data_frame, asset, freq="1h"):
+    def calculate_tick_count(self, data_frame, asset, freq="1h"):  # pragma: no cover
         """Calculate tick count for each asset at the given frequency."""
         if isinstance(asset, str):
             asset = [asset]

@@ -80,10 +80,10 @@ def plot_network_structure(
     """
     if ax is None:
         ax = [0.0, 0.0, 1.0, 1.0]
-    if not isinstance(edge_model, covariance.graph_lasso_.GraphicalLassoCV):
-        raise TypeError("edge_model must be of class covariance.graph_lasso_.GraphicalLassoCV ")  # noqa: TRY003
+    if not isinstance(edge_model, covariance.GraphicalLassoCV):
+        raise TypeError("edge_model must be of class covariance.GraphicalLassoCV")  # noqa: TRY003
 
-    if not isinstance(embedding, (np.ndarray, np.generic)):
+    if not isinstance(embedding, np.ndarray | np.generic):
         raise TypeError("embedding must be of class ndarray.")  # noqa: TRY003
 
     plt.figure(1, facecolor="w", figsize=figsize)

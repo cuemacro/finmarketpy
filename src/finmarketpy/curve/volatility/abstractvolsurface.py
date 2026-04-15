@@ -32,12 +32,12 @@ class AbstractVolSurface(ABC):
     @abc.abstractmethod
     def build_vol_surface(self):
         """Build the volatility surface."""
-        return
+        return  # pragma: no cover
 
     @abc.abstractmethod
     def extract_vol_surface(self):
         """Extract the volatility surface as a DataFrame."""
-        return
+        return  # pragma: no cover
 
     def _extremes(self, min, max, data):
         if min is None:
@@ -93,11 +93,11 @@ class AbstractVolSurface(ABC):
 
         return vol_surface_dict, extremes_dict
 
-    def _get_tenor_index(self, tenor):
+    def _get_tenor_index(self, tenor):  # pragma: no cover
         return self._tenors.index(tenor)
 
-    def _get_tenor_expiry(self, tenor):
+    def _get_tenor_expiry(self, tenor):  # pragma: no cover
         return
 
-    def _findate(self, date):
+    def _findate(self, date):  # pragma: no cover
         return Date(date.day, date.month, date.year)

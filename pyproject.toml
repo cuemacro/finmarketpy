@@ -16,6 +16,7 @@ dependencies = [
     "pandas>=1.5.3",
     "scikit-learn",
     "seasonal",
+    "xlsxwriter>=3.2.9",
 ]
 keywords = [
     "trading", "markets", "currencies", "pandas", "data", "Bloomberg", "tick", "stocks", "equities"
@@ -83,6 +84,21 @@ skips = ["B105", "B110", "B301", "B403"]
 "pre-commit" = "pre_commit"
 "marimo" = "marimo"
 "plotly" = "plotly"
+
+[tool.coverage.run]
+omit = [
+    # These files require live market data downloads (Bloomberg, etc.) and cannot be unit tested
+    "*/curve/fxoptionscurve.py",
+    "*/curve/rates/fxforwardspricer.py",
+    "*/curve/volatility/fxoptionspricer.py",
+    "*/curve/volatility/fxvolsurface.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]
 
 [tool.deptry.per_rule_ignores]
 #DEP001 = ["pyfolio"]       # very dated dependency!

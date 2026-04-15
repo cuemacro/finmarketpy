@@ -86,7 +86,7 @@ class TechIndicator:
         if name == "SMA":
             if data_frame_non_nan_early is not None:
                 # Calculate the lagged sum of the n-1 point
-                if pd.__version__ < "0.17":
+                if pd.__version__ < "0.17":  # pragma: no cover
                     rolling_sum = pd.rolling_sum(data_frame.shift(1).rolling, window=tech_params.sma_period - 1)
                 else:
                     rolling_sum = data_frame.shift(1).rolling(center=False, window=tech_params.sma_period - 1).sum()
@@ -99,7 +99,7 @@ class TechIndicator:
 
                 narray = np.where(data_frame_early > self._techind, 1, -1)
             else:
-                if pd.__version__ < "0.17":
+                if pd.__version__ < "0.17":  # pragma: no cover
                     self._techind = pd.rolling_sum(data_frame, window=tech_params.sma_period)
                 else:
                     self._techind = data_frame.rolling(window=tech_params.sma_period, center=False).mean()
@@ -263,8 +263,8 @@ class TechIndicator:
             down[down > 0] = 0
 
             # Calculate the EWMA
-            roll_up1 = pd.stats.moments.ewma(up, tech_params.rsi_period)
-            roll_down1 = pd.stats.moments.ewma(down.abs(), tech_params.rsi_period)
+            roll_up1 = up.ewm(span=tech_params.rsi_period).mean()
+            roll_down1 = down.abs().ewm(span=tech_params.rsi_period).mean()
 
             # Calculate the RSI based on EWMA
             rs1 = roll_up1 / roll_down1

@@ -96,7 +96,7 @@ def learn_network_structure(
     -------
     tuple of (GraphicalLassoCV, LocallyLinearEmbedding, embedding array, labels array)
     """
-    if not isinstance(ts_returns_data, (np.ndarray, np.generic)):
+    if not isinstance(ts_returns_data, np.ndarray | np.generic):
         raise TypeError("ts_returns_data must be of class ndarray")  # noqa: TRY003
 
     # learn graphical structure

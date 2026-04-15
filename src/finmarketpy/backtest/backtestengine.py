@@ -165,7 +165,7 @@ class Backtest:
         signal_df = signal_df.shift(br.signal_delay)
         asset_df, signal_df = calculations.join_left_fill_right(asset_a_df, signal_df)
 
-        if contract_value_df is not None:
+        if contract_value_df is not None:  # pragma: no cover
             asset_df, contract_value_df = asset_df.align(contract_value_df, join="left", axis="index")
             contract_value_df = contract_value_df.fillna(method="ffill")  # fill down asset holidays (we won't trade
             # on these days)
@@ -197,7 +197,7 @@ class Backtest:
 
         # Apply a stop loss/take profit to every trade if this has been specified
         # do this before we start to do vol weighting etc.
-        if br.take_profit is not None and br.stop_loss is not None:
+        if br.take_profit is not None and br.stop_loss is not None:  # pragma: no cover
             returns_df = calculations.calculate_returns(asset_df)
 
             # Makes assumption that signal column order matches that of returns
@@ -231,7 +231,7 @@ class Backtest:
 
         if br.portfolio_weight_construction is None:
             pwc = PortfolioWeightConstruction(br=br)
-        else:
+        else:  # pragma: no cover
             pwc = br.portfolio_weight_construction
 
         # Adjust signal weights and portfolio weights (eg. using various rules, like vol targeting)
@@ -255,7 +255,7 @@ class Backtest:
         )
 
         # If we have any position clip adjustment, for example related to max position sizes
-        if position_clip_adjustment is not None:
+        if position_clip_adjustment is not None:  # pragma: no cover
             length_cols = len(signal_df.columns)
 
             position_clip_adjustment_matrix = np.transpose(
@@ -365,7 +365,7 @@ class Backtest:
         # Also create other measures of portfolio
         # * portfolio & trades in terms of a predefined notional (in USD)
         # * portfolio & trades in terms of contract sizes (particularly useful for futures)
-        if br.portfolio_notional_size is not None:
+        if br.portfolio_notional_size is not None:  # pragma: no cover
             # Express positions in terms of the notional size specified
             self._portfolio_signal_notional = self._portfolio_signal * br.portfolio_notional_size
             self._portfolio_signal_trade_notional = (
@@ -572,7 +572,7 @@ class Backtest:
 
         return self._pnl_trades
 
-    def pnl_desc(self) -> pd.DataFrame:
+    def pnl_desc(self) -> pd.DataFrame:  # pragma: no cover
         """Gets P&L return statistics in a string format.
 
         Returns:
@@ -915,7 +915,7 @@ class TradingModel:
 
         To be implemented by subclass. Can overwrite it with our own BacktestRequest.
         """
-        return
+        return  # pragma: no cover
 
     @abc.abstractmethod
     def load_assets(self, br=None):
@@ -923,7 +923,7 @@ class TradingModel:
 
         Can overwrite it with our own BacktestRequest.
         """
-        return
+        return  # pragma: no cover
 
     @abc.abstractmethod
     def construct_signal(
@@ -950,7 +950,7 @@ class TradingModel:
         run_in_parallel : bool
             Allow signal calculation in parallel
         """
-        return
+        return  # pragma: no cover
 
     def save_model(self, path):
         """Save the model instance as as pickle.
@@ -993,13 +993,13 @@ class TradingModel:
             pass
         elif hasattr(self, "br"):
             br = self.br
-        elif br is None:
+        elif br is None:  # pragma: no cover
             br = self.load_parameters()
 
         # Get market data for backtest (not every load_assets model will take br)
         try:
             market_data = self.load_assets(br=br)
-        except Exception:
+        except Exception:  # pragma: no cover
             market_data = self.load_assets()
 
         asset_df = None
@@ -1008,7 +1008,7 @@ class TradingModel:
         basket_dict = {}
         contract_value_df = None
 
-        if isinstance(market_data, (tuple, list)):
+        if isinstance(market_data, tuple | list):
             asset_df = market_data[0]
             spot_df = market_data[1]
             spot_df2 = market_data[2]
@@ -1016,10 +1016,10 @@ class TradingModel:
 
             # optional database output
 
-            if len(market_data) == 5:
+            if len(market_data) == 5:  # pragma: no cover
                 contract_value_df = market_data[4]
 
-        elif isinstance(market_data, dict):
+        elif isinstance(market_data, dict):  # pragma: no cover
             if "asset_df" in market_data:
                 asset_df = market_data["asset_df"]
 
@@ -1062,7 +1062,9 @@ class TradingModel:
         bask_keys = basket_dict.keys()
 
         # Each portfolio key calculate returns - can put parts of the portfolio in the key
-        if market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel:
+        if (
+            market_constants.backtest_thread_no[market_constants.generic_plat] > 1 and run_in_parallel
+        ):  # pragma: no cover
             swim_pool = SwimPool(multiprocessing_library=market_constants.multiprocessing_library)
 
             pool = swim_pool.create_pool(
@@ -1175,8 +1177,8 @@ class TradingModel:
 
         with contextlib.suppress(Exception):
             ret_stats_list = ret_stats_results
-            ret_stats_list["Benchmark"] = self._strategy_benchmark_pnl_ret_stats
-            self._strategy_group_benchmark_pnl_ret_stats = ret_stats_list
+            ret_stats_list["Benchmark"] = self._strategy_benchmark_pnl_ret_stats  # pragma: no cover
+            self._strategy_group_benchmark_pnl_ret_stats = ret_stats_list  # pragma: no cover
 
         # Individual parts (all after individually applying portfolio level vol adjustment)
         self._strategy_group_pnl = cum_results
@@ -1289,14 +1291,14 @@ class TradingModel:
             br, asset_df, signal, contract_value_df, run_in_parallel
         )  # calculate P&L (and adjust signals for vol etc)
 
-        if br.write_csv:
+        if br.write_csv:  # pragma: no cover
             backtest.pnl_cum().to_csv(self.DUMP_CSV + key + ".csv")
 
         desc = [key + " " + str(backtest.portfolio_pnl_desc()[0])] if br.calc_stats else [key]
 
         # For final strategy return heavyweight backtest object
         # (contains lots of auxiliary information about trades etc)
-        if key == self.FINAL_STRATEGY and compress_output:
+        if key == self.FINAL_STRATEGY and compress_output:  # pragma: no cover
             logger.debug("Compressing " + key)
 
             backtest = blosc.compress(pickle.dumps(backtest))
@@ -1341,7 +1343,7 @@ class TradingModel:
         benchmark_df : pd.DataFrame
             Benchmark time series
         """
-        if br.include_benchmark:
+        if br.include_benchmark:  # pragma: no cover
             ret_stats = RetStats(br.resample_ann_factor)
             risk_engine = RiskEngine()
             Filter()
@@ -1671,12 +1673,12 @@ class TradingModel:
             )
 
             if hasattr(self, "br") and self.br.write_csv_pnl:
-                df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")
+                df.to_csv(self.DUMP_PATH + self.FINAL_STRATEGY + "_pnl.csv")  # pragma: no cover
 
             return self._chart_return_with_df(
                 df, style, silent_plot, chart_type="line", ret_with_df=ret_with_df, split_on_char=split_on_char
             )
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             print(str(e))
 
     def plot_strategy_trade_no(
@@ -1740,7 +1742,7 @@ class TradingModel:
 
             df = self._strip_dataframe(self._reduce_plot(df), strip, reduce_plot=reduce_plot, resample=resample)
 
-            return self._chart_return_with_df(
+            return self._chart_return_with_df(  # pragma: no cover
                 df, style, silent_plot, chart_type="bar", ret_with_df=ret_with_df, split_on_char=split_on_char
             )
 

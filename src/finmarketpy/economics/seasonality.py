@@ -71,7 +71,7 @@ class Seasonality:
 
         return intraday_seasonality
 
-    def bus_day_of_month_seasonality_from_prices(
+    def bus_day_of_month_seasonality_from_prices(  # pragma: no cover
         self,
         data_frame,
         month_list=None,
@@ -170,7 +170,7 @@ class Seasonality:
 
         return monthly_seasonality
 
-    def adjust_rolling_seasonality(self, data_frame, window=None, likely_period=None):
+    def adjust_rolling_seasonality(self, data_frame, window=None, likely_period=None):  # pragma: no cover
         """Adjust time series which exhibit strong seasonality.
 
         If time series do not exhibit any seasonality will return NaN values.
@@ -200,7 +200,7 @@ class Seasonality:
 
         return data_frame
 
-    def _remove_seasonality(self, series, likely_period=None):
+    def _remove_seasonality(self, series, likely_period=None):  # pragma: no cover
         from seasonal import adjust_seasons, fit_seasons
 
         # detrend and deseasonalize

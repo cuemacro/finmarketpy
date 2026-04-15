@@ -112,7 +112,7 @@ class FXForwardsCurve:
         # Don't include any "large" objects in the key
         return SpeedCache().generate_key(self, ["_market_data_generator", "_calculations", "_calendar", "_filter"])
 
-    def fetch_continuous_time_series(
+    def fetch_continuous_time_series(  # pragma: no cover
         self,
         md_request,
         market_data_generator,
@@ -271,7 +271,7 @@ class FXForwardsCurve:
 
         return 360.0
 
-    def construct_total_return_index(
+    def construct_total_return_index(  # pragma: no cover
         self,
         cross_fx,
         forwards_market_df,

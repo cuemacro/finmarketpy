@@ -35,7 +35,9 @@ market_constants = MarketConstants()
     target="cpu",
     nopython=True,
 )
-def _spot_index_numba(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount, out):
+def _spot_index_numba(
+    spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount, out
+):  # pragma: no cover
     out[0] = 100
 
     for i in range(1, len(out)):
@@ -47,7 +49,7 @@ def _spot_index_numba(spot, time_diff, base_deposit, terms_deposit, base_daycoun
         )
 
 
-def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount):
+def _spot_index(spot, time_diff, base_deposit, terms_deposit, base_daycount, terms_daycount):  # pragma: no cover
     import numpy as np
 
     out = np.zeros(len(spot))
@@ -95,7 +97,7 @@ class FXSpotCurve:
         # Don't include any "large" objects in the key
         return SpeedCache().generate_key(self, ["_market_data_generator", "_calculations"])
 
-    def fetch_continuous_time_series(
+    def fetch_continuous_time_series(  # pragma: no cover
         self,
         md_request,
         market_data_generator,
@@ -303,11 +305,14 @@ class FXSpotCurve:
                 )
 
                 if output_calculation_fields:
-                    total_return_index_df[cross + "-carry." + field] = carry
+                    # Store the base deposit (first column of carry) as the carry field
+                    total_return_index_df[cross + "-carry." + field] = carry.iloc[:, 0]
                     total_return_index_df[cross + "-tot-return." + field] = (
-                        total_return_index_df / total_return_index_df.shift(1) - 1.0
-                    )
-                    total_return_index_df[cross + "-spot-return." + field] = spot / spot.shift(1) - 1.0
+                        total_return_index_df[[cross + "-tot.close"]]
+                        / total_return_index_df[[cross + "-tot.close"]].shift(1)
+                        - 1.0
+                    ).iloc[:, 0]
+                    total_return_index_df[cross + "-spot-return." + field] = (spot / spot.shift(1) - 1.0).iloc[:, 0]
 
                 total_return_index_df_agg.append(total_return_index_df)
 

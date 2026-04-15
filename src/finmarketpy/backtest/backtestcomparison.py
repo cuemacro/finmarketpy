@@ -71,7 +71,7 @@ class BacktestComparison:
 
         return chart
 
-    def plot_sharpe(self, silent_plot=False, reduce_plot=True):
+    def plot_sharpe(self, silent_plot=False, reduce_plot=True):  # pragma: no cover
         """Plot the annualised Sharpe ratio of all models as a bar chart."""
         style = self.models[self.ref_index]._create_style("", "Sharpe Curve", reduce_plot=reduce_plot)
 

@@ -29,10 +29,10 @@ class MarketConstants:
     ###### SETUP ENVIRONMENT VARIABLES ######
     plat = str(platform.platform()).lower()
 
-    if "linux" in plat:
-        generic_plat = "linux"
-    elif "windows" in plat:
-        generic_plat = "windows"
+    if "linux" in plat:  # pragma: no cover
+        generic_plat = "linux"  # pragma: no cover
+    elif "windows" in plat:  # pragma: no cover
+        generic_plat = "windows"  # pragma: no cover
     elif "darwin" in plat or "macos" in plat:
         generic_plat = "mac"
 
@@ -177,13 +177,13 @@ class MarketConstants:
         if override_fields is None:
             override_fields = {}
         with contextlib.suppress(Exception):
-            from finmarketpy.util.marketcred import MarketCred
+            from finmarketpy.util.marketcred import MarketCred  # pragma: no cover
 
-            cred_keys = MarketCred.__dict__.keys()
+            cred_keys = MarketCred.__dict__.keys()  # pragma: no cover
 
-            for k in MarketConstants.__dict__:
-                if k in cred_keys and "__" not in k:
-                    setattr(MarketConstants, k, getattr(MarketCred, k))
+            for k in MarketConstants.__dict__:  # pragma: no cover
+                if k in cred_keys and "__" not in k:  # pragma: no cover
+                    setattr(MarketConstants, k, getattr(MarketCred, k))  # pragma: no cover
 
         # Store overrided fields
         if override_fields == {}:

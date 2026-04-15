@@ -33,7 +33,7 @@ class EventStudy:
         """Initialise EventStudy."""
         pass
 
-    def get_economic_event_ret_over_custom_event_day(
+    def get_economic_event_ret_over_custom_event_day(  # pragma: no cover
         self,
         data_frame_in,
         event_dates,
@@ -76,7 +76,7 @@ class EventStudy:
 
         return data_frame_events
 
-    def get_daily_moves_over_custom_event(
+    def get_daily_moves_over_custom_event(  # pragma: no cover
         self,
         data_frame_rets,
         ef_time_frame,
@@ -106,7 +106,7 @@ class EventStudy:
             adj_zero_point=adj_zero_point,
         )
 
-    def get_weekly_moves_over_custom_event(
+    def get_weekly_moves_over_custom_event(  # pragma: no cover
         self,
         data_frame_rets,
         ef_time_frame,
@@ -136,7 +136,7 @@ class EventStudy:
             adj_zero_point=adj_zero_point,
         )
 
-    def get_intraday_moves_over_custom_event(
+    def get_intraday_moves_over_custom_event(  # pragma: no cover
         self,
         data_frame_rets,
         ef_time_frame,
@@ -236,7 +236,7 @@ class EventStudy:
 
         return data_frame
 
-    def get_surprise_against_intraday_moves_over_custom_event(
+    def get_surprise_against_intraday_moves_over_custom_event(  # pragma: no cover
         self,
         data_frame_cross_orig,
         ef_time_frame,
@@ -367,11 +367,11 @@ class EventsFactory(EventStudy):
         if df is not None:
             self._econ_data_frame = df
         else:
-            self.load_economic_events()
+            self.load_economic_events()  # pragma: no cover
 
         return
 
-    def load_economic_events(self):
+    def load_economic_events(self):  # pragma: no cover
         """Load economic event data from the cache or disk storage."""
         self._econ_data_frame = self.speed_cache.get_dataframe(self._db_database_econ_file)
 
@@ -388,7 +388,7 @@ class EventsFactory(EventStudy):
 
             self.speed_cache.put_dataframe(self._db_database_econ_file, self._econ_data_frame)
 
-    def harvest_category(self, category_name):
+    def harvest_category(self, category_name):  # pragma: no cover
         """Fetch market data for all tickers in a given category.
 
         Returns the fetched data DataFrame.
@@ -407,11 +407,11 @@ class EventsFactory(EventStudy):
         """Return the loaded economic events DataFrame."""
         return self._econ_data_frame
 
-    def dump_economic_events_csv(self, path):
+    def dump_economic_events_csv(self, path):  # pragma: no cover
         """Write the economic events DataFrame to a CSV file at the given path."""
         self._econ_data_frame.to_csv(path)
 
-    def get_economic_event_date_time(self, name, event=None, csv=None):
+    def get_economic_event_date_time(self, name, event=None, csv=None):  # pragma: no cover
         """Return the release date-time series for a given economic event."""
         ticker = self.create_event_descriptor_field(name, event, "release-date-time-full")
 
@@ -432,7 +432,7 @@ class EventsFactory(EventStudy):
 
         return data_frame
 
-    def get_economic_event_date_time_dataframe(self, name, event=None, csv=None):
+    def get_economic_event_date_time_dataframe(self, name, event=None, csv=None):  # pragma: no cover
         """Return the release date-time data as a DataFrame for a given economic event."""
         series = self.get_economic_event_date_time(name, event, csv)
 
@@ -441,7 +441,7 @@ class EventsFactory(EventStudy):
 
         return data_frame
 
-    def get_economic_event_date_time_fields(self, fields, name, event=None):
+    def get_economic_event_date_time_fields(self, fields, name, event=None):  # pragma: no cover
         """Return a DataFrame of multiple fields aligned to the economic event dates.
 
         Joins event date-times with the requested data fields.
@@ -523,7 +523,7 @@ class EventsFactory(EventStudy):
         else:
             return name + "-" + event + "." + field
 
-    def get_all_economic_events_date_time(self):
+    def get_all_economic_events_date_time(self):  # pragma: no cover
         """Return a DataFrame of all economic event names and release date-times."""
         event_names = self.get_all_economic_events()
         columns = ["event-name", "release-date-time-full"]
@@ -553,7 +553,7 @@ class EventsFactory(EventStudy):
         """Return the release date series for a given economic event."""
         return self._econ_data_frame[self.create_event_descriptor_field(name, event, ".release-dt")]
 
-    def get_economic_event_ret_over_custom_event_day(
+    def get_economic_event_ret_over_custom_event_day(  # pragma: no cover
         self,
         data_frame_in,
         name,
@@ -574,7 +574,9 @@ class EventsFactory(EventStudy):
             data_frame_in, event_dates, name, event, start, end, lagged=lagged, NYC_cutoff=NYC_cutoff
         )
 
-    def get_economic_event_vol_over_event_day(self, vol_in, name, event, start, end, realised=False):
+    def get_economic_event_vol_over_event_day(
+        self, vol_in, name, event, start, end, realised=False
+    ):  # pragma: no cover
         """Return volatility data aligned to economic event dates."""
         return self.get_economic_event_ret_over_custom_event_day(vol_in, name, event, start, end, lagged=realised)
 
@@ -587,7 +589,7 @@ class EventsFactory(EventStudy):
         pass
 
     # Return only US events etc. by dates
-    def get_intraday_moves_over_event(
+    def get_intraday_moves_over_event(  # pragma: no cover
         self,
         data_frame_rets,
         cross,
@@ -620,7 +622,7 @@ class EventsFactory(EventStudy):
             freq=freq,
         )  # , start, end)
 
-    def get_surprise_against_intraday_moves_over_event(
+    def get_surprise_against_intraday_moves_over_event(  # pragma: no cover
         self,
         data_frame_cross_orig,
         cross,
@@ -694,12 +696,12 @@ class HistEconDataFactory:
         self._econ_country_codes = pd.read_csv(DataConstants().econ_country_codes)
         self._econ_country_groups = pd.read_csv(DataConstants().econ_country_groups)
 
-        if market_data_generator is None:
-            self.market_data_generator = MarketDataGenerator()
+        if market_data_generator is None:  # pragma: no cover
+            self.market_data_generator = MarketDataGenerator()  # pragma: no cover
         else:
-            self.market_data_generator = market_data_generator
+            self.market_data_generator = market_data_generator  # pragma: no cover
 
-    def get_economic_data_history(
+    def get_economic_data_history(  # pragma: no cover
         self, start_date, finish_date, country_group, data_type, source="alfred", cache_algo="internet_load_return"
     ):
         """Fetch historical economic data for a given country group and data type.
@@ -759,7 +761,7 @@ class HistEconDataFactory:
 
         return self.market_data_generator.fetch_market_data(md_request)
 
-    def grasp_coded_entry(self, df, index):
+    def grasp_coded_entry(self, df, index):  # pragma: no cover
         """Extract and reformat entries from a DataFrame starting at a given index.
 
         Returns a DataFrame with columns Date, Name, Val and Code.

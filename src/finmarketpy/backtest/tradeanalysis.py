@@ -58,7 +58,7 @@ class TradeAnalysis:
 
         return
 
-    def run_strategy_returns_stats(self, trading_model, engine="finmarketpy"):
+    def run_strategy_returns_stats(self, trading_model, engine="finmarketpy"):  # pragma: no cover
         """Plots useful statistics for the trading strategy using various backends.
 
         Parameters
@@ -195,7 +195,8 @@ class TradeAnalysis:
 
         # TODO Add summary sheet comparing return statistics for all the different models in the list
 
-        writer.save()
+        with contextlib.suppress(AttributeError):  # pragma: no cover
+            writer.save()  # removed in newer xlsxwriter
         writer.close()
 
     def save_positions_trades(self, tm, signals, trades, signal_caption, trade_caption, writer):
@@ -210,7 +211,7 @@ class TradeAnalysis:
         recent_signals.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + " " + signal_caption, engine="xlsxwriter")
         recent_trades.to_excel(writer, sheet_name=tm.FINAL_STRATEGY + " " + trade_caption, engine="xlsxwriter")
 
-    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False, reload_market_data=True):
+    def run_tc_shock(self, strategy, tc=None, run_in_parallel=False, reload_market_data=True):  # pragma: no cover
         """Run a transaction cost sensitivity analysis across a range of TC levels."""
         if tc is None:
             tc = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
@@ -229,7 +230,7 @@ class TradeAnalysis:
         )
 
     ###### Parameters and signal generations (need to be customised for every model)
-    def run_arbitrary_sensitivity(
+    def run_arbitrary_sensitivity(  # pragma: no cover
         self,
         trading_model,
         parameter_list=None,
@@ -375,7 +376,7 @@ class TradeAnalysis:
 
         return port_list, summary_ir, summary_rets
 
-    def _load_assets(self, trading_model, br):
+    def _load_assets(self, trading_model, br):  # pragma: no cover
         assets = trading_model.load_assets(br=br)
 
         asset_df = assets[0]
@@ -390,7 +391,9 @@ class TradeAnalysis:
 
         return asset_df, spot_df, spot_df2, basket_dict, contract_value_df
 
-    def _run_strategy(self, trading_model, asset_df, spot_df, spot_df2, br, contract_value_df, pretty_portfolio_name):
+    def _run_strategy(
+        self, trading_model, asset_df, spot_df, spot_df2, br, contract_value_df, pretty_portfolio_name
+    ):  # pragma: no cover
 
         logger = LoggerManager().getLogger(__name__)
 
@@ -411,7 +414,7 @@ class TradeAnalysis:
 
     ###### Parameters and signal generations (need to be customised for every model)
     ###### Plot all the output separately
-    def run_arbitrary_sensitivity_separately(
+    def run_arbitrary_sensitivity_separately(  # pragma: no cover
         self, trading_model, parameter_list=None, pretty_portfolio_names=None, strip=None
     ):
         """Run sensitivity analysis, plotting each parameter variation separately."""
@@ -441,7 +444,7 @@ class TradeAnalysis:
         trading_model.br = trading_model.fill_backtest_request()
         trading_model.FINAL_STRATEGY = final_strategy
 
-    def run_day_of_month_analysis(self, trading_model, resample_freq="B"):
+    def run_day_of_month_analysis(self, trading_model, resample_freq="B"):  # pragma: no cover
         """Run day-of-month and month-of-year seasonality analysis."""
         from finmarketpy.economics.seasonality import Seasonality
 

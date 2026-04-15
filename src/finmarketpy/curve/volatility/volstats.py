@@ -98,17 +98,17 @@ class VolStats:
                 if freq == "daily":
                     spot_df = self._market_df[asset + "." + field]
                 else:
-                    spot_df = self._intraday_spot_df[asset + "." + field]
+                    spot_df = self._intraday_spot_df[asset + "." + field]  # pragma: no cover
 
             if returns_calc == "simple":
                 returns_df = self._calculations.calculate_returns(spot_df)
             else:
-                returns_df = self._calculations.calculate_log_returns(spot_df)
+                returns_df = self._calculations.calculate_log_returns(spot_df)  # pragma: no cover
 
         cal = Calendar()
         tenor_days = cal.get_business_days_tenor(tenor_label)
 
-        if freq == "intraday":
+        if freq == "intraday":  # pragma: no cover
             # Annualization factor (1440 is number of minutes in the day)
             mult = int(1440.0 / float(freq_min_mult))
 

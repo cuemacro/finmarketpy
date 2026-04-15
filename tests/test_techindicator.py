@@ -556,5 +556,273 @@ def test_attr():
     assert_frame_equal(signal_df, expected_signal_df)
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])
+def test_ema():
+    """Test EMA indicator."""
+    indicator_name = "EMA"
+    tp = TechParams(fillna=True, sma_period=3)
+    tp.ema_period = 3
+
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates, columns=cols, data=list(range(1, 9)))
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+
+    assert techind is not None
+    assert signal is not None
+    assert techind.shape[0] == len(dates)
+    assert signal.shape[0] == len(dates)
+    # Columns should be renamed
+    assert techind.columns[0] == "Asset1.close EMA"
+    assert signal.columns[0] == "Asset1.close EMA Signal"
+
+
+def test_sma_with_early_data():
+    """Test SMA indicator with data_frame_non_nan_early (covers lines 84, 87-98)."""
+    indicator_name = "SMA"
+    tp = TechParams(fillna=True, sma_period=3)
+
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates, columns=cols, data=list(range(1, 9)), dtype=float)
+    early_df = pd.DataFrame(index=dates, columns=cols, data=list(range(2, 10)), dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp, data_frame_non_nan_early=early_df)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+
+
+def test_roc_with_early_data():
+    """Test ROC indicator with early data (covers line 132)."""
+    indicator_name = "ROC"
+    tp = TechParams(fillna=True)
+    tp.roc_period = 1
+
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates, columns=cols, data=list(range(1, 9)), dtype=float)
+    early_df = pd.DataFrame(index=dates, columns=cols, data=list(range(2, 10)), dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp, data_frame_non_nan_early=early_df)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+
+
+def test_bb():
+    """Test Bollinger Bands indicator."""
+    indicator_name = "BB"
+    tp = TechParams(fillna=True, sma_period=3)
+    tp.bb_period = 3
+    tp.bb_mult = 2.0
+
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates, columns=cols, data=list(range(1, 9)), dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+    # BB produces lower, mid, upper columns
+    assert techind.shape[1] == 3
+
+
+def test_long_only():
+    """Test long-only indicator."""
+    indicator_name = "long-only"
+    tp = TechParams(fillna=True)
+
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates, columns=cols, data=list(range(1, 9)), dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+    assert (signal.dropna() == 1).all().all()
+
+
+def test_short_only():
+    """Test short-only indicator."""
+    indicator_name = "short-only"
+    tp = TechParams(fillna=True)
+
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates, columns=cols, data=list(range(1, 9)), dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+    assert (signal.dropna() == 1).all().all()
+
+
+def test_atr():
+    """Test ATR indicator with OHLC data."""
+    indicator_name = "ATR"
+    tp = TechParams(fillna=True, atr_period=3)
+
+    # ATR needs Asset1.close, Asset1.low, Asset1.high columns
+    dates_atr = pd.date_range(start="1/1/2018", end="1/20/2018")
+    prices = list(range(1, len(dates_atr) + 1))
+    data = {
+        "Asset1.close": prices,
+        "Asset1.low": [p - 0.5 for p in prices],
+        "Asset1.high": [p + 0.5 for p in prices],
+    }
+    data_df = pd.DataFrame(index=dates_atr, data=data, dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    assert techind is not None
+    assert "Asset1.close ATR" in techind.columns
+
+
+def test_atr_without_fillna():
+    """Test ATR indicator without fillna (covers the dropna path)."""
+    indicator_name = "ATR"
+    tp = TechParams(fillna=False, atr_period=3)
+
+    dates_atr = pd.date_range(start="1/1/2018", end="1/20/2018")
+    prices = list(range(1, len(dates_atr) + 1))
+    data = {
+        "Asset1.close": prices,
+        "Asset1.low": [p - 0.5 for p in prices],
+        "Asset1.high": [p + 0.5 for p in prices],
+    }
+    data_df = pd.DataFrame(index=dates_atr, data=data, dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    assert techind is not None
+
+
+def test_vwap():
+    """Test VWAP indicator with OHLCV data."""
+    indicator_name = "VWAP"
+    tp = TechParams(fillna=True)
+
+    dates_vwap = pd.date_range(start="1/1/2018", end="1/20/2018")
+    n = len(dates_vwap)
+    data = {
+        "Asset1.close": list(range(10, 10 + n)),
+        "Asset1.low": [p - 1 for p in range(10, 10 + n)],
+        "Asset1.high": [p + 1 for p in range(10, 10 + n)],
+        "Asset1.volume": [1000.0] * n,
+    }
+    data_df = pd.DataFrame(index=dates_vwap, data=data, dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    assert techind is not None
+    assert "Asset1.close VWAP" in techind.columns
+
+
+def test_vwap_without_fillna():
+    """Test VWAP indicator without fillna."""
+    indicator_name = "VWAP"
+    tp = TechParams(fillna=False)
+
+    dates_vwap = pd.date_range(start="1/1/2018", end="1/20/2018")
+    n = len(dates_vwap)
+    data = {
+        "Asset1.close": list(range(10, 10 + n)),
+        "Asset1.low": [p - 1 for p in range(10, 10 + n)],
+        "Asset1.high": [p + 1 for p in range(10, 10 + n)],
+        "Asset1.volume": [1000.0] * n,
+    }
+    data_df = pd.DataFrame(index=dates_vwap, data=data, dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    assert techind is not None
+
+
+def test_gmma():
+    """Test GMMA indicator."""
+    indicator_name = "GMMA"
+    tp = TechParams(fillna=True, sma_period=3)
+    tp.sma2_period = 5
+
+    # Need enough data for the longest period (60)
+    dates_gmma = pd.date_range(start="1/1/2018", periods=100)
+    cols = get_cols_name(1)
+    data_df = pd.DataFrame(index=dates_gmma, columns=cols, data=list(range(1, 101)), dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+    # GMMA has 12 MA columns
+    assert techind.shape[1] == 12
+
+
+def test_rsi():
+    """Test RSI indicator after fixing deprecated API."""
+    indicator_name = "RSI"
+    tp = TechParams(fillna=True)
+    tp.rsi_period = 3
+    tp.rsi_lower = 30
+    tp.rsi_upper = 70
+
+    # Need enough data for RSI period
+    dates_rsi = pd.date_range(start="1/1/2018", periods=30)
+    cols = get_cols_name(1)
+    data = list(range(1, 31))
+    data_df = pd.DataFrame(index=dates_rsi, columns=cols, data=data, dtype=float)
+
+    ti = TechIndicator()
+    ti.create_tech_ind(data_df, indicator_name, tp)
+
+    techind = ti.get_techind()
+    signal = ti.get_signal()
+    assert techind is not None
+    assert signal is not None
+    assert techind.columns[0] == "Asset1.close RSI"
+
+
+def test_techparams_getters():
+    """Test TechParams property getters for green_n, green_count, red_n, red_count."""
+    tp = TechParams(fillna=True, atr_period=14, sma_period=20, green_n=4, green_count=9, red_n=2, red_count=13)
+    assert tp.green_n == 4
+    assert tp.green_count == 9
+    assert tp.red_n == 2
+    assert tp.red_count == 13
+
+    # Test setters too
+    tp.green_n = 5
+    tp.green_count = 10
+    tp.red_n = 3
+    tp.red_count = 14
+
+    assert tp.green_n == 5
+    assert tp.green_count == 10
+    assert tp.red_n == 3
+    assert tp.red_count == 14

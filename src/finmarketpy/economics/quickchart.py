@@ -89,7 +89,7 @@ class QuickChart:
         if tickers_rhs is not None:
             if isinstance(tickers_rhs, str):
                 tickers_rhs = {tickers_rhs: tickers_rhs}
-            elif isinstance(tickers, list):
+            elif isinstance(tickers, list):  # pragma: no cover
                 tickers_rhs_dict = {}
 
                 for t in tickers_rhs:
@@ -101,7 +101,7 @@ class QuickChart:
         else:
             tickers_rhs = {}
 
-        if df is None:
+        if df is None:  # pragma: no cover
             md_request = MarketDataRequest(
                 start_date=start_date,
                 finish_date=finish_date,

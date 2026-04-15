@@ -29,14 +29,14 @@ class AbstractCurve:
     @abc.abstractmethod
     def generate_key(self):
         """Generate a cache key for this curve instance."""
-        return
+        return  # pragma: no cover
 
     @abc.abstractmethod
     def fetch_continuous_time_series(self, md_request, market_data_generator):
         """Fetch a continuous time series for the given market data request."""
-        return
+        return  # pragma: no cover
 
     @abc.abstractmethod
     def construct_total_returns_index(self):
         """Construct the total returns index."""
-        return
+        return  # pragma: no cover

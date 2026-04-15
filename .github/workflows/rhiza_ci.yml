@@ -1,0 +1,317 @@
+# This file is part of the jebel-quant/rhiza repository
+# (https://github.com/jebel-quant/rhiza).
+#
+# Workflow: Continuous Integration
+#
+# Purpose: Run tests on multiple Python versions, check dependencies, run
+#          pre-commit hooks, verify documentation coverage, validate the
+#          project, run security scans, and check license compliance.
+#
+# Trigger: On push and pull_request.
+
+name: (RHIZA) CI
+
+permissions:
+  contents: read
+  actions: read
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.versions.outputs.list }}
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - id: versions
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: |
+          # Generate Python versions JSON from the script
+          JSON=$(make -f .rhiza/rhiza.mk -s version-matrix)
+          echo "list=$JSON" >> "$GITHUB_OUTPUT"
+
+      - name: Debug matrix
+        run: |
+          echo "Python versions: ${{ steps.versions.outputs.list }}"
+
+  test:
+    needs: generate-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+          python-version: ${{ matrix.python-version }}
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Run tests
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: |
+          make test
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: _tests/coverage.xml
+          if-no-files-found: ignore
+
+
+  typecheck:
+    name: Type checking
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Run ty type checker (make typecheck)
+        # Runs `uv run ty check src/` as defined in .rhiza/make.d/test.mk.
+        # ty is configured via [tool.ty.environment] in pyproject.toml.
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: make typecheck
+
+  deptry:
+    name: Check dependencies with deptry
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Run deptry
+        run: make deptry
+
+  pre-commit:
+    name: Pre-commit hooks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
+
+      - name: Run pre-commit
+        run: |
+          make fmt
+
+  docs-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Check docs coverage
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: |
+          make docs-coverage
+
+  validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Validate
+        shell: bash
+        run: |
+          make validate
+
+  security:
+    name: Security scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Run security scans
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: make security
+
+  license:
+    name: License compliance scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Configure git auth for private packages
+        uses: ./.github/actions/configure-git-auth
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Run license check
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: make license
+
+      - name: Generate LICENSES.md
+        env:
+          UV_EXTRA_INDEX_URL: ${{ secrets.UV_EXTRA_INDEX_URL }}
+        run: |
+          uv run --with pip-licenses pip-licenses --format markdown --output-file LICENSES.md
+
+      - name: Upload LICENSES.md
+        uses: actions/upload-artifact@v7
+        with:
+          name: LICENSES.md
+          path: LICENSES.md
+          if-no-files-found: ignore
+
+  coverage-badge:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          version: "0.11.6"
+
+      - name: Download coverage report
+        id: download-coverage
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-report
+          path: _tests/
+
+      - name: Generate coverage badge
+        if: steps.download-coverage.outcome == 'success'
+        run: |
+          uvx "genbadge[coverage]" coverage -i _tests/coverage.xml -o /tmp/coverage-badge.svg
+
+      - name: Push badge to gh-pages
+        if: steps.download-coverage.outcome == 'success'
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+          if git fetch origin gh-pages 2>/dev/null; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf .
+          fi
+
+          cp /tmp/coverage-badge.svg coverage-badge.svg
+          git add coverage-badge.svg
+
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update coverage badge [skip ci]"
+            git push origin gh-pages
+          else
+            echo "Coverage badge unchanged, skipping push"
+          fi

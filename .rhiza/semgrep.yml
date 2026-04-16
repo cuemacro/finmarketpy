@@ -1,0 +1,84 @@
+rules:
+  # ----------------------------
+  # Security
+  # ----------------------------
+
+  - id: numpy-load-allow-pickle
+    patterns:
+      - pattern: np.load($PATH, ...)
+      - pattern-not: np.load($PATH, ..., allow_pickle=False, ...)
+    message: |
+      np.load() may deserialize arbitrary objects when allow_pickle=True
+      (default in older NumPy versions). This can execute malicious code.
+      Pass allow_pickle=False unless explicitly required.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+
+  # ----------------------------
+  # Randomness / Reproducibility
+  # ----------------------------
+
+  - id: numpy-random-seed
+    pattern: np.random.seed(...)
+    message: |
+      np.random.seed() sets global state and is not thread-safe.
+      Prefer a local Generator via np.random.default_rng().
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: best-practice
+
+  - id: numpy-global-random-state
+    patterns:
+      - pattern-either:
+          - pattern: np.random.rand(...)
+          - pattern: np.random.randn(...)
+          - pattern: np.random.randint(...)
+          - pattern: np.random.random(...)
+          - pattern: np.random.normal(...)
+          - pattern: np.random.uniform(...)
+          - pattern: np.random.choice(...)
+          - pattern: np.random.shuffle(...)
+    message: |
+      Global np.random.* usage is not thread-safe and can harm reproducibility.
+      Prefer a local Generator:
+        rng = np.random.default_rng(seed)
+        rng.method(...)
+    languages: [python]
+    severity: INFO
+    metadata:
+      category: best-practice
+
+  # ----------------------------
+  # Numerical Stability
+  # ----------------------------
+
+  - id: numpy-avoid-inv
+    pattern: np.linalg.inv($X)
+    message: |
+      Avoid explicit matrix inversion. Use np.linalg.solve(A, b)
+      for better numerical stability and performance.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: numerical-stability
+
+  # ----------------------------
+  # Deprecated / Dangerous APIs
+  # ----------------------------
+
+  - id: numpy-matrix-deprecated
+    patterns:
+      - pattern-either:
+          - pattern: np.matrix(...)
+          - pattern: np.mat(...)
+    message: |
+      np.matrix is deprecated and scheduled for removal. Use np.array
+      or np.ndarray instead. It has different operator semantics (*).
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: maintainability
